@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io/project" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/project" 
+	elementFormDefault="qualified"
+	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library" >
+	
+	<import schemaLocation="library.xsd" 
+		namespace="http://www.adligo.org/fabricate/xml/io/library">
+	</import>
+    <element name="fabricat_project" type="tns:fabricate_project_type"></element>
+    
+    <complexType name="fabricate_project_type">
+    	<sequence>
+    		<element name="stages" type="tns:stages_type"></element>
+    		<element name="dependencies" type="lns:dependencies_type"></element>
+    	</sequence>
+    	<!--  note there is no name attribute, as it is always the same as the 
+    	project directory name -->
+    </complexType>
+
+    <complexType name="stages_type">
+    	<sequence>
+    		<element name="stage" type="string">
+	    		<annotation>
+					<documentation>
+						Each stage is called by main fabricate run (fabricate.xml), 
+						if the corresponding stage is present here in the project.xml.
+					</documentation>
+				</annotation>
+			</element>
+    	</sequence>
+    </complexType>
+
+
+
+
+
+
+
+
+
+</schema>

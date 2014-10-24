@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io/library" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/library" 
+	elementFormDefault="qualified">
+
+    <complexType name="library_type">
+    	<sequence>
+    		<element name="dependencies" type="tns:dependencies_type"></element>
+    	</sequence>
+    </complexType>
+
+    <element name="library" type="tns:library_type"></element>
+    
+    <simpleType name="project_dependency_type">
+    	<annotation>
+				<documentation>
+					This is a name of a project directory, the actual 
+					artifact ie (jar, war exc) is determined based on the 
+					context of the task running on the project for a particular
+					stage.  In other words there could be three jar files
+					which are produced for a project (a gwt jar, jse jar and jme jar)
+					so the artifact for a jme_jar task would be the jme jar.
+				</documentation>
+		</annotation>
+    	<restriction base="string"></restriction>
+    </simpleType>
+
+    <complexType name="dependency_type">
+    	<attribute name="group" type="string">
+    		<annotation>
+				<documentation>
+					This is the maven group.
+				</documentation>
+			</annotation>
+		</attribute>
+    	<attribute name="artifact" type="string">
+    		<annotation>
+				<documentation>
+					This is the maven artifact.
+				</documentation>
+			</annotation>
+    	</attribute>
+    	<attribute name="version" type="string">
+    		<annotation>
+				<documentation>
+					This is the maven version.
+				</documentation>
+			</annotation>
+    	</attribute>
+    </complexType>
+
+    <complexType name="dependencies_type">
+    	<sequence>
+    		<element name="library" type="tns:library_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="dependency" type="tns:dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="project" type="tns:project_dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+</schema>

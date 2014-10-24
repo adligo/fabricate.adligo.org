@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io" 
+	elementFormDefault="qualified"
+	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library" >
+	
+    <include schemaLocation=""></include>
+    <import schemaLocation="library.xsd" 
+		namespace="http://www.adligo.org/fabricate/xml/io/library">
+	</import>
+
+    <complexType name="fabricate_type">
+    	<sequence>
+    		<element name="dependencies"
+    			type="tns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
+    		</element>
+            <choice>
+    			<element name="groups" type="tns:project_groups_type"
+    				minOccurs="0" maxOccurs="1">
+    			</element>
+    			<element name="project_group" type="tns:stages_and_projects_type"
+    				minOccurs="0" maxOccurs="1">
+    			</element>
+    		</choice>
+    	</sequence>
+    </complexType>
+
+    <element name="fabricate" type="tns:fabricate_type"></element>
+
+    <complexType name="project_groups_type">
+    	<sequence>
+    		<element name="project_group" type="string" minOccurs="1" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="git_server_type">
+    	<sequence>
+    		<element name="hostname" type="string"></element>
+    		<element name="path" type="string"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="projects_type">
+    		<sequence>
+    			<element name="scm" type="tns:scm_type" minOccurs="1" maxOccurs="1"></element>
+    			<element name="project" type="tns:project_type" minOccurs="1" maxOccurs="unbounded"></element>
+    		</sequence>
+    	
+    </complexType>
+
+	<complexType name="scm_type">
+    
+    	<choice>
+    		<element name="git" type="tns:git_server_type" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    	</choice>
+    	
+    </complexType>
+    
+    <complexType name="project_type">
+    	<attribute name="name" type="string">
+    		<annotation>
+				<documentation>
+					This is the name of the project in the scm i.e.;
+					fabricate.adligo.org
+				</documentation>
+			</annotation>
+    	</attribute>
+    	<attribute name="version" type="string">
+    		<annotation>
+				<documentation>
+					This is the optional version in the scm (aka tag in git).
+				</documentation>
+			</annotation>
+    	</attribute>
+    </complexType>
+
+    <complexType name="fabricate_dependencies">
+    	<annotation>
+			<documentation>
+				Fabricate extensions can delivered through a maven download,
+				and added to the fabricate classpath for the main fab.  
+				In addition they can be added to the project_group/lib directory.
+			</documentation>
+		</annotation>
+    	<sequence>
+    		<element name="dependency" type="lns:dependency_type"
+    			minOccurs="0" maxOccurs="unbounded">
+    		</element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="task_type">
+        <attribute name="name" type="string"></attribute>
+        <attribute name="class" type="string">
+        	<annotation>
+				<documentation>
+					This is a class in the fabricate classpath
+					which must implement one of;
+					org.adligo.fabricate.common.I_ScmTask
+					org.adligo.fabricate.common.I_ProjectTask
+				</documentation>
+			</annotation>
+        </attribute>
+    </complexType>
+
+    <complexType name="stages_type">
+    	<sequence>
+    		<element name="stage" type="tns:task_type"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="stages_and_projects_type">
+    	<sequence>
+    		<element name="stages" type="tns:stages_type" minOccurs="1" maxOccurs="1"></element>
+    		<element name="projects" type="tns:projects_type" minOccurs="1" maxOccurs="1"></element>
+    	</sequence>
+    </complexType>
+</schema>

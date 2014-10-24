@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="package" name="fabricate">
+    <!-- 
+    Ant is used to build fabricate initally and then
+    fabricate can build it self for continous intergration
+    once it has a release tag.
+     -->
+	<target name="package">
+	    <echo> building fabricate from ant </echo>
+	    <delete dir="build" failonerror="false"/>
+	    <echo> clean complete </echo>
+	    <mkdir dir="build"/>
+	    <mkdir dir="build/classes" />
+	    <echo> compileing </echo>
+	    <javac srcdir="src"
+	         destdir="build/classes"
+	         debug="on"
+	         source="1.8"
+	  	/>
+	    <echo> compile complete </echo>
+	    <java classname="org.adligo.fabricate.build.Helper" classpath="build/classes" >
+	       <arg value="build"/>
+	    </java>
+	    <loadproperties>
+	      <file file="build/version.properties"/>
+	    </loadproperties>
+	    <echo> building ${fabricate_name}</echo>
+	    <mkdir dir="build/${fabricate_name}" />
+	    <mkdir dir="build/${fabricate_name}/${fabricate_name}" />
+	    <mkdir dir="build/${fabricate_name}/${fabricate_name}/lib" />
+	    
+	    <copy file="etc/MANIFEST.MF" todir="build" />
+	    <replace file="build/MANIFEST.MF" 
+		  		token="@ANT_VERSION@" value="${ant.version}"/>
+  		<replace file="build/MANIFEST.MF" 
+  	  		        token="@JAVA_VERSION@" value="${java.version}"/>
+  		
+		<replace file="build/MANIFEST.MF" 
+  	  		        token="@NAME@" value="fabricate"/>
+  	  	<replace file="build/MANIFEST.MF" 
+  	  		        token="@EXTENSION_NAME@" value="fabricate"/>
+
+		<replace file="build/MANIFEST.MF" 
+  	  		        token="@SPEC_TITLE@" value="${fabricate_name}"/>
+  	  	<replace file="build/MANIFEST.MF" 
+  	  		        token="@SPEC_VERSION@" value="${fabricate_version}"/>
+  	    <replace file="build/MANIFEST.MF" 
+  	  		        token="@SPEC_VENDOR@" value="Adligo Inc."/>
+  	    <replace file="build/MANIFEST.MF" 
+  	  		        token="@IMPL_TITLE@" value="${fabricate_name}"/>
+  	  	<replace file="build/MANIFEST.MF" 
+  	  		        token="@IMPL_VERSION@" value="${fabricate_version}"/>
+  	  	<replace file="build/MANIFEST.MF" 
+  	  		        token="@IMPL_VENDOR@" value="Adligo Inc."/>
+  	  	<jar destfile="build/${fabricate_name}/${fabricate_name}/lib/${fabricate_name}.jar" 
+  	  	    manifest="build/MANIFEST.MF">
+		    <fileset dir="build/classes"
+	             excludes="**/Helper.class"
+	    	/>
+		</jar>
+		<mkdir dir="build/${fabricate_name}/${fabricate_name}/bin" />
+		<copy file="bin/fab" todir="build/${fabricate_name}/${fabricate_name}/bin" />
+  	  	<chmod dir="build/${fabricate_name}/${fabricate_name}/bin" perm="ugo+rx" 
+       		includes="fab"/>
+  	  	
+		<tar destfile="build/${fabricate_name}.tar.gz" basedir="build/${fabricate_name}" 
+		    compression="gzip" />
+		<zip destfile="build/${fabricate_name}.zip">
+			<zipfileset dir="bin" prefix="${fabricate_name}/bin" filemode="555" dirmode="555" />
+			<zipfileset dir="build/${fabricate_name}" prefix="${fabricate_name}"/>
+		</zip>	
+		<echo>packaged sucessfully</echo>
+	</target>
+	
+	<target name="deploy" depends="package">
+	    <loadproperties>
+	      <file file="build.properties"/>
+	    </loadproperties>
+	    <delete dir="${deploy_dest}/${fabricate_name}" failonerror="false"/>
+	    <delete dir="${deploy_dest}/${fabricate_name}.tar.gz" failonerror="false"/>
+	    <move file="build/${fabricate_name}.tar.gz" todir="${deploy_dest}" />
+	    <untar src="${deploy_dest}/${fabricate_name}.tar.gz" dest="${deploy_dest}" compression="gzip" />
+	    <chmod dir="${deploy_dest}/${fabricate_name}/bin" perm="ugo+rx" 
+       		includes="fab"/>
+	</target>
+</project>

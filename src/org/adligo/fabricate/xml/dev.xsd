@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io/dev" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/dev" 
+	elementFormDefault="qualified">
+
+    <complexType name="fabricate_dev_type">
+    	<attribute name="project_group" type="string">
+    		<annotation>
+				<documentation>
+					This is simply a indicator of where the
+					project_group directory is so that a particualar
+					project which is building can locate fabricate.xml
+					and the shared libraries.
+				</documentation>
+			</annotation>
+		</attribute>
+    </complexType>
+
+    <element name="dev" type="tns:fabricate_dev_type"></element>
+</schema>

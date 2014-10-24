@@ -1,0 +1,21 @@
+#! /bin/sh
+
+# This is the fabricate shell script, to execute fabricate.
+# Licensed by Adligo Inc. 
+# http://www.apache.org/licenses/LICENSE-2.0
+
+if [ -z "$FABRICATE_HOME" ]; then
+    echo "FABRICATE_HOME is required to be set"
+    exit 1
+fi
+
+ARGS_FROM_SETUP=`java -cp $FABRICATE_HOME/lib/*.jar org.adligo.fabricate.FabricateSetup args "$@"`
+if [ -z "$ARGS_FROM_SETUP" ]; then
+    exit 1
+fi
+
+OPTIONS_FROM_FILE=`java -cp $FABRICATE_HOME/lib/*.jar org.adligo.fabricate.FabricateSetup opts "$@"`
+if [ -z "$OPTIONS_FROM_FILE" ]; then
+    exit 1
+fi
+java $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 
