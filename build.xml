@@ -13,6 +13,7 @@
 	    <mkdir dir="build/classes" />
 	    <echo> compileing </echo>
 	    <javac srcdir="src"
+	         classpath="lib/*.jar"
 	         destdir="build/classes"
 	         debug="on"
 	         source="1.8"
@@ -52,12 +53,19 @@
   	  		        token="@IMPL_VERSION@" value="${fabricate_version}"/>
   	  	<replace file="build/MANIFEST.MF" 
   	  		        token="@IMPL_VENDOR@" value="Adligo Inc."/>
+  	  	<copy todir="build/classes/org/adligo/fabricate/xml">
+		    <fileset dir="src/org/adligo/fabricate/xml" excludes="**/*.java" />
+		</copy>
   	  	<jar destfile="build/${fabricate_name}/${fabricate_name}/lib/${fabricate_name}.jar" 
   	  	    manifest="build/MANIFEST.MF">
 		    <fileset dir="build/classes"
 	             excludes="**/Helper.class"
 	    	/>
 		</jar>
+		<copy todir="build/${fabricate_name}/${fabricate_name}/lib">
+		    <fileset dir="lib">
+		    </fileset>
+		</copy>
 		<mkdir dir="build/${fabricate_name}/${fabricate_name}/bin" />
 		<copy file="bin/fab" todir="build/${fabricate_name}/${fabricate_name}/bin" />
   	  	<chmod dir="build/${fabricate_name}/${fabricate_name}/bin" perm="ugo+rx" 

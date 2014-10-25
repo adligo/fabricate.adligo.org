@@ -5,17 +5,20 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 
 if [ -z "$FABRICATE_HOME" ]; then
-    echo "FABRICATE_HOME is required to be set"
+    echo "Fabricate requires the FABRICATE_HOME environment variable to be set."
     exit 1
 fi
 
-ARGS_FROM_SETUP=`java -cp $FABRICATE_HOME/lib/*.jar org.adligo.fabricate.FabricateSetup args "$@"`
+#echo command line args are "$@"
+ARGS_FROM_SETUP=`java -cp $FABRICATE_HOME/lib/* org.adligo.fabricate.FabricateSetup args`
 if [ -z "$ARGS_FROM_SETUP" ]; then
     exit 1
 fi
+#echo ARGS_FROM_SETUP are $ARGS_FROM_SETUP
 
-OPTIONS_FROM_FILE=`java -cp $FABRICATE_HOME/lib/*.jar org.adligo.fabricate.FabricateSetup opts "$@"`
+OPTIONS_FROM_FILE=`java -cp $FABRICATE_HOME/lib/* org.adligo.fabricate.FabricateSetup opts`
 if [ -z "$OPTIONS_FROM_FILE" ]; then
     exit 1
 fi
-java $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 
+#echo OPTIONS_FROM_FILE are $OPTIONS_FROM_FILE
+java  $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricator "$@" $ARGS_FROM_SETUP 

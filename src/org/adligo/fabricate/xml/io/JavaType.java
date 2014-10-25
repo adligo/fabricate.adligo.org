@@ -15,16 +15,24 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for task_type complex type.
+ * 
+ * 					This provides a limited list of
+ * 					options to pass to the jvm which 
+ * 					actually does the fabrication.  
+ * 					These options are peers of options listed here
+ * 					http://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html
+ * 			
+ * 
+ * <p>Java class for java_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="task_type"&gt;
+ * &lt;complexType name="java_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="class" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="Xmx" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="Xms" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -33,60 +41,60 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "task_type")
-public class TaskType {
+@XmlType(name = "java_type")
+public class JavaType {
 
-    @XmlAttribute(name = "name")
-    protected String name;
-    @XmlAttribute(name = "class")
-    protected String clazz;
+    @XmlAttribute(name = "Xmx")
+    protected String xmx;
+    @XmlAttribute(name = "Xms")
+    protected String xms;
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the xmx property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getXmx() {
+        return xmx;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the xmx property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setXmx(String value) {
+        this.xmx = value;
     }
 
     /**
-     * Gets the value of the clazz property.
+     * Gets the value of the xms property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getClazz() {
-        return clazz;
+    public String getXms() {
+        return xms;
     }
 
     /**
-     * Sets the value of the clazz property.
+     * Sets the value of the xms property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setClazz(String value) {
-        this.clazz = value;
+    public void setXms(String value) {
+        this.xms = value;
     }
 
 }

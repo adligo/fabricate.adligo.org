@@ -6,25 +6,24 @@
 //
 
 
-package org.adligo.fabricate.xml.io.project;
+package org.adligo.fabricate.xml.io;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for stages_type complex type.
+ * <p>Java class for log_settings_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="stages_type"&gt;
+ * &lt;complexType name="log_settings_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="stage" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="log" type="{http://www.adligo.org/fabricate/xml/io}log_setting_type" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -34,36 +33,35 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "stages_type", propOrder = {
-    "stage"
+@XmlType(name = "log_settings_type", propOrder = {
+    "log"
 })
-public class StagesType {
+public class LogSettingsType {
 
-    @XmlElement(required = true)
-    protected String stage;
+    protected LogSettingType log;
 
     /**
-     * Gets the value of the stage property.
+     * Gets the value of the log property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link LogSettingType }
      *     
      */
-    public String getStage() {
-        return stage;
+    public LogSettingType getLog() {
+        return log;
     }
 
     /**
-     * Sets the value of the stage property.
+     * Sets the value of the log property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link LogSettingType }
      *     
      */
-    public void setStage(String value) {
-        this.stage = value;
+    public void setLog(LogSettingType value) {
+        this.log = value;
     }
 
 }

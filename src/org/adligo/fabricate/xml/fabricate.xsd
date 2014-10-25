@@ -5,22 +5,26 @@
 	elementFormDefault="qualified"
 	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library" >
 	
-    <include schemaLocation=""></include>
     <import schemaLocation="library.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io/library">
 	</import>
 
     <complexType name="fabricate_type">
     	<sequence>
-    		<element name="dependencies"
+    		<element name="java" type="tns:java_type" minOccurs="0"
+    			maxOccurs="1">
+    		</element>
+            <element name="logs" type="tns:log_settings_type" minOccurs="0" maxOccurs="1"></element>
+            <element name="dependencies"
     			type="tns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
     		</element>
-            <choice>
+    		<choice>
     			<element name="groups" type="tns:project_groups_type"
     				minOccurs="0" maxOccurs="1">
     			</element>
-    			<element name="project_group" type="tns:stages_and_projects_type"
-    				minOccurs="0" maxOccurs="1">
+    			<element name="project_group"
+    				type="tns:stages_and_projects_type" minOccurs="0"
+    				maxOccurs="1">
     			</element>
     		</choice>
     	</sequence>
@@ -116,6 +120,43 @@
     	<sequence>
     		<element name="stages" type="tns:stages_type" minOccurs="1" maxOccurs="1"></element>
     		<element name="projects" type="tns:projects_type" minOccurs="1" maxOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="java_type">
+    	<annotation>
+			<documentation>
+					This provides a limited list of
+					options to pass to the jvm which 
+					actually does the fabrication.  
+					These options are peers of options listed here
+					http://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html
+			</documentation>
+		</annotation>
+    	<attribute name="Xmx" type="string">
+    		<annotation>
+				<documentation>
+						Defaults to 64m
+				</documentation>
+			</annotation>
+    	</attribute>
+    	<attribute name="Xms" type="string">
+    		<annotation>
+				<documentation>
+						Defaults to 16m
+				</documentation>
+			</annotation>
+    	</attribute>
+    </complexType>
+
+    <complexType name="log_setting_type">
+    	<attribute name="class" type="string"></attribute>
+    	<attribute name="setting" type="boolean"></attribute>
+    </complexType>
+
+    <complexType name="log_settings_type">
+    	<sequence>
+    		<element name="log" type="tns:log_setting_type" minOccurs="0" maxOccurs="1"></element>
     	</sequence>
     </complexType>
 </schema>

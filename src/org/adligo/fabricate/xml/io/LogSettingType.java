@@ -15,16 +15,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for task_type complex type.
+ * <p>Java class for log_setting_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="task_type"&gt;
+ * &lt;complexType name="log_setting_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="class" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="setting" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -33,37 +33,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "task_type")
-public class TaskType {
+@XmlType(name = "log_setting_type")
+public class LogSettingType {
 
-    @XmlAttribute(name = "name")
-    protected String name;
     @XmlAttribute(name = "class")
     protected String clazz;
-
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+    @XmlAttribute(name = "setting")
+    protected Boolean setting;
 
     /**
      * Gets the value of the clazz property.
@@ -87,6 +63,30 @@ public class TaskType {
      */
     public void setClazz(String value) {
         this.clazz = value;
+    }
+
+    /**
+     * Gets the value of the setting property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isSetting() {
+        return setting;
+    }
+
+    /**
+     * Sets the value of the setting property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setSetting(Boolean value) {
+        this.setting = value;
     }
 
 }

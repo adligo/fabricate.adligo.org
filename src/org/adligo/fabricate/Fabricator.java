@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class Fabricate {
+public class Fabricator {
   private static PrintStream OUT = System.out;
   private static File fabricateXml;
   private static File projectXml;
