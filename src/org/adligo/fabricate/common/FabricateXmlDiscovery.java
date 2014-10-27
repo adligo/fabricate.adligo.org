@@ -1,5 +1,7 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.parsers.DevParser;
+import org.adligo.fabricate.xml.io.dev.FabricateDevType;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -25,18 +27,26 @@ public class FabricateXmlDiscovery {
   private File fabricateXml;
   private File projectXml;
   
-  public FabricateXmlDiscovery(I_FabLog log) {
+  public FabricateXmlDiscovery() {
     fabricateXml = new File("fabricate.xml");
     if (!fabricateXml.exists()) {
       projectXml = new File("project.xml");
       File dir = projectXml.getParentFile();
       if (dir != null) {
          File dirParent = dir.getParentFile();
-         File devXml = new File(dirParent.getAbsolutePath() + File.pathSeparator + "dev.xml");
+         File devXml = new File(dirParent.getAbsolutePath() + File.separator + "dev.xml");
          if (!devXml.exists()) {
-           return;
+           File projectsDir = dirParent.getParentFile();
+           fabricateXml = new File(projectsDir.getAbsolutePath() + File.separator + "fabricate.xml");
          } else {
-         
+           try {
+            FabricateDevType dev = DevParser.parse(devXml);
+            String projectGroup = dev.getProjectGroup();
+            fabricateXml = new File(dirParent.getAbsolutePath() + File.separator + 
+                projectGroup + File.separator + "fabricate.xml");
+          } catch (IOException e) {
+            //do nothing
+          }
          }
       }
     }
@@ -52,11 +62,21 @@ public class FabricateXmlDiscovery {
     return false;
   }
 
-  public File getFabricateXml() {
-    return fabricateXml;
+  public String getFabricateXmlPath() {
+    return fabricateXml.getAbsolutePath();
   }
 
-  public File getProjectXml() {
-    return projectXml;
+  public boolean hasProjectXml() {
+    if (projectXml == null) {
+      return false;
+    }
+    if (projectXml.exists()) {
+      return true;
+    }
+    return false;
+  }
+  
+  public String getProjectXml() {
+    return projectXml.getAbsolutePath();
   }
 }

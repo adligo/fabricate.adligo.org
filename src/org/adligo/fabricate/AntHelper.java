@@ -1,4 +1,4 @@
-package org.adligo.fabricate.build;
+package org.adligo.fabricate;
 
 import org.adligo.fabricate.external.GitCalls;
 
@@ -14,7 +14,7 @@ import java.io.IOException;
  * @author scott
  *
  */
-public class Helper {
+public class AntHelper {
 
 	public static void main(String [] args) {
 	  if (args.length == 0) {

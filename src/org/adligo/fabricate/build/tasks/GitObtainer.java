@@ -7,6 +7,6 @@ package org.adligo.fabricate.build.tasks;
  * @author scott
  *
  */
-public class VersionObtainer {
+public class GitObtainer {
 
 }

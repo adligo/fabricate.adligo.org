@@ -31,7 +31,7 @@
 				</documentation>
 			</annotation>
     	</attribute>
-    	<attribute name="duration" type="time">
+    	<attribute name="duration" type="duration">
     		<annotation>
 				<documentation>
 					The length of time fabricate ran.
@@ -58,69 +58,60 @@
     </complexType>
 
     <complexType name="machine_info_type">
-    	<sequence>
-    		<element name="machine" type="tns:machine_info_type">
-    			<annotation>
-					<documentation>
-						Information about the machine where fabricate ran.
-					</documentation>
-				</annotation>
-    		</element>
-    	</sequence>
-        <attribute name="hostname" type="string">
-        	<annotation>
-				<documentation>
-					The machines hostname.
-				</documentation>
-			</annotation>
-        </attribute>
-        <attribute name="cpu_name" type="string">
-        	<annotation>
-				<documentation>
-					The cpu name ie;
-					Intel(R) Core(TM) i7-4930K CPU @ 3.40GHz
-				</documentation>
-			</annotation>
-        </attribute>
+    	<attribute name="hostname" type="string">
+    		<annotation>
+    			<documentation>The machines hostname.</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="cpu_name" type="string">
+    		<annotation>
+    			<documentation>
+    				The cpu name ie; Intel(R) Core(TM) i7-4930K CPU @
+    				3.40GHz
+    			</documentation>
+    		</annotation>
+    	</attribute>
     	<attribute name="cpu_speed" type="string">
     		<annotation>
-				<documentation>
-					The parseable cpu speed ie;
-					3.40GHz
-				</documentation>
-			</annotation>
+    			<documentation>
+    				The parseable cpu speed ie; 3.40GHz
+    			</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="ram" type="string">
     		<annotation>
-				<documentation>
-					The amount of memory allocated to the JVM
-					which ran fabricate (aka -Xmx)
-				</documentation>
-			</annotation>
+    			<documentation>
+    				The amount of memory allocated to the JVM which ran
+    				fabricate (aka -Xmx)
+    			</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="processors" type="string">
     		<annotation>
-				<documentation>
-					The result of Runtime.getRuntime().availableProcessors()
-				</documentation>
-			</annotation>
+    			<documentation>
+    				The result of
+    				Runtime.getRuntime().availableProcessors()
+    			</documentation>
+    		</annotation>
     	</attribute>
+    	<attribute name="java_version" type="string"></attribute>
     </complexType>
-    
+
     <complexType name="failure_type">
+    	<sequence>
+    		<element name="detail" type="string"></element>
+    	</sequence>
     	<attribute name="stage" type="string">
     		<annotation>
-				<documentation>
-					The stage which failed.
-				</documentation>
-			</annotation>
+    			<documentation>The stage which failed.</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="project" type="string">
     		<annotation>
-				<documentation>
-					The project which failed.
-				</documentation>
-			</annotation>
+    			<documentation>The project which failed.</documentation>
+    		</annotation>
     	</attribute>
     </complexType>
+    
+    <element name="result" type="tns:result_type"></element>
 </schema>

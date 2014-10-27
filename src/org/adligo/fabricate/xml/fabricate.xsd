@@ -97,22 +97,33 @@
     </complexType>
 
     <complexType name="task_type">
-        <attribute name="name" type="string"></attribute>
-        <attribute name="class" type="string">
-        	<annotation>
-				<documentation>
-					This is a class in the fabricate classpath
-					which must implement one of;
-					org.adligo.fabricate.common.I_ScmTask
-					org.adligo.fabricate.common.I_ProjectTask
-				</documentation>
-			</annotation>
-        </attribute>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="class" type="string">
+    		<annotation>
+    			<documentation>
+    				This is a class in the fabricate classpath which
+    				must implement one of;
+    				org.adligo.fabricate.common.I_ScmTask
+    				org.adligo.fabricate.common.I_ProjectTask
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="optional" type="boolean">
+    		<annotation>
+    			<documentation>
+    				When this is set to true, the task/stage
+    				name must be set to true for the stage to
+    				execute.  This is done so that external users
+    				of the build do not need to push to a intelligence4j 
+    				server. 
+    			</documentation>
+    		</annotation>
+    	</attribute>
     </complexType>
 
     <complexType name="stages_type">
     	<sequence>
-    		<element name="stage" type="tns:task_type"></element>
+    		<element name="stage" type="tns:task_type" minOccurs="1" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 

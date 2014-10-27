@@ -19,7 +19,7 @@
 	         source="1.8"
 	  	/>
 	    <echo> compile complete </echo>
-	    <java classname="org.adligo.fabricate.build.Helper" classpath="build/classes" >
+	    <java classname="org.adligo.fabricate.AntHelper" classpath="build/classes" >
 	       <arg value="build"/>
 	    </java>
 	    <loadproperties>
@@ -68,6 +68,8 @@
 		</copy>
 		<mkdir dir="build/${fabricate_name}/${fabricate_name}/bin" />
 		<copy file="bin/fab" todir="build/${fabricate_name}/${fabricate_name}/bin" />
+		<replace file="build/${fabricate_name}/${fabricate_name}/bin/fab" 
+  	  		        token="@FABRICATE_NAME@" value="${fabricate_name}"/>
   	  	<chmod dir="build/${fabricate_name}/${fabricate_name}/bin" perm="ugo+rx" 
        		includes="fab"/>
   	  	

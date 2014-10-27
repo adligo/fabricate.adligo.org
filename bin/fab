@@ -10,15 +10,15 @@ if [ -z "$FABRICATE_HOME" ]; then
 fi
 
 #echo command line args are "$@"
-ARGS_FROM_SETUP=`java -cp $FABRICATE_HOME/lib/* org.adligo.fabricate.FabricateSetup args`
+ARGS_FROM_SETUP=`java -cp $FABRICATE_HOME/lib/@FABRICATE_NAME@.jar org.adligo.fabricate.FabricateSetup args `
 if [ -z "$ARGS_FROM_SETUP" ]; then
     exit 1
 fi
 #echo ARGS_FROM_SETUP are $ARGS_FROM_SETUP
 
-OPTIONS_FROM_FILE=`java -cp $FABRICATE_HOME/lib/* org.adligo.fabricate.FabricateSetup opts`
+OPTIONS_FROM_FILE=`java -cp $FABRICATE_HOME/lib/@FABRICATE_NAME@.jar org.adligo.fabricate.FabricateSetup opts `
 if [ -z "$OPTIONS_FROM_FILE" ]; then
     exit 1
 fi
 #echo OPTIONS_FROM_FILE are $OPTIONS_FROM_FILE
-java  $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricator "$@" $ARGS_FROM_SETUP 
+java  $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 

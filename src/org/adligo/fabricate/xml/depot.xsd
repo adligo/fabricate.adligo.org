@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io/depot" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/depot" 
+	elementFormDefault="qualified">
+
+    <complexType name="depot_type">
+    	<sequence>
+    		<element name="project" type="tns:project_artifacts_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="project_artifacts_type">
+    	<sequence>
+    		<element name="artifact" type="tns:artifact_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+    
+    <complexType name="artifact_type">
+    	<sequence>
+    	</sequence>
+    	<attribute name="type" type="string">
+    		<annotation>
+				<documentation>
+					The type of artifact ie jar, jme-jar exc.
+					Note the files are stored in a folder by type i.e.
+					depot
+					   |-jars
+					   |-jme-jars
+				</documentation>
+			</annotation>
+    	</attribute>
+    	<attribute name="filename" type="string">
+    		<annotation>
+				<documentation>
+					Each file may be different having version information
+					in the file name.
+				</documentation>
+			</annotation>
+    	</attribute>
+    </complexType>
+
+
+    <element name="depot" type="tns:depot_type"></element>
+</schema>
