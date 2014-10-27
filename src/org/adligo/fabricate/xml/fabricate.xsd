@@ -136,27 +136,31 @@
 
     <complexType name="java_type">
     	<annotation>
-			<documentation>
-					This provides a limited list of
-					options to pass to the jvm which 
-					actually does the fabrication.  
-					These options are peers of options listed here
-					http://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html
-			</documentation>
-		</annotation>
+    		<documentation>
+    			This provides a limited list of options to pass to the
+    			jvm which actually does the fabrication. These options
+    			are peers of options listed here
+    			http://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html
+    		</documentation>
+    	</annotation>
     	<attribute name="Xmx" type="string">
     		<annotation>
-				<documentation>
-						Defaults to 64m
-				</documentation>
-			</annotation>
+    			<documentation>Defaults to 64m</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="Xms" type="string">
     		<annotation>
-				<documentation>
-						Defaults to 16m
-				</documentation>
-			</annotation>
+    			<documentation>Defaults to 16m</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="threads" type="int">
+    		<annotation>
+    			<documentation>
+    			This optional attribute allows you to turn down or 
+    			off the concurrency feature of fabricate it 
+    			defaults to two times Runtime.getRuntime().availableProcessors()
+    			</documentation>
+    		</annotation>
     	</attribute>
     </complexType>
 
@@ -167,7 +171,7 @@
 
     <complexType name="log_settings_type">
     	<sequence>
-    		<element name="log" type="tns:log_setting_type" minOccurs="0" maxOccurs="1"></element>
+    		<element name="log" type="tns:log_setting_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 </schema>

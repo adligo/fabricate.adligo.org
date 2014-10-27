@@ -10,7 +10,6 @@ public interface I_Depot {
   /**
    * create the the depot directory 
    * with a new depot.xml
-   * @return
    */
   public void create();
   

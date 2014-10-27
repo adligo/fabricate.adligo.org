@@ -3,9 +3,8 @@ package org.adligo.fabricate.build.run;
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.I_FabContext;
+import org.adligo.fabricate.common.I_FabSetupTask;
 import org.adligo.fabricate.common.SystemHelper;
-import org.adligo.fabricate.parsers.FabricateParser;
-import org.adligo.fabricate.parsers.ProjectParser;
 import org.adligo.fabricate.xml.io.FabricateType;
 import org.adligo.fabricate.xml.io.ProjectGroupsType;
 import org.adligo.fabricate.xml.io.ProjectType;
@@ -15,6 +14,8 @@ import org.adligo.fabricate.xml.io.TaskType;
 import org.adligo.fabricate.xml.io.result.FailureType;
 import org.adligo.fabricate.xml.io.result.MachineInfoType;
 import org.adligo.fabricate.xml.io.result.ResultType;
+import org.adligo.fabricate.xml_io.FabricateIO;
+import org.adligo.fabricate.xml_io.ProjectIO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,7 +37,7 @@ import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 
 public class TaskManager {
-  private PrintStream out = System.out;
+  private static PrintStream OUT = System.out;
   private List<String> tasks_ = new ArrayList<String>();
   private Map<String, Object> taskMap_ = new HashMap<String, Object>();
   private List<String> sucessfulTasks_ = new ArrayList<String>();
@@ -61,10 +62,10 @@ public class TaskManager {
     String fabricateXml = xmlDiscovery.getFabricateXmlPath();
     try {
       fabricateXmlPath_ = fabricateXml;
-      fab_ = FabricateParser.parse(new File(fabricateXml));
+      fab_ = FabricateIO.parse(new File(fabricateXml));
       if (xmlDiscovery.hasProjectXml()) {
         projectXmlPath_ = xmlDiscovery.getProjectXml();
-        project_ = ProjectParser.parse(new File(projectXmlPath_));
+        project_ = ProjectIO.parse(new File(projectXmlPath_));
       }
     } catch (IOException e) {
       failureException_ = e;
@@ -107,6 +108,29 @@ public class TaskManager {
       tasks_.add(taskName);
       taskMap_.put(taskName, instance);
     }
+    for (String taskName: tasks_) {
+      if (ctx_ == null) {
+        OUT.println("Starting stage/task " + taskName);
+      } else {
+        if (ctx_.isLogEnabled(TaskManager.class)) {
+          OUT.println("Starting stage/task " + taskName);
+        }
+      }
+      Object obj = taskMap_.get(taskName);
+      if (!setup) {
+        I_FabSetupTask setupTask = (I_FabSetupTask) obj;
+        setupTask.setFabricate(fab_);
+        setupTask.setInitalDirPath(initalDirPath);
+        setupTask.setProject(project_);
+        setupTask.setFabricateXmlPath(fabricateXmlPath_);
+        setupTask.setProjectXmlPath(projectXmlPath_);
+        ctx_ = setupTask.setup(args_);
+        setup = true;
+        sucessfulTasks_.add(taskName);
+      } else {
+        
+      }
+    }
   }
   
   @SuppressWarnings("boxing")
@@ -130,7 +154,13 @@ public class TaskManager {
         x.printStackTrace();
       }
     }
-    out.println("Writing " + resultFile.getAbsolutePath());
+    if (ctx_ != null) {
+      if (ctx_.isLogEnabled(TaskManager.class)) {
+        OUT.println("Writing " + resultFile.getAbsolutePath());
+      }
+    } else {
+      OUT.println("Writing " + resultFile.getAbsolutePath());
+    }
     ResultType result = new ResultType();
     File fabricatePath = new File(fabricateXmlPath_.substring(0, fabricateXmlPath_.length() - 14));
     
@@ -183,7 +213,8 @@ public class TaskManager {
       JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.result");
       Marshaller marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      marshaller.marshal(new JAXBElement<ResultType>(new QName("http://www.adligo.org/fabricate/xml/io/result",
+      marshaller.marshal(new JAXBElement<ResultType>(
+          new QName("http://www.adligo.org/fabricate/xml/io/result",
           "result"), ResultType.class, result), resultFile);
     } catch (Exception e) {
       // TODO Auto-generated catch block

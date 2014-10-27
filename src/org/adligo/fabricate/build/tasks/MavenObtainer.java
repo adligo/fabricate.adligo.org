@@ -10,13 +10,14 @@ import org.adligo.fabricate.common.I_FabTask;
  * @author scott
  *
  */
-public class GitObtainer implements I_FabTask {
-
+public class MavenObtainer implements I_FabTask {
 
   @Override
   public void setup(I_FabContext ctx) {
     // TODO Auto-generated method stub
     
   }
+
+
 
 }

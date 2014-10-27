@@ -1,6 +1,12 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.xml.io.FabricateType;
+import org.adligo.fabricate.xml.io.LogSettingType;
+import org.adligo.fabricate.xml.io.LogSettingsType;
+import org.adligo.fabricate.xml.io.ProjectType;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FabContextMutant implements I_FabContext {
@@ -15,8 +21,14 @@ public class FabContextMutant implements I_FabContext {
   private String initialPath;
   private String outputPath;
   private Map<Class<?>,Boolean> logSettings = new HashMap<Class<?>,Boolean>();
+  private FabricateType fabricate_;
+  private ProjectType project_;
   
+  public FabContextMutant() {
+  }
 
+
+  
   @Override
   public FabRunType getRunType() {
     return runType;
@@ -121,5 +133,36 @@ public class FabContextMutant implements I_FabContext {
 
   public void setOutputPath(String outputPath) {
     this.outputPath = outputPath;
+  }
+  
+  @SuppressWarnings("boxing")
+  public void checkDefaultLog(Class<?> c, boolean setting) {
+    if (!logSettings.containsKey(c)) {
+      logSettings.put(c, setting);
+    }
+  }
+
+
+
+  public FabricateType getFabricate() {
+    return fabricate_;
+  }
+
+
+
+  public void setFabricate_(FabricateType fabricate) {
+    fabricate_ = fabricate;
+  }
+
+
+
+  public ProjectType getProject_() {
+    return project_;
+  }
+
+
+
+  public void setProject_(ProjectType project) {
+    project_ = project;
   }
 }

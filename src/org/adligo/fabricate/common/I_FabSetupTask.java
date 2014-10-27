@@ -11,6 +11,8 @@ import java.util.Map;
  * assumed that I_FabSetupTask's are NOT concurrent
  * and only one at a time will run on the fabricate
  * environment.
+ *   Note fabricate generally uses system specific paths
+ * using File.seperator.
  * 
  * @author scott
  *
@@ -19,6 +21,8 @@ public interface I_FabSetupTask {
   public void setInitalDirPath(String initalDir);
   public void setFabricate(FabricateType fabricate);
   public void setProject(ProjectType project);
+  public void setFabricateXmlPath(String fabricateXmlPath);
+  public void setProjectXmlPath(String projectXmlPath);
   /**
    * 
    * @param args the parsed arguments from the initial call to java

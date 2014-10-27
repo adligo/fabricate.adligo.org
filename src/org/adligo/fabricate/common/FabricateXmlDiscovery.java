@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.parsers.DevParser;
 import org.adligo.fabricate.xml.io.dev.FabricateDevType;
+import org.adligo.fabricate.xml_io.DevIO;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -40,7 +40,7 @@ public class FabricateXmlDiscovery {
            fabricateXml = new File(projectsDir.getAbsolutePath() + File.separator + "fabricate.xml");
          } else {
            try {
-            FabricateDevType dev = DevParser.parse(devXml);
+            FabricateDevType dev = DevIO.parse(devXml);
             String projectGroup = dev.getProjectGroup();
             fabricateXml = new File(dirParent.getAbsolutePath() + File.separator + 
                 projectGroup + File.separator + "fabricate.xml");

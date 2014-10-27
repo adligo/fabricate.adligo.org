@@ -1,4 +1,4 @@
-package org.adligo.fabricate.parsers;
+package org.adligo.fabricate.xml_io;
 
 import org.adligo.fabricate.xml.io.ProjectType;
 
@@ -10,7 +10,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-public class ProjectParser {
+public class ProjectIO {
   
   @SuppressWarnings("unchecked")
   public static ProjectType parse(File file) throws IOException {

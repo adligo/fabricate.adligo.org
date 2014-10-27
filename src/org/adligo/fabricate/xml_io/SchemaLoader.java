@@ -1,4 +1,4 @@
-package org.adligo.fabricate.parsers;
+package org.adligo.fabricate.xml_io;
 
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;

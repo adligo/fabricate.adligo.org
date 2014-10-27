@@ -4,9 +4,9 @@ import org.adligo.fabricate.common.FabricateDefaults;
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.StringUtils;
-import org.adligo.fabricate.parsers.FabricateParser;
 import org.adligo.fabricate.xml.io.FabricateType;
 import org.adligo.fabricate.xml.io.JavaType;
+import org.adligo.fabricate.xml_io.FabricateIO;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class FabricateSetup {
     File fabricateXml = new File(fd.getFabricateXmlPath());
     
     try {
-      FabricateType fab =  FabricateParser.parse(fabricateXml);
+      FabricateType fab =  FabricateIO.parse(fabricateXml);
       FabricateHelper fh = new FabricateHelper(fab);
      
       System.out.println(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
