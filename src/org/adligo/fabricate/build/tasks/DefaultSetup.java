@@ -8,6 +8,7 @@ import org.adligo.fabricate.common.FileUtils;
 import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupTask;
+import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.xml.io.FabricateType;
 import org.adligo.fabricate.xml.io.LogSettingType;
 import org.adligo.fabricate.xml.io.LogSettingsType;
@@ -48,6 +49,9 @@ public class DefaultSetup implements I_FabSetupTask {
   public I_FabContext setup(Map<String, String> args) {
     FabContextMutant fcm = new FabContextMutant();
     setupLogging(fcm);
+    fcm.setArgs(args);
+    fcm.setFabricate(fabricate_);
+    fcm.setProject(project_);
     fcm.setInitialPath(initalDir_);
     fcm.setFabricateXmlPath(fabricateXmlPath_);
     fcm.setFabricateDirPath(fabricateXmlPath_.substring(0, fabricateXmlPath_.length() - 14));
@@ -66,20 +70,26 @@ public class DefaultSetup implements I_FabSetupTask {
       depot_ = new Depot(depot, fcm);
       fcm.setDepot(new Depot(fabricateDir + File.separator + "depot",fcm));
     }
+    cleanDir(fcm, fabricateDir, "output");
+    fcm.setOutputPath(fabricateDir + File.separator + "output");
+    
     if (project_ != null) {
       cleanForProjectRun(fcm);
     } else {
       cleanDepot(fcm, depot);
-      cleanDir(fcm, fabricateDir, "output");
+      
       if (args.containsKey("dev")) {
-        
+        File fabDir = new File(fabricateDir);
+        File file = fabDir.getParentFile();
+        fcm.setProjectsPath(file.getAbsolutePath());
       } else {
         //must be the default setting
         fcm.setRunType(FabRunType.DEFAULT);
         cleanDir(fcm, fabricateDir,"projects");
+        fcm.setProjectsPath(fabricateDir + File.separator + "projects");
       }
     }
-    return null;
+    return fcm;
   }
 
   
@@ -100,7 +110,6 @@ public class DefaultSetup implements I_FabSetupTask {
       throw new RuntimeException("There was a problem creating the " + dir + " directory " + 
           System.lineSeparator() + fullDir);
     }
-    fcm.setOutputPath(fullDir);
   }
 
   public void cleanDepot(FabContextMutant fcm, String depot) {
@@ -159,8 +168,11 @@ public class DefaultSetup implements I_FabSetupTask {
         }
       }
     }
+    fcm.checkDefaultLog(DefaultSetup.class, true);
     fcm.checkDefaultLog(FileUtils.class, true);
     fcm.checkDefaultLog(TaskManager.class, true);
+    fcm.checkDefaultLog(GitCalls.class, true);
+    fcm.checkDefaultLog(GitObtainer.class, true);
   }
   
 

@@ -39,10 +39,17 @@
     </complexType>
 
     <complexType name="git_server_type">
-    	<sequence>
-    		<element name="hostname" type="string"></element>
-    		<element name="path" type="string"></element>
-    	</sequence>
+    		<attribute name="user" type="string"></attribute>
+    		<attribute name="hostname" type="string"></attribute>
+    		<attribute name="path" type="string">
+    			<annotation>
+		    		<documentation>
+		    			This is the remote path, and must contain a
+		    			final slash in the remote servers file syntax
+		    			which I think is always /.
+		    		</documentation>
+		    	</annotation>
+    		</attribute>
     </complexType>
 
     <complexType name="projects_type">

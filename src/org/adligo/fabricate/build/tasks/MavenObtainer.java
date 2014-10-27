@@ -18,6 +18,36 @@ public class MavenObtainer implements I_FabTask {
     
   }
 
+  @Override
+  public void run() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public boolean isConcurrent() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean isFinished() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public boolean hadException() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public Exception getException() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 
 
 }

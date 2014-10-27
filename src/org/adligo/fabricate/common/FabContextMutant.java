@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class FabContextMutant implements I_FabContext {
   private FabRunType runType;
-  private Map<String,String> args;
+  private Map<String,String> args_ = new HashMap<String,String>();
   private String fabricateXmlPath;
   private String fabricateDirPath;
   private String projectPath;
@@ -36,12 +36,12 @@ public class FabContextMutant implements I_FabContext {
 
   @Override
   public boolean hasArg(String key) {
-    return args.containsKey(key);
+    return args_.containsKey(key);
   }
 
   @Override
   public String getArgValue(String key) {
-    return args.get(key);
+    return args_.get(key);
   }
 
   @Override
@@ -150,19 +150,25 @@ public class FabContextMutant implements I_FabContext {
 
 
 
-  public void setFabricate_(FabricateType fabricate) {
+  public void setFabricate(FabricateType fabricate) {
     fabricate_ = fabricate;
   }
 
 
 
-  public ProjectType getProject_() {
+  public ProjectType getProject() {
     return project_;
   }
 
 
 
-  public void setProject_(ProjectType project) {
+  public void setProject(ProjectType project) {
     project_ = project;
+  }
+
+
+
+  public void setArgs(Map<String, String> args) {
+    args_ = args;
   }
 }

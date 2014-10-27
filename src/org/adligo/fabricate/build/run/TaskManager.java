@@ -4,8 +4,10 @@ import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupTask;
+import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.SystemHelper;
 import org.adligo.fabricate.xml.io.FabricateType;
+import org.adligo.fabricate.xml.io.JavaType;
 import org.adligo.fabricate.xml.io.ProjectGroupsType;
 import org.adligo.fabricate.xml.io.ProjectType;
 import org.adligo.fabricate.xml.io.StagesAndProjectsType;
@@ -38,7 +40,7 @@ import javax.xml.namespace.QName;
 
 public class TaskManager {
   private static PrintStream OUT = System.out;
-  private List<String> tasks_ = new ArrayList<String>();
+  private List<TaskType> tasks_ = new ArrayList<TaskType>();
   private Map<String, Object> taskMap_ = new HashMap<String, Object>();
   private List<String> sucessfulTasks_ = new ArrayList<String>();
   private String currentTask_;
@@ -94,6 +96,7 @@ public class TaskManager {
   }
   
   
+  @SuppressWarnings("boxing")
   private void runProjects() throws Exception {
     StagesAndProjectsType stagesAndProjects = fab_.getProjectGroup();
     StagesType stages = stagesAndProjects.getStages();
@@ -105,30 +108,71 @@ public class TaskManager {
       String className = task.getClazz();
       Class<?> clazz = Class.forName(className);
       Object instance = clazz.newInstance();
-      tasks_.add(taskName);
+      tasks_.add(task);
       taskMap_.put(taskName, instance);
     }
-    for (String taskName: tasks_) {
-      if (ctx_ == null) {
-        OUT.println("Starting stage/task " + taskName);
-      } else {
-        if (ctx_.isLogEnabled(TaskManager.class)) {
-          OUT.println("Starting stage/task " + taskName);
+    
+    ConcurrentExecutor concurrentExecutor = new ConcurrentExecutor();
+    JavaType java = fab_.getJava();
+    if (java != null) {
+      Integer threads = java.getThreads();
+      if (threads != null && threads >= 1) {
+        concurrentExecutor.setThreads(threads);
+      }
+    }
+    
+    for (TaskType task: tasks_) {
+      String taskName = task.getName();
+      Boolean optional = task.isOptional();
+      if (optional == null) {
+        optional = Boolean.FALSE;
+      }
+      boolean execute = true;
+      if (optional) {
+        execute = false;
+        if (args_.containsKey(taskName)) {
+          execute = true;
         }
       }
-      Object obj = taskMap_.get(taskName);
-      if (!setup) {
-        I_FabSetupTask setupTask = (I_FabSetupTask) obj;
-        setupTask.setFabricate(fab_);
-        setupTask.setInitalDirPath(initalDirPath);
-        setupTask.setProject(project_);
-        setupTask.setFabricateXmlPath(fabricateXmlPath_);
-        setupTask.setProjectXmlPath(projectXmlPath_);
-        ctx_ = setupTask.setup(args_);
-        setup = true;
-        sucessfulTasks_.add(taskName);
-      } else {
-        
+      if (execute) {
+        if (ctx_ == null) {
+          OUT.println("Starting stage " + taskName);
+        } else {
+          if (ctx_.isLogEnabled(TaskManager.class)) {
+            OUT.println("Starting stage " + taskName);
+          }
+        }
+        Object obj = taskMap_.get(taskName);
+        if (!setup) {
+          I_FabSetupTask setupTask = (I_FabSetupTask) obj;
+          setupTask.setFabricate(fab_);
+          setupTask.setInitalDirPath(initalDirPath);
+          setupTask.setProject(project_);
+          setupTask.setFabricateXmlPath(fabricateXmlPath_);
+          setupTask.setProjectXmlPath(projectXmlPath_);
+          ctx_ = setupTask.setup(args_);
+          setup = true;
+          sucessfulTasks_.add(taskName);
+        } else {
+          
+          I_FabTask fabTask = (I_FabTask) obj;
+          fabTask.setup(ctx_);
+          if (fabTask.isConcurrent()) {
+            concurrentExecutor.setTask(fabTask);
+            if (ctx_.isLogEnabled(TaskManager.class)) {
+              OUT.println("Starting concurrent execution with " + concurrentExecutor.getThreads());
+            }
+            concurrentExecutor.execute();
+            concurrentExecutor.waitUntilFinished();
+            
+          } else {
+            //run it on this thread
+            fabTask.run();
+          }
+          if (fabTask.hadException()) {
+            throw fabTask.getException();
+          }
+        }
       }
     }
   }
@@ -172,6 +216,9 @@ public class TaskManager {
     result.setOsVersion(osVersion);
     if (failureException_ == null) {
       result.setSuccessful(true);
+      if (ctx_.isLogEnabled(TaskManager.class)) {
+        OUT.println("Fabrication Successful!");
+      }
     } else {
       result.setSuccessful(false);
       FailureType failure = new FailureType();
@@ -183,6 +230,10 @@ public class TaskManager {
       String stackText = new String(baos.toByteArray());
       failure.setDetail(stackText);
       result.setFailure(failure);
+      if (ctx_.isLogEnabled(TaskManager.class)) {
+        failureException_.printStackTrace(OUT);
+        OUT.println("Fabrication Failed!");
+      }
     }
     String hostName = SystemHelper.getHostname();
     
@@ -204,7 +255,13 @@ public class TaskManager {
     String startString = args_.get("start");
     long start = new Long(startString);
     long dur = end - start;
-    
+    if (ctx_ != null) {
+      if (ctx_.isLogEnabled(TaskManager.class)) {
+         logDuration(dur);
+      }
+    } else {
+      logDuration(dur);
+    }
     try {
       DatatypeFactory df = DatatypeFactory.newInstance();
       Duration duration = df.newDuration(dur);
@@ -221,5 +278,21 @@ public class TaskManager {
       e.printStackTrace();
     } 
     
+  }
+  
+  public void logDuration(long duration) {
+    if (duration < 1000) {
+      OUT.println("Duration was " + duration + " milliseconds.");
+    } else if (duration < 1000 * 60) {
+      double secs = duration;
+      secs = secs / 1000;
+      int secsInt = (int) secs;
+      OUT.println("Duration was " + secsInt + " seconds.");
+    } else if (duration < 1000 * 60 * 60) {
+      double mins = duration;
+      mins = mins / 1000 * 60;
+      int minsInt = (int) mins;
+      OUT.println("Duration was " + minsInt + " minutes.");
+    }
   }
 }

@@ -35,7 +35,7 @@ public class AntHelper {
       fos.write(new String("fabricate_version=" + desc + 
           System.lineSeparator()).getBytes("UTF-8"));
       fos.close();
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }

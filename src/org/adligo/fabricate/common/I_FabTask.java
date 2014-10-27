@@ -14,6 +14,10 @@ package org.adligo.fabricate.common;
  * @author scott
  *
  */
-public interface I_FabTask {
+public interface I_FabTask extends Runnable {
   public void setup(I_FabContext ctx);
+  public boolean isConcurrent();
+  public boolean isFinished();
+  public boolean hadException();
+  public Exception getException();
 }

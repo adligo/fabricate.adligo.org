@@ -1,5 +1,8 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.xml.io.FabricateType;
+import org.adligo.fabricate.xml.io.ProjectType;
+
 /**
  * This interface represents the 
  * layout of files and other settings
@@ -46,5 +49,8 @@ public interface I_FabContext {
    * @return
    */
   public String getOutputPath();
+  
+  public FabricateType getFabricate();
+  public ProjectType getProject();
   
 }
