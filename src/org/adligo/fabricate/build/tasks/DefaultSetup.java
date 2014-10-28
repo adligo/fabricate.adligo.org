@@ -8,11 +8,13 @@ import org.adligo.fabricate.common.FileUtils;
 import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupTask;
+import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.external.GitCalls;
+import org.adligo.fabricate.external.RepositoryDownloader;
 import org.adligo.fabricate.xml.io.FabricateType;
 import org.adligo.fabricate.xml.io.LogSettingType;
 import org.adligo.fabricate.xml.io.LogSettingsType;
-import org.adligo.fabricate.xml.io.ProjectType;
+import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +27,7 @@ public class DefaultSetup implements I_FabSetupTask {
   private static PrintStream OUT = System.out;
   private String initalDir_;
   private FabricateType fabricate_;
-  private ProjectType project_;
+  private FabricateProjectType project_;
   private String fabricateXmlPath_;
   private String projectXmlPath_;
   private I_Depot depot_;
@@ -41,7 +43,7 @@ public class DefaultSetup implements I_FabSetupTask {
   }
 
   @Override
-  public void setProject(ProjectType project) {
+  public void setProject(FabricateProjectType project) {
     project_ = project;
   }
 
@@ -72,6 +74,10 @@ public class DefaultSetup implements I_FabSetupTask {
     }
     cleanDir(fcm, fabricateDir, "output");
     fcm.setOutputPath(fabricateDir + File.separator + "output");
+    LocalRepositoryHelper lrh = new LocalRepositoryHelper();
+    String localRepository = lrh.getRepositoryPath(fabricate_);
+    fcm.setLocalRepositoryPath(localRepository);
+    
     
     if (project_ != null) {
       cleanForProjectRun(fcm);
@@ -171,8 +177,10 @@ public class DefaultSetup implements I_FabSetupTask {
     fcm.checkDefaultLog(DefaultSetup.class, true);
     fcm.checkDefaultLog(FileUtils.class, true);
     fcm.checkDefaultLog(TaskManager.class, true);
-    fcm.checkDefaultLog(GitCalls.class, true);
+    fcm.checkDefaultLog(GitCalls.class, false);
     fcm.checkDefaultLog(GitObtainer.class, true);
+    fcm.checkDefaultLog(MavenObtainer.class, true);
+    fcm.checkDefaultLog(RepositoryDownloader.class, true);
   }
   
 

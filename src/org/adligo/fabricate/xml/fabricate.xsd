@@ -39,9 +39,9 @@
     </complexType>
 
     <complexType name="git_server_type">
-    		<attribute name="user" type="string"></attribute>
-    		<attribute name="hostname" type="string"></attribute>
-    		<attribute name="path" type="string">
+    		<attribute name="user" type="string" use="optional"></attribute>
+    		<attribute name="hostname" type="string" use="required"></attribute>
+    		<attribute name="path" type="string" use="required">
     			<annotation>
 		    		<documentation>
 		    			This is the remote path, and must contain a
@@ -71,7 +71,7 @@
     </complexType>
     
     <complexType name="project_type">
-    	<attribute name="name" type="string">
+    	<attribute name="name" type="string" use="required">
     		<annotation>
 				<documentation>
 					This is the name of the project in the scm i.e.;
@@ -79,7 +79,7 @@
 				</documentation>
 			</annotation>
     	</attribute>
-    	<attribute name="version" type="string">
+    	<attribute name="version" type="string" use="optional">
     		<annotation>
 				<documentation>
 					This is the optional version in the scm (aka tag in git).
@@ -90,17 +90,53 @@
 
     <complexType name="fabricate_dependencies">
     	<annotation>
-			<documentation>
-				Fabricate extensions can delivered through a maven download,
-				and added to the fabricate classpath for the main fab.  
-				In addition they can be added to the project_group/lib directory.
-			</documentation>
-		</annotation>
+    		<documentation>
+    			Fabricate extensions can delivered through a maven
+    			download, and added to the fabricate classpath for the
+    			main fab. In addition they can be added to the
+    			project_group/lib directory.
+    		</documentation>
+    	</annotation>
     	<sequence>
+    		<element name="remote_repository" type="string"
+    			minOccurs="1" maxOccurs="unbounded">
+    			<annotation>
+    				<documentation>
+    					The repositories listed with these elements are
+    					maven servers used to find a particular
+    					artifact. This is just like
+    					distributionManagement in the maven document.
+    					Fabricate currently only supports the default
+    					layout.  This is the url to the repository 
+    					folder ie;
+    					http://central.maven.org/maven2/
+    					http://repository.jboss.org/nexus/content/repositories/developer/
+    					only http is available.
+    				</documentation>
+    			</annotation>
+    		</element>
     		<element name="dependency" type="lns:dependency_type"
     			minOccurs="0" maxOccurs="unbounded">
     		</element>
     	</sequence>
+    	<attribute name="local_repository" type="string">
+    		<annotation>
+    			<documentation>
+    				This is where the local maven downloads are
+    				stored, it defaults to ${user.home}/local_repository
+    				Also the fab_repo uses a collapsed directory
+    				structure, do reduce the number of directories
+    				created.
+    				local_repository
+    				   |-org.apache.maven.plugins
+    				   |    |-maven-jar-plugin
+    				   |    |     |-3.2.3
+    				   |    |     |    |-maven-plugin-api-3.2.3.jar
+    				   |    |     |    |-maven-plugin-api-3.2.3.jar.sha1
+    			    A regular maven repository would have 4 directories for the group name
+    			</documentation>
+    		</annotation>
+    	</attribute>
     </complexType>
 
     <complexType name="task_type">

@@ -12,11 +12,15 @@
 	    <mkdir dir="build"/>
 	    <mkdir dir="build/classes" />
 	    <echo> compileing </echo>
+	    <path id="lib.path.ref">
+		    <fileset dir="lib" includes="*.jar"/>
+		 </path>
 	    <javac srcdir="src"
-	         classpath="lib/*.jar"
+	         classpath="lib/httpclient-4.3.4.jar;lib/httpcore-4.3.2.jar"
 	         destdir="build/classes"
 	         debug="on"
 	         source="1.8"
+	         classpathref="lib.path.ref"
 	  	/>
 	    <echo> compile complete </echo>
 	    <java classname="org.adligo.fabricate.AntHelper" classpath="build/classes" >

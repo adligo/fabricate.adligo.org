@@ -1,12 +1,9 @@
 package org.adligo.fabricate.common;
 
 import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.LogSettingType;
-import org.adligo.fabricate.xml.io.LogSettingsType;
-import org.adligo.fabricate.xml.io.ProjectType;
+import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class FabContextMutant implements I_FabContext {
@@ -22,7 +19,8 @@ public class FabContextMutant implements I_FabContext {
   private String outputPath;
   private Map<Class<?>,Boolean> logSettings = new HashMap<Class<?>,Boolean>();
   private FabricateType fabricate_;
-  private ProjectType project_;
+  private FabricateProjectType project_;
+  private String localRepositoryPath_;
   
   public FabContextMutant() {
   }
@@ -142,33 +140,31 @@ public class FabContextMutant implements I_FabContext {
     }
   }
 
-
-
   public FabricateType getFabricate() {
     return fabricate_;
   }
-
-
 
   public void setFabricate(FabricateType fabricate) {
     fabricate_ = fabricate;
   }
 
-
-
-  public ProjectType getProject() {
+  public FabricateProjectType getProject() {
     return project_;
   }
 
-
-
-  public void setProject(ProjectType project) {
+  public void setProject(FabricateProjectType project) {
     project_ = project;
   }
 
-
-
   public void setArgs(Map<String, String> args) {
     args_ = args;
+  }
+
+  public String getLocalRepositoryPath() {
+    return localRepositoryPath_;
+  }
+
+  public void setLocalRepositoryPath(String localRepositoryPath) {
+    localRepositoryPath_ = localRepositoryPath;
   }
 }

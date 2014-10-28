@@ -36,10 +36,7 @@ public class Fabricate {
     }
     
     Map<String,String> argMap = parseArgs(args);
-    Set<Entry<String,String>> entries = argMap.entrySet();
-    for (Entry<String,String> e: entries) {
-      OUT.println(e.getKey() + " = " + e.getValue());
-    }
+   
     FileOutputStream fos = null;
     try {
       if (!runMarker.createNewFile()) {

@@ -8,17 +8,26 @@ if [ -z "$FABRICATE_HOME" ]; then
     echo "Fabricate requires the FABRICATE_HOME environment variable to be set."
     exit 1
 fi
+CLASSPATH=$FABRICATE_HOME/lib/commons-logging-1.2.jar
+CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpcore-4.3.2.jar
+CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpclient-4.3.5.jar
+CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/@FABRICATE_NAME@.jar 
 
 #echo command line args are "$@"
-ARGS_FROM_SETUP=`java -cp $FABRICATE_HOME/lib/@FABRICATE_NAME@.jar org.adligo.fabricate.FabricateSetup args `
+ARGS_FROM_SETUP=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup args `
 if [ -z "$ARGS_FROM_SETUP" ]; then
     exit 1
 fi
 #echo ARGS_FROM_SETUP are $ARGS_FROM_SETUP
 
-OPTIONS_FROM_FILE=`java -cp $FABRICATE_HOME/lib/@FABRICATE_NAME@.jar org.adligo.fabricate.FabricateSetup opts `
+OPTIONS_FROM_FILE=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup opts `
 if [ -z "$OPTIONS_FROM_FILE" ]; then
     exit 1
 fi
+EXCEPTION=Exception
 #echo OPTIONS_FROM_FILE are $OPTIONS_FROM_FILE
-java  $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 
+if [ "${OPTIONS_FROM_FILE#*$EXCEPTION}" != "$OPTIONS_FROM_FILE" ]; then
+	echo "Fabrication Failed!"
+else
+	java  $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 
+fi

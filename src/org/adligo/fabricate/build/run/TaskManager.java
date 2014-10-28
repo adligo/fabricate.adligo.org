@@ -9,10 +9,10 @@ import org.adligo.fabricate.common.SystemHelper;
 import org.adligo.fabricate.xml.io.FabricateType;
 import org.adligo.fabricate.xml.io.JavaType;
 import org.adligo.fabricate.xml.io.ProjectGroupsType;
-import org.adligo.fabricate.xml.io.ProjectType;
 import org.adligo.fabricate.xml.io.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io.StagesType;
 import org.adligo.fabricate.xml.io.TaskType;
+import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 import org.adligo.fabricate.xml.io.result.FailureType;
 import org.adligo.fabricate.xml.io.result.MachineInfoType;
 import org.adligo.fabricate.xml.io.result.ResultType;
@@ -45,7 +45,7 @@ public class TaskManager {
   private List<String> sucessfulTasks_ = new ArrayList<String>();
   private String currentTask_;
   private FabricateType fab_;
-  private ProjectType project_;
+  private FabricateProjectType project_;
   private Exception failureException_;
   private Map<String,String> args_;
   private String initalDirPath;
@@ -160,7 +160,7 @@ public class TaskManager {
           if (fabTask.isConcurrent()) {
             concurrentExecutor.setTask(fabTask);
             if (ctx_.isLogEnabled(TaskManager.class)) {
-              OUT.println("Starting concurrent execution with " + concurrentExecutor.getThreads());
+              OUT.println("Starting concurrent execution with " + concurrentExecutor.getThreads() + " threads");
             }
             concurrentExecutor.execute();
             concurrentExecutor.waitUntilFinished();

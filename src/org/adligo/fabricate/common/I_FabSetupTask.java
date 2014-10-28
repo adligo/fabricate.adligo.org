@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common;
 
 import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.ProjectType;
+import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ import java.util.Map;
 public interface I_FabSetupTask {
   public void setInitalDirPath(String initalDir);
   public void setFabricate(FabricateType fabricate);
-  public void setProject(ProjectType project);
+  public void setProject(FabricateProjectType project);
   public void setFabricateXmlPath(String fabricateXmlPath);
   public void setProjectXmlPath(String projectXmlPath);
   /**

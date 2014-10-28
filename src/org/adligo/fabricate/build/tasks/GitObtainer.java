@@ -44,7 +44,7 @@ public class GitObtainer implements I_FabTask {
     ctx_ = ctx;
     projectsPath_ = ctx_.getProjectsPath();
     if (ctx_.isLogEnabled(GitObtainer.class)) {
-      OUT.println("Git projects are in " + projectsPath_);
+      OUT.println("The project directory is " + projectsPath_);
     }
     FabricateType fab = ctx.getFabricate();
     StagesAndProjectsType stageAndProj = fab.getProjectGroup();
@@ -58,7 +58,7 @@ public class GitObtainer implements I_FabTask {
     List<ProjectType> projTypes =  projects.getProject();
     projects_.clear();
     if (ctx_.isLogEnabled(GitObtainer.class)) {
-      OUT.println("Git found " + projTypes.size() + " projects");
+      OUT.println("Found " + projTypes.size() + " projects.");
     }
     projects_.addAll(projTypes);
     projectCount_ = projTypes.size();
@@ -88,49 +88,66 @@ public class GitObtainer implements I_FabTask {
       
       while (project != null) {
         String proj = project.getName();
-        if (!StringUtils.isEmpty(proj)) {
         
-          switch (runType) {
-            case DEFAULT:
+        switch (runType) {
+          case DEFAULT:
+            if (ctx_.isLogEnabled(GitObtainer.class)) {
+              OUT.println("Starting git clone for " + proj);
+            }
+            try {
+              gc.clone(proj, projectsPath_);
+            } catch (IOException e) {
+              lastException_ = e;
+              return;
+            }
+            if (ctx_.isLogEnabled(GitObtainer.class)) {
+              OUT.println("Finished git clone for " + proj);
+            }
+            String version = project.getVersion();
+            if (!StringUtils.isEmpty(version)) {
               if (ctx_.isLogEnabled(GitObtainer.class)) {
-                OUT.println("Starting git clone for " + proj);
+                OUT.println("Starting git checkout for " + proj);
               }
               try {
-                gc.clone(proj, projectsPath_);
+                gc.checkout(proj, projectsPath_, version);
               } catch (IOException e) {
                 lastException_ = e;
                 return;
               }
-              String version = project.getVersion();
-              if (!StringUtils.isEmpty(version)) {
+              if (ctx_.isLogEnabled(GitObtainer.class)) {
+                OUT.println("Finished git checkout for " + proj);
+              }
+            }
+            break;
+          case DEVELOPMENT:
+              if ("pull".equals(gitCommand)) {
+                if (ctx_.isLogEnabled(GitObtainer.class)) {
+                  OUT.println("Starting git pull for " + proj);
+                }
                 try {
-                  gc.checkout(proj, projectsPath_, version);
+                  gc.pull(proj, projectsPath_);
                 } catch (IOException e) {
                   lastException_ = e;
                   return;
                 }
-              }
-              break;
-            case DEVELOPMENT:
-                if ("pull".equals(gitCommand)) {
-                  try {
-                    gc.pull(proj, projectsPath_);
-                  } catch (IOException e) {
-                    lastException_ = e;
-                    return;
-                  }
+                if (ctx_.isLogEnabled(GitObtainer.class)) {
+                  OUT.println("Finished git pull for " + proj);
                 }
-              break;
-             default:
-               return;
-          }
+              }
+            break;
+           default:
+             return;
         }
         finishedCount_.incrementAndGet();
         if (finishedCount_.get() == projectCount_) {
+          if (ctx_.isLogEnabled(GitObtainer.class)) {
+            OUT.println("GitObtainer setting finished ");
+          }
           finished_.set(true);
         }
         project = projects_.poll();
       }
+      
     } catch (Exception x) {
       lastException_ = x;
     }
@@ -138,7 +155,11 @@ public class GitObtainer implements I_FabTask {
 
   @Override
   public boolean isFinished() {
+    
     if (lastException_ != null) {
+      if (ctx_.isLogEnabled(GitObtainer.class)) {
+        OUT.println("GitObtainer had a Exception ");
+      }
       return true;
     }
     return finished_.get();
@@ -158,6 +179,11 @@ public class GitObtainer implements I_FabTask {
   @Override
   public boolean isConcurrent() {
     return true;
+  }
+
+  @Override
+  public void setStageName(String stageName) {
+    //ignore
   }
 
 }

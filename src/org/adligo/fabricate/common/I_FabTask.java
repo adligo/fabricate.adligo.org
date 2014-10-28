@@ -15,6 +15,7 @@ package org.adligo.fabricate.common;
  *
  */
 public interface I_FabTask extends Runnable {
+  public void setStageName(String stageName);
   public void setup(I_FabContext ctx);
   public boolean isConcurrent();
   public boolean isFinished();

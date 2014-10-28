@@ -41,4 +41,10 @@ public class PublishToIntelligence4j implements I_FabTask {
     return null;
   }
 
+  @Override
+  public void setStageName(String stageName) {
+    // TODO Auto-generated method stub
+    
+  }
+
 }

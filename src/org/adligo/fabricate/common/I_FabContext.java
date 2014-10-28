@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common;
 
 import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.ProjectType;
+import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 
 /**
  * This interface represents the 
@@ -51,6 +51,6 @@ public interface I_FabContext {
   public String getOutputPath();
   
   public FabricateType getFabricate();
-  public ProjectType getProject();
-  
+  public FabricateProjectType getProject();
+  public String getLocalRepositoryPath();
 }

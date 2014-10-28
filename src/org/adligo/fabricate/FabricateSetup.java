@@ -1,11 +1,16 @@
 package org.adligo.fabricate;
 
+import org.adligo.fabricate.common.FabContextMutant;
 import org.adligo.fabricate.common.FabricateDefaults;
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
-import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.LocalRepositoryHelper;
+import org.adligo.fabricate.external.DefaultLocalRepositoryPathBuilder;
+import org.adligo.fabricate.external.RepositoryDownloader;
+import org.adligo.fabricate.xml.io.FabricateDependencies;
 import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.JavaType;
+import org.adligo.fabricate.xml.io.library.DependenciesType;
+import org.adligo.fabricate.xml.io.library.DependencyType;
 import org.adligo.fabricate.xml_io.FabricateIO;
 
 import java.io.File;
@@ -47,17 +52,14 @@ public class FabricateSetup {
       FabricateType fab =  FabricateIO.parse(fabricateXml);
       FabricateHelper fh = new FabricateHelper(fab);
      
+      downloadFabricateRunClasspathDependencies(fab);
+      
       System.out.println(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
           buildClasspath(fabricateXml.getAbsolutePath(), fabHome));
     } catch (IOException e) {
-      if (debug) {
-        e.printStackTrace();
-      }
-      System.out.println(" -Xmx" + FabricateDefaults.JAVA_XMX_DEFAULT + " -Xms" + 
-          FabricateDefaults.JAVA_XMS_DEFAULT + " -cp " + fabHome + "/lib/*.jar");
+      //this should also de-rail the fabricate run, as there will be no classpath
+      e.printStackTrace();
     }
-    
-   
   }
 
   private static void doArgs(boolean debug) {
@@ -93,5 +95,32 @@ public class FabricateSetup {
     }
     String result = sb.toString();
     return result;
+  }
+  
+  /**
+   * throws a fatal error when one of the 
+   * dependencies requested for the fabricate 
+   * class path can not be down loaded
+   * @param fab
+   * @throws IOException
+   */
+  public static void downloadFabricateRunClasspathDependencies(FabricateType fab) throws IOException {
+    FabricateDependencies deps =  fab.getDependencies();
+    if (deps != null) {
+      List<DependencyType> depTypes = deps.getDependency();
+      if (depTypes != null) {
+        LocalRepositoryHelper lrh = new LocalRepositoryHelper();
+        String localRepository = lrh.getRepositoryPath(fab);
+        FabContextMutant fcm = new FabContextMutant();
+        fcm.setLocalRepositoryPath(localRepository);
+        //leave logs empty here
+        List<String> repos = deps.getRemoteRepository();
+        RepositoryDownloader rdl = new RepositoryDownloader(repos, 
+            new DefaultLocalRepositoryPathBuilder(localRepository, File.separator), fcm);
+        for (DependencyType dep: depTypes) {
+          rdl.findOrDownloadAndSha1(dep);
+        }
+      }
+    }
   }
 }

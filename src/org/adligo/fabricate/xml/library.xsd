@@ -27,32 +27,37 @@
     </simpleType>
 
     <complexType name="dependency_type">
-    	<attribute name="group" type="string">
+    	<attribute name="group" type="string" use="required">
     		<annotation>
-				<documentation>
-					This is the maven group.
-				</documentation>
-			</annotation>
-		</attribute>
-    	<attribute name="artifact" type="string">
-    		<annotation>
-				<documentation>
-					This is the maven artifact.
-				</documentation>
-			</annotation>
+    			<documentation>This is the maven group.</documentation>
+    		</annotation>
     	</attribute>
-    	<attribute name="version" type="string">
+    	<attribute name="artifact" type="string" use="required">
     		<annotation>
-				<documentation>
-					This is the maven version.
-				</documentation>
-			</annotation>
+    			<documentation>
+    				This is the maven artifact.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="version" type="string" use="required">
+    		<annotation>
+    			<documentation>
+    				This is the maven version.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="type" type="string" use="optional">
+    		<annotation>
+    			<documentation>
+    				This defaults to jar.
+    			</documentation>
+    		</annotation>
     	</attribute>
     </complexType>
 
     <complexType name="dependencies_type">
     	<sequence>
-    		<element name="library" type="tns:library_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="library" type="string" minOccurs="0" maxOccurs="unbounded"></element>
     		<element name="dependency" type="tns:dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
     		<element name="project" type="tns:project_dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
