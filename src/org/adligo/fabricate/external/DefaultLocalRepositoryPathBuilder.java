@@ -11,7 +11,7 @@ import java.io.File;
  * @author scott
  *
  */
-public class DefaultLocalRepositoryPathBuilder implements I_LocalRepositoryPathBuilder {
+public class DefaultLocalRepositoryPathBuilder implements I_RepositoryPathBuilder {
   private String repo_;
   private String seperator_;
   
@@ -37,6 +37,39 @@ public class DefaultLocalRepositoryPathBuilder implements I_LocalRepositoryPathB
     String artifact = dependency.getArtifact();
     String version = dependency.getVersion();
     
+    
+    return repo_ + group + seperator_ + 
+        artifact + seperator_ + version ;
+  }
+  
+  public String getUrl(DependencyType dependency) {
+    String artifact = dependency.getArtifact();
+    String version = dependency.getVersion();
+    String type = dependency.getType();
+    if (type == null) {
+      type = "jar";
+    }
+    
+    return getFolderUrl(dependency) + seperator_ +
+        artifact + "-" + version + "." + type;
+  }
+
+  public String getFolderUrl(DependencyType dependency) {
+    String group = dependency.getGroup();
+    String artifact = dependency.getArtifact();
+    String version = dependency.getVersion();
+    
+    StringBuilder sb = new StringBuilder();
+    char [] groupChars = group.toCharArray();
+    for (int i = 0; i < groupChars.length; i++) {
+      char c = groupChars[i];
+      if (c == '.') {
+        sb.append("/");
+      } else {
+        sb.append(c);
+      }
+    }
+    group = sb.toString();
     
     return repo_ + group + seperator_ + 
         artifact + seperator_ + version ;

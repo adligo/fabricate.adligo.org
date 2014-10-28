@@ -12,6 +12,7 @@ import org.adligo.fabricate.xml.io.ProjectsType;
 import org.adligo.fabricate.xml.io.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io.library.DependenciesType;
 import org.adligo.fabricate.xml.io.library.DependencyType;
+import org.adligo.fabricate.xml.io.library.LibraryType;
 import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 import org.adligo.fabricate.xml.io.project.StagesType;
 import org.adligo.fabricate.xml_io.LibraryIO;
@@ -43,7 +44,9 @@ public class MavenObtainer implements I_FabTask {
   
   private String stageName_;
   private int projectCount_;
-  private AtomicInteger finishedCount_ = new AtomicInteger(0);
+  private AtomicInteger finishedProjectCount_ = new AtomicInteger(0);
+  private AtomicInteger depCount_ = new AtomicInteger(0);
+  private AtomicInteger finishedDepCount_ = new AtomicInteger(0);
   private String projectsPath_;
   private I_FabContext ctx_;
   private AtomicBoolean finishedProjects_ = new AtomicBoolean(false);
@@ -71,7 +74,7 @@ public class MavenObtainer implements I_FabTask {
     projects_.clear();
     projects_.addAll(projTypes);
     projectCount_ = projTypes.size();
-    finishedCount_.set(0);
+    finishedProjectCount_.set(0);
     finished_.set(false);
   }
 
@@ -97,35 +100,60 @@ public class MavenObtainer implements I_FabTask {
         List<String> stages = stagesType.getStage();
         if (stages.contains(stageName_)) {
           DependenciesType deps = fabProject.getDependencies();
-          List<String> libs =  deps.getLibrary();
-          if (libs != null) {
-            for (String lib: libs) {
-              addLibrary(fabricateDir, lib);
-              
+          if (deps != null) {
+            List<String> libs =  deps.getLibrary();
+            if (libs != null) {
+              for (String lib: libs) {
+                if (ctx_.isLogEnabled(MavenObtainer.class)) {
+                  OUT.println("project " + projectName + " has library " + lib);
+                }
+                addLibrary(fabricateDir, lib);
+              }
+            }
+            List<DependencyType> depsList = deps.getDependency();
+            for (DependencyType dep: depsList) {
+              uniqueDeps_.add(new DependencyTypeHelper(dep));
             }
           }
-          List<DependencyType> depsList = deps.getDependency();
-          for (DependencyType dep: depsList) {
-            uniqueDeps_.add(new DependencyTypeHelper(dep));
-          }
         }
-        finishedCount_.incrementAndGet();
-        if (finishedCount_.get() == projectCount_) {
-          if (ctx_.isLogEnabled(MavenObtainer.class)) {
-            OUT.println("Finished finding dependencies for projects in " + projectsPath_);
-          }
-          finishedProjects_.set(true);
-        }
+        finishedProjectCount_.incrementAndGet();
+        
         project = projects_.poll();
       }
-      deps_.addAll(uniqueDeps_);
+      if (finishedProjectCount_.get() == projectCount_) {
+        if (!finishedProjects_.get()) {
+          synchronized (this) {
+            if (!finishedProjects_.get()) {
+              if (ctx_.isLogEnabled(MavenObtainer.class)) {
+                OUT.println("Finished finding dependencies for projects in " + projectsPath_ + 
+                    System.lineSeparator() + " there are " + uniqueDeps_.size());
+              }
+              finishedProjects_.set(true);
+              deps_.addAll(uniqueDeps_);
+              depCount_.set(uniqueDeps_.size());
+            }
+          }
+        }
+      }
+      
+      while (!finishedProjects_.get()) {
+        try {
+          Thread.sleep(250);
+        } catch (InterruptedException x) {
+          //do nothing, continue execution
+        }
+      }
+      
       
       DependencyTypeHelper dep = deps_.poll();
       while (dep != null) {
         repoDown_.findOrDownloadAndSha1(dep.getDependencyType());
+        finishedDepCount_.incrementAndGet();
         dep = deps_.poll();
       }
-      finished_.set(true);
+      if (finishedDepCount_.get() == depCount_.get()) {
+        finished_.set(true);
+      }
     } catch (Exception x) {
       lastException_ = x;
     }
@@ -136,18 +164,21 @@ public class MavenObtainer implements I_FabTask {
       return;
     }
     libsDone_.add(lib);
-    DependenciesType libDeps = LibraryIO.parse(new File(fabricateDir + 
-        File.separator + "lib" + lib + ".xml"));
-    List<String> subLibs = libDeps.getLibrary();
-    for (String subLib: subLibs) {
-      //recurse
-      addLibrary(fabricateDir, subLib);
-    }
-    List<DependencyType> deps = libDeps.getDependency();
-    for (DependencyType dep: deps) {
-      uniqueDeps_.add(new DependencyTypeHelper(dep));
-    }
+    LibraryType libDeps = LibraryIO.parse(new File(fabricateDir + 
+        File.separator + "lib" + File.separator + lib + ".xml"));
+    DependenciesType depsType = libDeps.getDependencies();
     
+    if (depsType != null) {
+    List<String> subLibs = depsType.getLibrary();
+      for (String subLib: subLibs) {
+        //recurse
+        addLibrary(fabricateDir, subLib);
+      }
+      List<DependencyType> deps = depsType.getDependency();
+      for (DependencyType dep: deps) {
+        uniqueDeps_.add(new DependencyTypeHelper(dep));
+      }
+    }
   }
 
   @Override

@@ -1,6 +1,5 @@
 package org.adligo.fabricate.xml_io;
 
-import org.adligo.fabricate.xml.io.ProjectType;
 import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 
 import java.io.File;
@@ -16,7 +15,7 @@ public class ProjectIO {
   @SuppressWarnings("unchecked")
   public static FabricateProjectType parse(File file) throws IOException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.project");
+      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.project");
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       
       jaxbUnmarshaller.setSchema(SchemaLoader.INSTANCE.get());

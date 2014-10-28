@@ -157,6 +157,7 @@ public class TaskManager {
           
           I_FabTask fabTask = (I_FabTask) obj;
           fabTask.setup(ctx_);
+          fabTask.setStageName(taskName);
           if (fabTask.isConcurrent()) {
             concurrentExecutor.setTask(fabTask);
             if (ctx_.isLogEnabled(TaskManager.class)) {

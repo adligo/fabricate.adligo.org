@@ -11,7 +11,8 @@ import org.adligo.fabricate.xml.io.library.DependencyType;
  * @author scott
  *
  */
-public interface I_LocalRepositoryPathBuilder {
+public interface I_RepositoryPathBuilder {
+  public String getUrl(DependencyType dependency);
   public String getPath(DependencyType dependency);
   public String getFolderPath(DependencyType dependency);
 }

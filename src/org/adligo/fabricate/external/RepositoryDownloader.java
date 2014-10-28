@@ -11,7 +11,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,13 +42,13 @@ public class RepositoryDownloader {
   private List<String> repositories_ = new ArrayList<String>();
   
   
-  private I_LocalRepositoryPathBuilder pathBuilder_;
+  private I_RepositoryPathBuilder pathBuilder_;
   private I_FabContext ctx_;
   private String localRepo_;
   
   @SuppressWarnings("boxing")
   public RepositoryDownloader(List<String> repositories, 
-      I_LocalRepositoryPathBuilder pathBuilder, I_FabContext ctx) {
+      I_RepositoryPathBuilder pathBuilder, I_FabContext ctx) {
     ctx_ = ctx;
     localRepo_ = ctx.getLocalRepositoryPath();
     
@@ -65,7 +67,11 @@ public class RepositoryDownloader {
 
               });
         if (status == 200) {
-          repositories_.add(repoUrl);
+          if ("/".equals(repoUrl.charAt(repoUrl.length() - 1))) {
+            repositories_.add(repoUrl);
+          } else {
+            repositories_.add(repoUrl + "/");
+          }
         }
       } catch (IOException e) {
         //do nothing some server is down.
@@ -105,7 +111,7 @@ public class RepositoryDownloader {
     for (String repo: threadRemoteRepos) {
       DefaultLocalRepositoryPathBuilder remoteBuilder = 
           new DefaultLocalRepositoryPathBuilder(repo, "/");
-      String url = remoteBuilder.getPath(dep);
+      String url = remoteBuilder.getUrl(dep);
       String filePath = pathBuilder_.getPath(dep);
       String folderPath = pathBuilder_.getFolderPath(dep);
       new File(folderPath).mkdirs();
@@ -136,21 +142,21 @@ public class RepositoryDownloader {
       
       if (downloadedFile) {
         
-        String shaFile = filePath + ".sha1";
+        String md5File = filePath + ".md5";
         boolean downloadedSha = false;
-        if (new File(shaFile).exists()) {
+        if (new File(md5File).exists()) {
           downloadedSha = true;
         } else {
-          String shaUrl = url + ".sha1";
+          String md5Url = url + ".md5";
           if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-            OUT.println("Trying to download " + shaUrl + System.lineSeparator() +
-                "\t to " + shaFile);
+            OUT.println("Trying to download " + md5Url + System.lineSeparator() +
+                "\t to " + md5File);
           }
           try {
-            downloadFile(httpClient, shaUrl, shaFile);
+            downloadFile(httpClient, md5Url, md5File);
             if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-              OUT.println("Download " + shaUrl + System.lineSeparator() +
-                  "\t to " + shaFile);
+              OUT.println("Downloaded " + md5Url + System.lineSeparator() +
+                  "\t to " + md5File);
             }
             downloadedSha = true;
           } catch (IOException e) {
@@ -164,18 +170,35 @@ public class RepositoryDownloader {
           
           byte[] b;
           
+          FileInputStream fis = new FileInputStream(new File(md5File));
           try {
             b = Files.readAllBytes(Paths.get(new File(filePath).toURI()));
-            byte[] hash = MessageDigest.getInstance("MD5").digest(b);
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.reset();
+            md.update(b);
+            byte[] hash = md.digest();
             String actual = DatatypeConverter.printHexBinary(hash);
+            actual = actual.toLowerCase();
             
-            List<String> lines = Files.readAllLines(Paths.get(new File(shaFile).toURI()));
-            if (lines != null) {
-              if (lines.size() >= 1) {
-                String line = lines.get(0);
-                if (actual.equals(line)) {
-                  successfulDownloads = true;
-                  break;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte [] bytes = new byte[1];
+            while (fis.read(bytes) != -1) {
+              baos.write(bytes);
+            }
+            
+            if (bytes != null) {
+              String line = new String(baos.toByteArray(),"UTF-8");
+              if (actual.equals(line)) {
+                successfulDownloads = true;
+                break;
+              } else {
+                if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
+                  OUT.println("The file md5 " + System.lineSeparator() +
+                      actual + System.lineSeparator() +
+                      "did not match the .md5 " + System.lineSeparator() +
+                      md5File + System.lineSeparator() + 
+                      line);
+                  
                 }
               }
             }
@@ -183,10 +206,16 @@ public class RepositoryDownloader {
             //guess it was a bad download?
           } catch (NoSuchAlgorithmException e) {
             e.printStackTrace(OUT);
+          } finally {
+            try {
+              fis.close();
+            } catch (IOException x) {
+              
+            }
           }
           if (!successfulDownloads) {
-            new File(filePath).delete();
-            new File(shaFile).delete();
+            //new File(filePath).delete();
+            //new File(shaFile).delete();
           }
         }
       }
