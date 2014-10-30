@@ -1,20 +1,24 @@
-package org.adligo.fabricate.build.tasks;
+package org.adligo.fabricate.build.stages;
 
-import org.adligo.fabricate.build.run.TaskManager;
+import org.adligo.fabricate.build.run.StageManager;
+import org.adligo.fabricate.build.stages.shared.ProjectsMemory;
+import org.adligo.fabricate.build.stages.tasks.CompileTask;
 import org.adligo.fabricate.common.Depot;
 import org.adligo.fabricate.common.FabContextMutant;
 import org.adligo.fabricate.common.FabRunType;
-import org.adligo.fabricate.common.FileUtils;
 import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.I_FabSetupTask;
+import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.RepositoryDownloader;
+import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.xml.io.FabricateType;
 import org.adligo.fabricate.xml.io.LogSettingType;
 import org.adligo.fabricate.xml.io.LogSettingsType;
+import org.adligo.fabricate.xml.io.dev.FabricateDevType;
 import org.adligo.fabricate.xml.io.project.FabricateProjectType;
+import org.adligo.fabricate.xml_io.DevIO;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +27,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultSetup implements I_FabSetupTask {
+public class DefaultSetup implements I_FabSetupStage {
   private static PrintStream OUT = System.out;
   private String initalDir_;
   private FabricateType fabricate_;
@@ -56,6 +60,7 @@ public class DefaultSetup implements I_FabSetupTask {
     fcm.setProject(project_);
     fcm.setInitialPath(initalDir_);
     fcm.setFabricateXmlPath(fabricateXmlPath_);
+    fcm.setJavaHome(System.getenv("JAVA_HOME"));
     fcm.setFabricateDirPath(fabricateXmlPath_.substring(0, fabricateXmlPath_.length() - 14));
     if (projectXmlPath_ != null) {
       fcm.setProjectPath(projectXmlPath_.substring(0, projectXmlPath_.length() - 12));
@@ -80,14 +85,17 @@ public class DefaultSetup implements I_FabSetupTask {
     
     
     if (project_ != null) {
-      cleanForProjectRun(fcm);
+      fcm.setRunType(FabRunType.PROJECT);
+      fcm.setProjectPath(initalDir_);
     } else {
       cleanDepot(fcm, depot);
       
       if (args.containsKey("dev")) {
+        fcm.setRunType(FabRunType.DEVELOPMENT);
         File fabDir = new File(fabricateDir);
         File file = fabDir.getParentFile();
         fcm.setProjectsPath(file.getAbsolutePath());
+        createDevFile(file.getAbsolutePath() + File.separator + "dev.xml",fabDir.getName());
       } else {
         //must be the default setting
         fcm.setRunType(FabRunType.DEFAULT);
@@ -98,6 +106,15 @@ public class DefaultSetup implements I_FabSetupTask {
     return fcm;
   }
 
+  private void createDevFile(String file, String content) {
+    FabricateDevType fdt = new FabricateDevType();
+    fdt.setProjectGroup(content);
+    try {
+      DevIO.write(fdt, file);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
   
   public void cleanDir(FabContextMutant fcm, String fabricateDir, String dir) {
     String fullDir = fabricateDir + File.separator + dir;
@@ -107,7 +124,8 @@ public class DefaultSetup implements I_FabSetupTask {
         if (fcm.isLogEnabled(DefaultSetup.class)) {
           OUT.println("Cleaning " + fullDir);
         }
-        FileUtils.removeRecursive(Paths.get(dirFile.toURI()), fcm);
+        FileUtils fus = new FileUtils(fcm);
+        fus.removeRecursive(Paths.get(dirFile.toURI()));
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -125,19 +143,6 @@ public class DefaultSetup implements I_FabSetupTask {
     depot_.clean();
   }
 
-  public void cleanForProjectRun(FabContextMutant fcm) {
-    fcm.setRunType(FabRunType.PROJECT);
-    //initalDir_ must then be the project directory
-    String projectPath = fcm.getProjectPath();
-    String buildPath = projectPath + File.separator + "build";
-    
-    try {
-      FileUtils.removeRecursive(
-          Paths.get(new File(buildPath).toURI()), fcm);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   public String getFabricateXmlPath() {
     return fabricateXmlPath_;
@@ -174,13 +179,19 @@ public class DefaultSetup implements I_FabSetupTask {
         }
       }
     }
+    //alpha ordered default ons
+    fcm.checkDefaultLog(CompileTask.class, true);
     fcm.checkDefaultLog(DefaultSetup.class, true);
     fcm.checkDefaultLog(FileUtils.class, true);
-    fcm.checkDefaultLog(TaskManager.class, true);
-    fcm.checkDefaultLog(GitCalls.class, false);
     fcm.checkDefaultLog(GitObtainer.class, true);
+    fcm.checkDefaultLog(LoadAndCleanProjects.class, true);
     fcm.checkDefaultLog(MavenObtainer.class, true);
-    fcm.checkDefaultLog(RepositoryDownloader.class, true);
+    fcm.checkDefaultLog(StageManager.class, true);
+    fcm.checkDefaultLog(ProjectsMemory.class, true);
+    
+  //alpha ordered default offs
+    fcm.checkDefaultLog(GitCalls.class, false);
+    fcm.checkDefaultLog(RepositoryDownloader.class, false);
   }
   
 

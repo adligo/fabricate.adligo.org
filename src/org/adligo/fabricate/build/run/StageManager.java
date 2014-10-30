@@ -3,21 +3,23 @@ package org.adligo.fabricate.build.run;
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.I_FabSetupTask;
-import org.adligo.fabricate.common.I_FabTask;
+import org.adligo.fabricate.common.I_FabSetupStage;
+import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.SystemHelper;
+import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.xml.io.FabricateType;
 import org.adligo.fabricate.xml.io.JavaType;
 import org.adligo.fabricate.xml.io.ProjectGroupsType;
+import org.adligo.fabricate.xml.io.StageType;
 import org.adligo.fabricate.xml.io.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io.StagesType;
-import org.adligo.fabricate.xml.io.TaskType;
 import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 import org.adligo.fabricate.xml.io.result.FailureType;
 import org.adligo.fabricate.xml.io.result.MachineInfoType;
 import org.adligo.fabricate.xml.io.result.ResultType;
 import org.adligo.fabricate.xml_io.FabricateIO;
 import org.adligo.fabricate.xml_io.ProjectIO;
+import org.adligo.fabricate.xml_io.ResultIO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,19 +33,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
-import javax.xml.namespace.QName;
 
-public class TaskManager {
-  private static PrintStream OUT = System.out;
-  private List<TaskType> tasks_ = new ArrayList<TaskType>();
-  private Map<String, Object> taskMap_ = new HashMap<String, Object>();
+public class StageManager {
+  private List<StageType> stages_ = new ArrayList<StageType>();
+  private Map<String, Object> stageMap_ = new HashMap<String, Object>();
   private List<String> sucessfulTasks_ = new ArrayList<String>();
-  private String currentTask_;
   private FabricateType fab_;
   private FabricateProjectType project_;
   private Exception failureException_;
@@ -56,7 +53,7 @@ public class TaskManager {
   private String failureStage_;
   private String failureProject_;
   
-  public TaskManager(FabricateXmlDiscovery xmlDiscovery, Map<String,String> args) {
+  public StageManager(FabricateXmlDiscovery xmlDiscovery, Map<String,String> args) {
     File file = new File(".");
     initalDirPath = file.getAbsolutePath();
     initalDirPath = initalDirPath.substring(0, initalDirPath.length() - 2);
@@ -99,17 +96,17 @@ public class TaskManager {
   @SuppressWarnings("boxing")
   private void runProjects() throws Exception {
     StagesAndProjectsType stagesAndProjects = fab_.getProjectGroup();
-    StagesType stages = stagesAndProjects.getStages();
-    List<TaskType> tasks = stages.getStage();
-    for (int i = 0; i < tasks.size(); i++) {
-      TaskType task = tasks.get(i);
-      String taskName = task.getName();
+    StagesType stagesType = stagesAndProjects.getStages();
+    List<StageType> stages = stagesType.getStage();
+    for (int i = 0; i < stages.size(); i++) {
+      StageType stage = stages.get(i);
+      String taskName = stage.getName();
       
-      String className = task.getClazz();
+      String className = stage.getClazz();
       Class<?> clazz = Class.forName(className);
       Object instance = clazz.newInstance();
-      tasks_.add(task);
-      taskMap_.put(taskName, instance);
+      stages_.add(stage);
+      stageMap_.put(taskName, instance);
     }
     
     ConcurrentExecutor concurrentExecutor = new ConcurrentExecutor();
@@ -121,9 +118,9 @@ public class TaskManager {
       }
     }
     
-    for (TaskType task: tasks_) {
-      String taskName = task.getName();
-      Boolean optional = task.isOptional();
+    for (StageType stage: stages_) {
+      String taskName = stage.getName();
+      Boolean optional = stage.isOptional();
       if (optional == null) {
         optional = Boolean.FALSE;
       }
@@ -136,15 +133,15 @@ public class TaskManager {
       }
       if (execute) {
         if (ctx_ == null) {
-          OUT.println("Starting stage " + taskName);
+          ThreadLocalPrintStream.println("Starting stage " + taskName);
         } else {
-          if (ctx_.isLogEnabled(TaskManager.class)) {
-            OUT.println("Starting stage " + taskName);
+          if (ctx_.isLogEnabled(StageManager.class)) {
+            ThreadLocalPrintStream.println("Starting stage " + taskName);
           }
         }
-        Object obj = taskMap_.get(taskName);
+        Object obj = stageMap_.get(taskName);
         if (!setup) {
-          I_FabSetupTask setupTask = (I_FabSetupTask) obj;
+          I_FabSetupStage setupTask = (I_FabSetupStage) obj;
           setupTask.setFabricate(fab_);
           setupTask.setInitalDirPath(initalDirPath);
           setupTask.setProject(project_);
@@ -155,13 +152,15 @@ public class TaskManager {
           sucessfulTasks_.add(taskName);
         } else {
           
-          I_FabTask fabTask = (I_FabTask) obj;
-          fabTask.setup(ctx_);
+          I_FabStage fabTask = (I_FabStage) obj;
           fabTask.setStageName(taskName);
+          fabTask.setup(ctx_);
+          
           if (fabTask.isConcurrent()) {
             concurrentExecutor.setTask(fabTask);
-            if (ctx_.isLogEnabled(TaskManager.class)) {
-              OUT.println("Starting concurrent execution with " + concurrentExecutor.getThreads() + " threads");
+            if (ctx_.isLogEnabled(StageManager.class)) {
+              ThreadLocalPrintStream.println("Starting concurrent execution with " + 
+                  concurrentExecutor.getThreads() + " threads");
             }
             concurrentExecutor.execute();
             concurrentExecutor.waitUntilFinished();
@@ -200,11 +199,11 @@ public class TaskManager {
       }
     }
     if (ctx_ != null) {
-      if (ctx_.isLogEnabled(TaskManager.class)) {
-        OUT.println("Writing " + resultFile.getAbsolutePath());
+      if (ctx_.isLogEnabled(StageManager.class)) {
+        ThreadLocalPrintStream.println("Writing " + resultFile.getAbsolutePath());
       }
     } else {
-      OUT.println("Writing " + resultFile.getAbsolutePath());
+      ThreadLocalPrintStream.println("Writing " + resultFile.getAbsolutePath());
     }
     ResultType result = new ResultType();
     File fabricatePath = new File(fabricateXmlPath_.substring(0, fabricateXmlPath_.length() - 14));
@@ -217,9 +216,6 @@ public class TaskManager {
     result.setOsVersion(osVersion);
     if (failureException_ == null) {
       result.setSuccessful(true);
-      if (ctx_.isLogEnabled(TaskManager.class)) {
-        OUT.println("Fabrication Successful!");
-      }
     } else {
       result.setSuccessful(false);
       FailureType failure = new FailureType();
@@ -231,10 +227,7 @@ public class TaskManager {
       String stackText = new String(baos.toByteArray());
       failure.setDetail(stackText);
       result.setFailure(failure);
-      if (ctx_.isLogEnabled(TaskManager.class)) {
-        failureException_.printStackTrace(OUT);
-        OUT.println("Fabrication Failed!");
-      }
+      
     }
     String hostName = SystemHelper.getHostname();
     
@@ -257,43 +250,53 @@ public class TaskManager {
     long start = new Long(startString);
     long dur = end - start;
     if (ctx_ != null) {
-      if (ctx_.isLogEnabled(TaskManager.class)) {
+      if (ctx_.isLogEnabled(StageManager.class)) {
          logDuration(dur);
       }
     } else {
       logDuration(dur);
     }
+    
     try {
       DatatypeFactory df = DatatypeFactory.newInstance();
       Duration duration = df.newDuration(dur);
       result.setDuration(duration);
+    } catch (DatatypeConfigurationException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+      return;
+    }
       
-      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.result");
-      Marshaller marshaller = jaxbContext.createMarshaller();
-      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-      marshaller.marshal(new JAXBElement<ResultType>(
-          new QName("http://www.adligo.org/fabricate/xml/io/result",
-          "result"), ResultType.class, result), resultFile);
-    } catch (Exception e) {
+    try { 
+      ResultIO.write(result, resultFile.getAbsolutePath());
+    } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     } 
-    
+    if (result.isSuccessful()) {
+      ThreadLocalPrintStream.println("Fabrication Successful!");
+    } else {
+      if (failureException_ != null) {
+        ThreadLocalPrintStream.printTrace(failureException_);
+      }
+      ThreadLocalPrintStream.println("Fabrication Failed!");
+    }
+    System.exit(0);
   }
   
   public void logDuration(long duration) {
     if (duration < 1000) {
-      OUT.println("Duration was " + duration + " milliseconds.");
+      ThreadLocalPrintStream.println("Duration was " + duration + " milliseconds.");
     } else if (duration < 1000 * 60) {
       double secs = duration;
       secs = secs / 1000;
       int secsInt = (int) secs;
-      OUT.println("Duration was " + secsInt + " seconds.");
+      ThreadLocalPrintStream.println("Duration was " + secsInt + " seconds.");
     } else if (duration < 1000 * 60 * 60) {
       double mins = duration;
       mins = mins / 1000 * 60;
       int minsInt = (int) mins;
-      OUT.println("Duration was " + minsInt + " minutes.");
+      ThreadLocalPrintStream.println("Duration was " + minsInt + " minutes.");
     }
   }
 }

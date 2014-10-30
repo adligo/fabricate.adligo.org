@@ -21,6 +21,7 @@ public class FabContextMutant implements I_FabContext {
   private FabricateType fabricate_;
   private FabricateProjectType project_;
   private String localRepositoryPath_;
+  private String javaHome_;
   
   public FabContextMutant() {
   }
@@ -166,5 +167,13 @@ public class FabContextMutant implements I_FabContext {
 
   public void setLocalRepositoryPath(String localRepositoryPath) {
     localRepositoryPath_ = localRepositoryPath;
+  }
+
+  public String getJavaHome() {
+    return javaHome_;
+  }
+
+  public void setJavaHome(String javaHome) {
+    javaHome_ = javaHome;
   }
 }

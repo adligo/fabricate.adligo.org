@@ -1,8 +1,8 @@
-package org.adligo.fabricate.build.tasks;
+package org.adligo.fabricate.build.stages;
 
 import org.adligo.fabricate.common.FabRunType;
 import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.I_FabTask;
+import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.xml.io.FabricateType;
@@ -12,10 +12,12 @@ import org.adligo.fabricate.xml.io.ProjectsType;
 import org.adligo.fabricate.xml.io.ScmType;
 import org.adligo.fabricate.xml.io.StagesAndProjectsType;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author scott
  *
  */
-public class GitObtainer implements I_FabTask {
+public class GitObtainer implements I_FabStage {
   private static PrintStream OUT = System.out;
   private ConcurrentLinkedQueue<ProjectType> projects_ = new ConcurrentLinkedQueue<ProjectType>();
   private int projectCount_;
@@ -38,6 +40,7 @@ public class GitObtainer implements I_FabTask {
   private I_FabContext ctx_;
   private AtomicBoolean finished_ = new AtomicBoolean(false);
   private volatile Exception lastException_ = null;
+  private final Semaphore semaphore_ = new Semaphore(1);
   
   @Override
   public void setup(I_FabContext ctx) {
@@ -72,12 +75,7 @@ public class GitObtainer implements I_FabTask {
       FabRunType runType = ctx_.getRunType();
       ProjectType project = projects_.poll();
       
-      
-     String gitCommand = ctx_.getArgValue("git");
-      if (FabRunType.DEVELOPMENT == runType && gitCommand == null) {
-        //nothing to do
-        return;
-      }
+      String gitCommand = ctx_.getArgValue("git");
       
       GitCalls gc = new GitCalls();
       gc.setCtx(ctx_);
@@ -88,38 +86,15 @@ public class GitObtainer implements I_FabTask {
       
       while (project != null) {
         String proj = project.getName();
-        
         switch (runType) {
           case DEFAULT:
-            if (ctx_.isLogEnabled(GitObtainer.class)) {
-              OUT.println("Starting git clone for " + proj);
-            }
-            try {
-              gc.clone(proj, projectsPath_);
-            } catch (IOException e) {
-              lastException_ = e;
-              return;
-            }
-            if (ctx_.isLogEnabled(GitObtainer.class)) {
-              OUT.println("Finished git clone for " + proj);
-            }
-            String version = project.getVersion();
-            if (!StringUtils.isEmpty(version)) {
-              if (ctx_.isLogEnabled(GitObtainer.class)) {
-                OUT.println("Starting git checkout for " + proj);
-              }
-              try {
-                gc.checkout(proj, projectsPath_, version);
-              } catch (IOException e) {
-                lastException_ = e;
-                return;
-              }
-              if (ctx_.isLogEnabled(GitObtainer.class)) {
-                OUT.println("Finished git checkout for " + proj);
-              }
-            }
+            cloneAndCheckout(project, gc, proj);
             break;
           case DEVELOPMENT:
+            File projectDir = new File(projectsPath_ + File.separator + proj);
+            if (!projectDir.exists()) {
+              cloneAndCheckout(project, gc, proj);
+            } else {
               if ("pull".equals(gitCommand)) {
                 if (ctx_.isLogEnabled(GitObtainer.class)) {
                   OUT.println("Starting git pull for " + proj);
@@ -134,22 +109,68 @@ public class GitObtainer implements I_FabTask {
                   OUT.println("Finished git pull for " + proj);
                 }
               }
+            }
             break;
            default:
              return;
         }
         finishedCount_.incrementAndGet();
         if (finishedCount_.get() == projectCount_) {
-          if (ctx_.isLogEnabled(GitObtainer.class)) {
-            OUT.println("GitObtainer setting finished ");
+          if (!finished_.get()) {
+            finish();
           }
-          finished_.set(true);
+          
         }
         project = projects_.poll();
       }
       
     } catch (Exception x) {
       lastException_ = x;
+    }
+  }
+
+  public void finish() {
+    try {
+      if (!finished_.get()) {
+        semaphore_.acquire();
+        if (ctx_.isLogEnabled(GitObtainer.class)) {
+          OUT.println("GitObtainer setting finished ");
+        }
+        finished_.set(true);
+        semaphore_.release();
+      }
+    } catch (InterruptedException x) {
+      //do nothing this thread didn't acquire the semaphore
+    }
+  }
+
+  public void cloneAndCheckout(ProjectType project, GitCalls gc, String proj) {
+    if (ctx_.isLogEnabled(GitObtainer.class)) {
+      OUT.println("Starting git clone for " + proj);
+    }
+    try {
+      gc.clone(proj, projectsPath_);
+    } catch (IOException e) {
+      lastException_ = e;
+      return;
+    }
+    if (ctx_.isLogEnabled(GitObtainer.class)) {
+      OUT.println("Finished git clone for " + proj);
+    }
+    String version = project.getVersion();
+    if (!StringUtils.isEmpty(version)) {
+      if (ctx_.isLogEnabled(GitObtainer.class)) {
+        OUT.println("Starting git checkout for " + proj);
+      }
+      try {
+        gc.checkout(proj, projectsPath_, version);
+      } catch (IOException e) {
+        lastException_ = e;
+        return;
+      }
+      if (ctx_.isLogEnabled(GitObtainer.class)) {
+        OUT.println("Finished git checkout for " + proj);
+      }
     }
   }
 

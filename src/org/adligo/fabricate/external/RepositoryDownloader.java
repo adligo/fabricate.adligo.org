@@ -84,7 +84,7 @@ public class RepositoryDownloader {
       //do nothing, what could you do close it again
     }
     if (repositories_.size() == 0) {
-      throw new RuntimeException("All of the remote repositories are down.");
+      throw new RuntimeException("Unable to reach any remote repositories.");
     }
   }
   
@@ -121,15 +121,18 @@ public class RepositoryDownloader {
         downloadedFile = true;
       } else {
         if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-          OUT.println("Trying to download " + url + System.lineSeparator() +
-              "\t to " + filePath);
+          OUT.println("Trying to download "  + System.lineSeparator() +
+              "\t" + repo + System.lineSeparator() +
+              "\t" + url.substring(repo.length(), url.length()) + System.lineSeparator() +
+              "\tto" + System.lineSeparator() + 
+              "\t" + filePath);
         }
         try {
           
           downloadFile(httpClient, url, filePath);
           if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-            OUT.println("Downloaded " + url + System.lineSeparator() +
-                "\t to " + filePath);
+            OUT.println("Successful downloaded to " + System.lineSeparator() +
+                "\t" + filePath);
           }
           downloadedFile = true;
         } catch (IOException e) {
@@ -149,14 +152,17 @@ public class RepositoryDownloader {
         } else {
           String md5Url = url + ".md5";
           if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-            OUT.println("Trying to download " + md5Url + System.lineSeparator() +
-                "\t to " + md5File);
+            OUT.println("Trying to download "  + System.lineSeparator() +
+                "\t" + repo + System.lineSeparator() +
+                "\t" + md5Url.substring(repo.length(), md5Url.length()) + System.lineSeparator() +
+                "\tto" + System.lineSeparator() + 
+                "\t" + md5File);
           }
           try {
             downloadFile(httpClient, md5Url, md5File);
             if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-              OUT.println("Downloaded " + md5Url + System.lineSeparator() +
-                  "\t to " + md5File);
+              OUT.println("Successful downloaded to " + System.lineSeparator() +
+                  "\t" + md5File);
             }
             downloadedSha = true;
           } catch (IOException e) {
@@ -214,8 +220,8 @@ public class RepositoryDownloader {
             }
           }
           if (!successfulDownloads) {
-            //new File(filePath).delete();
-            //new File(shaFile).delete();
+            new File(filePath).delete();
+            new File(md5File).delete();
           }
         }
       }

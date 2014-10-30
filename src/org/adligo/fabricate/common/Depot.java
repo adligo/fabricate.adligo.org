@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.xml.io.depot.DepotType;
 import org.adligo.fabricate.xml_io.DepotIO;
 
@@ -68,7 +69,8 @@ public class Depot implements I_Depot {
         }
       }
       try {
-        FileUtils.removeRecursive(Paths.get(dir.toURI()), ctx_);
+        FileUtils fus = new FileUtils(ctx_);
+        fus.removeRecursive(Paths.get(dir.toURI()));
       } catch (IOException x) {
         throw new RuntimeException(x);
       }

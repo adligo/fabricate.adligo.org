@@ -1,36 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
 	targetNamespace="http://www.adligo.org/fabricate/xml/io" 
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io" 
+	xmlns:fns="http://www.adligo.org/fabricate/xml/io" 
 	elementFormDefault="qualified"
-	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library" >
+	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library"
+	xmlns:pns="http://www.adligo.org/fabricate/xml/io/project"
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/tasks" >
 	
     <import schemaLocation="library.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io/library">
 	</import>
-
+	<import schemaLocation="project.xsd" 
+		namespace="http://www.adligo.org/fabricate/xml/io/project">
+	</import>
+	<import schemaLocation="tasks.xsd" 
+		namespace="http://www.adligo.org/fabricate/xml/io/tasks">
+	</import>
+	
     <complexType name="fabricate_type">
     	<sequence>
-    		<element name="java" type="tns:java_type" minOccurs="0"
+    		<element name="java" type="fns:java_type" minOccurs="0"
     			maxOccurs="1">
     		</element>
-            <element name="logs" type="tns:log_settings_type" minOccurs="0" maxOccurs="1"></element>
+            <element name="logs" type="fns:log_settings_type" minOccurs="0" maxOccurs="1"></element>
             <element name="dependencies"
-    			type="tns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
+    			type="fns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
     		</element>
     		<choice>
-    			<element name="groups" type="tns:project_groups_type"
+    			<element name="groups" type="fns:project_groups_type"
     				minOccurs="0" maxOccurs="1">
     			</element>
     			<element name="project_group"
-    				type="tns:stages_and_projects_type" minOccurs="0"
+    				type="fns:stages_and_projects_type" minOccurs="0"
     				maxOccurs="1">
     			</element>
     		</choice>
     	</sequence>
     </complexType>
 
-    <element name="fabricate" type="tns:fabricate_type"></element>
+    <element name="fabricate" type="fns:fabricate_type"></element>
 
     <complexType name="project_groups_type">
     	<sequence>
@@ -54,8 +62,8 @@
 
     <complexType name="projects_type">
     		<sequence>
-    			<element name="scm" type="tns:scm_type" minOccurs="1" maxOccurs="1"></element>
-    			<element name="project" type="tns:project_type" minOccurs="1" maxOccurs="unbounded"></element>
+    			<element name="scm" type="fns:scm_type" minOccurs="1" maxOccurs="1"></element>
+    			<element name="project" type="fns:project_type" minOccurs="1" maxOccurs="unbounded"></element>
     		</sequence>
     	
     </complexType>
@@ -63,7 +71,7 @@
 	<complexType name="scm_type">
     
     	<choice>
-    		<element name="git" type="tns:git_server_type" minOccurs="1"
+    		<element name="git" type="fns:git_server_type" minOccurs="1"
     			maxOccurs="1">
     		</element>
     	</choice>
@@ -139,7 +147,11 @@
     	</attribute>
     </complexType>
 
-    <complexType name="task_type">
+    <complexType name="stage_type">
+    	<sequence>
+    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="task" type="tns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
     	<attribute name="name" type="string"></attribute>
     	<attribute name="class" type="string">
     		<annotation>
@@ -154,11 +166,10 @@
     	<attribute name="optional" type="boolean">
     		<annotation>
     			<documentation>
-    				When this is set to true, the task/stage
-    				name must be set to true for the stage to
-    				execute.  This is done so that external users
-    				of the build do not need to push to a intelligence4j 
-    				server. 
+    				When this is set to true, the task/stage name must
+    				be set to true for the stage to execute. This is
+    				done so that external users of the build do not need
+    				to push to a intelligence4j server.
     			</documentation>
     		</annotation>
     	</attribute>
@@ -166,14 +177,14 @@
 
     <complexType name="stages_type">
     	<sequence>
-    		<element name="stage" type="tns:task_type" minOccurs="1" maxOccurs="unbounded"></element>
+    		<element name="stage" type="fns:stage_type" minOccurs="1" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 
     <complexType name="stages_and_projects_type">
     	<sequence>
-    		<element name="stages" type="tns:stages_type" minOccurs="1" maxOccurs="1"></element>
-    		<element name="projects" type="tns:projects_type" minOccurs="1" maxOccurs="1"></element>
+    		<element name="stages" type="fns:stages_type" minOccurs="1" maxOccurs="1"></element>
+    		<element name="projects" type="fns:projects_type" minOccurs="1" maxOccurs="1"></element>
     	</sequence>
     </complexType>
 
@@ -214,7 +225,7 @@
 
     <complexType name="log_settings_type">
     	<sequence>
-    		<element name="log" type="tns:log_setting_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="log" type="fns:log_setting_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 </schema>

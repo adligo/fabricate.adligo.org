@@ -17,7 +17,7 @@ import java.util.Map;
  * @author scott
  *
  */
-public interface I_FabSetupTask {
+public interface I_FabSetupStage {
   public void setInitalDirPath(String initalDir);
   public void setFabricate(FabricateType fabricate);
   public void setProject(FabricateProjectType project);

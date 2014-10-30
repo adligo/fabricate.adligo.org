@@ -1,11 +1,16 @@
 package org.adligo.fabricate;
 
+import org.adligo.fabricate.common.ArgsParser;
 import org.adligo.fabricate.common.FabContextMutant;
 import org.adligo.fabricate.common.FabricateDefaults;
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
+import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.DefaultLocalRepositoryPathBuilder;
+import org.adligo.fabricate.external.Executor;
+import org.adligo.fabricate.external.JavaCalls;
 import org.adligo.fabricate.external.RepositoryDownloader;
 import org.adligo.fabricate.xml.io.FabricateDependencies;
 import org.adligo.fabricate.xml.io.FabricateType;
@@ -18,34 +23,58 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FabricateSetup {
-  private static PrintStream OUT = System.out;
   
 	public static void main(String [] args) {
-	  List<String> argList = new ArrayList<String>();
-	  for (int i = 0; i < args.length; i++) {
-      argList.add(args[i]);
-    }
-	  if ("args".equals(args[0])) {
-	    doArgs(argList.contains("debug"));
-	  } else if ("opts".equals(args[0])) {
-	    doOpts(argList.contains("debug"));
+	  Map<String,String> argMap = ArgsParser.parseArgs(args);
+	  if (argMap.containsKey("args")) {
+	    doArgs(argMap);
+	  } else if (argMap.containsKey("opts")) {
+	    doOpts(argMap);
 	  }
 	  
 	}
 
-  private static void doOpts(boolean debug) {
+  private static void doOpts(Map<String,String> argMap) {
     String fabHome = System.getenv("FABRICATE_HOME");
-    FabricateXmlDiscovery fd = new FabricateXmlDiscovery();
+    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(argMap.containsKey("debug"));
     if (!fd.hasFabricateXml()) {
-      System.out.println("-cp " + fabHome + "/lib/*.jar");
+      System.out.println("Exception no fabricate.xml or project.xml found.");
     } else {
-      workWithFabricateXml(fabHome, fd, debug);
+      String javaHome = System.getenv("JAVA_HOME");
+      if (StringUtils.isEmpty(javaHome)) {
+        ThreadLocalPrintStream.println(
+            "Exception no $JAVA_HOME environment variable set");
+        return;
+      } else {
+        String version = argMap.get("java");
+        if (StringUtils.isEmpty(javaHome)) {
+          ThreadLocalPrintStream.println("Exception java version parameter expected");
+          return;
+        }
+        try {
+          String javaHomeVersion = JavaCalls.getJavaVersion(
+              new File(javaHome + File.separator + "bin"));
+          if (!javaHomeVersion.equals(version)) {
+            ThreadLocalPrintStream.println("Exception java home to have version "
+                + version + " but was " + javaHomeVersion);
+            return;
+          }
+        } catch (IOException | InterruptedException e) {
+          e.printStackTrace();
+          return;
+        }
+        
+        
+      }
+      workWithFabricateXml(fabHome, fd, argMap);
     }
   }
 
-  public static void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd, boolean debug) {
+  public static void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd, 
+      Map<String,String> argMap) {
     File fabricateXml = new File(fd.getFabricateXmlPath());
     
     try {
@@ -62,9 +91,19 @@ public class FabricateSetup {
     }
   }
 
-  private static void doArgs(boolean debug) {
+  private static void doArgs(Map<String,String> argMap) {
     long now = System.currentTimeMillis();
-    OUT.println("start=" + now);
+    
+    try {
+      String versionNbrString = JavaCalls.getJavaVersion();
+      double versionDouble = JavaCalls.getJavaMajorVersion(versionNbrString);
+      if (versionDouble < 1.8) {
+        throw new IllegalStateException("Fabricate requires java 1.8 or greater");
+      }
+      ThreadLocalPrintStream.println("start=" + now + " java=" + versionNbrString);
+    } catch (IOException | InterruptedException | IllegalStateException e) {
+      e.printStackTrace();
+    }
   }
   
   public static String buildClasspath(String fabricateXml, String fabricateHome) {

@@ -1,9 +1,9 @@
-package org.adligo.fabricate.build.tasks;
+package org.adligo.fabricate.build.stages;
 
 import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.I_FabTask;
+import org.adligo.fabricate.common.I_FabStage;
 
-public class Tests4jTests implements I_FabTask {
+public class PublishToIntelligence4j implements I_FabStage {
 
   @Override
   public void run() {

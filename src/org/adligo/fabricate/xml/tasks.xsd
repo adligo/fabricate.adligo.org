@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io/tasks" 
+	elementFormDefault="qualified"
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/tasks" >
+	
+    <complexType name="task_type">
+    	<sequence>
+    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded">
+    			<annotation>
+					<documentation>
+						Each task is called by main fabricate run (fabricate.xml)
+						there may be many tasks to one stage.  Each task gets params
+						which are formed by the project.xml's task params overriding
+						the fabricate.xml's task params.
+					</documentation>
+				</annotation>
+    		</element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+    
+    <complexType name="param_type">
+    	<attribute name="key" type="string" use="required"></attribute>
+    	<attribute name="value" type="string" use="optional"></attribute>
+    </complexType>
+</schema>

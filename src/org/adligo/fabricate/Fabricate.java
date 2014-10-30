@@ -1,6 +1,7 @@
 package org.adligo.fabricate;
 
-import org.adligo.fabricate.build.run.TaskManager;
+import org.adligo.fabricate.build.run.StageManager;
+import org.adligo.fabricate.common.ArgsParser;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 
 import java.io.File;
@@ -9,7 +10,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -20,7 +20,14 @@ public class Fabricate {
   
   
   public static final void main(String [] args) {
-    FabricateXmlDiscovery discovery = new FabricateXmlDiscovery();
+    Map<String,String> argMap = ArgsParser.parseArgs(args);
+    if (argMap.containsKey("debug")) {
+      Set<Entry<String,String>> entries = argMap.entrySet();
+      for (Entry<String,String> e: entries) {
+        OUT.println(e.getKey() + " = " + e.getValue());
+      }
+    }
+    FabricateXmlDiscovery discovery = new FabricateXmlDiscovery(argMap.containsKey("debug"));
     
     if (!discovery.hasFabricateXml()) {
       OUT.println("Fabricate did not discover a fabricate.xml or project.xml.");
@@ -35,8 +42,7 @@ public class Fabricate {
       return;
     }
     
-    Map<String,String> argMap = parseArgs(args);
-   
+    
     FileOutputStream fos = null;
     try {
       if (!runMarker.createNewFile()) {
@@ -68,26 +74,8 @@ public class Fabricate {
       }
     }
     
-    TaskManager tm = new TaskManager(discovery, argMap);
+    StageManager tm = new StageManager(discovery, argMap);
     tm.run();
   }
   
-  private static Map<String,String> parseArgs(String [] args) {
-    Map<String,String> toRet = new HashMap<String,String>();
-    for (int i = 0; i < args.length; i++) {
-      String arg = args[i];
-      int eq = arg.indexOf("=");
-      if (eq != -1) {
-        String key = arg.substring(0, eq);
-        String value = "";
-        if (arg.length() > eq + 1) {
-          value = arg.substring(eq + 1, arg.length());
-        } 
-        toRet.put(key, value);
-      } else {
-        toRet.put(arg,null);
-      }
-    }
-    return toRet;
-  }
 }

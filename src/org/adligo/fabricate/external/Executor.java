@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * This is suppose to execute a process similar to a 
@@ -31,6 +33,7 @@ public class Executor {
     pb.redirectErrorStream(true);
     Process p = pb.start();
     p.waitFor();
+    int exitValue = p.exitValue();
     
     InputStream is = null;
     InputStreamReader isr = null;
@@ -60,7 +63,21 @@ public class Executor {
         is.close();
       }
     }
-    p.waitFor();
+    if (exitValue != 0) {
+      throw new IOException("Process exited abnormially " + exitValue + System.lineSeparator() +
+          inDir.getAbsolutePath() + System.lineSeparator() +
+          toString(args) + System.lineSeparator() +
+          new String(baos.toByteArray()));
+    }
     return new String(baos.toByteArray());
+  }
+  
+  private static String toString(String [] args) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < args.length; i++) {
+      sb.append(args[i]);
+      sb.append(" ");
+    }
+    return sb.toString();
   }
 }

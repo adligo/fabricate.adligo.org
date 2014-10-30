@@ -1,30 +1,28 @@
-package org.adligo.fabricate.build.tasks;
+package org.adligo.fabricate.build.stages;
 
+import org.adligo.fabricate.build.stages.shared.ProjectsMemory;
 import org.adligo.fabricate.common.DependencyTypeHelper;
 import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.I_FabTask;
+import org.adligo.fabricate.common.I_FabStage;
+import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.external.DefaultLocalRepositoryPathBuilder;
 import org.adligo.fabricate.external.RepositoryDownloader;
 import org.adligo.fabricate.xml.io.FabricateDependencies;
 import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.ProjectType;
-import org.adligo.fabricate.xml.io.ProjectsType;
-import org.adligo.fabricate.xml.io.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io.library.DependenciesType;
 import org.adligo.fabricate.xml.io.library.DependencyType;
 import org.adligo.fabricate.xml.io.library.LibraryType;
 import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 import org.adligo.fabricate.xml.io.project.StagesType;
 import org.adligo.fabricate.xml_io.LibraryIO;
-import org.adligo.fabricate.xml_io.ProjectIO;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,12 +30,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * this class is a delegates to to other classes that 
  * obtain projects from source control (i.e. git).
  * 
+ * This task is not participation aware, it doesn't check the project.xml file 
+ * for the stage, it always executes.
+ * 
  * @author scott
  *
  */
-public class MavenObtainer implements I_FabTask {
+public class MavenObtainer implements I_FabStage {
   private static PrintStream OUT = System.out;
-  private ConcurrentLinkedQueue<ProjectType> projects_ = new ConcurrentLinkedQueue<ProjectType>();
+  private ConcurrentLinkedQueue<NamedProject> projects_;
   private ConcurrentLinkedQueue<DependencyTypeHelper> deps_ = new ConcurrentLinkedQueue<DependencyTypeHelper>();
   private CopyOnWriteArraySet<String> libsDone_ = new CopyOnWriteArraySet<String>();
   private CopyOnWriteArraySet<DependencyTypeHelper> uniqueDeps_ = new CopyOnWriteArraySet<DependencyTypeHelper>();
@@ -53,6 +54,9 @@ public class MavenObtainer implements I_FabTask {
   private AtomicBoolean finished_ = new AtomicBoolean(false);
   private volatile Exception lastException_ = null;
   private RepositoryDownloader repoDown_;
+  private final Semaphore semaphore4Deps_ = new Semaphore(1);
+  private final Semaphore semaphore_ = new Semaphore(1);
+  
   @Override
   public void setup(I_FabContext ctx) {
     ctx_ = ctx;
@@ -67,13 +71,8 @@ public class MavenObtainer implements I_FabTask {
       OUT.println("Finding dependencies for projects in " + projectsPath_);
     }
     
-    StagesAndProjectsType stageAndProj = fab.getProjectGroup();
-    ProjectsType projects = stageAndProj.getProjects();
-    
-    List<ProjectType> projTypes =  projects.getProject();
-    projects_.clear();
-    projects_.addAll(projTypes);
-    projectCount_ = projTypes.size();
+    projects_ = ProjectsMemory.getNewProjectDependencyOrder();
+    projectCount_ = projects_.size();
     finishedProjectCount_.set(0);
     finished_.set(false);
   }
@@ -81,39 +80,29 @@ public class MavenObtainer implements I_FabTask {
   @Override
   public void run() {
     try {
-      ProjectType project = projects_.poll();
+      NamedProject project = projects_.poll();
       
       String fabricateDir = ctx_.getFabricateDirPath();
       while (project != null) {
         String projectName = project.getName();
-        File projectXml = new File(projectsPath_ + File.separator + projectName + File.separator +
-            "project.xml");
-        if (!projectXml.exists()) {
-          lastException_ = new FileNotFoundException(projectXml.getAbsolutePath());
-          return;
-        }
-        if (ctx_.isLogEnabled(MavenObtainer.class)) {
-          OUT.println("Reading " + projectXml);
-        }
-        FabricateProjectType fabProject = ProjectIO.parse(projectXml);
+        
+        FabricateProjectType fabProject = project.getProject();
         StagesType stagesType = fabProject.getStages();
-        List<String> stages = stagesType.getStage();
-        if (stages.contains(stageName_)) {
-          DependenciesType deps = fabProject.getDependencies();
-          if (deps != null) {
-            List<String> libs =  deps.getLibrary();
-            if (libs != null) {
-              for (String lib: libs) {
-                if (ctx_.isLogEnabled(MavenObtainer.class)) {
-                  OUT.println("project " + projectName + " has library " + lib);
-                }
-                addLibrary(fabricateDir, lib);
+      
+        DependenciesType deps = fabProject.getDependencies();
+        if (deps != null) {
+          List<String> libs =  deps.getLibrary();
+          if (libs != null) {
+            for (String lib: libs) {
+              if (ctx_.isLogEnabled(MavenObtainer.class)) {
+                OUT.println("project " + projectName + " has library " + lib);
               }
+              addLibrary(fabricateDir, lib);
             }
-            List<DependencyType> depsList = deps.getDependency();
-            for (DependencyType dep: depsList) {
-              uniqueDeps_.add(new DependencyTypeHelper(dep));
-            }
+          }
+          List<DependencyType> depsList = deps.getDependency();
+          for (DependencyType dep: depsList) {
+            uniqueDeps_.add(new DependencyTypeHelper(dep));
           }
         }
         finishedProjectCount_.incrementAndGet();
@@ -122,41 +111,72 @@ public class MavenObtainer implements I_FabTask {
       }
       if (finishedProjectCount_.get() == projectCount_) {
         if (!finishedProjects_.get()) {
-          synchronized (this) {
-            if (!finishedProjects_.get()) {
-              if (ctx_.isLogEnabled(MavenObtainer.class)) {
-                OUT.println("Finished finding dependencies for projects in " + projectsPath_ + 
-                    System.lineSeparator() + " there are " + uniqueDeps_.size());
-              }
-              finishedProjects_.set(true);
-              deps_.addAll(uniqueDeps_);
-              depCount_.set(uniqueDeps_.size());
-            }
-          }
+          finishFindingDeps();
         }
       }
-      
-      while (!finishedProjects_.get()) {
-        try {
-          Thread.sleep(250);
-        } catch (InterruptedException x) {
-          //do nothing, continue execution
-        }
-      }
-      
-      
+      DefaultLocalRepositoryPathBuilder pathBuilder = new DefaultLocalRepositoryPathBuilder("", "");
       DependencyTypeHelper dep = deps_.poll();
       while (dep != null) {
-        repoDown_.findOrDownloadAndSha1(dep.getDependencyType());
+        DependencyType depType = dep.getDependencyType();
+        if (ctx_.isLogEnabled(MavenObtainer.class)) {
+          OUT.println("Checking dependency " + pathBuilder.getFileName(depType));
+        }
+        repoDown_.findOrDownloadAndSha1(depType);
         finishedDepCount_.incrementAndGet();
         dep = deps_.poll();
       }
       if (finishedDepCount_.get() == depCount_.get()) {
-        finished_.set(true);
+        if (!finished_.get()) {
+          finish();
+        }
       }
     } catch (Exception x) {
       lastException_ = x;
     }
+  }
+
+  public void finish() {
+    if (!finished_.get()) {
+      try {
+        semaphore_.acquire();
+        if (!finished_.get()) {
+          if (ctx_.isLogEnabled(MavenObtainer.class)) {
+            OUT.println("Finished all MavenObtainer downloads.");
+          }
+          finished_.set(true);
+        }
+        semaphore_.release();
+      } catch (InterruptedException x) {
+        //do nothing this thread didn't get the acquire
+      }
+    } 
+  }
+
+  public void finishFindingDeps() {
+    
+    if (!finishedProjects_.get()) {
+      try {
+        semaphore4Deps_.acquire();
+        if (ctx_.isLogEnabled(MavenObtainer.class)) {
+          OUT.println("Finished finding dependencies for projects in " + projectsPath_ + 
+              System.lineSeparator() + " there are " + uniqueDeps_.size());
+        }
+        finishedProjects_.set(true);
+        deps_.addAll(uniqueDeps_);
+        depCount_.set(uniqueDeps_.size());
+        semaphore4Deps_.release();
+      } catch (InterruptedException x) {
+        while (!finishedProjects_.get()) {
+          try {
+            Thread.sleep(250);
+          } catch (InterruptedException g) {
+            //do nothing, continue execution
+          }
+        }
+      }
+        
+    }
+   
   }
 
   public void addLibrary(String fabricateDir, String lib) throws IOException {

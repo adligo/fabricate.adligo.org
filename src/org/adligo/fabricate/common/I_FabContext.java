@@ -18,6 +18,7 @@ public interface I_FabContext {
   public String getArgValue(String key);
   public String getFabricateXmlPath();
   public String getFabricateDirPath();
+  public String getJavaHome();
   /**
    * this is only used during a development
    * run of a single project

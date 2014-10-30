@@ -26,7 +26,8 @@ public class SchemaLoader implements LSResourceResolver {
   public static final String LIB_SCHEMA = XML_PACKAGE + "library.xsd";
   public static final String PROJECT_SCHEMA = XML_PACKAGE + "project.xsd";
   public static final String RESULT_SCHEMA = XML_PACKAGE + "result.xsd";
-                  
+  public static final String TASKS_SCHEMA = XML_PACKAGE + "tasks.xsd";
+  
   private DOMImplementationRegistry registry;
   private DOMImplementationLS domImplementationLS;
   private SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -51,12 +52,14 @@ public class SchemaLoader implements LSResourceResolver {
     namespaceToSchema.put("http://www.adligo.org/fabricate/xml/io/library", LIB_SCHEMA);
     namespaceToSchema.put("http://www.adligo.org/fabricate/xml/io/project", PROJECT_SCHEMA);
     namespaceToSchema.put("http://www.adligo.org/fabricate/xml/io/result", RESULT_SCHEMA);
+    namespaceToSchema.put("http://www.adligo.org/fabricate/xml/io/tasks", TASKS_SCHEMA);
     factory.setResourceResolver(this);  
     
     try {
       load(new Source[] {
           new StreamSource(FabricateXmlDiscovery.class.getResourceAsStream(DEV_SCHEMA)),
           new StreamSource(FabricateXmlDiscovery.class.getResourceAsStream(LIB_SCHEMA)),
+          new StreamSource(FabricateXmlDiscovery.class.getResourceAsStream(TASKS_SCHEMA)),
           new StreamSource(FabricateXmlDiscovery.class.getResourceAsStream(FAB_SCHEMA)),
           new StreamSource(FabricateXmlDiscovery.class.getResourceAsStream(PROJECT_SCHEMA)),
           new StreamSource(FabricateXmlDiscovery.class.getResourceAsStream(RESULT_SCHEMA))

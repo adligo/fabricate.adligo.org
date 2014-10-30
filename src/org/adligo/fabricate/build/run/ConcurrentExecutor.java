@@ -1,6 +1,6 @@
 package org.adligo.fabricate.build.run;
 
-import org.adligo.fabricate.common.I_FabTask;
+import org.adligo.fabricate.common.I_FabStage;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ConcurrentExecutor {
-  private I_FabTask task_;
+  private I_FabStage task_;
   private int threads_ = Runtime.getRuntime().availableProcessors() * 2;
   private ExecutorService service_;
   private List<Future<?>> futures_ = new CopyOnWriteArrayList<Future<?>>();
@@ -34,11 +34,11 @@ public class ConcurrentExecutor {
     }
   }
 
-  public I_FabTask getTask() {
+  public I_FabStage getTask() {
     return task_;
   }
 
-  public void setTask(I_FabTask task) {
+  public void setTask(I_FabStage task) {
     task_ = task;
   }
   

@@ -1,24 +1,23 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.xml.io.project.FabricateProjectType;
+
+import java.util.Map;
 
 /**
- * I_FabTask is a interface to allow plug-able
- * tasks to be called from fabricate.  It is generally
- * assumed that I_FabTask's are NOT concurrent
- * and only one at a time will run on the fabricate
- * environment.
- * The run method should be thread safe since
- * it will be called by multiple threads, any memory
- * should also use the concurrent collections.
+ * Tasks are intended to be reusable in multiple stage
+ * classes so custom stages can be built by java developers
+ * based on their need to modify fabricate.
+ * 
+ * Tasks are not intended to be thread safe, 
+ * a new one is should be created for each project/stage.
+ * 
+ * Note tasks should also have some sort of execute method,
+ * which could throw any type of exception.
  * 
  * @author scott
  *
  */
-public interface I_FabTask extends Runnable {
-  public void setStageName(String stageName);
-  public void setup(I_FabContext ctx);
-  public boolean isConcurrent();
-  public boolean isFinished();
-  public boolean hadException();
-  public Exception getException();
+public interface I_FabTask {
+  public void setup(I_FabContext ctx, NamedProject project, Map<String,String> params);
 }

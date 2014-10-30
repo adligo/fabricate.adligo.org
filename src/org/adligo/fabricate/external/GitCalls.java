@@ -115,24 +115,24 @@ public class GitCalls {
     return false;
   }
   
-  public static String describe() throws IOException {
-    String result;
+  public static String describe() {
+    String result = null;
     try {
       result = Executor.executeProcess(new File("."), "git", "describe");
-    } catch (InterruptedException e) {
-      throw new IOException(e);
+    } catch (InterruptedException | IOException e) {
+      //do nothing it has a exit code of 128 when there are no tags.
     }
-    if (result != null && result.trim().length() >= 1) {
-      if (gitOutputSuccess(result)) {
-        return result;
-      } else {
-        return "snapshot";
-      }
+    if (result == null) {
+      return "snapshot";
     }
     if (result.indexOf("fatal:") != -1) {
       return "snapshot";
     }
-    return result;
+    if (gitOutputSuccess(result)) {
+      return result;
+    } else {
+      return "snapshot";
+    }
   }
 
   public String getHostname() {

@@ -13,21 +13,34 @@ CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpcore-4.3.2.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpclient-4.3.5.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/@FABRICATE_NAME@.jar 
 
+EXCEPTION=Exception
+DEBUG=debug
+ARGS="$@"
 #echo command line args are "$@"
-ARGS_FROM_SETUP=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup args `
+ARGS_FROM_SETUP=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup args "$@" `
 if [ -z "$ARGS_FROM_SETUP" ]; then
     exit 1
 fi
-#echo ARGS_FROM_SETUP are $ARGS_FROM_SETUP
 
-OPTIONS_FROM_FILE=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup opts `
-if [ -z "$OPTIONS_FROM_FILE" ]; then
-    exit 1
-fi
-EXCEPTION=Exception
-#echo OPTIONS_FROM_FILE are $OPTIONS_FROM_FILE
-if [ "${OPTIONS_FROM_FILE#*$EXCEPTION}" != "$OPTIONS_FROM_FILE" ]; then
+if [ "${ARGS_FROM_SETUP#*$EXCEPTION}" != "$ARGS_FROM_SETUP" ]; then
 	echo "Fabrication Failed!"
 else
-	java  $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 
+	if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
+		echo ARGS_FROM_SETUP are $ARGS_FROM_SETUP
+	fi
+	OPTIONS_FROM_FILE=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup opts "$@" $ARGS_FROM_SETUP`
+	if [ -z "$OPTIONS_FROM_FILE" ]; then
+    	exit 1
+	fi
+
+	if [ "${OPTIONS_FROM_FILE#*$EXCEPTION}" != "$OPTIONS_FROM_FILE" ]; then
+		echo "$OPTIONS_FROM_FILE"
+		echo "Fabrication Failed!"
+	else
+		if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
+			echo OPTIONS_FROM_FILE are $OPTIONS_FROM_FILE
+		fi
+		java  $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 
+	fi
 fi
+

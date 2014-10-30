@@ -21,6 +21,11 @@ public class DefaultLocalRepositoryPathBuilder implements I_RepositoryPathBuilde
   }
   @Override
   public String getPath(DependencyType dependency) {
+    return getFolderPath(dependency) + seperator_ +
+        getFileName(dependency);
+  }
+
+  public String getFileName(DependencyType dependency) {
     String artifact = dependency.getArtifact();
     String version = dependency.getVersion();
     String type = dependency.getType();
@@ -28,18 +33,12 @@ public class DefaultLocalRepositoryPathBuilder implements I_RepositoryPathBuilde
       type = "jar";
     }
     
-    return getFolderPath(dependency) + seperator_ +
-        artifact + "-" + version + "." + type;
+    return artifact + "-" + version + "." + type;
   }
-
+  
   public String getFolderPath(DependencyType dependency) {
     String group = dependency.getGroup();
-    String artifact = dependency.getArtifact();
-    String version = dependency.getVersion();
-    
-    
-    return repo_ + group + seperator_ + 
-        artifact + seperator_ + version ;
+    return repo_ + group;
   }
   
   public String getUrl(DependencyType dependency) {
