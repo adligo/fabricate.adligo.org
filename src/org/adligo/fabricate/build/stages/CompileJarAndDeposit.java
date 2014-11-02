@@ -50,7 +50,9 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
   public void run() {
     try {
       NamedProject p = projectsQueue_.poll();
+      boolean didOne = false;
       while (p != null) {
+        didOne = true;
         String projectName = p.getName();
         if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
           ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " working on project " +
@@ -121,8 +123,10 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
         ThreadLocalPrintStream.println( " projectsQueueSize_ = " + projectsQueueSize_ +
             " projectsFinished_ = " + projectsFinished_.get());
       }
-      if (projectsQueueSize_ == projectsFinished_.get()) {
-        finish();
+      if (didOne) {
+        if (projectsQueueSize_ == projectsFinished_.get()) {
+          finish();
+        }
       }
     } catch (Exception x) {
       super.finish(x);
