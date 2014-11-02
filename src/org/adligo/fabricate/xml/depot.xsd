@@ -6,20 +6,19 @@
 
     <complexType name="depot_type">
     	<sequence>
-    		<element name="project" type="tns:project_artifacts_type" minOccurs="0" maxOccurs="unbounded"></element>
-    	</sequence>
-    </complexType>
-    
-    <complexType name="project_artifacts_type">
-    	<sequence>
     		<element name="artifact" type="tns:artifact_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
-    	<attribute name="name" type="string"></attribute>
     </complexType>
     
     <complexType name="artifact_type">
-    	<sequence>
-    	</sequence>
+    	<attribute name="project" type="string" use="required">
+    		<annotation>
+				<documentation>
+					The name of the project that this artifact 
+					came from.
+				</documentation>
+			</annotation>
+    	</attribute>
     	<attribute name="type" type="string">
     		<annotation>
 				<documentation>

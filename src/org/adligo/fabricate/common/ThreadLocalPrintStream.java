@@ -22,6 +22,11 @@ public class ThreadLocalPrintStream {
   public static final void printTrace(Throwable t) {
     PrintStream out = get();
     t.printStackTrace(out);
+    Throwable cause = t.getCause();
+    while (cause != null) {
+      cause.printStackTrace(out);
+      cause = cause.getCause();
+    }
   }
   
   private static PrintStream get() {

@@ -18,7 +18,12 @@ public interface I_FabStage extends Runnable {
   public void setStageName(String stageName);
   public void setup(I_FabContext ctx);
   public boolean isConcurrent();
-  public boolean isFinished();
+  /**
+   * The thread that calls this method
+   * will be blocked until it is notified
+   * that it is ok to continue
+   */
+  public void waitUntilFinished();
   public boolean hadException();
   public Exception getException();
 }

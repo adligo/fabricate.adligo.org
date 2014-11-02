@@ -1,5 +1,6 @@
 package org.adligo.fabricate.external;
 
+import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.xml.io.library.DependencyType;
 
 import java.io.File;
@@ -11,14 +12,17 @@ import java.io.File;
  * @author scott
  *
  */
-public class DefaultLocalRepositoryPathBuilder implements I_RepositoryPathBuilder {
+public class DefaultRepositoryPathBuilder implements I_RepositoryPathBuilder {
+  public static final String DASH = "-";
   private String repo_;
   private String seperator_;
   
-  public DefaultLocalRepositoryPathBuilder(String repository, String seperator) {
+  public DefaultRepositoryPathBuilder(String repository, String seperator) {
     repo_ = repository;
     seperator_ = seperator;
   }
+  
+  
   @Override
   public String getPath(DependencyType dependency) {
     return getFolderPath(dependency) + seperator_ +
@@ -26,14 +30,17 @@ public class DefaultLocalRepositoryPathBuilder implements I_RepositoryPathBuilde
   }
 
   public String getFileName(DependencyType dependency) {
+    String fileName  = dependency.getFileName();
+    if (!StringUtils.isEmpty(fileName)) {
+      return fileName;
+    }
     String artifact = dependency.getArtifact();
     String version = dependency.getVersion();
     String type = dependency.getType();
     if (type == null) {
       type = "jar";
     }
-    
-    return artifact + "-" + version + "." + type;
+    return artifact + DASH + version + "." + type;
   }
   
   public String getFolderPath(DependencyType dependency) {
@@ -42,15 +49,12 @@ public class DefaultLocalRepositoryPathBuilder implements I_RepositoryPathBuilde
   }
   
   public String getUrl(DependencyType dependency) {
-    String artifact = dependency.getArtifact();
-    String version = dependency.getVersion();
     String type = dependency.getType();
     if (type == null) {
       type = "jar";
     }
     
-    return getFolderUrl(dependency) + seperator_ +
-        artifact + "-" + version + "." + type;
+    return getFolderUrl(dependency) + seperator_ + getFileName(dependency);
   }
 
   public String getFolderUrl(DependencyType dependency) {
@@ -70,7 +74,7 @@ public class DefaultLocalRepositoryPathBuilder implements I_RepositoryPathBuilde
     }
     group = sb.toString();
     
-    return repo_ + group + seperator_ + 
-        artifact + seperator_ + version ;
+    return repo_ + group + "/" + 
+        artifact + "/" + version ;
   }
 }

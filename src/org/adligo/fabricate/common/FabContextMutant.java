@@ -5,6 +5,7 @@ import org.adligo.fabricate.xml.io.project.FabricateProjectType;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FabContextMutant implements I_FabContext {
   private FabRunType runType;
@@ -22,6 +23,9 @@ public class FabContextMutant implements I_FabContext {
   private FabricateProjectType project_;
   private String localRepositoryPath_;
   private String javaHome_;
+  private String javaVersion_;
+  private String fabricateVersion_;
+  private ConcurrentHashMap<String, Object> memory_ = new ConcurrentHashMap<String, Object>();
   
   public FabContextMutant() {
   }
@@ -175,5 +179,31 @@ public class FabContextMutant implements I_FabContext {
 
   public void setJavaHome(String javaHome) {
     javaHome_ = javaHome;
+  }
+
+  public String getJavaVersion() {
+    return javaVersion_;
+  }
+
+  public void setJavaVersion(String javaVersion) {
+    javaVersion_ = javaVersion;
+  }
+
+  public String getFabricateVersion() {
+    return fabricateVersion_;
+  }
+
+  public void setFabricateVersion(String fabricateVersion) {
+    fabricateVersion_ = fabricateVersion;
+  }
+
+  @Override
+  public void putInMemory(String key, Object value) {
+    memory_.put(key, value);
+  }
+
+  @Override
+  public Object getFromMemory(String key) {
+    return memory_.get(key);
   }
 }

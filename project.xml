@@ -2,4 +2,8 @@
 <tns:fabricate_project xmlns:tns="http://www.adligo.org/fabricate/xml/io/project" 
     xmlns:tns1="http://www.adligo.org/fabricate/xml/io/library" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
+    <tns:stages>
+        <tns:stage name="jar" />
+        <tns:stage name="build-fabricate-archives" />
+    </tns:stages>
  </tns:fabricate_project>

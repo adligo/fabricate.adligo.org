@@ -87,7 +87,7 @@ public class FileUtils {
           {
               File f = file.toFile();
               String absPath = f.getAbsolutePath();
-              absPath = simplePathName + File.separator + 
+              absPath = simplePathName + 
                   absPath.substring(length, absPath.length());
               if (matcher.isMatch(absPath)) {
                 list.add(absPath);

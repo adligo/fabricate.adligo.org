@@ -117,8 +117,10 @@
     					Fabricate currently only supports the default
     					layout.  This is the url to the repository 
     					folder ie;
-    					http://central.maven.org/maven2/
-    					http://repository.jboss.org/nexus/content/repositories/developer/
+    					http://docs.codehaus.org/display/MAVENUSER/Mirrors+Repositories
+    					http://repo1.maven.org/maven2/
+    					http://uk.maven.org/maven2/
+    					http://mirrors.ibiblio.org/maven2/
     					only http is available.
     				</documentation>
     			</annotation>

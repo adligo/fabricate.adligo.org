@@ -1,7 +1,7 @@
 package org.adligo.fabricate.build.stages;
 
+import org.adligo.fabricate.build.run.DepotManager;
 import org.adligo.fabricate.build.run.StageManager;
-import org.adligo.fabricate.build.stages.shared.ProjectsMemory;
 import org.adligo.fabricate.build.stages.tasks.CompileTask;
 import org.adligo.fabricate.common.Depot;
 import org.adligo.fabricate.common.FabContextMutant;
@@ -11,6 +11,7 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.external.GitCalls;
+import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.RepositoryDownloader;
 import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.xml.io.FabricateType;
@@ -34,6 +35,7 @@ public class DefaultSetup implements I_FabSetupStage {
   private FabricateProjectType project_;
   private String fabricateXmlPath_;
   private String projectXmlPath_;
+  private DepotManager depotManager_;
   private I_Depot depot_;
   
   @Override
@@ -58,9 +60,11 @@ public class DefaultSetup implements I_FabSetupStage {
     fcm.setArgs(args);
     fcm.setFabricate(fabricate_);
     fcm.setProject(project_);
+    fcm.setFabricateVersion(args.get("fabricate_version"));
     fcm.setInitialPath(initalDir_);
     fcm.setFabricateXmlPath(fabricateXmlPath_);
     fcm.setJavaHome(System.getenv("JAVA_HOME"));
+    fcm.setJavaVersion(args.get("java"));
     fcm.setFabricateDirPath(fabricateXmlPath_.substring(0, fabricateXmlPath_.length() - 14));
     if (projectXmlPath_ != null) {
       fcm.setProjectPath(projectXmlPath_.substring(0, projectXmlPath_.length() - 12));
@@ -70,13 +74,13 @@ public class DefaultSetup implements I_FabSetupStage {
     String depot = null;
     if (args.containsKey("depot")) {
       depot = args.get("depot");
-      depot_ = new Depot(depot, fcm);
-      fcm.setDepot(depot_);
     } else {
       depot = fabricateDir + File.separator + "depot";
-      depot_ = new Depot(depot, fcm);
-      fcm.setDepot(new Depot(fabricateDir + File.separator + "depot",fcm));
     }
+    depotManager_ = new DepotManager(fcm, depot);
+    depot_ = depotManager_.getDepot();
+    fcm.setDepot(depot_);
+    
     cleanDir(fcm, fabricateDir, "output");
     fcm.setOutputPath(fabricateDir + File.separator + "output");
     LocalRepositoryHelper lrh = new LocalRepositoryHelper();
@@ -88,7 +92,7 @@ public class DefaultSetup implements I_FabSetupStage {
       fcm.setRunType(FabRunType.PROJECT);
       fcm.setProjectPath(initalDir_);
     } else {
-      cleanDepot(fcm, depot);
+      depotManager_.clean();
       
       if (args.containsKey("dev")) {
         fcm.setRunType(FabRunType.DEVELOPMENT);
@@ -136,14 +140,6 @@ public class DefaultSetup implements I_FabSetupStage {
     }
   }
 
-  public void cleanDepot(FabContextMutant fcm, String depot) {
-    if (fcm.isLogEnabled(DefaultSetup.class)) {
-      OUT.println("Cleaning " + depot);
-    }
-    depot_.clean();
-  }
-
-
   public String getFabricateXmlPath() {
     return fabricateXmlPath_;
   }
@@ -180,18 +176,26 @@ public class DefaultSetup implements I_FabSetupStage {
       }
     }
     //alpha ordered default ons
+    fcm.checkDefaultLog(BaseConcurrentStage.class, true);
     fcm.checkDefaultLog(CompileTask.class, true);
+    fcm.checkDefaultLog(CompileJarAndDeposit.class, true);
     fcm.checkDefaultLog(DefaultSetup.class, true);
+    fcm.checkDefaultLog(DepotManager.class, true);
     fcm.checkDefaultLog(FileUtils.class, true);
     fcm.checkDefaultLog(GitObtainer.class, true);
+    fcm.checkDefaultLog(JavaJar.class, true);
     fcm.checkDefaultLog(LoadAndCleanProjects.class, true);
     fcm.checkDefaultLog(MavenObtainer.class, true);
     fcm.checkDefaultLog(StageManager.class, true);
-    fcm.checkDefaultLog(ProjectsMemory.class, true);
+    fcm.checkDefaultLog(CompileTask.class, true);
+    
+    fcm.checkDefaultLog(Depot.class, true);
     
   //alpha ordered default offs
     fcm.checkDefaultLog(GitCalls.class, false);
     fcm.checkDefaultLog(RepositoryDownloader.class, false);
+    //JavaJar true can cause the jar process to hang?
+    
   }
   
 

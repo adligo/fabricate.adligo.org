@@ -16,9 +16,10 @@ public interface I_FabContext {
   public boolean isLogEnabled(Class<?> clazz);
   public boolean hasArg(String key);
   public String getArgValue(String key);
-  public String getFabricateXmlPath();
   public String getFabricateDirPath();
-  public String getJavaHome();
+  public String getFabricateXmlPath();
+  public String getFabricateVersion();
+  
   /**
    * this is only used during a development
    * run of a single project
@@ -44,6 +45,10 @@ public interface I_FabContext {
    * @return
    */
   public String getInitialPath();
+  public String getJavaHome();
+  public String getJavaVersion();
+  
+  public String getLocalRepositoryPath();
   /**
    * This is the location where the 
    * output goes (result.xml, test xml files exc).
@@ -53,5 +58,7 @@ public interface I_FabContext {
   
   public FabricateType getFabricate();
   public FabricateProjectType getProject();
-  public String getLocalRepositoryPath();
+  public void putInMemory(String key, Object value);
+  public Object getFromMemory(String key);
+  
 }

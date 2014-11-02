@@ -1,5 +1,6 @@
 package org.adligo.fabricate.external;
 
+import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.StringUtils;
 
 import java.io.File;
@@ -8,18 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class JavaCompilerCalls {
+public class JavaCompiler {
+  private I_FabContext ctx_;
   private String inDir_;
   private String javaC_;
   
-  public JavaCompilerCalls(String inDir, String javaC) {
+  public JavaCompiler(I_FabContext ctx, String inDir, String javaC) {
+    ctx_ = ctx;
     inDir_ = inDir;
     javaC_ = javaC;
     
   }
-  public void compile(String srcPath, Map<JavaCParam,String> params, List<String> javaFiles) throws IOException {
+  public void compile(Map<JavaCParam,String> params, List<String> javaFiles) throws IOException {
 
-    List<String> args = buildArgs(javaC_, srcPath, params);
+    List<String> args = buildArgs(javaC_, params);
     args.addAll(javaFiles);
     try {
       Executor.executeProcess(new File(inDir_), args.toArray(new String[args.size()]));
@@ -28,7 +31,7 @@ public class JavaCompilerCalls {
     }
   }
   
-  private List<String> buildArgs(String whichJavaC, String srcPath, Map<JavaCParam,String> params) {
+  private List<String> buildArgs(String whichJavaC, Map<JavaCParam,String> params) {
     List<String> list = new  ArrayList<String>();
     list.add(whichJavaC);
     appendNoSpaceArg(params, JavaCParam.G, list);
@@ -38,8 +41,10 @@ public class JavaCompilerCalls {
     appendNoSpaceArg(params, JavaCParam.DEPRECATION, list);
     
     appendSpaceArg(params, JavaCParam.CP, list);
+    /* this wasn't helping
     list.add(JavaCParam.SOURCEPATH.toString());
     list.add(srcPath);
+    */
     appendNoSpaceArg(params, JavaCParam.PROC, list);
     appendSpaceArg(params, JavaCParam.PROCESSOR, list);
     appendSpaceArg(params, JavaCParam.PROCESSORPATH, list);

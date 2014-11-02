@@ -15,6 +15,7 @@ CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/@FABRICATE_NAME@.jar
 
 EXCEPTION=Exception
 DEBUG=debug
+VERSION=-version
 ARGS="$@"
 #echo command line args are "$@"
 ARGS_FROM_SETUP=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup args "$@" `
@@ -25,6 +26,12 @@ fi
 if [ "${ARGS_FROM_SETUP#*$EXCEPTION}" != "$ARGS_FROM_SETUP" ]; then
 	echo "Fabrication Failed!"
 else
+	if [ "${ARGS#*$VERSION}" != "$ARGS" ]; then
+		echo "Fabricate by Adligo."
+		VERSION=`echo $ARGS_FROM_SETUP | cut -f4 -d"="`
+		echo "Version $VERSION" 
+		exit 0
+	fi
 	if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
 		echo ARGS_FROM_SETUP are $ARGS_FROM_SETUP
 	fi

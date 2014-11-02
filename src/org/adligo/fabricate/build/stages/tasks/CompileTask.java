@@ -1,29 +1,38 @@
 package org.adligo.fabricate.build.stages.tasks;
 
+import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
+import org.adligo.fabricate.external.I_RepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCParam;
-import org.adligo.fabricate.external.JavaCompilerCalls;
+import org.adligo.fabricate.external.JavaCompiler;
 import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.external.files.I_FileMatcher;
 import org.adligo.fabricate.external.files.IncludesExcludesFileMatcher;
 import org.adligo.fabricate.external.files.PatternFileMatcher;
+import org.adligo.fabricate.xml.io.library.DependenciesType;
+import org.adligo.fabricate.xml.io.library.DependencyType;
+import org.adligo.fabricate.xml.io.library.LibraryType;
+import org.adligo.fabricate.xml.io.project.FabricateProjectType;
+import org.adligo.fabricate.xml_io.LibraryIO;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 public class CompileTask extends BaseTask implements I_FabTask {
-  public static final String SRC_DIRS = "srcDirs";
+  
   public static final String INCLUDES = "includes";
   public static final String EXCLUDES = "excludes";
   private Map<JavaCParam,String> compilerParams_;
@@ -32,25 +41,20 @@ public class CompileTask extends BaseTask implements I_FabTask {
   private String dir_;
   private String destDir_;
   private Map<String,List<String>> srcFiles_ = new HashMap<String,List<String>>();
+  private I_RepositoryPathBuilder repositoryPathBuilder_;
   
   @Override
   public void setup(I_FabContext ctx, NamedProject project, Map<String, String> params) {
     super.setup(ctx, project, params);
-    String srcDirsParams = params.get(SRC_DIRS);
-    
-    if (StringUtils.isEmpty(srcDirsParams)) {
-      srcDirs_ = new String[] {"src"};
-    } else {
-      StringTokenizer st = new StringTokenizer(srcDirsParams, ",");
-      List<String> tokens = new ArrayList<String>();
-      while (st.hasMoreTokens()) {
-        tokens.add(st.nextToken());
+    srcDirs_ = getDelimitedValue(DefaultTaskHelper.SRC_DIRS, ",",params);
+    if (ctx_.isLogEnabled(CompileTask.class)) {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < srcDirs_.length; i++) {
+        sb.append(srcDirs_[i]);
+        sb.append(" ");
       }
-      srcDirs_ = tokens.toArray(new String[tokens.size()]);
-    }
-    for (int i = 0; i < srcDirs_.length; i++) {
-      srcDirs_[i] = projectsPath_ + File.separator + projectName_ + File.separator +
-          srcDirs_[i];
+      ThreadLocalPrintStream.println("Project " + project.getName() + " has srcDirs " + System.lineSeparator() +
+          sb.toString());
     }
     compilerParams_ = new HashMap<JavaCParam, String>();
     Set<Entry<String,String>> entries = params.entrySet();
@@ -89,23 +93,103 @@ public class CompileTask extends BaseTask implements I_FabTask {
         return;
       }
     }
+    repositoryPathBuilder_ = new DefaultRepositoryPathBuilder(ctx_.getLocalRepositoryPath(),
+        File.separator);
+    
     
     whichJavaC_ = ctx_.getJavaHome() + File.separator + "bin" +
         File.separator + "javac";
+    compilerParams_ = Collections.unmodifiableMap(compilerParams_);
   }
 
-  public void execute() throws IOException {
-    JavaCompilerCalls jcc = new JavaCompilerCalls(dir_, whichJavaC_);
-    for (int i = 0; i < srcDirs_.length; i++) {
-      String srcDir = srcDirs_[i];
-      List<String> javaFiles = srcFiles_.get(srcDir);
-      if (ctx_.isLogEnabled(CompileTask.class)) {
-        ThreadLocalPrintStream.println("compiling from " + srcDir + System.lineSeparator() +
-              "\tto " + destDir_);
+  private String buildClasspath() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("");
+    
+    NamedProject np = project_;
+    FabricateProjectType fpt =  np.getProject();
+    buildClasspath(fpt.getDependencies(), new HashSet<String>(), sb);
+    return sb.toString();
+  }
+
+  public void buildClasspath(DependenciesType depsType, Set<String> completedLibraries,
+      StringBuilder sb) {
+    if (depsType == null) {
+      return;
+    }
+    List<String> libraries = depsType.getLibrary();
+    if (libraries != null) {
+      for (String lib: libraries) {
+        if (!completedLibraries.contains(lib)) {
+          completedLibraries.add(lib);
+          String libFile = ctx_.getFabricateDirPath() + File.separator + "lib" +
+              File.separator + lib + ".xml";
+          try {
+            LibraryType libType = LibraryIO.parse(new File(libFile));
+            DependenciesType subDepsType = libType.getDependencies();
+            buildClasspath(subDepsType, completedLibraries, sb);
+          } catch (IOException e) {
+            throw new IllegalStateException(e);
+          }
+        }
       }
-      jcc.compile(srcDir, compilerParams_, javaFiles);
+    }
+    List<DependencyType> deps = depsType.getDependency();
+    if (deps != null) {
+      for (DependencyType dep: deps) {
+        String jarFilePath = repositoryPathBuilder_.getPath(dep);
+        if (sb.length() >= 1) {
+          sb.append(File.pathSeparator);
+        }
+        sb.append(jarFilePath);
+      }
     }
     
+    List<String> projects = depsType.getProject();
+    if (projects != null) {
+      I_Depot depot = ctx_.getDepot();
+      for (String project: projects) { 
+        String file = depot.get(project, "jar");
+        if (sb.length() >= 1) {
+          sb.append(File.pathSeparator);
+        } 
+        sb.append(file);
+      }
+    }
+  }
+  
+  
+  public void execute() throws IOException {
+      JavaCompiler jcc = new JavaCompiler(ctx_, dir_, whichJavaC_);
+      
+      Map<JavaCParam,String> params = new HashMap<JavaCParam, String>();
+      params.putAll(compilerParams_);
+      
+      String cp = buildClasspath();
+      if (!StringUtils.isEmpty(cp)) {
+        if (ctx_.isLogEnabled(CompileTask.class)) {
+          ThreadLocalPrintStream.println("Project " + projectName_ + " has classpath" + System.lineSeparator() +
+                cp); 
+        }
+        params.put(JavaCParam.CP, cp);
+      }
+      
+      
+      List<String> allFiles = new ArrayList<String>();
+      for (int i = 0; i < srcDirs_.length; i++) {
+        String srcDir = srcDirs_[i];
+        if (i == 1) {
+          cp = cp + File.pathSeparator + "classes";
+          params.put(JavaCParam.CP, cp);
+        }
+        List<String> javaFiles = srcFiles_.get(srcDir);
+        if (ctx_.isLogEnabled(CompileTask.class)) {
+          ThreadLocalPrintStream.println("adding source files from " + srcDir + System.lineSeparator() +
+                "\tfor compile to " + destDir_);
+        }
+        allFiles.addAll(javaFiles);
+      }
+      jcc.compile(params, allFiles);
   }
 
 }

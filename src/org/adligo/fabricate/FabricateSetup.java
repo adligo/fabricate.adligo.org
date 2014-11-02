@@ -8,9 +8,10 @@ import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.external.DefaultLocalRepositoryPathBuilder;
+import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.Executor;
 import org.adligo.fabricate.external.JavaCalls;
+import org.adligo.fabricate.external.ManifestParser;
 import org.adligo.fabricate.external.RepositoryDownloader;
 import org.adligo.fabricate.xml.io.FabricateDependencies;
 import org.adligo.fabricate.xml.io.FabricateType;
@@ -100,7 +101,33 @@ public class FabricateSetup {
       if (versionDouble < 1.8) {
         throw new IllegalStateException("Fabricate requires java 1.8 or greater");
       }
-      ThreadLocalPrintStream.println("start=" + now + " java=" + versionNbrString);
+      String fabricateHome = System.getenv("FABRICATE_HOME");
+      if (fabricateHome == null) {
+        ThreadLocalPrintStream.println("Exception no fabricate home.");
+        return;
+      }
+      File lib = new File(fabricateHome + File.separator + "lib");
+      File [] files = lib.listFiles();
+      File fabricateJar = null;
+      for (int i = 0; i < files.length; i++) {
+        File file = files[i];
+        String fileName = file.getName();
+        if (fileName.indexOf("fabricate_") == 0) {
+          fabricateJar = file;
+          break;
+        }
+      }
+      if (fabricateJar == null) {
+        ThreadLocalPrintStream.println("Exception no fabricate_*.jar in FABRICATE_HOME/lib " + 
+              fabricateHome + "/lib!");
+        return;
+      }
+      ManifestParser mp = new ManifestParser();
+      mp.readManifest(fabricateJar.getAbsolutePath());
+      String fabricateVersion = mp.get(ManifestParser.IMPLEMENTATION_VERSION);
+      
+      ThreadLocalPrintStream.println("start=" + now + " java=" + versionNbrString +
+          " fabricate_version=" + fabricateVersion);
     } catch (IOException | InterruptedException | IllegalStateException e) {
       e.printStackTrace();
     }
@@ -155,7 +182,7 @@ public class FabricateSetup {
         //leave logs empty here
         List<String> repos = deps.getRemoteRepository();
         RepositoryDownloader rdl = new RepositoryDownloader(repos, 
-            new DefaultLocalRepositoryPathBuilder(localRepository, File.separator), fcm);
+            new DefaultRepositoryPathBuilder(localRepository, File.separator), fcm);
         for (DependencyType dep: depTypes) {
           rdl.findOrDownloadAndSha1(dep);
         }

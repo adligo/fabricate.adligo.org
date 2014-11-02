@@ -1,7 +1,5 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.project.FabricateProjectType;
-
 import java.util.Map;
 
 /**
@@ -19,5 +17,13 @@ import java.util.Map;
  *
  */
 public interface I_FabTask {
+  /**
+   * Many tasks in a stage will be concurrently executing this method
+   * on their local instance implementations of this class.
+   * 
+   * @param ctx
+   * @param project
+   * @param params
+   */
   public void setup(I_FabContext ctx, NamedProject project, Map<String,String> params);
 }

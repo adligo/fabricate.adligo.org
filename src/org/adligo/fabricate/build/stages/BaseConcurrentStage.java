@@ -1,6 +1,5 @@
 package org.adligo.fabricate.build.stages;
 
-import org.adligo.fabricate.build.stages.shared.ProjectsMemory;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
@@ -19,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,8 +35,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
   protected String projectsPath_;
   protected I_FabContext ctx_;
   protected FabricateType fabricate_;
-  protected final AtomicBoolean finished_ = new AtomicBoolean(false);
-  protected volatile Exception lastException_ = null;
+  private final ArrayBlockingQueue<Boolean> finished_ = new ArrayBlockingQueue<Boolean>(1);
+  private volatile Exception lastException_ = null;
   private Map<String,String> stageParams_ = null;
   private Map<String,Map<String,String>> taskParams_ = null;
   
@@ -45,7 +46,7 @@ public abstract class BaseConcurrentStage implements I_FabStage {
     ctx_ = ctx;
     fabricate_ = ctx_.getFabricate();
     projectsPath_ = ctx_.getProjectsPath();
-    finished_.set(false);
+    
     StagesAndProjectsType spt =  fabricate_.getProjectGroup();
     org.adligo.fabricate.xml.io.StagesType st = spt.getStages();
     List<org.adligo.fabricate.xml.io.StageType> stages = st.getStage();
@@ -98,16 +99,35 @@ public abstract class BaseConcurrentStage implements I_FabStage {
   }
 
   @Override
-  public boolean isFinished() {
-    if (lastException_ != null) {
-       if (ctx_.isLogEnabled(BaseConcurrentStage.class)) {
-         ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " had a exception.");
-       }
-      return true;
+  public void waitUntilFinished() {
+    try {
+      finished_.take();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
-    return finished_.get();
   }
 
+  protected void finish() {
+    try {
+      finished_.put(Boolean.TRUE);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  
+  protected void finish(Exception x) {
+    lastException_ = x;
+    if (ctx_.isLogEnabled(BaseConcurrentStage.class)) {
+      ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " had a exception.");
+    }
+    try {
+      
+      finished_.put(Boolean.TRUE);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  
   @Override
   public boolean hadException() {
     if (lastException_ != null) {
@@ -189,12 +209,15 @@ public abstract class BaseConcurrentStage implements I_FabStage {
       for (ProjectStageType stage: stages) {
         String projectStage = stage.getName();
         if (stageName_.equals(projectStage)) {
+          Map<String,String> toAdd = toMap(stage.getParam());
+          toRet.putAll(toAdd);
+          
           List<TaskType> tasks = stage.getTask();
           if (tasks != null) {
             for (TaskType taskType: tasks) {
               String projTaskName = taskType.getName();
               if (task.equals(projTaskName)) {
-                Map<String,String> toAdd = toMap(taskType.getParam());
+                toAdd = toMap(taskType.getParam());
                 toRet.putAll(toAdd);
                 break;
               }
@@ -202,6 +225,9 @@ public abstract class BaseConcurrentStage implements I_FabStage {
           }
         }
       }
+    }
+    if (ctx_.isLogEnabled(BaseConcurrentStage.class)) {
+      ThreadLocalPrintStream.println("Task " + task + " has params " + toRet);
     }
     return toRet;
   }
@@ -237,9 +263,14 @@ public abstract class BaseConcurrentStage implements I_FabStage {
    * 
    * @return
    */
+  @SuppressWarnings("unchecked")
   public ConcurrentLinkedQueue<NamedProject> getParticipantQueue() {
-    ConcurrentLinkedQueue<NamedProject> queue = ProjectsMemory.getNewProjectDependencyOrder();
+    ConcurrentLinkedQueue<NamedProject> queue = getNewProjectDependencyOrder();
     List<NamedProject> list = new ArrayList<NamedProject>(queue);
+    
+    ConcurrentHashMap<String, AtomicBoolean> projectStates =
+        (ConcurrentHashMap<String, AtomicBoolean>)
+        ctx_.getFromMemory(DefaultMemoryConstants.PROJECT_STATES);
     
     Iterator<NamedProject> it = list.iterator();
     while (it.hasNext()) {
@@ -247,9 +278,50 @@ public abstract class BaseConcurrentStage implements I_FabStage {
       FabricateProjectType fpt = np.getProject();
       if (!isParticipant(fpt)) {
         it.remove();
-        ProjectsMemory.setProjectFinisedForStage(np);
+        AtomicBoolean b = projectStates.get(np.getName());
+        b.set(true);
       } 
     }
     return new ConcurrentLinkedQueue<NamedProject>(list);
+  }
+  
+  /**
+   * This method can be called by stage/tasks after LoadAndCleanProjects
+   * to obtain a new project queue, if a task for a project
+   * depends on other projects being finished the methods
+   * hasProjectFinishedStage and 
+   * setProjectFinisedForStage can be used to make sure
+   * that execution happens in a nice orderly manor.
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  protected ConcurrentLinkedQueue<NamedProject> getNewProjectDependencyOrder() {
+    ConcurrentHashMap<String, AtomicBoolean> projectStates = new ConcurrentHashMap<String, AtomicBoolean>();
+    List<NamedProject> projs = (List<NamedProject>)
+          ctx_.getFromMemory(DefaultMemoryConstants.PROJECTS_DEPENDENCY_ORDER);
+    
+    for (NamedProject np: projs) {
+      projectStates.put(np.getName(), new AtomicBoolean(false));
+    }
+    ctx_.putInMemory(DefaultMemoryConstants.PROJECT_STATES, projectStates);
+    return new ConcurrentLinkedQueue<NamedProject>(projs);
+  }
+  
+  public boolean hasFinishedStage(String projectName) {
+    @SuppressWarnings("unchecked")
+    ConcurrentHashMap<String, AtomicBoolean> projectStates =
+        (ConcurrentHashMap<String, AtomicBoolean>)
+        ctx_.getFromMemory(DefaultMemoryConstants.PROJECT_STATES);
+    AtomicBoolean b = projectStates.get(projectName);
+    return b.get();
+  }
+  
+  public void setFinisedStage(String projectName) {
+    @SuppressWarnings("unchecked")
+    ConcurrentHashMap<String, AtomicBoolean> projectStates =
+        (ConcurrentHashMap<String, AtomicBoolean>)
+        ctx_.getFromMemory(DefaultMemoryConstants.PROJECT_STATES);
+    AtomicBoolean b = projectStates.get(projectName);
+    b.set(true);
   }
 }

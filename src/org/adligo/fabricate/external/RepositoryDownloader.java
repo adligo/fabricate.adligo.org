@@ -1,9 +1,11 @@
 package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.I_FabContext;
+import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.xml.io.library.DependencyType;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -38,9 +40,7 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class RepositoryDownloader {
   private static PrintStream OUT = System.out;
-  
   private List<String> repositories_ = new ArrayList<String>();
-  
   
   private I_RepositoryPathBuilder pathBuilder_;
   private I_FabContext ctx_;
@@ -66,12 +66,8 @@ public class RepositoryDownloader {
                   }
 
               });
-        if (status == 200) {
-          if ("/".equals(repoUrl.charAt(repoUrl.length() - 1))) {
-            repositories_.add(repoUrl);
-          } else {
-            repositories_.add(repoUrl + "/");
-          }
+        if (status < 300) {
+          repositories_.add(repoUrl);
         }
       } catch (IOException e) {
         //do nothing some server is down.
@@ -109,8 +105,8 @@ public class RepositoryDownloader {
     List<String> threadRemoteRepos = new ArrayList<String>(repositories_);
     boolean successfulDownloads = false;
     for (String repo: threadRemoteRepos) {
-      DefaultLocalRepositoryPathBuilder remoteBuilder = 
-          new DefaultLocalRepositoryPathBuilder(repo, "/");
+      DefaultRepositoryPathBuilder remoteBuilder = 
+          new DefaultRepositoryPathBuilder(repo, "/");
       String url = remoteBuilder.getUrl(dep);
       String filePath = pathBuilder_.getPath(dep);
       String folderPath = pathBuilder_.getFolderPath(dep);
@@ -188,8 +184,13 @@ public class RepositoryDownloader {
             
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte [] bytes = new byte[1];
+            int counter = 0;
             while (fis.read(bytes) != -1) {
               baos.write(bytes);
+              counter++;
+              if (counter >= 100) {
+                break;
+              }
             }
             
             if (bytes != null) {
@@ -226,10 +227,17 @@ public class RepositoryDownloader {
         }
       }
     }
+
+    if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
+      DefaultRepositoryPathBuilder builder = 
+          new DefaultRepositoryPathBuilder("", "/");
+      ThreadLocalPrintStream.println(builder.getUrl(dep) +
+          " was sucessful? " + successfulDownloads);
+    }
     if (!successfulDownloads) {
-      DefaultLocalRepositoryPathBuilder builder = 
-            new DefaultLocalRepositoryPathBuilder("any remote repository ", "/");
-      throw new IOException("Unable to download from " + 
+      DefaultRepositoryPathBuilder builder = 
+            new DefaultRepositoryPathBuilder("any remote repository ", "/");
+      throw new IllegalStateException("Unable to download from " + 
           builder.getPath(dep));
     }
   }
@@ -239,7 +247,11 @@ public class RepositoryDownloader {
     try {
       CloseableHttpResponse resp = httpClient.execute(new HttpGet(url));
       entity = resp.getEntity();
-      
+      StatusLine status = resp.getStatusLine();
+      if (status.getStatusCode() >= 300) {
+        throw new IOException("The following url returned a invalid status code " + status + System.lineSeparator() +
+            "\t" + url);
+      }
     } catch (ClientProtocolException x) {
       throw new IOException(x);
     }

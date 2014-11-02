@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author scott
  *
  */
-public class GitObtainer implements I_FabStage {
+public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
   private static PrintStream OUT = System.out;
   private ConcurrentLinkedQueue<ProjectType> projects_ = new ConcurrentLinkedQueue<ProjectType>();
   private int projectCount_;
@@ -38,12 +38,11 @@ public class GitObtainer implements I_FabStage {
   private String gitPath_;
   private String projectsPath_;
   private I_FabContext ctx_;
-  private AtomicBoolean finished_ = new AtomicBoolean(false);
-  private volatile Exception lastException_ = null;
   private final Semaphore semaphore_ = new Semaphore(1);
   
   @Override
   public void setup(I_FabContext ctx) {
+    super.setup(ctx);
     ctx_ = ctx;
     projectsPath_ = ctx_.getProjectsPath();
     if (ctx_.isLogEnabled(GitObtainer.class)) {
@@ -66,7 +65,6 @@ public class GitObtainer implements I_FabStage {
     projects_.addAll(projTypes);
     projectCount_ = projTypes.size();
     finishedCount_.set(0);
-    finished_.set(false);
   }
 
   @Override
@@ -102,7 +100,7 @@ public class GitObtainer implements I_FabStage {
                 try {
                   gc.pull(proj, projectsPath_);
                 } catch (IOException e) {
-                  lastException_ = e;
+                  super.finish(e);
                   return;
                 }
                 if (ctx_.isLogEnabled(GitObtainer.class)) {
@@ -116,29 +114,24 @@ public class GitObtainer implements I_FabStage {
         }
         finishedCount_.incrementAndGet();
         if (finishedCount_.get() == projectCount_) {
-          if (!finished_.get()) {
-            finish();
-          }
-          
+          finish();
         }
         project = projects_.poll();
       }
       
     } catch (Exception x) {
-      lastException_ = x;
+      super.finish(x);
     }
   }
 
   public void finish() {
     try {
-      if (!finished_.get()) {
-        semaphore_.acquire();
-        if (ctx_.isLogEnabled(GitObtainer.class)) {
-          OUT.println("GitObtainer setting finished ");
-        }
-        finished_.set(true);
-        semaphore_.release();
+      semaphore_.acquire();
+      if (ctx_.isLogEnabled(GitObtainer.class)) {
+        OUT.println("GitObtainer setting finished ");
       }
+      super.finish();
+      semaphore_.release();
     } catch (InterruptedException x) {
       //do nothing this thread didn't acquire the semaphore
     }
@@ -151,7 +144,7 @@ public class GitObtainer implements I_FabStage {
     try {
       gc.clone(proj, projectsPath_);
     } catch (IOException e) {
-      lastException_ = e;
+      super.finish(e);
       return;
     }
     if (ctx_.isLogEnabled(GitObtainer.class)) {
@@ -165,46 +158,13 @@ public class GitObtainer implements I_FabStage {
       try {
         gc.checkout(proj, projectsPath_, version);
       } catch (IOException e) {
-        lastException_ = e;
+        super.finish(e);
         return;
       }
       if (ctx_.isLogEnabled(GitObtainer.class)) {
         OUT.println("Finished git checkout for " + proj);
       }
     }
-  }
-
-  @Override
-  public boolean isFinished() {
-    
-    if (lastException_ != null) {
-      if (ctx_.isLogEnabled(GitObtainer.class)) {
-        OUT.println("GitObtainer had a Exception ");
-      }
-      return true;
-    }
-    return finished_.get();
-  }
-  
-  public boolean hadException() {
-    if (lastException_ == null) {
-      return false;
-    }
-    return true;
-  }
-  
-  public Exception getException() {
-    return lastException_;
-  }
-
-  @Override
-  public boolean isConcurrent() {
-    return true;
-  }
-
-  @Override
-  public void setStageName(String stageName) {
-    //ignore
   }
 
 }

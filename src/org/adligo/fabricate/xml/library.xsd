@@ -48,8 +48,16 @@
     	</attribute>
     	<attribute name="type" type="string" use="optional">
     		<annotation>
-    			<documentation>
-    				This defaults to jar.
+    			<documentation>This defaults to jar.</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="fileName" type="string" use="optional">
+    		<annotation>
+    			<documentation>This optional attribute allows you to
+    				specify any kind of file name in the remote maven
+    				repository, so you can have underscores or
+    				files with out version information in the filename
+    				exc.
     			</documentation>
     		</annotation>
     	</attribute>

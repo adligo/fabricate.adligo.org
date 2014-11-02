@@ -119,7 +119,7 @@ public class StageManager {
     }
     
     for (StageType stage: stages_) {
-      String taskName = stage.getName();
+      String stageName = stage.getName();
       Boolean optional = stage.isOptional();
       if (optional == null) {
         optional = Boolean.FALSE;
@@ -127,19 +127,19 @@ public class StageManager {
       boolean execute = true;
       if (optional) {
         execute = false;
-        if (args_.containsKey(taskName)) {
+        if (args_.containsKey(stageName)) {
           execute = true;
         }
       }
       if (execute) {
         if (ctx_ == null) {
-          ThreadLocalPrintStream.println("Starting stage " + taskName);
+          ThreadLocalPrintStream.println("Starting stage " + stageName);
         } else {
           if (ctx_.isLogEnabled(StageManager.class)) {
-            ThreadLocalPrintStream.println("Starting stage " + taskName);
+            ThreadLocalPrintStream.println("Starting stage " + stageName);
           }
         }
-        Object obj = stageMap_.get(taskName);
+        Object obj = stageMap_.get(stageName);
         if (!setup) {
           I_FabSetupStage setupTask = (I_FabSetupStage) obj;
           setupTask.setFabricate(fab_);
@@ -149,11 +149,11 @@ public class StageManager {
           setupTask.setProjectXmlPath(projectXmlPath_);
           ctx_ = setupTask.setup(args_);
           setup = true;
-          sucessfulTasks_.add(taskName);
+          sucessfulTasks_.add(stageName);
         } else {
           
           I_FabStage fabTask = (I_FabStage) obj;
-          fabTask.setStageName(taskName);
+          fabTask.setStageName(stageName);
           fabTask.setup(ctx_);
           
           if (fabTask.isConcurrent()) {
@@ -170,7 +170,14 @@ public class StageManager {
             fabTask.run();
           }
           if (fabTask.hadException()) {
+            if (ctx_.isLogEnabled(StageManager.class)) {
+              ThreadLocalPrintStream.println("Finished stage " + stageName + " with an exception.");
+            }
             throw fabTask.getException();
+          } else {
+            if (ctx_.isLogEnabled(StageManager.class)) {
+              ThreadLocalPrintStream.println("Finished stage " + stageName + " succesfuly");
+            }
           }
         }
       }
@@ -224,6 +231,11 @@ public class StageManager {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       PrintStream ps = new PrintStream(baos);
       failureException_.printStackTrace(ps);
+      Throwable t = failureException_.getCause();
+      while (t != null) {
+        t.printStackTrace(ps);
+        t = t.getCause();
+      }
       String stackText = new String(baos.toByteArray());
       failure.setDetail(stackText);
       result.setFailure(failure);

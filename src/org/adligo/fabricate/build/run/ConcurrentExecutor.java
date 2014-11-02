@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ConcurrentExecutor {
-  private I_FabStage task_;
+  private I_FabStage stage_;
   private int threads_ = Runtime.getRuntime().availableProcessors() * 2;
   private ExecutorService service_;
   private List<Future<?>> futures_ = new CopyOnWriteArrayList<Future<?>>();
@@ -29,28 +29,21 @@ public class ConcurrentExecutor {
     }
     futures_.clear();
     for (int i = 0; i <= threads_; i++) {
-      Future<?> future = service_.submit(task_);
+      Future<?> future = service_.submit(stage_);
       futures_.add(future);
     }
   }
 
   public I_FabStage getTask() {
-    return task_;
+    return stage_;
   }
 
   public void setTask(I_FabStage task) {
-    task_ = task;
+    stage_ = task;
   }
   
   public void waitUntilFinished() {
-    while ( !task_.isFinished()) {
-      try {
-        Thread.sleep(250);
-      } catch (InterruptedException x) {
-        x.printStackTrace();
-      }
-    }
-    service_.shutdownNow();
+    stage_.waitUntilFinished();
   }
 
   public int getThreads() {

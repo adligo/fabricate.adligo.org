@@ -71,7 +71,7 @@ public class GitCalls {
     String result;
     try {
      result = Executor.executeProcess(new File(localProjectDir + File.separator + project), 
-          "git", "pull", "origin","master");
+          "git", "pull", "-f","origin","master");
       if (ctx_.isLogEnabled(GitCalls.class)) {
         OUT.println("In " + localProjectDir + File.separator + project + System.lineSeparator() +
             "git checkout origin master" + System.lineSeparator() +
@@ -116,9 +116,12 @@ public class GitCalls {
   }
   
   public static String describe() {
+    return describe(".");
+  }
+  public static String describe(String where) {
     String result = null;
     try {
-      result = Executor.executeProcess(new File("."), "git", "describe");
+      result = Executor.executeProcess(new File(where), "git", "describe");
     } catch (InterruptedException | IOException e) {
       //do nothing it has a exit code of 128 when there are no tags.
     }
