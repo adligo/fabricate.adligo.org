@@ -6,4 +6,9 @@
         <tns:stage name="jar" />
         <tns:stage name="build-fabricate-archives" />
     </tns:stages>
+    <tns:dependencies>
+	    <tns:dependency group="commons-logging" artifact="commons-logging" version="1.2" />
+	    <tns:dependency group="org.apache.httpcomponents" artifact="httpclient" version="4.3.5" />
+	    <tns:dependency group="org.apache.httpcomponents" artifact="httpcore" version="4.3.2" />
+	 </tns:dependencies>
  </tns:fabricate_project>
