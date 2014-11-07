@@ -25,6 +25,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
@@ -299,16 +301,21 @@ public class StageManager {
   public void logDuration(long duration) {
     if (duration < 1000) {
       ThreadLocalPrintStream.println("Duration was " + duration + " milliseconds.");
-    } else if (duration < 1000 * 60) {
-      double secs = duration;
-      secs = secs / 1000;
-      int secsInt = (int) secs;
-      ThreadLocalPrintStream.println("Duration was " + secsInt + " seconds.");
-    } else if (duration < 1000 * 60 * 60) {
+    } else if (duration > 1000 * 60) {
       double mins = duration;
-      mins = mins / 1000 * 60;
-      int minsInt = (int) mins;
-      ThreadLocalPrintStream.println("Duration was " + minsInt + " minutes.");
+      double divisor = 1000 * 60;
+      mins = mins / divisor;
+      BigDecimal bd = new BigDecimal(mins);
+      bd = bd.setScale(2, RoundingMode.HALF_UP);
+      
+      ThreadLocalPrintStream.println("Duration was " + bd.toPlainString() + " minutes.");
+    } else {
+      double secs = duration;
+      double divisor = 1000;
+      secs = secs / divisor;
+      BigDecimal bd = new BigDecimal(secs);
+      bd = bd.setScale(2, RoundingMode.HALF_UP);
+      ThreadLocalPrintStream.println("Duration was " + bd.toPlainString() + " seconds.");
     }
   }
 }

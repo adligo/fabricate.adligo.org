@@ -17,8 +17,8 @@ public class DepotIO {
   public static void write(File file, DepotType depot) throws IOException {
     try {
      
-      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.depot");
-      Marshaller marshaller = jaxbContext.createMarshaller();
+      
+      Marshaller marshaller = FabricateJaxbContexts.DEPOT_CONTEXT.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
       marshaller.marshal(new JAXBElement<DepotType>(
           new QName("http://www.adligo.org/fabricate/xml/io/depot",
@@ -30,8 +30,7 @@ public class DepotIO {
   @SuppressWarnings("unchecked")
   public static DepotType parse(File file) throws IOException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.depot");
-      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+      Unmarshaller jaxbUnmarshaller = FabricateJaxbContexts.DEPOT_CONTEXT.createUnmarshaller();
       
       jaxbUnmarshaller.setSchema(SchemaLoader.INSTANCE.get());
       JAXBElement<DepotType> devType = (JAXBElement<DepotType>) jaxbUnmarshaller.unmarshal(file);

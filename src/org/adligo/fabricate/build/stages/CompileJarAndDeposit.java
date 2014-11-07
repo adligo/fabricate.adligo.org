@@ -105,12 +105,13 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
        }
        while (keys.hasMoreElements()) {
          ProjectBlock key = keys.nextElement();
-         if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-           ThreadLocalPrintStream.println(projectName + " is checking necessary notifications " +
-               key.getBlockingProject());
-         }
+         
          if (projectName.equals(key.getBlockingProject())) {
            ArrayBlockingQueue<Boolean> block =  projectBlockMap_.get(key);
+           if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
+             ThreadLocalPrintStream.println(projectName + " is checking notifying " +
+                 key.getProject());
+           }
            block.add(Boolean.TRUE);
            projectBlockMap_.remove(key);
          }
@@ -119,11 +120,12 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
         projectsFinished_.incrementAndGet();
         p = projectsQueue_.poll();
       }
-      if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-        ThreadLocalPrintStream.println( " projectsQueueSize_ = " + projectsQueueSize_ +
-            " projectsFinished_ = " + projectsFinished_.get());
-      }
+      
       if (didOne) {
+        if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
+          ThreadLocalPrintStream.println( " projectsQueueSize_ = " + projectsQueueSize_ +
+              " projectsFinished_ = " + projectsFinished_.get());
+        }
         if (projectsQueueSize_ == projectsFinished_.get()) {
           finish();
         }
