@@ -10,6 +10,7 @@ import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
+import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.RepositoryDownloader;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultSetup implements I_FabSetupStage {
-  private static PrintStream OUT = System.out;
   private String initalDir_;
   private FabricateType fabricate_;
   private FabricateProjectType project_;
@@ -89,12 +89,14 @@ public class DefaultSetup implements I_FabSetupStage {
     
     
     if (project_ != null) {
+      ThreadLocalPrintStream.println("running in project mode");
       fcm.setRunType(FabRunType.PROJECT);
       fcm.setProjectPath(initalDir_);
     } else {
       depotManager_.clean();
       
       if (args.containsKey("dev")) {
+        ThreadLocalPrintStream.println("running in developer mode");
         fcm.setRunType(FabRunType.DEVELOPMENT);
         File fabDir = new File(fabricateDir);
         File file = fabDir.getParentFile();
@@ -102,6 +104,7 @@ public class DefaultSetup implements I_FabSetupStage {
         createDevFile(file.getAbsolutePath() + File.separator + "dev.xml",fabDir.getName());
       } else {
         //must be the default setting
+        ThreadLocalPrintStream.println("running in default mode");
         fcm.setRunType(FabRunType.DEFAULT);
         cleanDir(fcm, fabricateDir,"projects");
         fcm.setProjectsPath(fabricateDir + File.separator + "projects");
@@ -126,7 +129,7 @@ public class DefaultSetup implements I_FabSetupStage {
     if (dirFile.exists()) {
       try {
         if (fcm.isLogEnabled(DefaultSetup.class)) {
-          OUT.println("Cleaning " + fullDir);
+          ThreadLocalPrintStream.println("Cleaning " + fullDir);
         }
         FileUtils fus = new FileUtils(fcm);
         fus.removeRecursive(Paths.get(dirFile.toURI()));
@@ -185,7 +188,7 @@ public class DefaultSetup implements I_FabSetupStage {
     fcm.checkDefaultLog(GitObtainer.class, true);
     fcm.checkDefaultLog(JavaJar.class, true);
     fcm.checkDefaultLog(LoadAndCleanProjects.class, true);
-    fcm.checkDefaultLog(MavenObtainer.class, true);
+    fcm.checkDefaultLog(MavenDownloader.class, true);
     fcm.checkDefaultLog(StageManager.class, true);
     fcm.checkDefaultLog(CompileTask.class, true);
     

@@ -99,7 +99,7 @@ public class FabricateSetup {
       String versionNbrString = JavaCalls.getJavaVersion();
       double versionDouble = JavaCalls.getJavaMajorVersion(versionNbrString);
       if (versionDouble < 1.8) {
-        throw new IllegalStateException("Fabricate requires java 1.8 or greater");
+        throw new IllegalStateException("Fabricate requires java 1.7 or greater");
       }
       String fabricateHome = System.getenv("FABRICATE_HOME");
       if (fabricateHome == null) {

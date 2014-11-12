@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author scott
  *
  */
-public class MavenObtainer extends BaseConcurrentStage implements I_FabStage {
+public class MavenDownloader extends BaseConcurrentStage implements I_FabStage {
    private ConcurrentLinkedQueue<NamedProject> projects_;
   private ConcurrentLinkedQueue<DependencyTypeHelper> deps_ = new ConcurrentLinkedQueue<DependencyTypeHelper>();
   private CopyOnWriteArraySet<String> libsDone_ = new CopyOnWriteArraySet<String>();
@@ -62,7 +62,7 @@ public class MavenObtainer extends BaseConcurrentStage implements I_FabStage {
         File.separator), ctx);
     
     projectsPath_ = ctx_.getProjectsPath();
-    if (ctx_.isLogEnabled(MavenObtainer.class)) {
+    if (ctx_.isLogEnabled(MavenDownloader.class)) {
       ThreadLocalPrintStream.println("Finding dependencies for projects in " + projectsPath_);
     }
     
@@ -88,7 +88,7 @@ public class MavenObtainer extends BaseConcurrentStage implements I_FabStage {
           List<String> libs =  deps.getLibrary();
           if (libs != null) {
             for (String lib: libs) {
-              if (ctx_.isLogEnabled(MavenObtainer.class)) {
+              if (ctx_.isLogEnabled(MavenDownloader.class)) {
                 ThreadLocalPrintStream.println("project " + projectName + " has library " + lib);
               }
               addLibrary(fabricateDir, lib);
@@ -112,7 +112,7 @@ public class MavenObtainer extends BaseConcurrentStage implements I_FabStage {
       DependencyTypeHelper dep = deps_.poll();
       while (dep != null) {
         DependencyType depType = dep.getDependencyType();
-        if (ctx_.isLogEnabled(MavenObtainer.class)) {
+        if (ctx_.isLogEnabled(MavenDownloader.class)) {
           ThreadLocalPrintStream.println("Checking dependency " + pathBuilder.getFileName(depType));
         }
         repoDown_.findOrDownloadAndSha1(depType);
@@ -133,7 +133,7 @@ public class MavenObtainer extends BaseConcurrentStage implements I_FabStage {
    
       try {
         semaphore_.acquire();
-        if (ctx_.isLogEnabled(MavenObtainer.class)) {
+        if (ctx_.isLogEnabled(MavenDownloader.class)) {
           ThreadLocalPrintStream.println("Finished all MavenObtainer downloads.");
         }
         super.finish();
@@ -148,7 +148,7 @@ public class MavenObtainer extends BaseConcurrentStage implements I_FabStage {
     if (!finishedProjects_.get()) {
       try {
         semaphore4Deps_.acquire();
-        if (ctx_.isLogEnabled(MavenObtainer.class)) {
+        if (ctx_.isLogEnabled(MavenDownloader.class)) {
           ThreadLocalPrintStream.println("Finished finding dependencies for projects in " + projectsPath_ + 
               System.lineSeparator() + " there are " + uniqueDeps_.size());
         }

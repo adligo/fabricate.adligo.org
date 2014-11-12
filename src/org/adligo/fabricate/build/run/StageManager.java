@@ -61,15 +61,24 @@ public class StageManager {
     initalDirPath = initalDirPath.substring(0, initalDirPath.length() - 2);
     
     String fabricateXml = xmlDiscovery.getFabricateXmlPath();
+    
     try {
       fabricateXmlPath_ = fabricateXml;
+      ThreadLocalPrintStream.println("reading " + fabricateXml);
       fab_ = FabricateIO.parse(new File(fabricateXml));
-      if (xmlDiscovery.hasProjectXml()) {
-        projectXmlPath_ = xmlDiscovery.getProjectXml();
-        project_ = ProjectIO.parse(new File(projectXmlPath_));
-      }
     } catch (IOException e) {
       failureException_ = e;
+    }
+    if (fab_ == null) {
+      try {
+        if (xmlDiscovery.hasProjectXml()) {
+          projectXmlPath_ = xmlDiscovery.getProjectXml();
+          ThreadLocalPrintStream.println("reading " + projectXmlPath_);
+          project_ = ProjectIO.parse(new File(projectXmlPath_));
+        }
+      } catch (IOException e) {
+        failureException_ = e;
+      }
     }
     args_ = args;
   }

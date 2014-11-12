@@ -20,6 +20,7 @@
 	         destdir="build/classes"
 	         debug="on"
 	         source="1.8"
+	         target="1.8"
 	         classpathref="lib.path.ref"
 	  	/>
 	    <echo> compile complete </echo>
@@ -80,7 +81,6 @@
 		<tar destfile="build/${fabricate_name}.tar.gz" basedir="build/${fabricate_name}" 
 		    compression="gzip" />
 		<zip destfile="build/${fabricate_name}.zip">
-			<zipfileset dir="bin" prefix="${fabricate_name}/bin" filemode="555" dirmode="555" />
 			<zipfileset dir="build/${fabricate_name}" prefix="${fabricate_name}"/>
 		</zip>	
 		<echo>packaged sucessfully</echo>
@@ -92,7 +92,7 @@
 	    </loadproperties>
 	    <delete dir="${deploy_dest}/${fabricate_name}" failonerror="false"/>
 	    <delete dir="${deploy_dest}/${fabricate_name}.tar.gz" failonerror="false"/>
-	    <move file="build/${fabricate_name}.tar.gz" todir="${deploy_dest}" />
+	    <copy file="build/${fabricate_name}.tar.gz" todir="${deploy_dest}" />
 	    <untar src="${deploy_dest}/${fabricate_name}.tar.gz" dest="${deploy_dest}" compression="gzip" />
 	    <chmod dir="${deploy_dest}/${fabricate_name}/bin" perm="ugo+rx" 
        		includes="fab"/>
