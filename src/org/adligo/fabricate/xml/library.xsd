@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-	targetNamespace="http://www.adligo.org/fabricate/xml/io/library" 
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io/library" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io/library/v1_0" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/library/v1_0" 
 	elementFormDefault="qualified">
 
     <complexType name="library_type">

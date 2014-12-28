@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-	targetNamespace="http://www.adligo.org/fabricate/xml/io" 
-	xmlns:fns="http://www.adligo.org/fabricate/xml/io" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io/v1_0" 
+	xmlns:fns="http://www.adligo.org/fabricate/xml/io/v1_0" 
 	elementFormDefault="qualified"
-	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library"
-	xmlns:pns="http://www.adligo.org/fabricate/xml/io/project"
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io/tasks" >
+	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library/v1_0"
+	xmlns:pns="http://www.adligo.org/fabricate/xml/io/project/v1_0"
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/tasks/v1_0" >
 	
     <import schemaLocation="library.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/library">
+		namespace="http://www.adligo.org/fabricate/xml/io/library/v1_0">
 	</import>
 	<import schemaLocation="project.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/project">
+		namespace="http://www.adligo.org/fabricate/xml/io/project/v1_0">
 	</import>
 	<import schemaLocation="tasks.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/tasks">
+		namespace="http://www.adligo.org/fabricate/xml/io/tasks/v1_0">
 	</import>
 	
     <complexType name="fabricate_type">

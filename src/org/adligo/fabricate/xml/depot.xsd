@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-	targetNamespace="http://www.adligo.org/fabricate/xml/io/depot" 
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io/depot" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io/depot/v1_0" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io/depot/v1_0" 
 	elementFormDefault="qualified">
 
     <complexType name="depot_type">
