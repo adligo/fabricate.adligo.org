@@ -15,7 +15,7 @@ public class FabricateIO {
   @SuppressWarnings("unchecked")
   public static FabricateType parse(File file) throws IOException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io");
+      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.v1_0");
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       
       jaxbUnmarshaller.setSchema(SchemaLoader.INSTANCE.get());

@@ -15,7 +15,7 @@ public class LibraryIO {
   @SuppressWarnings("unchecked")
   public static LibraryType parse(File file) throws IOException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.library");
+      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.library.v1_0");
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       
       jaxbUnmarshaller.setSchema(SchemaLoader.INSTANCE.get());

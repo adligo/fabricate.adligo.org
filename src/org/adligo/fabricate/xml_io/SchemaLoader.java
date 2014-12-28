@@ -21,12 +21,12 @@ import javax.xml.validation.SchemaFactory;
 public class SchemaLoader implements LSResourceResolver {
   public static final SchemaLoader INSTANCE = new SchemaLoader();
   public static final String XML_PACKAGE = "/org/adligo/fabricate/xml/";
-  public static final String DEV_SCHEMA = XML_PACKAGE + "dev.xsd";
-  public static final String FAB_SCHEMA = XML_PACKAGE + "fabricate.xsd";
-  public static final String LIB_SCHEMA = XML_PACKAGE + "library.xsd";
-  public static final String PROJECT_SCHEMA = XML_PACKAGE + "project.xsd";
-  public static final String RESULT_SCHEMA = XML_PACKAGE + "result.xsd";
-  public static final String TASKS_SCHEMA = XML_PACKAGE + "tasks.xsd";
+  public static final String DEV_SCHEMA = XML_PACKAGE + "dev_v1_0.xsd";
+  public static final String FAB_SCHEMA = XML_PACKAGE + "fabricate_v1_0.xsd";
+  public static final String LIB_SCHEMA = XML_PACKAGE + "library_v1_0.xsd";
+  public static final String PROJECT_SCHEMA = XML_PACKAGE + "project_v1_0.xsd";
+  public static final String RESULT_SCHEMA = XML_PACKAGE + "result_v1_0.xsd";
+  public static final String TASKS_SCHEMA = XML_PACKAGE + "tasks_v1_0.xsd";
   
   private DOMImplementationRegistry registry;
   private DOMImplementationLS domImplementationLS;

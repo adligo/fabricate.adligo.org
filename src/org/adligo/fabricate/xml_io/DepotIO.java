@@ -20,7 +20,7 @@ public class DepotIO {
       Marshaller marshaller = FabricateJaxbContexts.DEPOT_CONTEXT.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
       marshaller.marshal(new JAXBElement<DepotType>(
-          new QName("http://www.adligo.org/fabricate/xml/io/depot",
+          new QName("http://www.adligo.org/fabricate/xml/io/depot/v1_0",
           "depot"), DepotType.class, depot), file);
     } catch (Exception e) {
       throw new IOException(e);

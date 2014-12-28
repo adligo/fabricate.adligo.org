@@ -23,7 +23,7 @@ public class ProjectIO {
   @SuppressWarnings("unchecked")
   public static FabricateProjectType parse(File file) throws IOException {
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.project");
+      JAXBContext jaxbContext = JAXBContext.newInstance("org.adligo.fabricate.xml.io.project.v1_0");
       Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
       
       jaxbUnmarshaller.setSchema(SchemaLoader.INSTANCE.get());

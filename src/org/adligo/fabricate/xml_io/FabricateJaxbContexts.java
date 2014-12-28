@@ -14,7 +14,7 @@ public class FabricateJaxbContexts {
     
     private static final JAXBContext getDepotContext() {
       try {
-        return JAXBContext.newInstance("org.adligo.fabricate.xml.io.depot");
+        return JAXBContext.newInstance("org.adligo.fabricate.xml.io.depot.v1_0");
       } catch (JAXBException e) {
         throw new RuntimeException(e);
       }

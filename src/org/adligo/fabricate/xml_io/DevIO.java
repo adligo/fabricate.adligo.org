@@ -14,8 +14,8 @@ import javax.xml.namespace.QName;
 
 public class DevIO {
   
-  public static final String NAMESPACE_NAME = "org.adligo.fabricate.xml.io.dev";
-  public static final QName NAMESPACE_QNAME = new QName("http://www.adligo.org/fabricate/xml/io/dev","dev");
+  public static final String NAMESPACE_NAME = "org.adligo.fabricate.xml.io.dev.v1_0";
+  public static final QName NAMESPACE_QNAME = new QName("http://www.adligo.org/fabricate/xml/io/dev/v1_0","dev");
   
   @SuppressWarnings("unchecked")
   public static FabricateDevType parse(File file) throws IOException {
