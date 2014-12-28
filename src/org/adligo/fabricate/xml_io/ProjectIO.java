@@ -1,10 +1,9 @@
 package org.adligo.fabricate.xml_io;
 
-import org.adligo.fabricate.xml.io.project.FabricateProjectType;
+import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;

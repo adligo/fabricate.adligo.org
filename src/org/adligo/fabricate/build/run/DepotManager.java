@@ -6,7 +6,7 @@ import org.adligo.fabricate.common.I_DepotEntry;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.files.FileUtils;
-import org.adligo.fabricate.xml.io.depot.DepotType;
+import org.adligo.fabricate.xml.io.depot.v1_0.DepotType;
 import org.adligo.fabricate.xml_io.DepotIO;
 
 import java.io.File;

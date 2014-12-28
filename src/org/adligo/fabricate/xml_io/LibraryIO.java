@@ -1,6 +1,6 @@
 package org.adligo.fabricate.xml_io;
 
-import org.adligo.fabricate.xml.io.library.LibraryType;
+import org.adligo.fabricate.xml.io.library.v1_0.LibraryType;
 
 import java.io.File;
 import java.io.IOException;

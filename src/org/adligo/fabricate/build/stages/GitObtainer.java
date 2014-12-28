@@ -5,12 +5,12 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.external.GitCalls;
-import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.GitServerType;
-import org.adligo.fabricate.xml.io.ProjectType;
-import org.adligo.fabricate.xml.io.ProjectsType;
-import org.adligo.fabricate.xml.io.ScmType;
-import org.adligo.fabricate.xml.io.StagesAndProjectsType;
+import org.adligo.fabricate.xml.io.v1_0.FabricateType;
+import org.adligo.fabricate.xml.io.v1_0.GitServerType;
+import org.adligo.fabricate.xml.io.v1_0.ProjectType;
+import org.adligo.fabricate.xml.io.v1_0.ProjectsType;
+import org.adligo.fabricate.xml.io.v1_0.ScmType;
+import org.adligo.fabricate.xml.io.v1_0.StagesAndProjectsType;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,6 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

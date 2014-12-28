@@ -1,9 +1,7 @@
 package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.StringUtils;
-import org.adligo.fabricate.xml.io.library.DependencyType;
-
-import java.io.File;
+import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
 
 /**
  * This can be used with a local or remote repository

@@ -11,8 +11,9 @@ import org.adligo.fabricate.common.ProjectBlock;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.ManifestParser;
-import org.adligo.fabricate.xml.io.library.DependenciesType;
-import org.adligo.fabricate.xml.io.project.FabricateProjectType;
+import org.adligo.fabricate.xml.io.library.v1_0.DependenciesType;
+import org.adligo.fabricate.xml.io.library.v1_0.ProjectDependencyType;
+import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
 
 import java.io.File;
 import java.util.Enumeration;
@@ -22,7 +23,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabStage {
@@ -157,11 +157,12 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
     DependenciesType deps = fpt.getDependencies();
     
     if (deps != null) {
-      List<String> projects = deps.getProject();
-      for (String project: projects) {
-        if (!hasFinishedStage(project)) {
+      List<ProjectDependencyType> projects = deps.getProject();
+      for (ProjectDependencyType project: projects) {
+        String projectName = project.getValue();
+        if (!hasFinishedStage(projectName)) {
           ArrayBlockingQueue<Boolean> queue = new ArrayBlockingQueue<Boolean>(1);
-          projectBlockMap_.putIfAbsent(new ProjectBlock(np.getName(),project), 
+          projectBlockMap_.putIfAbsent(new ProjectBlock(np.getName(),projectName), 
               queue);
           try {
             queue.take();

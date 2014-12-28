@@ -6,12 +6,13 @@ import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.files.FileUtils;
-import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.ProjectType;
-import org.adligo.fabricate.xml.io.ProjectsType;
-import org.adligo.fabricate.xml.io.StagesAndProjectsType;
-import org.adligo.fabricate.xml.io.library.DependenciesType;
-import org.adligo.fabricate.xml.io.project.FabricateProjectType;
+import org.adligo.fabricate.xml.io.library.v1_0.DependenciesType;
+import org.adligo.fabricate.xml.io.library.v1_0.ProjectDependencyType;
+import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io.v1_0.FabricateType;
+import org.adligo.fabricate.xml.io.v1_0.ProjectType;
+import org.adligo.fabricate.xml.io.v1_0.ProjectsType;
+import org.adligo.fabricate.xml.io.v1_0.StagesAndProjectsType;
 import org.adligo.fabricate.xml_io.ProjectIO;
 
 import java.io.File;
@@ -181,7 +182,7 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
       if (dt == null) {
         order.add(name);
       } else {
-        List<String> projects =  dt.getProject();
+        List<ProjectDependencyType> projects =  dt.getProject();
         if (projects == null) {
           order.add(name);
         } else if (projects.size() == 0){
@@ -222,7 +223,11 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
         if (!order.contains(name)) {
           FabricateProjectType fp = proj.getProject();
           DependenciesType dt =  fp.getDependencies();
-          List<String> projects =  dt.getProject();
+          List<ProjectDependencyType> projectDeps =  dt.getProject();
+          List<String> projects = new ArrayList<String>();
+          for (ProjectDependencyType pdt: projectDeps) {
+            projects.add(pdt.getValue());
+          }
           if (order.containsAll(projects)) {
               order.add(name);
               it.remove();

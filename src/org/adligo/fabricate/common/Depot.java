@@ -1,8 +1,7 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.depot.ArtifactType;
-import org.adligo.fabricate.xml.io.depot.DepotType;
-import org.adligo.fabricate.xml.io.depot.ProjectArtifactsType;
+import org.adligo.fabricate.xml.io.depot.v1_0.ArtifactType;
+import org.adligo.fabricate.xml.io.depot.v1_0.DepotType;
 import org.adligo.fabricate.xml_io.DepotIO;
 
 import java.io.File;
@@ -48,8 +47,8 @@ public class Depot implements I_Depot {
   private ConcurrentHashMap<String,ConcurrentHashMap<String,String>> 
       artifactTypesToProjectsToArtifacts_ = 
       new ConcurrentHashMap<String, ConcurrentHashMap<String,String>>();
-  private ConcurrentHashMap<String,ProjectArtifactsType> projectsToArtifacts_ = 
-      new ConcurrentHashMap<String, ProjectArtifactsType>();
+  private ConcurrentHashMap<String,ArtifactType> projectsToArtifacts_ = 
+      new ConcurrentHashMap<String, ArtifactType>();
   
   public Depot(String dir, I_FabContext ctx, DepotType depot) {
     dir_ = dir;

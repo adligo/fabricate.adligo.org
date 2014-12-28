@@ -14,10 +14,11 @@ import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.external.files.I_FileMatcher;
 import org.adligo.fabricate.external.files.IncludesExcludesFileMatcher;
 import org.adligo.fabricate.external.files.PatternFileMatcher;
-import org.adligo.fabricate.xml.io.library.DependenciesType;
-import org.adligo.fabricate.xml.io.library.DependencyType;
-import org.adligo.fabricate.xml.io.library.LibraryType;
-import org.adligo.fabricate.xml.io.project.FabricateProjectType;
+import org.adligo.fabricate.xml.io.library.v1_0.DependenciesType;
+import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
+import org.adligo.fabricate.xml.io.library.v1_0.LibraryType;
+import org.adligo.fabricate.xml.io.library.v1_0.ProjectDependencyType;
+import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
 import org.adligo.fabricate.xml_io.LibraryIO;
 
 import java.io.File;
@@ -145,11 +146,12 @@ public class CompileTask extends BaseTask implements I_FabTask {
       }
     }
     
-    List<String> projects = depsType.getProject();
+    List<ProjectDependencyType> projects = depsType.getProject();
     if (projects != null) {
       I_Depot depot = ctx_.getDepot();
-      for (String project: projects) { 
-        String file = depot.get(project, "jar");
+      for (ProjectDependencyType project: projects) { 
+        String projectName = project.getValue();
+        String file = depot.get(projectName, "jar");
         if (sb.length() >= 1) {
           sb.append(File.pathSeparator);
         } 

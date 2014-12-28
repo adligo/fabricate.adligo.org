@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.project.FabricateProjectType;
+import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io.v1_0.FabricateType;
 
 /**
  * This interface represents the 

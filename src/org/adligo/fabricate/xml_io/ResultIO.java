@@ -1,6 +1,6 @@
 package org.adligo.fabricate.xml_io;
 
-import org.adligo.fabricate.xml.io.result.ResultType;
+import org.adligo.fabricate.xml.io.result.v1_0.ResultType;
 
 import java.io.File;
 import java.io.IOException;

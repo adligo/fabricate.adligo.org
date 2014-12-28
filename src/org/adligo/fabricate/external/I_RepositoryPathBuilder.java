@@ -1,6 +1,6 @@
 package org.adligo.fabricate.external;
 
-import org.adligo.fabricate.xml.io.library.DependencyType;
+import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
 /**
  * Implementations of this class create the full path name
  * of a directory under the local_repository

@@ -4,13 +4,15 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.StagesAndProjectsType;
-import org.adligo.fabricate.xml.io.project.FabricateProjectType;
-import org.adligo.fabricate.xml.io.project.ProjectStageType;
-import org.adligo.fabricate.xml.io.project.StagesType;
-import org.adligo.fabricate.xml.io.tasks.ParamType;
-import org.adligo.fabricate.xml.io.tasks.TaskType;
+import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io.project.v1_0.ProjectStageType;
+import org.adligo.fabricate.xml.io.project.v1_0.ProjectStagesType;
+import org.adligo.fabricate.xml.io.tasks.v1_0.ParamType;
+import org.adligo.fabricate.xml.io.tasks.v1_0.TaskType;
+import org.adligo.fabricate.xml.io.v1_0.FabricateType;
+import org.adligo.fabricate.xml.io.v1_0.StageType;
+import org.adligo.fabricate.xml.io.v1_0.StagesAndProjectsType;
+import org.adligo.fabricate.xml.io.v1_0.StagesType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,9 +50,9 @@ public abstract class BaseConcurrentStage implements I_FabStage {
     projectsPath_ = ctx_.getProjectsPath();
     
     StagesAndProjectsType spt =  fabricate_.getProjectGroup();
-    org.adligo.fabricate.xml.io.StagesType st = spt.getStages();
-    List<org.adligo.fabricate.xml.io.StageType> stages = st.getStage();
-    for (org.adligo.fabricate.xml.io.StageType stage: stages) {
+    StagesType st = spt.getStages();
+    List<StageType> stages = st.getStage();
+    for (StageType stage: stages) {
       String stageName = stage.getName();
       if (stageName_.equals(stageName)) {
         List<ParamType> params = stage.getParam();
@@ -171,7 +173,7 @@ public abstract class BaseConcurrentStage implements I_FabStage {
     Map<String,String> toRet = new HashMap<String,String>();
     toRet.putAll(stageParams_);
     
-    StagesType st = project.getStages();
+    ProjectStagesType st = project.getStages();
     if (st != null) {
       List<ProjectStageType> stages = st.getStage();
       for (ProjectStageType stage: stages) {
@@ -203,7 +205,7 @@ public abstract class BaseConcurrentStage implements I_FabStage {
         toRet.putAll(toRet);
       }
     }
-    StagesType st = project.getStages();
+    ProjectStagesType st = project.getStages();
     if (st != null) {
       List<ProjectStageType> stages = st.getStage();
       for (ProjectStageType stage: stages) {
@@ -242,7 +244,7 @@ public abstract class BaseConcurrentStage implements I_FabStage {
    * @return
    */
   public boolean isParticipant(FabricateProjectType project) {
-    StagesType st = project.getStages();
+    ProjectStagesType st = project.getStages();
     if (st != null) {
       List<ProjectStageType> stages = st.getStage();
       for (ProjectStageType stage: stages) {

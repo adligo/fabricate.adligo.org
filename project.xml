@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tns:fabricate_project xmlns:tns="http://www.adligo.org/fabricate/xml/io/project" 
-    xmlns:tns1="http://www.adligo.org/fabricate/xml/io/library" 
+<tns:fabricate_project xmlns:tns="http://www.adligo.org/fabricate/xml/io/project/v1_0" 
+    xmlns:tns1="http://www.adligo.org/fabricate/xml/io/library/v1_0" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
     <tns:stages>
         <tns:stage name="jar" />

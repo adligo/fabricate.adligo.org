@@ -1,11 +1,10 @@
 package org.adligo.fabricate.xml_io;
 
-import org.adligo.fabricate.xml.io.depot.DepotType;
+import org.adligo.fabricate.xml.io.depot.v1_0.DepotType;
 
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;

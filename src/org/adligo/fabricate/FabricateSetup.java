@@ -2,27 +2,22 @@ package org.adligo.fabricate;
 
 import org.adligo.fabricate.common.ArgsParser;
 import org.adligo.fabricate.common.FabContextMutant;
-import org.adligo.fabricate.common.FabricateDefaults;
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
-import org.adligo.fabricate.external.Executor;
 import org.adligo.fabricate.external.JavaCalls;
 import org.adligo.fabricate.external.ManifestParser;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.xml.io.FabricateDependencies;
-import org.adligo.fabricate.xml.io.FabricateType;
-import org.adligo.fabricate.xml.io.library.DependenciesType;
-import org.adligo.fabricate.xml.io.library.DependencyType;
+import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
+import org.adligo.fabricate.xml.io.v1_0.FabricateDependencies;
+import org.adligo.fabricate.xml.io.v1_0.FabricateType;
 import org.adligo.fabricate.xml_io.FabricateIO;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

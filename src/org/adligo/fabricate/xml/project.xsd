@@ -20,14 +20,14 @@
     
     <complexType name="fabricate_project_type">
     	<sequence>
-    		<element name="stages" type="pns:stages_type" minOccurs="1" maxOccurs="1"></element>
+    		<element name="stages" type="pns:project_stages_type" minOccurs="1" maxOccurs="1"></element>
     		<element name="dependencies" type="lns:dependencies_type" minOccurs="0" maxOccurs="1"></element>
     	</sequence>
     	<!--  note there is no name attribute, as it is always the same as the 
     	project directory name -->
     </complexType>
 
-    <complexType name="stages_type">
+    <complexType name="project_stages_type">
     	<sequence minOccurs="1" maxOccurs="unbounded">
     		<element name="stage" type="pns:project_stage_type" minOccurs="1" maxOccurs="unbounded">
 	    		<annotation>

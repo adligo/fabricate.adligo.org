@@ -1,11 +1,10 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.dev.FabricateDevType;
+import org.adligo.fabricate.xml.io.dev.v1_0.FabricateDevType;
 import org.adligo.fabricate.xml_io.DevIO;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
  * this class attempts to locate a fabricate.xml
