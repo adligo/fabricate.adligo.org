@@ -7,13 +7,13 @@
 	xmlns:pns="http://www.adligo.org/fabricate/xml/io/project/v1_0"
 	xmlns:tns="http://www.adligo.org/fabricate/xml/io/tasks/v1_0" >
 	
-    <import schemaLocation="library.xsd" 
+    <import schemaLocation="library_v1_0.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io/library/v1_0">
 	</import>
-	<import schemaLocation="project.xsd" 
+	<import schemaLocation="project_v1_0.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io/project/v1_0">
 	</import>
-	<import schemaLocation="tasks.xsd" 
+	<import schemaLocation="tasks_v1_0.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io/tasks/v1_0">
 	</import>
 	
@@ -22,11 +22,14 @@
     		<element name="java" type="fns:java_type" minOccurs="0"
     			maxOccurs="1">
     		</element>
-            <element name="logs" type="fns:log_settings_type" minOccurs="0" maxOccurs="1"></element>
-            <element name="dependencies"
+    		<element name="logs" type="fns:log_settings_type"
+    			minOccurs="0" maxOccurs="1">
+    		</element>
+    		<element name="dependencies"
     			type="fns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
     		</element>
-    		<choice>
+            <element name="command" type="fns:command_type" minOccurs="0" maxOccurs="unbounded"></element>
+            <choice>
     			<element name="groups" type="fns:project_groups_type"
     				minOccurs="0" maxOccurs="1">
     			</element>
@@ -229,5 +232,29 @@
     	<sequence>
     		<element name="log" type="fns:log_setting_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
+    </complexType>
+
+    <complexType name="command_type">
+        <annotation>
+        	<documentation>
+Note commands are not part of the general
+build process, but are executed on each project
+in concurrent project dependency order 
+(although the command implementation
+could contain any kind of project filter/selection
+process).  They were originally added for creating 
+eclipse  .classpath files from fabricates project.xml
+files, however they could be used for any 
+purpose.</documentation>
+        </annotation>
+        <attribute name="name" type="string" use="required"></attribute>
+    	<attribute name="class" type="string" use="required">
+    		<annotation>
+    			<documentation>
+This class must be available in the 
+fabricate dependencies in this file,
+also any dependent classes must
+be available in the fabricate dependencies.</documentation>
+    		</annotation></attribute>
     </complexType>
 </schema>

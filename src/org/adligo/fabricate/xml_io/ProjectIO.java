@@ -20,6 +20,8 @@ import javax.xml.bind.Unmarshaller;
  */
 public class ProjectIO {
   
+  public static final String THERE_WAS_AN_ERROR_PARSING_THE_FOLLOWING_FILE = "There was an error parsing the following file;";
+
   @SuppressWarnings("unchecked")
   public static FabricateProjectType parse(File file) throws IOException {
     try {
@@ -31,7 +33,8 @@ public class ProjectIO {
       FabricateProjectType toRet = devType.getValue();
       return toRet;
     } catch (JAXBException e) {
-      throw new IOException(e);
+      throw new IOException(THERE_WAS_AN_ERROR_PARSING_THE_FOLLOWING_FILE +
+          file.getAbsolutePath(), e);
     } 
   }
   

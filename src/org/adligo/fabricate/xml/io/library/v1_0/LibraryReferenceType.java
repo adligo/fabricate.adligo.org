@@ -6,87 +6,89 @@
 //
 
 
-package org.adligo.fabricate.xml.io.v1_0;
+package org.adligo.fabricate.xml.io.library.v1_0;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java class for project_type complex type.
+ * <p>Java class for library_reference_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="project_type"&gt;
- *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="version" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *     &lt;/restriction&gt;
- *   &lt;/complexContent&gt;
+ * &lt;complexType name="library_reference_type"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+ *       &lt;attribute name="platform" type="{http://www.adligo.org/fabricate/xml/io/library/v1_0}platform_type" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
  * &lt;/complexType&gt;
  * </pre>
  * 
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "project_type")
-public class ProjectType {
+@XmlType(name = "library_reference_type", propOrder = {
+    "value"
+})
+public class LibraryReferenceType {
 
-    @XmlAttribute(name = "name", required = true)
-    protected String name;
-    @XmlAttribute(name = "version")
-    protected String version;
+    @XmlValue
+    protected String value;
+    @XmlAttribute(name = "platform")
+    protected String platform;
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getValue() {
+        return value;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     /**
-     * Gets the value of the version property.
+     * Gets the value of the platform property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getVersion() {
-        return version;
+    public String getPlatform() {
+        return platform;
     }
 
     /**
-     * Sets the value of the version property.
+     * Sets the value of the platform property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setVersion(String value) {
-        this.version = value;
+    public void setPlatform(String value) {
+        this.platform = value;
     }
 
 }

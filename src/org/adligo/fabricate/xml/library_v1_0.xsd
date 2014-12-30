@@ -32,6 +32,9 @@
     </complexType>
 
     <complexType name="dependency_type">
+    	<sequence>
+    		<element name="ide" type="tns:ide_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
     	<attribute name="group" type="string" use="required">
     		<annotation>
     			<documentation>This is the maven group.</documentation>
@@ -66,10 +69,22 @@
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="platform" type="tns:platform_type" use="optional">
+    	<attribute name="platform" type="tns:platform_type"
+    		use="optional">
     		<annotation>
     			<documentation></documentation>
-    		</annotation></attribute>
+    		</annotation>
+    	</attribute>
+    	<attribute name="extract" type="boolean" use="optional">
+    		<annotation>
+    			<documentation>
+    				The default value is false, this option tells
+    				fabricate to extract (unzip for jar files) the jar
+    				file into a extract folder with a name matching the
+    				jar name (with out .jar).
+    			</documentation>
+    		</annotation>
+    	</attribute>
     </complexType>
 
     <complexType name="dependencies_type">
@@ -89,4 +104,37 @@ the default value is ALL, common platforms are JSE, JME and GWT.</documentation>
         </annotation>
         <restriction base="string"></restriction>
     </simpleType>
+
+
+    <complexType name="library_reference_type">
+    	<simpleContent>
+    		<extension base="string">
+    			<attribute name="platform" type="tns:platform_type"
+    				use="optional">
+    			</attribute>
+    		</extension>
+    	</simpleContent>
+    </complexType>
+
+    <complexType name="ide_argument_type">
+        <annotation>
+        	<documentation>
+This is a way to convert the dependency to a IDE (aka the programming program),
+like Eclipse, NetBeans and others.</documentation>
+        </annotation>
+        <attribute name="key" type="string"></attribute>
+    	<attribute name="val" type="string"></attribute>
+    </complexType>
+
+    <complexType name="ide_type">
+    	<annotation>
+    		<documentation>
+    			The name like Eclipse, NetBeans.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="arg" type="tns:ide_argument_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
 </schema>

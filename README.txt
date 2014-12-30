@@ -31,3 +31,7 @@ fab dev
 all projects in the same directory
 as the project group directory 
 will get compiled etc.
+
+
+Note the *v1_0 xml name spaces are subject to change until the v1_0 version
+of fabricate is released.

@@ -6,7 +6,7 @@
 //
 
 
-package org.adligo.fabricate.xml.io.project.v1_0;
+package org.adligo.fabricate.xml.io.library.v1_0;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,22 +14,23 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import org.adligo.fabricate.xml.io.tasks.v1_0.ParamType;
-import org.adligo.fabricate.xml.io.tasks.v1_0.TaskType;
 
 
 /**
- * <p>Java class for project_stage_type complex type.
+ * 
+ *     			The name like Eclipse, NetBeans.
+ *     		
+ * 
+ * <p>Java class for ide_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="project_stage_type"&gt;
+ * &lt;complexType name="ide_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="param" type="{http://www.adligo.org/fabricate/xml/io/tasks/v1_0}param_type" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element name="task" type="{http://www.adligo.org/fabricate/xml/io/tasks/v1_0}task_type" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="arg" type="{http://www.adligo.org/fabricate/xml/io/library/v1_0}ide_argument_type" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
@@ -40,73 +41,42 @@ import org.adligo.fabricate.xml.io.tasks.v1_0.TaskType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "project_stage_type", propOrder = {
-    "param",
-    "task"
+@XmlType(name = "ide_type", propOrder = {
+    "arg"
 })
-public class ProjectStageType {
+public class IdeType {
 
-    protected List<ParamType> param;
-    protected List<TaskType> task;
+    protected List<IdeArgumentType> arg;
     @XmlAttribute(name = "name")
     protected String name;
 
     /**
-     * Gets the value of the param property.
+     * Gets the value of the arg property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the param property.
+     * This is why there is not a <CODE>set</CODE> method for the arg property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getParam().add(newItem);
+     *    getArg().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ParamType }
+     * {@link IdeArgumentType }
      * 
      * 
      */
-    public List<ParamType> getParam() {
-        if (param == null) {
-            param = new ArrayList<ParamType>();
+    public List<IdeArgumentType> getArg() {
+        if (arg == null) {
+            arg = new ArrayList<IdeArgumentType>();
         }
-        return this.param;
-    }
-
-    /**
-     * Gets the value of the task property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the task property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getTask().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link TaskType }
-     * 
-     * 
-     */
-    public List<TaskType> getTask() {
-        if (task == null) {
-            task = new ArrayList<TaskType>();
-        }
-        return this.task;
+        return this.arg;
     }
 
     /**

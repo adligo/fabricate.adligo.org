@@ -6,7 +6,7 @@
 //
 
 
-package org.adligo.fabricate.xml.io.v1_0;
+package org.adligo.fabricate.xml.io.library.v1_0;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,16 +15,20 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for project_type complex type.
+ * 
+ * This is a way to convert the dependency to a IDE (aka the programming program),
+ * like Eclipse, NetBeans and others.
+ * 
+ * <p>Java class for ide_argument_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="project_type"&gt;
+ * &lt;complexType name="ide_argument_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="version" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="key" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="val" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -33,60 +37,60 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "project_type")
-public class ProjectType {
+@XmlType(name = "ide_argument_type")
+public class IdeArgumentType {
 
-    @XmlAttribute(name = "name", required = true)
-    protected String name;
-    @XmlAttribute(name = "version")
-    protected String version;
+    @XmlAttribute(name = "key")
+    protected String key;
+    @XmlAttribute(name = "val")
+    protected String val;
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the key property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the key property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setKey(String value) {
+        this.key = value;
     }
 
     /**
-     * Gets the value of the version property.
+     * Gets the value of the val property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getVersion() {
-        return version;
+    public String getVal() {
+        return val;
     }
 
     /**
-     * Sets the value of the version property.
+     * Sets the value of the val property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setVersion(String value) {
-        this.version = value;
+    public void setVal(String value) {
+        this.val = value;
     }
 
 }

@@ -7,13 +7,13 @@
 	xmlns:sns="http://www.adligo.org/fabricate/xml/io/stages/v1_0"
 	xmlns:tns="http://www.adligo.org/fabricate/xml/io/tasks/v1_0" >
 	
-	<import schemaLocation="library.xsd" 
+	<import schemaLocation="library_v1_0.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io/library/v1_0">
 	</import>
-	<import schemaLocation="stages.xsd" 
+	<import schemaLocation="stages_v1_0.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io/stages/v1_0">
 	</import>
-	<import schemaLocation="tasks.xsd" 
+	<import schemaLocation="tasks_v1_0.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io/tasks/v1_0">
 	</import>
     <element name="fabricate_project" type="pns:fabricate_project_type"></element>

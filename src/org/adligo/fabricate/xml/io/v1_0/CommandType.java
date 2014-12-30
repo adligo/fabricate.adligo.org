@@ -15,16 +15,27 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for project_type complex type.
+ * 
+ * Note commands are not part of the general
+ * build process, but are executed on each project
+ * in concurrent project dependency order 
+ * (although the command implementation
+ * could contain any kind of project filter/selection
+ * process).  They were originally added for creating 
+ * eclipse  .classpath files from fabricates project.xml
+ * files, however they could be used for any 
+ * purpose.
+ * 
+ * <p>Java class for command_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="project_type"&gt;
+ * &lt;complexType name="command_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
- *       &lt;attribute name="version" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="class" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -33,13 +44,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "project_type")
-public class ProjectType {
+@XmlType(name = "command_type")
+public class CommandType {
 
     @XmlAttribute(name = "name", required = true)
     protected String name;
-    @XmlAttribute(name = "version")
-    protected String version;
+    @XmlAttribute(name = "class", required = true)
+    protected String clazz;
 
     /**
      * Gets the value of the name property.
@@ -66,27 +77,27 @@ public class ProjectType {
     }
 
     /**
-     * Gets the value of the version property.
+     * Gets the value of the clazz property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getVersion() {
-        return version;
+    public String getClazz() {
+        return clazz;
     }
 
     /**
-     * Sets the value of the version property.
+     * Sets the value of the clazz property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setVersion(String value) {
-        this.version = value;
+    public void setClazz(String value) {
+        this.clazz = value;
     }
 
 }

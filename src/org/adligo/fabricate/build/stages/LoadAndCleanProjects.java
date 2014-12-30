@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
@@ -41,6 +42,7 @@ import java.util.concurrent.Semaphore;
  *
  */
 public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabStage {
+  public static final String COULD_NOT_FIND_THE_FILE = "Could not find the file ";
   private boolean run_ = true;
   private ConcurrentLinkedQueue<String> projectsQueue_ = new ConcurrentLinkedQueue<String>();
   private int projectsCount_;
@@ -93,19 +95,7 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
       
       String project = projectsQueue_.poll();
       while (project != null) {
-        String filePath = projectsPath_ + File.separator + project + File.separator +
-            "project.xml";
-        File projectXmlFile = new File(filePath);
-        if (!projectXmlFile.exists()) {
-          throw new FileNotFoundException("Could not find the file " + 
-              System.lineSeparator() + filePath);
-        }
-        if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
-          ThreadLocalPrintStream.println("Reading " + filePath);
-        }
-        FabricateProjectType fabProject = ProjectIO.parse(projectXmlFile);
-        projectsMemory_.put(project, new NamedProject(project, fabProject));
-        cleanBuildForProjectRun(projectsPath_ + File.separator + project);
+        runProject(project);
         
         project = projectsQueue_.poll();
       }
@@ -122,6 +112,39 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
     }
   }
 
+  public void runProject(String project) throws FileNotFoundException, IOException {
+    String filePath = projectsPath_ + File.separator + project + File.separator +
+        "project.xml";
+    File projectXmlFile = new File(filePath);
+    if (!projectXmlFile.exists()) {
+      throw new FileNotFoundException(COULD_NOT_FIND_THE_FILE + 
+          System.lineSeparator() + filePath);
+    }
+    if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
+      ThreadLocalPrintStream.println("Reading " + filePath);
+    }
+    FabricateProjectType fabProject = ProjectIO.parse(projectXmlFile);
+    projectsMemory_.put(project, new NamedProject(project, fabProject));
+    cleanBuildForProjectRun(projectsPath_ + File.separator + project);
+  }
+
+  public void checkProjectDependency(String name, Set<String> projects, String projectName) {
+    if (!projects.contains(projectName)) {
+      throw new IllegalStateException("The following project;" + 
+          System.lineSeparator() +
+          name + 
+          " references a project;" +
+          System.lineSeparator() +
+          projectName + 
+          System.lineSeparator() +
+          " which is NOT referenced in fabricate.xml");
+    }
+    if (name.equals(projectName)) {
+      throw new IllegalStateException("The following project may NOT depend on itself;" + 
+          System.lineSeparator() + name);
+    }
+  }
+  
   public void finish() {
     try {
       semaphore_.acquire();
@@ -156,6 +179,13 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
   }
   
   
+  /**
+   * Note project dependency order is the order 
+   * of projects based on their project dependency.
+   * It doesn't look at external dependencies.
+   * @param ctx_
+   * @throws IllegalStateException
+   */
   private void calcProjectDependencyOrder(I_FabContext ctx_) throws IllegalStateException {
     if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
       ThreadLocalPrintStream.println("Calculating project dependency order for " + 
@@ -226,6 +256,8 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
           List<ProjectDependencyType> projectDeps =  dt.getProject();
           List<String> projects = new ArrayList<String>();
           for (ProjectDependencyType pdt: projectDeps) {
+            String projectName = pdt.getValue();
+            checkProjectDependency(name, projectsMemory_.keySet(), projectName);
             projects.add(pdt.getValue());
           }
           if (order.containsAll(projects)) {
@@ -243,7 +275,7 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
           sb.append(np.getName() + System.lineSeparator());
         }
         throw new IllegalStateException("Unable to find project dependency order"
-            + "for the following projects."  + System.lineSeparator() + 
+            + " for the following projects."  + System.lineSeparator() + 
             sb.toString());
       }
       lastSize = nextSize;
@@ -257,4 +289,6 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
     ctx_.putInMemory(DefaultMemoryConstants.PROJECTS_MEMORY, projectsMemory_);
     ctx_.putInMemory(DefaultMemoryConstants.PROJECTS_DEPENDENCY_ORDER, list);
   }
+
+  
 }
