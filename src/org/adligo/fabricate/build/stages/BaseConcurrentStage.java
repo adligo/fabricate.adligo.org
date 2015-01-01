@@ -3,7 +3,10 @@ package org.adligo.fabricate.build.stages;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
+import org.adligo.fabricate.common.ProjectBlock;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.xml.io.library.v1_0.DependenciesType;
+import org.adligo.fabricate.xml.io.library.v1_0.ProjectDependencyType;
 import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
 import org.adligo.fabricate.xml.io.project.v1_0.ProjectStageType;
 import org.adligo.fabricate.xml.io.project.v1_0.ProjectStagesType;
@@ -16,6 +19,7 @@ import org.adligo.fabricate.xml.io.v1_0.StagesType;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +45,15 @@ public abstract class BaseConcurrentStage implements I_FabStage {
   private volatile Exception lastException_ = null;
   private Map<String,String> stageParams_ = null;
   private Map<String,Map<String,String>> taskParams_ = null;
+  /**
+   * the key to this is the current threads projects name space
+   * the blocking projects name the value is a ArrayBlockingQueue
+   * with size 1 that the current thread adds to the concurrent hash
+   * map, when a project finishes it spins through the map entries
+   * looking for it's name and adds a item to the BlockingQueue. 
+   */
+  private ConcurrentHashMap<ProjectBlock, ArrayBlockingQueue<Boolean>> projectBlockMap_ =
+      new ConcurrentHashMap<ProjectBlock, ArrayBlockingQueue<Boolean>>();
   
   @SuppressWarnings("unchecked")
   @Override
@@ -315,6 +328,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
         (ConcurrentHashMap<String, AtomicBoolean>)
         ctx_.getFromMemory(DefaultMemoryConstants.PROJECT_STATES);
     AtomicBoolean b = projectStates.get(projectName);
+    
+   
     return b.get();
   }
   
@@ -325,5 +340,52 @@ public abstract class BaseConcurrentStage implements I_FabStage {
         ctx_.getFromMemory(DefaultMemoryConstants.PROJECT_STATES);
     AtomicBoolean b = projectStates.get(projectName);
     b.set(true);
+    System.out.println("The following project has finished the stage " + stageName_ + System.lineSeparator() + 
+          "\t" + projectName);
+    
+    //notify the projects which are blocked
+    Enumeration<ProjectBlock> keys =  projectBlockMap_.keys();
+    if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
+      ThreadLocalPrintStream.println(projectName + " is checking necessary dependent project notifications." +
+          projectBlockMap_.size());
+    }
+    while (keys.hasMoreElements()) {
+      ProjectBlock key = keys.nextElement();
+      
+      if (projectName.equals(key.getBlockingProject())) {
+        ArrayBlockingQueue<Boolean> block =  projectBlockMap_.get(key);
+        if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
+          ThreadLocalPrintStream.println(projectName + " is  notifying " +
+              key.getProject());
+        }
+        block.add(Boolean.TRUE);
+        projectBlockMap_.remove(key);
+      }
+    }
+  }
+  
+  protected void waitForDependentProjectsToFinish(NamedProject np) {
+    FabricateProjectType fpt =  np.getProject();
+    DependenciesType deps = fpt.getDependencies();
+    
+    if (deps != null) {
+      List<ProjectDependencyType> projects = deps.getProject();
+      for (ProjectDependencyType project: projects) {
+        String projectName = project.getValue();
+        if (!hasFinishedStage(projectName)) {
+          System.out.println("The project " + np.getName() + " is waiting for " + projectName + " to finish.");
+          if (!hasFinishedStage(projectName)) {
+            ArrayBlockingQueue<Boolean> queue = new ArrayBlockingQueue<Boolean>(1);
+            projectBlockMap_.putIfAbsent(new ProjectBlock(np.getName(),projectName), 
+                queue);
+            try {
+              queue.take();
+            } catch (InterruptedException e) {
+              throw new RuntimeException(e);
+            }
+          }
+        }
+      }
+    }
   }
 }

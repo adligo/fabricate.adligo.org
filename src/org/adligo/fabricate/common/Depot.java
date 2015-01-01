@@ -165,8 +165,13 @@ public class Depot implements I_Depot {
       return null;
     }
     String file =  subMap.get(projectName);
+    if (file == null) {
+      throw new IllegalStateException("There isn't a file for the following project/artifact;" + System.lineSeparator() +
+          "\t" + projectName + "," + artifactType);
+    }
     if (!new File(file).exists()) {
-      throw new IllegalStateException("The following file doesn't appear to be on disk" + System.lineSeparator() +
+      throw new IllegalStateException("There isn't a file for the following project/artifact/file;" + System.lineSeparator() +
+          "\t" + projectName + "," + artifactType +System.lineSeparator() +
           "\t" + file);
     }
     return file;

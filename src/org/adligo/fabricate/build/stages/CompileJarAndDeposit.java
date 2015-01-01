@@ -29,15 +29,7 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
   private ConcurrentLinkedQueue<NamedProject> projectsQueue_;
   private final Semaphore semaphore_ = new Semaphore(1);
   private AtomicInteger projectsFinished_ = new AtomicInteger(0);
-  /**
-   * the key to this is the current threads projects name space
-   * the blocking projects name the value is a ArrayBlockingQueue
-   * with size 1 that the current thread adds to the concurrent hash
-   * map, when a project finishes it spins through the map entries
-   * looking for it's name and adds a item to the BlockingQueue. 
-   */
-  private ConcurrentHashMap<ProjectBlock, ArrayBlockingQueue<Boolean>> projectBlockMap_ =
-      new ConcurrentHashMap<ProjectBlock, ArrayBlockingQueue<Boolean>>();
+
   private int projectsQueueSize_;
   @Override
   public void setup(I_FabContext ctx) {
@@ -54,6 +46,7 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
       while (p != null) {
         didOne = true;
         String projectName = p.getName();
+        
         if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
           ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " working on project " +
               projectName);
@@ -67,7 +60,7 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
           super.finish(compile.getLastSetupException());
           return;
         }
-        checkIfProjectsDependedOnAreAllFinished(p);
+        waitForDependentProjectsToFinish(p);
         compile.execute();
         String projectVersion = GitCalls.describe(compile.getProjectPath());
         JarTask jar = new JarTask();
@@ -95,27 +88,11 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
         
         String fileName = projectsPath_ + File.separator + projectName + 
             File.separator + "build" + File.separator + jarName;
+        ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " adding jar to depot " +
+            fileName);
        deposit.execute(fileName, "jar");
         
-       
-       Enumeration<ProjectBlock> keys =  projectBlockMap_.keys();
-       if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-         ThreadLocalPrintStream.println(projectName + " is checking necessary notifications " +
-             projectBlockMap_.size());
-       }
-       while (keys.hasMoreElements()) {
-         ProjectBlock key = keys.nextElement();
-         
-         if (projectName.equals(key.getBlockingProject())) {
-           ArrayBlockingQueue<Boolean> block =  projectBlockMap_.get(key);
-           if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-             ThreadLocalPrintStream.println(projectName + " is checking notifying " +
-                 key.getProject());
-           }
-           block.add(Boolean.TRUE);
-           projectBlockMap_.remove(key);
-         }
-       }
+        
         setFinisedStage(projectName);
         projectsFinished_.incrementAndGet();
         p = projectsQueue_.poll();
@@ -152,25 +129,6 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
   }
 
 
-  private void checkIfProjectsDependedOnAreAllFinished(NamedProject np) {
-    FabricateProjectType fpt =  np.getProject();
-    DependenciesType deps = fpt.getDependencies();
-    
-    if (deps != null) {
-      List<ProjectDependencyType> projects = deps.getProject();
-      for (ProjectDependencyType project: projects) {
-        String projectName = project.getValue();
-        if (!hasFinishedStage(projectName)) {
-          ArrayBlockingQueue<Boolean> queue = new ArrayBlockingQueue<Boolean>(1);
-          projectBlockMap_.putIfAbsent(new ProjectBlock(np.getName(),projectName), 
-              queue);
-          try {
-            queue.take();
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      }
-    }
-  }
+
+  
 }
