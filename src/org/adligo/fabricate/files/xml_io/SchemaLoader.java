@@ -140,7 +140,7 @@ public class SchemaLoader implements LSResourceResolver {
         InputStream in = SchemaLoader.class.getResourceAsStream(schemaResource);
         ret.setByteStream(in);
         //ret.setSystemId(systemId);
-       // ret.setPublicId(namespaceURI);
+        ret.setPublicId(namespaceURI);
         namespaceToLSInput_.put(namespaceURI, ret);
         return ret;
       }
