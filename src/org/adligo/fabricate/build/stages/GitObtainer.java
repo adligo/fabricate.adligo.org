@@ -5,12 +5,12 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.external.GitCalls;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
-import org.adligo.fabricate.xml.io.v1_0.GitServerType;
-import org.adligo.fabricate.xml.io.v1_0.ProjectType;
-import org.adligo.fabricate.xml.io.v1_0.ProjectsType;
-import org.adligo.fabricate.xml.io.v1_0.ScmType;
-import org.adligo.fabricate.xml.io.v1_0.StagesAndProjectsType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.GitServerType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectsType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ScmType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
 
 import java.io.File;
 import java.io.IOException;

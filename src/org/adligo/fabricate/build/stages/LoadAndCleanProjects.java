@@ -6,14 +6,16 @@ import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.files.FileUtils;
-import org.adligo.fabricate.xml.io.library.v1_0.DependenciesType;
-import org.adligo.fabricate.xml.io.library.v1_0.ProjectDependencyType;
-import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
-import org.adligo.fabricate.xml.io.v1_0.ProjectType;
-import org.adligo.fabricate.xml.io.v1_0.ProjectsType;
-import org.adligo.fabricate.xml.io.v1_0.StagesAndProjectsType;
-import org.adligo.fabricate.xml_io.ProjectIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.xml_io.ProjectIO;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectsType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.ProjectDependencyType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,6 +45,7 @@ import java.util.concurrent.Semaphore;
  */
 public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabStage {
   public static final String COULD_NOT_FIND_THE_FILE = "Could not find the file ";
+  private I_FabFiles files_ = FabFiles.INSTANCE;
   private boolean run_ = true;
   private ConcurrentLinkedQueue<String> projectsQueue_ = new ConcurrentLinkedQueue<String>();
   private int projectsCount_;
@@ -123,7 +126,7 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
     if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
       ThreadLocalPrintStream.println("Reading " + filePath);
     }
-    FabricateProjectType fabProject = ProjectIO.parse(projectXmlFile);
+    FabricateProjectType fabProject = files_.parseProject_v1_0(filePath);
     projectsMemory_.put(project, new NamedProject(project, fabProject));
     cleanBuildForProjectRun(projectsPath_ + File.separator + project);
   }

@@ -1,6 +1,6 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
 /**
  * This class helps the MavenObtainer determine

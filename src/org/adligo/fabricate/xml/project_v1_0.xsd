@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-	targetNamespace="http://www.adligo.org/fabricate/xml/io/project/v1_0" 
-	xmlns:pns="http://www.adligo.org/fabricate/xml/io/project/v1_0" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io_v1/project_v1_0.xsd" 
+	xmlns:pns="http://www.adligo.org/fabricate/xml/io_v1/project_v1_0.xsd" 
 	elementFormDefault="qualified"
-	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library/v1_0"
-	xmlns:sns="http://www.adligo.org/fabricate/xml/io/stages/v1_0"
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io/tasks/v1_0" >
+	xmlns:lns="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd"
+	xmlns:cns="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd" >
 	
 	<import schemaLocation="library_v1_0.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/library/v1_0">
+		namespace="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd">
 	</import>
-	<import schemaLocation="stages_v1_0.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/stages/v1_0">
+	<import schemaLocation="common_v1_0.xsd" 
+		namespace="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd">
 	</import>
-	<import schemaLocation="tasks_v1_0.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/tasks/v1_0">
-	</import>
+	
     <element name="fabricate_project" type="pns:fabricate_project_type"></element>
     
     <complexType name="fabricate_project_type">
     	<sequence>
-    		<element name="stages" type="pns:project_stages_type" minOccurs="1" maxOccurs="1"></element>
-    		<element name="dependencies" type="lns:dependencies_type" minOccurs="0" maxOccurs="1"></element>
+            <element name="command" type="pns:project_command_type" minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="stages" type="pns:project_stages_type"
+    			minOccurs="1" maxOccurs="1">
+    		</element>
+    		<element name="dependencies" type="lns:dependencies_type"
+    			minOccurs="0" maxOccurs="1">
+    		</element>
     	</sequence>
     	<!--  note there is no name attribute, as it is always the same as the 
     	project directory name -->
@@ -44,8 +46,15 @@
 
     <complexType name="project_stage_type">
     	<sequence>
-    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
-    		<element name="task" type="tns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="task" type="cns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    </complexType>
+
+    <complexType name="project_command_type">
+    	<sequence>
+    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     	<attribute name="name" type="string"></attribute>
     </complexType>

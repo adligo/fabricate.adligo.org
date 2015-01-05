@@ -1,13 +1,23 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FabContextMutant implements I_FabContext {
+  public I_ProjectContext getProjectContext() {
+    return projectContext_;
+  }
+
+
+
+  public void setProjectContext(I_ProjectContext projectContext) {
+    this.projectContext_ = projectContext;
+  }
+
   private FabRunType runType;
   private Map<String,String> args_ = new HashMap<String,String>();
   private String fabricateXmlPath;
@@ -25,6 +35,7 @@ public class FabContextMutant implements I_FabContext {
   private String javaHome_;
   private String javaVersion_;
   private String fabricateVersion_;
+  private I_ProjectContext projectContext_;
   private ConcurrentHashMap<String, Object> memory_ = new ConcurrentHashMap<String, Object>();
   
   public FabContextMutant() {

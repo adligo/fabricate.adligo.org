@@ -1,7 +1,8 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.dev.v1_0.FabricateDevType;
-import org.adligo.fabricate.xml_io.DevIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,26 +15,34 @@ import java.io.IOException;
  *
  */
 public class FabricateXmlDiscovery {
-  private File fabricateXml;
-  private File projectXml;
+  private I_FabFiles files_ = FabFiles.INSTANCE;
+  private File fabricateXml_;
+  private File projectXml_;
+  
+  public FabricateXmlDiscovery() {}
+  
+  public FabricateXmlDiscovery(I_FabFiles stubs) {
+    files_ = stubs;
+  }
   
   public FabricateXmlDiscovery(boolean debug) {
-    fabricateXml = new File("fabricate.xml");
-    if (!fabricateXml.exists()) {
-      projectXml = new File("project.xml");
-      if (projectXml.exists()) {
-        String projectXmlAbs = projectXml.getAbsolutePath();
+    fabricateXml_ = new File("fabricate.xml");
+    if (!fabricateXml_.exists()) {
+      projectXml_ = new File("project.xml");
+      if (projectXml_.exists()) {
+        String projectXmlAbs = projectXml_.getAbsolutePath();
         File dir = new File(projectXmlAbs.substring(0, projectXmlAbs.length() -12));
         File dirParent = dir.getParentFile();
-        File devXml = new File(dirParent.getAbsolutePath() + File.separator + "dev.xml");
-        if (!devXml.exists()) {
+        String devXmlFilePath = dirParent.getAbsolutePath() + File.separator + "dev.xml";
+        
+        if (!files_.exists(devXmlFilePath)) {
           File projectsDir = dirParent.getParentFile();
-          fabricateXml = new File(projectsDir.getAbsolutePath() + File.separator + "fabricate.xml");
+          fabricateXml_ = new File(projectsDir.getAbsolutePath() + File.separator + "fabricate.xml");
         } else {
           try {
-           FabricateDevType dev = DevIO.parse(devXml);
+           FabricateDevType dev = files_.parseDev_v1_0(devXmlFilePath);
            String projectGroup = dev.getProjectGroup();
-           fabricateXml = new File(dirParent.getAbsolutePath() + File.separator + 
+           fabricateXml_ = new File(dirParent.getAbsolutePath() + File.separator + 
                projectGroup + File.separator + "fabricate.xml");
           } catch (IOException e) {
             if (debug) {
@@ -46,30 +55,34 @@ public class FabricateXmlDiscovery {
   }
   
   public boolean hasFabricateXml() {
-    if (fabricateXml == null) {
+    if (fabricateXml_ == null) {
       return false;
     }
-    if (fabricateXml.exists()) {
+    if (fabricateXml_.exists()) {
       return true;
     }
     return false;
   }
 
   public String getFabricateXmlPath() {
-    return fabricateXml.getAbsolutePath();
+    return fabricateXml_.getAbsolutePath();
   }
 
   public boolean hasProjectXml() {
-    if (projectXml == null) {
+    if (projectXml_ == null) {
       return false;
     }
-    if (projectXml.exists()) {
+    if (projectXml_.exists()) {
       return true;
     }
     return false;
   }
   
   public String getProjectXml() {
-    return projectXml.getAbsolutePath();
+    return projectXml_.getAbsolutePath();
+  }
+  
+  public I_FabFiles getFiles() {
+    return files_;
   }
 }

@@ -3,7 +3,7 @@ package org.adligo.fabricate.common;
 import java.util.Map;
 
 /**
- * Tasks are intended to be reusable in multiple stage
+ * Tasks are intended to be reusable (classes) in multiple stage
  * classes so custom stages can be built by java developers
  * based on their need to modify fabricate.
  * 

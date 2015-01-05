@@ -14,12 +14,15 @@ import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.external.files.I_FileMatcher;
 import org.adligo.fabricate.external.files.IncludesExcludesFileMatcher;
 import org.adligo.fabricate.external.files.PatternFileMatcher;
-import org.adligo.fabricate.xml.io.library.v1_0.DependenciesType;
-import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
-import org.adligo.fabricate.xml.io.library.v1_0.LibraryType;
-import org.adligo.fabricate.xml.io.library.v1_0.ProjectDependencyType;
-import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
-import org.adligo.fabricate.xml_io.LibraryIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.xml_io.LibraryIO;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.ProjectDependencyType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +39,8 @@ public class CompileTask extends BaseTask implements I_FabTask {
   
   public static final String INCLUDES = "includes";
   public static final String EXCLUDES = "excludes";
+  private static I_FabFiles files_ = FabFiles.INSTANCE;
+  
   private Map<JavaCParam,String> compilerParams_;
   private String [] srcDirs_;
   private String whichJavaC_;
@@ -118,15 +123,16 @@ public class CompileTask extends BaseTask implements I_FabTask {
     if (depsType == null) {
       return;
     }
-    List<String> libraries = depsType.getLibrary();
+    List<LibraryReferenceType> libraries = depsType.getLibrary();
     if (libraries != null) {
-      for (String lib: libraries) {
-        if (!completedLibraries.contains(lib)) {
-          completedLibraries.add(lib);
+      for (LibraryReferenceType lib: libraries) {
+        String libName = lib.getValue();
+        if (!completedLibraries.contains(libName)) {
+          completedLibraries.add(libName);
           String libFile = ctx_.getFabricateDirPath() + File.separator + "lib" +
-              File.separator + lib + ".xml";
+              File.separator + libName + ".xml";
           try {
-            LibraryType libType = LibraryIO.parse(new File(libFile));
+            LibraryType libType = files_.parseLibrary_v1_0(libFile);
             DependenciesType subDepsType = libType.getDependencies();
             buildClasspath(subDepsType, completedLibraries, sb);
           } catch (IOException e) {

@@ -2,7 +2,7 @@ package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;

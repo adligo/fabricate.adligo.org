@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-	targetNamespace="http://www.adligo.org/fabricate/xml/io/library/v1_0" 
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io/library/v1_0" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd" 
 	elementFormDefault="qualified">
 
     <complexType name="library_type">
@@ -89,7 +89,7 @@
 
     <complexType name="dependencies_type">
     	<sequence>
-    		<element name="library" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="library" type="tns:library_reference_type" minOccurs="0" maxOccurs="unbounded"></element>
     		<element name="dependency" type="tns:dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
     		<element name="project" type="tns:project_dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>

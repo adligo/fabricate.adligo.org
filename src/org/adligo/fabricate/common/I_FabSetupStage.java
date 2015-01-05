@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.util.Map;
 

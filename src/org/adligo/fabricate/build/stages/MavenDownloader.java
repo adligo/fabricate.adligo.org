@@ -7,13 +7,15 @@ import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.xml.io.library.v1_0.DependenciesType;
-import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
-import org.adligo.fabricate.xml.io.library.v1_0.LibraryType;
-import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
-import org.adligo.fabricate.xml.io.v1_0.FabricateDependencies;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
-import org.adligo.fabricate.xml_io.LibraryIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +42,7 @@ public class MavenDownloader extends BaseConcurrentStage implements I_FabStage {
   private CopyOnWriteArraySet<String> libsDone_ = new CopyOnWriteArraySet<String>();
   private CopyOnWriteArraySet<DependencyTypeHelper> uniqueDeps_ = new CopyOnWriteArraySet<DependencyTypeHelper>();
   
+  private I_FabFiles files_ = FabFiles.INSTANCE;
   private int projectCount_;
   private AtomicInteger finishedProjectCount_ = new AtomicInteger(0);
   private AtomicInteger depCount_ = new AtomicInteger(0);
@@ -84,13 +87,14 @@ public class MavenDownloader extends BaseConcurrentStage implements I_FabStage {
       
         DependenciesType deps = fabProject.getDependencies();
         if (deps != null) {
-          List<String> libs =  deps.getLibrary();
+          List<LibraryReferenceType> libs =  deps.getLibrary();
           if (libs != null) {
-            for (String lib: libs) {
+            for (LibraryReferenceType lib: libs) {
+              String libName = lib.getValue();
               if (ctx_.isLogEnabled(MavenDownloader.class)) {
-                ThreadLocalPrintStream.println("project " + projectName + " has library " + lib);
+                ThreadLocalPrintStream.println("project " + projectName + " has library " + libName);
               }
-              addLibrary(fabricateDir, lib);
+              addLibrary(fabricateDir, libName);
             }
           }
           List<DependencyType> depsList = deps.getDependency();
@@ -174,15 +178,15 @@ public class MavenDownloader extends BaseConcurrentStage implements I_FabStage {
       return;
     }
     libsDone_.add(lib);
-    LibraryType libDeps = LibraryIO.parse(new File(fabricateDir + 
-        File.separator + "lib" + File.separator + lib + ".xml"));
+    LibraryType libDeps = files_.parseLibrary_v1_0(fabricateDir + 
+        File.separator + "lib" + File.separator + lib + ".xml");
     DependenciesType depsType = libDeps.getDependencies();
     
     if (depsType != null) {
-    List<String> subLibs = depsType.getLibrary();
-      for (String subLib: subLibs) {
+    List<LibraryReferenceType> subLibs = depsType.getLibrary();
+      for (LibraryReferenceType subLib: subLibs) {
         //recurse
-        addLibrary(fabricateDir, subLib);
+        addLibrary(fabricateDir, subLib.getValue());
       }
       List<DependencyType> deps = depsType.getDependency();
       for (DependencyType dep: deps) {

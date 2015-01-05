@@ -10,7 +10,6 @@ note if your using eclipse, you will need to
 down load ant 1.9.4 unzip it and set ANT_HOME
 using the eclipse preferences/ant/Runtime/Ant Home button. 
 
-
 To Use It;
 Setup the JAVA_HOME and FABRICATE_HOME environment variable
 which should point to a uncompressed copy of fabricate.
@@ -20,7 +19,7 @@ Add fab (the shell script) to your path.
 To run in default mode simply type
 fab
 in a project_group directory (with a fabricate.xml file)
-ie project_group.adligo.org
+i.e. project_group.adligo.org
 which will down load the projects under the output directory
 and do the work
 

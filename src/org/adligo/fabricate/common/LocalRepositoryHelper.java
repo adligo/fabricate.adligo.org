@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.v1_0.FabricateDependencies;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 
 import java.io.File;
 

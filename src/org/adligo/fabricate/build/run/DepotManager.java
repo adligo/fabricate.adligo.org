@@ -6,8 +6,10 @@ import org.adligo.fabricate.common.I_DepotEntry;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.files.FileUtils;
-import org.adligo.fabricate.xml.io.depot.v1_0.DepotType;
-import org.adligo.fabricate.xml_io.DepotIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.xml_io.DepotIO;
+import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class DepotManager {
+  private I_FabFiles files_ = FabFiles.INSTANCE;
   private I_FabContext ctx_;
   private DepotType depotType_;
   private String dir_;
@@ -49,9 +52,8 @@ public class DepotManager {
       throw new IllegalStateException(x);
     }
     
-    File depot = new File(depotXml_);
     try {
-      depotType_ = DepotIO.parse(depot);
+      depotType_ = files_.parseDepot_v1_0(depotXml_);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -70,20 +72,18 @@ public class DepotManager {
         ThreadLocalPrintStream.println("DepotManager creating depot " + dir_);
       }
     }
-    File dir = new File(dir_);
-    
-    if (!dir.exists()) { 
-      if (!dir.mkdirs()) {
+    if (!files_.exists(dir_)) { 
+      if (!files_.mkdirs(dir_)) {
         throw new IllegalStateException("Problem creating " + dir_);
       }
     }
-    File depot = new File(depotXml_);
-    if (!depot.exists())
-    try {
-      depotType_ = new DepotType();
-      DepotIO.write(depot, depotType_);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    if (!files_.exists(depotXml_)) {
+      try {
+        depotType_ = new DepotType();
+        files_.writeDepot_v1_0(depotXml_, depotType_);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
   public void clean()  {

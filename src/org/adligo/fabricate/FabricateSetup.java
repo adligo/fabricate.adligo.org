@@ -11,10 +11,12 @@ import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCalls;
 import org.adligo.fabricate.external.ManifestParser;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.xml.io.library.v1_0.DependencyType;
-import org.adligo.fabricate.xml.io.v1_0.FabricateDependencies;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
-import org.adligo.fabricate.xml_io.FabricateIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.xml_io.FabricateIO;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public class FabricateSetup {
+  private static I_FabFiles FILES_ = FabFiles.INSTANCE;
   
 	public static void main(String [] args) {
 	  Map<String,String> argMap = ArgsParser.parseArgs(args);
@@ -71,16 +74,16 @@ public class FabricateSetup {
 
   public static void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd, 
       Map<String,String> argMap) {
-    File fabricateXml = new File(fd.getFabricateXmlPath());
+    String fabricateXmlPath = new File(fd.getFabricateXmlPath()).getAbsolutePath();
     
     try {
-      FabricateType fab =  FabricateIO.parse(fabricateXml);
+      FabricateType fab =  FILES_.parseFabricate_v1_0(fabricateXmlPath);
       FabricateHelper fh = new FabricateHelper(fab);
      
       downloadFabricateRunClasspathDependencies(fab);
       
       System.out.println(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
-          buildClasspath(fabricateXml.getAbsolutePath(), fabHome));
+          buildClasspath(fabricateXmlPath, fabHome));
     } catch (IOException e) {
       //this should also de-rail the fabricate run, as there will be no classpath
       e.printStackTrace();

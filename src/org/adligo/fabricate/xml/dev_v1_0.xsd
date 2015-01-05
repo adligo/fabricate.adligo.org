@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-	targetNamespace="http://www.adligo.org/fabricate/xml/io/dev/v1_0" 
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io/dev/v1_0" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io_v1/dev_v1_0.xsd" 
+	xmlns:tns="http://www.adligo.org/fabricate/xml/io_v1/dev_v1_0.xsd" 
 	elementFormDefault="qualified">
 
     <complexType name="fabricate_dev_type">

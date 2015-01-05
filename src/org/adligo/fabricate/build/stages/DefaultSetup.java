@@ -15,12 +15,14 @@ import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.RepositoryDownloader;
 import org.adligo.fabricate.external.files.FileUtils;
-import org.adligo.fabricate.xml.io.dev.v1_0.FabricateDevType;
-import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
-import org.adligo.fabricate.xml.io.v1_0.LogSettingType;
-import org.adligo.fabricate.xml.io.v1_0.LogSettingsType;
-import org.adligo.fabricate.xml_io.DevIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.xml_io.DevIO;
+import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingsType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultSetup implements I_FabSetupStage {
+  private I_FabFiles files_ = FabFiles.INSTANCE; 
   private String initalDir_;
   private FabricateType fabricate_;
   private FabricateProjectType project_;
@@ -116,7 +119,7 @@ public class DefaultSetup implements I_FabSetupStage {
     FabricateDevType fdt = new FabricateDevType();
     fdt.setProjectGroup(content);
     try {
-      DevIO.write(fdt, file);
+      files_.writeDev_1_0(file, fdt);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

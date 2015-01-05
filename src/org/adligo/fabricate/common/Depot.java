@@ -1,8 +1,10 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.depot.v1_0.ArtifactType;
-import org.adligo.fabricate.xml.io.depot.v1_0.DepotType;
-import org.adligo.fabricate.xml_io.DepotIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.xml_io.DepotIO;
+import org.adligo.fabricate.xml.io_v1.depot_v1_0.ArtifactType;
+import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class Depot implements I_Depot {
+  private I_FabFiles files_ = FabFiles.INSTANCE;
   private String dir_;
   private I_FabContext ctx_;
   
@@ -147,7 +150,7 @@ public class Depot implements I_Depot {
       }
     }
     try {
-      DepotIO.write(new File(dir_ + File.separator + "depot.xml"), type);
+      files_.writeDepot_v1_0(dir_ + File.separator + "depot.xml", type);
     } catch (Exception x) {
         throw new RuntimeException(x);
     }

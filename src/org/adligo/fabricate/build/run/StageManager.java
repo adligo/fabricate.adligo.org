@@ -7,19 +7,21 @@ import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.SystemHelper;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
-import org.adligo.fabricate.xml.io.result.v1_0.FailureType;
-import org.adligo.fabricate.xml.io.result.v1_0.MachineInfoType;
-import org.adligo.fabricate.xml.io.result.v1_0.ResultType;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
-import org.adligo.fabricate.xml.io.v1_0.JavaType;
-import org.adligo.fabricate.xml.io.v1_0.ProjectGroupsType;
-import org.adligo.fabricate.xml.io.v1_0.StageType;
-import org.adligo.fabricate.xml.io.v1_0.StagesAndProjectsType;
-import org.adligo.fabricate.xml.io.v1_0.StagesType;
-import org.adligo.fabricate.xml_io.FabricateIO;
-import org.adligo.fabricate.xml_io.ProjectIO;
-import org.adligo.fabricate.xml_io.ResultIO;
+import org.adligo.fabricate.files.FabFiles;
+import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.xml_io.FabricateIO;
+import org.adligo.fabricate.files.xml_io.ProjectIO;
+import org.adligo.fabricate.files.xml_io.ResultIO;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.JavaType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectGroupsType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
+import org.adligo.fabricate.xml.io_v1.result_v1_0.MachineInfoType;
+import org.adligo.fabricate.xml.io_v1.result_v1_0.ResultType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,6 +42,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
 public class StageManager {
+  private I_FabFiles files_ = FabFiles.INSTANCE;
   private List<StageType> stages_ = new ArrayList<StageType>();
   private Map<String, Object> stageMap_ = new HashMap<String, Object>();
   private List<String> sucessfulTasks_ = new ArrayList<String>();
@@ -65,7 +68,7 @@ public class StageManager {
     try {
       fabricateXmlPath_ = fabricateXml;
       ThreadLocalPrintStream.println("reading " + fabricateXml);
-      fab_ = FabricateIO.parse(new File(fabricateXml));
+      fab_ = files_.parseFabricate_v1_0(fabricateXml);
     } catch (IOException e) {
       failureException_ = e;
     }
@@ -74,7 +77,7 @@ public class StageManager {
         if (xmlDiscovery.hasProjectXml()) {
           projectXmlPath_ = xmlDiscovery.getProjectXml();
           ThreadLocalPrintStream.println("reading " + projectXmlPath_);
-          project_ = ProjectIO.parse(new File(projectXmlPath_));
+          project_ = files_.parseProject_v1_0(projectXmlPath_);
         }
       } catch (IOException e) {
         failureException_ = e;

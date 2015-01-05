@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.xml.io.project.v1_0.FabricateProjectType;
-import org.adligo.fabricate.xml.io.v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 /**
  * This interface represents the 
@@ -56,8 +56,35 @@ public interface I_FabContext {
    */
   public String getOutputPath();
   
+  /**
+   * @deprecated
+   * remove this because it depends on jaxb 
+   * generated classes.  Replace usages
+   * with FabContextMutant instead of this interface,
+   * so it can still be used locally in this project, 
+   * wrap other methods in FabricateType to this class.
+   * @return
+   */
   public FabricateType getFabricate();
+  
+  /**
+   * @deprecated
+   * please use the getProjectContext Method
+   * @return
+   */
   public FabricateProjectType getProject();
+  /**
+   * This is the project where the
+   * fabricate execution started,
+   * or the name of the fabricate project from the command line;
+   * fab dev project="css.adligo.org".  When 
+   * the project context is present it implies that only this project
+   * should be fabricated (with out fabricating it's project dependencies).
+   * 
+   * @return
+   */
+  public I_ProjectContext getProjectContext();
+  
   public void putInMemory(String key, Object value);
   public Object getFromMemory(String key);
   

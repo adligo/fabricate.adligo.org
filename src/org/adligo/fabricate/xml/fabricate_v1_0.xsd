@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-	targetNamespace="http://www.adligo.org/fabricate/xml/io/v1_0" 
-	xmlns:fns="http://www.adligo.org/fabricate/xml/io/v1_0" 
+	targetNamespace="http://www.adligo.org/fabricate/xml/io_v1/fabricate_v1_0.xsd" 
+	xmlns:fns="http://www.adligo.org/fabricate/xml/io_v1/fabricate_v1_0.xsd" 
 	elementFormDefault="qualified"
-	xmlns:lns="http://www.adligo.org/fabricate/xml/io/library/v1_0"
-	xmlns:pns="http://www.adligo.org/fabricate/xml/io/project/v1_0"
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io/tasks/v1_0" >
+	xmlns:lns="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd"
+	xmlns:pns="http://www.adligo.org/fabricate/xml/io_v1/project_v1_0.xsd"
+	xmlns:cns="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd" >
 	
+	<!-- 
+	Comments on name space;
+	The last part of the name space here should match up with the file names for the schemas (.xsd) files.
+	Also the parent name space should match for all schemas in this directory, since they reference
+	each other in a flat way (all files in a single directory). The idea here being that on the actual web 
+	server these urls would be as close to they are in the .jar file, and that 
+	http://www.adligo.org/fabricate/xml/io_v1/library_v1_0
+	would serve up library_v1_0.xsd.
+	In addition new versions could be mixed in i.e. library_v1_1.xsd, once v2_0 is started 
+	it would have a io_v2/
+	 -->
     <import schemaLocation="library_v1_0.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/library/v1_0">
+		namespace="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd">
 	</import>
 	<import schemaLocation="project_v1_0.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/project/v1_0">
+		namespace="http://www.adligo.org/fabricate/xml/io_v1/project_v1_0.xsd">
 	</import>
-	<import schemaLocation="tasks_v1_0.xsd" 
-		namespace="http://www.adligo.org/fabricate/xml/io/tasks/v1_0">
+	<import schemaLocation="common_v1_0.xsd" 
+		namespace="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd">
 	</import>
 	
     <complexType name="fabricate_type">
@@ -152,10 +163,11 @@
     	</attribute>
     </complexType>
 
+    
     <complexType name="stage_type">
     	<sequence>
-    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
-    		<element name="task" type="tns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="task" type="cns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     	<attribute name="name" type="string"></attribute>
     	<attribute name="class" type="string">
@@ -235,26 +247,30 @@
     </complexType>
 
     <complexType name="command_type">
-        <annotation>
-        	<documentation>
-Note commands are not part of the general
-build process, but are executed on each project
-in concurrent project dependency order 
-(although the command implementation
-could contain any kind of project filter/selection
-process).  They were originally added for creating 
-eclipse  .classpath files from fabricates project.xml
-files, however they could be used for any 
-purpose.</documentation>
-        </annotation>
-        <attribute name="name" type="string" use="required"></attribute>
+    	<annotation>
+    		<documentation>
+    			Note commands are not part of the general build process,
+    			but are executed on each project in concurrent project
+    			dependency order (although the command implementation
+    			could contain any kind of project filter/selection
+    			process). They were originally added for creating
+    			eclipse .classpath files from fabricates project.xml
+    			files, however they could be used for any purpose.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="name" type="string" use="required"></attribute>
     	<attribute name="class" type="string" use="required">
     		<annotation>
     			<documentation>
-This class must be available in the 
-fabricate dependencies in this file,
-also any dependent classes must
-be available in the fabricate dependencies.</documentation>
-    		</annotation></attribute>
+    				This class must be available in the fabricate
+    				dependencies in this file, also any dependent
+    				classes must be available in the fabricate
+    				dependencies.
+    			</documentation>
+    		</annotation>
+    	</attribute>
     </complexType>
 </schema>
