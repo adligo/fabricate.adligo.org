@@ -24,21 +24,26 @@ import java.util.List;
 import java.util.Map;
 
 public class FabricateSetup {
-  private static I_FabFiles FILES_ = FabFiles.INSTANCE;
+  private  I_FabFiles files_;
   
-	public static void main(String [] args) {
+	@SuppressWarnings("unused")
+  public static void main(String [] args) {
+	  new FabricateSetup(args, FabFiles.INSTANCE);
+	}
+	
+	public FabricateSetup(String [] args, I_FabFiles files) {
+	  files_ = files;
 	  Map<String,String> argMap = ArgsParser.parseArgs(args);
-	  if (argMap.containsKey("args")) {
-	    doArgs(argMap);
-	  } else if (argMap.containsKey("opts")) {
-	    doOpts(argMap);
-	  }
-	  
+    if (argMap.containsKey("args")) {
+      doArgs(argMap);
+    } else if (argMap.containsKey("opts")) {
+      doOpts(argMap);
+    }
 	}
 
-  private static void doOpts(Map<String,String> argMap) {
+  private void doOpts(Map<String,String> argMap) {
     String fabHome = System.getenv("FABRICATE_HOME");
-    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(argMap.containsKey("debug"));
+    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(files_, argMap.containsKey("debug"));
     if (!fd.hasFabricateXml()) {
       System.out.println("Exception no fabricate.xml or project.xml found.");
     } else {
@@ -72,12 +77,12 @@ public class FabricateSetup {
     }
   }
 
-  public static void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd, 
+  private void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd, 
       Map<String,String> argMap) {
     String fabricateXmlPath = new File(fd.getFabricateXmlPath()).getAbsolutePath();
     
     try {
-      FabricateType fab =  FILES_.parseFabricate_v1_0(fabricateXmlPath);
+      FabricateType fab =  files_.parseFabricate_v1_0(fabricateXmlPath);
       FabricateHelper fh = new FabricateHelper(fab);
      
       downloadFabricateRunClasspathDependencies(fab);
@@ -90,7 +95,7 @@ public class FabricateSetup {
     }
   }
 
-  private static void doArgs(Map<String,String> argMap) {
+  private void doArgs(Map<String,String> argMap) {
     long now = System.currentTimeMillis();
     
     try {
@@ -131,7 +136,7 @@ public class FabricateSetup {
     }
   }
   
-  public static String buildClasspath(String fabricateXml, String fabricateHome) {
+  private String buildClasspath(String fabricateXml, String fabricateHome) {
     StringBuilder sb = new StringBuilder();
     
     File file = new File(fabricateHome + File.separator + "lib");
@@ -168,7 +173,7 @@ public class FabricateSetup {
    * @param fab
    * @throws IOException
    */
-  public static void downloadFabricateRunClasspathDependencies(FabricateType fab) throws IOException {
+  private void downloadFabricateRunClasspathDependencies(FabricateType fab) throws IOException {
     FabricateDependencies deps =  fab.getDependencies();
     if (deps != null) {
       List<DependencyType> depTypes = deps.getDependency();

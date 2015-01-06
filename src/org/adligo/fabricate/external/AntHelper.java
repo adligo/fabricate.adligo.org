@@ -1,4 +1,4 @@
-package org.adligo.fabricate;
+package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.external.GitCalls;
 

@@ -24,7 +24,7 @@
 	         classpathref="lib.path.ref"
 	  	/>
 	    <echo> compile complete </echo>
-	    <java classname="org.adligo.fabricate.AntHelper" classpath="build/classes" >
+	    <java classname="org.adligo.fabricate.external.AntHelper" classpath="build/classes" >
 	       <arg value="build"/>
 	    </java>
 	    <loadproperties>

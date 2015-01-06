@@ -15,22 +15,19 @@ import java.io.IOException;
  *
  */
 public class FabricateXmlDiscovery {
+
+
   private I_FabFiles files_ = FabFiles.INSTANCE;
   private File fabricateXml_;
   private File projectXml_;
   
-  public FabricateXmlDiscovery() {}
-  
-  public FabricateXmlDiscovery(I_FabFiles stubs) {
+  public FabricateXmlDiscovery(I_FabFiles stubs, boolean debug) {
     files_ = stubs;
-  }
-  
-  public FabricateXmlDiscovery(boolean debug) {
-    fabricateXml_ = new File("fabricate.xml");
-    if (!fabricateXml_.exists()) {
-      projectXml_ = new File("project.xml");
-      if (projectXml_.exists()) {
-        String projectXmlAbs = projectXml_.getAbsolutePath();
+    if (files_.exists("fabricate.xml")) {
+      fabricateXml_ = new File("fabricate.xml");
+    } else {
+      if (files_.exists("project.xml")) {
+        String projectXmlAbs = new File("project.xml").getAbsolutePath();
         File dir = new File(projectXmlAbs.substring(0, projectXmlAbs.length() -12));
         File dirParent = dir.getParentFile();
         String devXmlFilePath = dirParent.getAbsolutePath() + File.separator + "dev.xml";
@@ -85,4 +82,5 @@ public class FabricateXmlDiscovery {
   public I_FabFiles getFiles() {
     return files_;
   }
+  
 }
