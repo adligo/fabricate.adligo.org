@@ -3,7 +3,8 @@ package org.adligo.fabricate.common.en;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 
 public class ProjectEnMessages implements I_ProjectMessages {
-
+  public static final ProjectEnMessages INSTANCE = new ProjectEnMessages();
+  
   private static final String DOES_NOT_CONTAIN_A_PROJECT_XML_FILE = 
         "does not contain a project.xml file.";
   private static final String MUST_DEPEND_ON_A_PROJECT_CONTAINED_IN_THE_FABRICATE_XML_FILE = 
@@ -13,6 +14,8 @@ public class ProjectEnMessages implements I_ProjectMessages {
   private static final String THE_FOLLOWING_PROJECT = 
         "The following project;";
 
+  private ProjectEnMessages() {}
+  
   @Override
   public String getTheFollowingProject() {
     return THE_FOLLOWING_PROJECT;

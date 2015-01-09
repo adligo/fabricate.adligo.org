@@ -15,12 +15,12 @@ public class ThreadLocalPrintStream {
   private static final ThreadLocal<PrintStream> OUT = new ThreadLocal<PrintStream>();
   
   public static final void println(String p) {
-    PrintStream out = get();
+    PrintStream out = getProtected();
     out.println(p);
   }
   
   public static final void printTrace(Throwable t) {
-    PrintStream out = get();
+    PrintStream out = getProtected();
     t.printStackTrace(out);
     Throwable cause = t.getCause();
     while (cause != null) {
@@ -29,7 +29,7 @@ public class ThreadLocalPrintStream {
     }
   }
   
-  private static PrintStream get() {
+  protected static PrintStream getProtected() {
     PrintStream toRet = OUT.get();
     if (toRet == null) {
       toRet = ORIGINAL;
@@ -38,11 +38,18 @@ public class ThreadLocalPrintStream {
     return toRet;
   }
   
-  protected static void set(PrintStream threadPrintStream) {
+  /**
+   * for tests only
+   * @param threadPrintStream
+   */
+  protected static void setProtected(PrintStream threadPrintStream) {
     OUT.set(threadPrintStream);
   }
   
-  protected static void revert() {
+  /**
+   * for tests only
+   */
+  protected static void revertProtected() {
     OUT.set(ORIGINAL);
   }
 }

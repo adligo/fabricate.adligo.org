@@ -1,21 +1,20 @@
-package org.adligo.fabricate.common.i18n;
+package org.adligo.fabricate.common;
+
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FabricateConstantsDelegate implements I_FabricateConstants {
+public class FabricateConstantsWrapper implements I_FabricateConstants {
   private I_FabricateConstants constants_;
   
   public I_ProjectMessages getProjectMessages() {
     return constants_.getProjectMessages();
   }
   
-  public FabricateConstantsDelegate(String className) {
-    try {
-      constants_ = (I_FabricateConstants) Class.forName(className).newInstance();
-    } catch (ClassNotFoundException | IllegalArgumentException | InstantiationException | IllegalAccessException x) {
-      throw new IllegalArgumentException(x);
-    }
+  public FabricateConstantsWrapper(I_FabricateConstants constants) {
+    constants_ = constants;
   }
   
   public I_FabricateConstants getConstants() {
@@ -27,7 +26,7 @@ public class FabricateConstantsDelegate implements I_FabricateConstants {
     List<String> classNames = new ArrayList<String>();
     classNames.add("org.adligo.fabricate.Fabricate");
     classNames.add("org.adligo.fabricate_tests.mocks.FabricateConstantsMock");
-    new MethodBlocker(FabricateConstantsDelegate.class,"setConstants" , classNames);
+    new MethodBlocker(FabricateConstantsWrapper.class,"setConstants" , classNames);
     this.constants_ = constants;
   }
 

@@ -1,11 +1,14 @@
 package org.adligo.fabricate.build.stages.tasks;
 
+import org.adligo.fabricate.common.FabricateConstants;
 import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.I_RepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCParam;
@@ -36,6 +39,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class CompileTask extends BaseTask implements I_FabTask {
+  private static final I_FabricateConstants CONSTANTS = FabricateConstants.INSTANCE;
   
   public static final String INCLUDES = "includes";
   public static final String EXCLUDES = "excludes";
@@ -173,6 +177,7 @@ public class CompileTask extends BaseTask implements I_FabTask {
       Map<JavaCParam,String> params = new HashMap<JavaCParam, String>();
       params.putAll(compilerParams_);
       
+      I_ProjectMessages messages = CONSTANTS.getProjectMessages();
       String cp = buildClasspath();
       if (!StringUtils.isEmpty(cp)) {
         if (ctx_.isLogEnabled(CompileTask.class)) {
