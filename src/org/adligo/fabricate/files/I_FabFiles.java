@@ -14,10 +14,18 @@ public interface I_FabFiles extends I_FabXmlFiles {
   /**
    * Stubs to new File(String filePath).exists();
    * 
-   * @param dirsPath
+   * @param filePath
    * @return
    */
   public boolean exists(String filePath);
+  
+  /**
+   * Stubs to new File(String filePath).getAbsolutePath()
+   * 
+   * @param filePath
+   * @return
+   */
+  public String getAbsolutePath(String filePath);
   /**
    * Stubs to new File(String dirsPath).mkDirs();
    * 

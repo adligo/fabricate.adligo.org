@@ -29,6 +29,10 @@ public class ThreadLocalPrintStream {
     }
   }
   
+  /**
+   * protected for test code only
+   * @return
+   */
   protected static PrintStream getProtected() {
     PrintStream toRet = OUT.get();
     if (toRet == null) {

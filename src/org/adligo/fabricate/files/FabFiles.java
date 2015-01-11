@@ -63,6 +63,11 @@ public class FabFiles implements I_FabFiles {
     return new File(dirsPath).mkdirs();
   }
 
+  @Override
+  public String getAbsolutePath(String filePath) {
+    return new File(filePath).getAbsolutePath();
+  }
+
 
 
 }

@@ -117,12 +117,17 @@ the default value is ALL, common platforms are JSE, JME and GWT.</documentation>
     </complexType>
 
     <complexType name="ide_argument_type">
-        <annotation>
-        	<documentation>
-This is a way to convert the dependency to a IDE (aka the programming program),
-like Eclipse, NetBeans and others.</documentation>
-        </annotation>
-        <attribute name="key" type="string"></attribute>
+    	<annotation>
+    		<documentation>
+    			This is a way to convert the dependency to a IDE (aka
+    			the programming program), like Eclipse, NetBeans and
+    			others.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="arg" type="tns:ide_argument_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="key" type="string"></attribute>
     	<attribute name="val" type="string"></attribute>
     </complexType>
 
