@@ -190,7 +190,7 @@ public class DefaultSetup implements I_FabSetupStage {
     fcm.checkDefaultLog(GitObtainer.class, true);
     fcm.checkDefaultLog(JavaJar.class, true);
     fcm.checkDefaultLog(LoadAndCleanProjects.class, true);
-    fcm.checkDefaultLog(MavenDownloader.class, true);
+    fcm.checkDefaultLog(DependencyDownloader.class, true);
     fcm.checkDefaultLog(StageManager.class, true);
     fcm.checkDefaultLog(CompileTask.class, true);
     
