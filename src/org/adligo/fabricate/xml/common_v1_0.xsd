@@ -20,6 +20,35 @@
     	<attribute name="name" type="string"></attribute>
     </complexType>
     
+    <complexType name="command_type">
+    	<annotation>
+    		<documentation>
+    			Note commands are not part of the general build process,
+    			but are executed on each project in concurrent project
+    			dependency order (although the command implementation
+    			could contain any kind of project filter/selection
+    			process). They were originally added for creating
+    			eclipse .classpath files from fabricates project.xml
+    			files, however they could be used for any purpose.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="name" type="string" use="required"></attribute>
+    	<attribute name="class" type="string" use="required">
+    		<annotation>
+    			<documentation>
+    				This class must be available in the fabricate
+    				dependencies in this file, also any dependent
+    				classes must be available in the fabricate
+    				dependencies.  Also this class must implement
+    				org.adligo.fabricate.common.I_Plugin.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    </complexType>
+    
     <complexType name="param_type">
     	<sequence>
     		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>

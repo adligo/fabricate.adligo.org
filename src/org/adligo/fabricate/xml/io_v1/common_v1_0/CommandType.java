@@ -6,7 +6,7 @@
 //
 
 
-package org.adligo.fabricate.xml.io_v1.project_v1_0;
+package org.adligo.fabricate.xml.io_v1.common_v1_0;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,24 +14,32 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
-import org.adligo.fabricate.xml.io_v1.common_v1_0.TaskType;
 
 
 /**
- * <p>Java class for project_stage_type complex type.
+ * 
+ *     			Note commands are not part of the general build process,
+ *     			but are executed on each project in concurrent project
+ *     			dependency order (although the command implementation
+ *     			could contain any kind of project filter/selection
+ *     			process). They were originally added for creating
+ *     			eclipse .classpath files from fabricates project.xml
+ *     			files, however they could be used for any purpose.
+ *     		
+ * 
+ * <p>Java class for command_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="project_stage_type"&gt;
+ * &lt;complexType name="command_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
  *         &lt;element name="param" type="{http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd}param_type" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element name="task" type="{http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd}task_type" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="class" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -40,16 +48,16 @@ import org.adligo.fabricate.xml.io_v1.common_v1_0.TaskType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "project_stage_type", propOrder = {
-    "param",
-    "task"
+@XmlType(name = "command_type", propOrder = {
+    "param"
 })
-public class ProjectStageType {
+public class CommandType {
 
     protected List<ParamType> param;
-    protected List<TaskType> task;
-    @XmlAttribute(name = "name")
+    @XmlAttribute(name = "name", required = true)
     protected String name;
+    @XmlAttribute(name = "class", required = true)
+    protected String clazz;
 
     /**
      * Gets the value of the param property.
@@ -81,35 +89,6 @@ public class ProjectStageType {
     }
 
     /**
-     * Gets the value of the task property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the task property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getTask().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link TaskType }
-     * 
-     * 
-     */
-    public List<TaskType> getTask() {
-        if (task == null) {
-            task = new ArrayList<TaskType>();
-        }
-        return this.task;
-    }
-
-    /**
      * Gets the value of the name property.
      * 
      * @return
@@ -131,6 +110,30 @@ public class ProjectStageType {
      */
     public void setName(String value) {
         this.name = value;
+    }
+
+    /**
+     * Gets the value of the clazz property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getClazz() {
+        return clazz;
+    }
+
+    /**
+     * Sets the value of the clazz property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setClazz(String value) {
+        this.clazz = value;
     }
 
 }

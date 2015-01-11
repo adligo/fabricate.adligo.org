@@ -39,7 +39,7 @@
     		<element name="dependencies"
     			type="fns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
     		</element>
-            <element name="command" type="fns:command_type" minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="command" type="cns:command_type" minOccurs="0" maxOccurs="unbounded"></element>
             <choice>
     			<element name="groups" type="fns:project_groups_type"
     				minOccurs="0" maxOccurs="1">
@@ -55,8 +55,11 @@
     <element name="fabricate" type="fns:fabricate_type"></element>
 
     <complexType name="project_groups_type">
-    	<sequence>
-    		<element name="project_group" type="string" minOccurs="1" maxOccurs="unbounded"></element>
+        <annotation>
+        	<documentation></documentation>
+        </annotation>
+        <sequence>
+    		<element name="project_group" type="fns:project_group_type" minOccurs="1" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 
@@ -113,7 +116,7 @@
     <complexType name="fabricate_dependencies">
     	<annotation>
     		<documentation>
-    			Fabricate extensions can delivered through a maven
+    			Fabricate extensions can delivered through a repository
     			download, and added to the fabricate classpath for the
     			main fab. In addition they can be added to the
     			project_group/lib directory.
@@ -129,24 +132,28 @@
     					artifact. This is just like
     					distributionManagement in the maven document.
     					Fabricate currently only supports the default
-    					layout.  This is the url to the repository 
-    					folder ie;
+    					layout. This is the url to the repository folder
+    					ie;
     					http://docs.codehaus.org/display/MAVENUSER/Mirrors+Repositories
     					http://repo1.maven.org/maven2/
     					http://uk.maven.org/maven2/
-    					http://mirrors.ibiblio.org/maven2/
-    					only http is available.
+    					http://mirrors.ibiblio.org/maven2/ only http is
+    					available.
     				</documentation>
     			</annotation>
     		</element>
-    		<element name="dependency" type="lns:dependency_type"
+            <element name="library" type="lns:library_reference_type" minOccurs="0" maxOccurs="unbounded">
+            	<annotation>
+            		<documentation>Note the platform_type is always ignored in this context.</documentation>
+            	</annotation></element>
+            <element name="dependency" type="lns:dependency_type"
     			minOccurs="0" maxOccurs="unbounded">
     		</element>
     	</sequence>
     	<attribute name="local_repository" type="string">
     		<annotation>
     			<documentation>
-    				This is where the local maven downloads are
+    				This is where the local repository downloads are
     				stored, it defaults to ${user.home}/local_repository
     				Also the fab_repo uses a collapsed directory
     				structure, do reduce the number of directories
@@ -246,31 +253,19 @@
     	</sequence>
     </complexType>
 
-    <complexType name="command_type">
-    	<annotation>
-    		<documentation>
-    			Note commands are not part of the general build process,
-    			but are executed on each project in concurrent project
-    			dependency order (although the command implementation
-    			could contain any kind of project filter/selection
-    			process). They were originally added for creating
-    			eclipse .classpath files from fabricates project.xml
-    			files, however they could be used for any purpose.
-    		</documentation>
-    	</annotation>
-    	<sequence>
-    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    
+
+    <complexType name="project_group_type">
+        <annotation>
+        	<documentation>
+Project groups are projects with fabricate.xml files, 
+fabricate will be able to delegate to other fabrications.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="scm" type="fns:scm_type" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="project" type="fns:project_type" minOccurs="1" maxOccurs="1"></element>
     	</sequence>
-    	<attribute name="name" type="string" use="required"></attribute>
-    	<attribute name="class" type="string" use="required">
-    		<annotation>
-    			<documentation>
-    				This class must be available in the fabricate
-    				dependencies in this file, also any dependent
-    				classes must be available in the fabricate
-    				dependencies.
-    			</documentation>
-    		</annotation>
-    	</attribute>
     </complexType>
 </schema>

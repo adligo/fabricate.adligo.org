@@ -15,17 +15,21 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for stages_and_projects_type complex type.
+ * 
+ * Project groups are projects with fabricate.xml files, 
+ * fabricate will be able to delegate to other fabrications.
+ * 
+ * <p>Java class for project_group_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="stages_and_projects_type"&gt;
+ * &lt;complexType name="project_group_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="stages" type="{http://www.adligo.org/fabricate/xml/io_v1/fabricate_v1_0.xsd}stages_type"/&gt;
- *         &lt;element name="projects" type="{http://www.adligo.org/fabricate/xml/io_v1/fabricate_v1_0.xsd}projects_type"/&gt;
+ *         &lt;element name="scm" type="{http://www.adligo.org/fabricate/xml/io_v1/fabricate_v1_0.xsd}scm_type"/&gt;
+ *         &lt;element name="project" type="{http://www.adligo.org/fabricate/xml/io_v1/fabricate_v1_0.xsd}project_type"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -35,63 +39,63 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "stages_and_projects_type", propOrder = {
-    "stages",
-    "projects"
+@XmlType(name = "project_group_type", propOrder = {
+    "scm",
+    "project"
 })
-public class StagesAndProjectsType {
+public class ProjectGroupType {
 
     @XmlElement(required = true)
-    protected StagesType stages;
+    protected ScmType scm;
     @XmlElement(required = true)
-    protected ProjectsType projects;
+    protected ProjectType project;
 
     /**
-     * Gets the value of the stages property.
+     * Gets the value of the scm property.
      * 
      * @return
      *     possible object is
-     *     {@link StagesType }
+     *     {@link ScmType }
      *     
      */
-    public StagesType getStages() {
-        return stages;
+    public ScmType getScm() {
+        return scm;
     }
 
     /**
-     * Sets the value of the stages property.
+     * Sets the value of the scm property.
      * 
      * @param value
      *     allowed object is
-     *     {@link StagesType }
+     *     {@link ScmType }
      *     
      */
-    public void setStages(StagesType value) {
-        this.stages = value;
+    public void setScm(ScmType value) {
+        this.scm = value;
     }
 
     /**
-     * Gets the value of the projects property.
+     * Gets the value of the project property.
      * 
      * @return
      *     possible object is
-     *     {@link ProjectsType }
+     *     {@link ProjectType }
      *     
      */
-    public ProjectsType getProjects() {
-        return projects;
+    public ProjectType getProject() {
+        return project;
     }
 
     /**
-     * Sets the value of the projects property.
+     * Sets the value of the project property.
      * 
      * @param value
      *     allowed object is
-     *     {@link ProjectsType }
+     *     {@link ProjectType }
      *     
      */
-    public void setProjects(ProjectsType value) {
-        this.projects = value;
+    public void setProject(ProjectType value) {
+        this.project = value;
     }
 
 }

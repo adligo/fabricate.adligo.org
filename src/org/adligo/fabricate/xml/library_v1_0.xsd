@@ -127,8 +127,8 @@ the default value is ALL, common platforms are JSE, JME and GWT.</documentation>
     	<sequence>
     		<element name="arg" type="tns:ide_argument_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
-    	<attribute name="key" type="string"></attribute>
-    	<attribute name="val" type="string"></attribute>
+    	<attribute name="key" type="string" use="required"></attribute>
+    	<attribute name="value" type="string" use="required"></attribute>
     </complexType>
 
     <complexType name="ide_type">
