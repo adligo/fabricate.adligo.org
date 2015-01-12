@@ -46,7 +46,7 @@
 
     <complexType name="project_stage_type">
     	<sequence>
-    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
     		<element name="task" type="cns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     	<attribute name="name" type="string"></attribute>

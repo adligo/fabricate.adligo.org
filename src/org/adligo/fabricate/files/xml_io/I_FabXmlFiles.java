@@ -16,5 +16,5 @@ public interface I_FabXmlFiles {
   public LibraryType parseLibrary_v1_0(String xmlFilePath) throws IOException;
   
   public void writeDepot_v1_0(String filePath, DepotType depot) throws IOException;
-  public void writeDev_1_0(String filePath, FabricateDevType dev) throws IOException;
+  public void writeDev_v1_0(String filePath, FabricateDevType dev) throws IOException;
 }

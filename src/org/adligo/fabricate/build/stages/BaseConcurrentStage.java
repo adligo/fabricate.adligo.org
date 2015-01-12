@@ -6,6 +6,7 @@ import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ProjectBlock;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.TaskType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
@@ -68,7 +69,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
     for (StageType stage: stages) {
       String stageName = stage.getName();
       if (stageName_.equals(stageName)) {
-        List<ParamType> params = stage.getParam();
+        ParamsType paramsType = stage.getParams();
+        List<ParamType> params =  paramsType.getParam();
         if (params != null) {
           if (params.size() > 0) {
             Map<String,String> paramMap = new HashMap<String, String>();
@@ -192,7 +194,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
       for (ProjectStageType stage: stages) {
         String projectStage = stage.getName();
         if (stageName_.equals(projectStage)) {
-          List<ParamType> params =  stage.getParam();
+          ParamsType paramsType = stage.getParams();
+          List<ParamType> params =  paramsType.getParam();
           for (ParamType param: params) {
             toRet.put(param.getKey(), param.getValue());
           }
@@ -224,7 +227,9 @@ public abstract class BaseConcurrentStage implements I_FabStage {
       for (ProjectStageType stage: stages) {
         String projectStage = stage.getName();
         if (stageName_.equals(projectStage)) {
-          Map<String,String> toAdd = toMap(stage.getParam());
+          ParamsType paramsType = stage.getParams();
+          List<ParamType> params =  paramsType.getParam();
+          Map<String,String> toAdd = toMap(params);
           toRet.putAll(toAdd);
           
           List<TaskType> tasks = stage.getTask();

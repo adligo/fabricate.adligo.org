@@ -6,7 +6,7 @@
 //
 
 
-package org.adligo.fabricate.xml.io_v1.fabricate_v1_0;
+package org.adligo.fabricate.xml.io_v1.common_v1_0;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,16 +16,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for log_settings_type complex type.
+ * <p>Java class for params_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="log_settings_type"&gt;
+ * &lt;complexType name="params_type"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="log" type="{http://www.adligo.org/fabricate/xml/io_v1/fabricate_v1_0.xsd}log_setting_type" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="param" type="{http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd}param_type" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -35,40 +35,40 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "log_settings_type", propOrder = {
-    "log"
+@XmlType(name = "params_type", propOrder = {
+    "param"
 })
-public class LogSettingsType {
+public class ParamsType {
 
-    protected List<LogSettingType> log;
+    protected List<ParamType> param;
 
     /**
-     * Gets the value of the log property.
+     * Gets the value of the param property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the log property.
+     * This is why there is not a <CODE>set</CODE> method for the param property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getLog().add(newItem);
+     *    getParam().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LogSettingType }
+     * {@link ParamType }
      * 
      * 
      */
-    public List<LogSettingType> getLog() {
-        if (log == null) {
-            log = new ArrayList<LogSettingType>();
+    public List<ParamType> getParam() {
+        if (param == null) {
+            param = new ArrayList<ParamType>();
         }
-        return this.log;
+        return this.param;
     }
 
 }

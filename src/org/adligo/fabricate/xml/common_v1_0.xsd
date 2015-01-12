@@ -56,4 +56,10 @@
     	<attribute name="key" type="string" use="required"></attribute>
     	<attribute name="value" type="string" use="optional"></attribute>
     </complexType>
+
+    <complexType name="params_type">
+    	<sequence>
+    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
 </schema>

@@ -119,7 +119,7 @@ public class DefaultSetup implements I_FabSetupStage {
     FabricateDevType fdt = new FabricateDevType();
     fdt.setProjectGroup(content);
     try {
-      files_.writeDev_1_0(file, fdt);
+      files_.writeDev_v1_0(file, fdt);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

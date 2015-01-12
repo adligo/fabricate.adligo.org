@@ -51,7 +51,7 @@ public class FabXmlFiles implements I_FabXmlFiles {
 
 
   @Override
-  public void writeDev_1_0(String filePath, FabricateDevType dev) throws IOException {
+  public void writeDev_v1_0(String filePath, FabricateDevType dev) throws IOException {
     DevIO.write_v1_0(filePath, dev);
   }
 
