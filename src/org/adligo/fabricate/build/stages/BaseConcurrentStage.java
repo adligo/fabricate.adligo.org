@@ -70,14 +70,16 @@ public abstract class BaseConcurrentStage implements I_FabStage {
       String stageName = stage.getName();
       if (stageName_.equals(stageName)) {
         ParamsType paramsType = stage.getParams();
-        List<ParamType> params =  paramsType.getParam();
-        if (params != null) {
-          if (params.size() > 0) {
-            Map<String,String> paramMap = new HashMap<String, String>();
-            for (ParamType stp: params) {
-              paramMap.put(stp.getKey(), stp.getValue());
+        if (paramsType != null) {
+          List<ParamType> params =  paramsType.getParam();
+          if (params != null) {
+            if (params.size() > 0) {
+              Map<String,String> paramMap = new HashMap<String, String>();
+              for (ParamType stp: params) {
+                paramMap.put(stp.getKey(), stp.getValue());
+              }
+              stageParams_ = Collections.unmodifiableMap(paramMap);
             }
-            stageParams_ = Collections.unmodifiableMap(paramMap);
           }
         }
         if (stageParams_ == null) {
@@ -195,9 +197,11 @@ public abstract class BaseConcurrentStage implements I_FabStage {
         String projectStage = stage.getName();
         if (stageName_.equals(projectStage)) {
           ParamsType paramsType = stage.getParams();
-          List<ParamType> params =  paramsType.getParam();
-          for (ParamType param: params) {
-            toRet.put(param.getKey(), param.getValue());
+          if (paramsType != null) {
+            List<ParamType> params =  paramsType.getParam();
+            for (ParamType param: params) {
+              toRet.put(param.getKey(), param.getValue());
+            }
           }
         }
       }
@@ -228,18 +232,20 @@ public abstract class BaseConcurrentStage implements I_FabStage {
         String projectStage = stage.getName();
         if (stageName_.equals(projectStage)) {
           ParamsType paramsType = stage.getParams();
-          List<ParamType> params =  paramsType.getParam();
-          Map<String,String> toAdd = toMap(params);
-          toRet.putAll(toAdd);
-          
-          List<TaskType> tasks = stage.getTask();
-          if (tasks != null) {
-            for (TaskType taskType: tasks) {
-              String projTaskName = taskType.getName();
-              if (task.equals(projTaskName)) {
-                toAdd = toMap(taskType.getParam());
-                toRet.putAll(toAdd);
-                break;
+          if (paramsType != null) {
+            List<ParamType> params =  paramsType.getParam();
+            Map<String,String> toAdd = toMap(params);
+            toRet.putAll(toAdd);
+            
+            List<TaskType> tasks = stage.getTask();
+            if (tasks != null) {
+              for (TaskType taskType: tasks) {
+                String projTaskName = taskType.getName();
+                if (task.equals(projTaskName)) {
+                  toAdd = toMap(taskType.getParam());
+                  toRet.putAll(toAdd);
+                  break;
+                }
               }
             }
           }
