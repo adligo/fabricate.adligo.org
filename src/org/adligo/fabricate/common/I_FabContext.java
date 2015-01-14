@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
@@ -87,5 +88,6 @@ public interface I_FabContext {
   
   public void putInMemory(String key, Object value);
   public Object getFromMemory(String key);
+  public I_FabricateConstants getConstants();
   
 }

@@ -1,4 +1,4 @@
-package org.adligo.fabricate.external.files;
+package org.adligo.fabricate.files;
 
 import org.adligo.fabricate.common.I_FabContext;
 

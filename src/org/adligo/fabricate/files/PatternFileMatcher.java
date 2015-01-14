@@ -1,11 +1,15 @@
-package org.adligo.fabricate.external.files;
+package org.adligo.fabricate.files;
 
+import org.adligo.fabricate.common.FabricateConstants;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_FileMessages;
 
 import java.io.File;
 
 public class PatternFileMatcher implements I_FileMatcher {
+  private final I_FabricateConstants constants_;
   private I_FabContext ctx_;
   private boolean anyDir_ = false;
   private String parentDir_;
@@ -20,12 +24,13 @@ public class PatternFileMatcher implements I_FileMatcher {
   
   public PatternFileMatcher(I_FabContext ctx, String pattern, boolean includes) {
     ctx_ = ctx;
+    constants_  = ctx.getConstants();
     pattern_ = pattern;
     includes_ = includes;
     int slash = pattern.indexOf("/");
     int nextSlash = pattern.indexOf("/", slash + 1);
     int lastSlash = nextSlash;
-    if (nextSlash == -1) {
+    if (nextSlash == -1 && slash != -1) {
       String beforeSlash = pattern.substring(0, slash);
       char [] chars = beforeSlash.toCharArray();
       boolean foundNonStar = false;
@@ -38,7 +43,7 @@ public class PatternFileMatcher implements I_FileMatcher {
         anyDir_ = true;
       }
       lastSlash = slash;
-    } else {
+    } else if (slash != -1 && nextSlash != -1){
       
       nextSlash = pattern.indexOf("/", nextSlash + 1);
       while (nextSlash != -1) {
@@ -67,8 +72,8 @@ public class PatternFileMatcher implements I_FileMatcher {
         } else if (i == chars.length - 1) {
           endFileWild_ = true;
         } else {
-          throw new IllegalArgumentException(
-              "Wildcard is not allowed in the middle of file name text.");
+          I_FileMessages fileMessages = constants_.getFileMessages();
+          throw new IllegalArgumentException(fileMessages.getTheWildCardCharacterIsNotAllowedInMiddle());
         }
       } else {
         sb.append(c);
@@ -109,15 +114,14 @@ public class PatternFileMatcher implements I_FileMatcher {
   }
 
   public void log(File file, boolean matched) {
-    String match = "matched";
-    if (!matched) {
-      match = "did NOT match";
-    }
+    I_FileMessages fileMessages = constants_.getFileMessages();
     if (ctx_.isLogEnabled(PatternFileMatcher.class)) {
-      ThreadLocalPrintStream.println("The following file " + match + " the pattern " + 
-            pattern_ + ", includes " + includes_ + File.separator +
-            "/t" + file.getAbsolutePath());
+      String message = fileMessages.getTheFollowingFile() + constants_.getLineSeperator() +
+          file.getAbsolutePath() + constants_.getLineSeperator() +
+          fileMessages.getDidNotMatchedTheFollowingPattren() + constants_.getLineSeperator() +
+          pattern_;
+      ThreadLocalPrintStream.println(message);
     }
   }
-  
+
 }

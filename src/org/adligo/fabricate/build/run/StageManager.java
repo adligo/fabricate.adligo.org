@@ -155,13 +155,13 @@ public class StageManager {
         }
         Object obj = stageMap_.get(stageName);
         if (!setup) {
-          I_FabSetupStage setupTask = (I_FabSetupStage) obj;
-          setupTask.setFabricate(fab_);
-          setupTask.setInitalDirPath(initalDirPath);
-          setupTask.setProject(project_);
-          setupTask.setFabricateXmlPath(fabricateXmlPath_);
-          setupTask.setProjectXmlPath(projectXmlPath_);
-          ctx_ = setupTask.setup(args_);
+          I_FabSetupStage setupStage = (I_FabSetupStage) obj;
+          setupStage.setFabricate(fab_);
+          setupStage.setInitalDirPath(initalDirPath);
+          setupStage.setProject(project_);
+          setupStage.setFabricateXmlPath(fabricateXmlPath_);
+          setupStage.setProjectXmlPath(projectXmlPath_);
+          ctx_ = setupStage.setup(args_);
           setup = true;
           sucessfulTasks_.add(stageName);
         } else {

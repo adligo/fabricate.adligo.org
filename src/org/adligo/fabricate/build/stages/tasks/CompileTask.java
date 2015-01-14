@@ -13,13 +13,11 @@ import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.I_RepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCParam;
 import org.adligo.fabricate.external.JavaCompiler;
-import org.adligo.fabricate.external.files.FileUtils;
-import org.adligo.fabricate.external.files.I_FileMatcher;
-import org.adligo.fabricate.external.files.IncludesExcludesFileMatcher;
-import org.adligo.fabricate.external.files.PatternFileMatcher;
 import org.adligo.fabricate.files.FabFiles;
 import org.adligo.fabricate.files.I_FabFiles;
-import org.adligo.fabricate.files.xml_io.LibraryIO;
+import org.adligo.fabricate.files.I_FileMatcher;
+import org.adligo.fabricate.files.IncludesExcludesFileMatcher;
+import org.adligo.fabricate.files.PatternFileMatcher;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
@@ -90,13 +88,12 @@ public class CompileTask extends BaseTask implements I_FabTask {
     } else {
       matcher = new IncludesExcludesFileMatcher(ctx_, inParam, "*/*.java", exParam, null);
     }
-    FileUtils fus = new FileUtils(ctx_);
     compilerParams_.put(JavaCParam.D, destDir_);
     for (int i = 0; i < srcDirs_.length; i++) {
       String srcDir = srcDirs_[i];
       List<String> files;
       try {
-        files = fus.list(new File(srcDir).toPath(), matcher);
+        files = files_.list(srcDir, matcher);
         srcFiles_.put(srcDir, files);
       } catch (IOException e1) {
         lastException_ = e1;

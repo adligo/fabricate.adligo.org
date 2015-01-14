@@ -4,27 +4,17 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.JarParam;
 import org.adligo.fabricate.external.JavaCParam;
-import org.adligo.fabricate.external.JavaCompiler;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.ManifestParser;
-import org.adligo.fabricate.external.files.FileUtils;
-import org.adligo.fabricate.external.files.I_FileMatcher;
-import org.adligo.fabricate.external.files.IncludesExcludesFileMatcher;
-import org.adligo.fabricate.external.files.PatternFileMatcher;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * This always creates a .jar file in the project/build directory.

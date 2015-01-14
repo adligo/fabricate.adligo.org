@@ -1,5 +1,7 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.common.en.FabricateEnConstants;
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
@@ -8,16 +10,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FabContextMutant implements I_FabContext {
-  public I_ProjectContext getProjectContext() {
-    return projectContext_;
-  }
 
-
-
-  public void setProjectContext(I_ProjectContext projectContext) {
-    this.projectContext_ = projectContext;
-  }
-
+  private I_FabricateConstants constants_ = FabricateEnConstants.INSTANCE;
   private FabRunType runType;
   private Map<String,String> args_ = new HashMap<String,String>();
   private String fabricateXmlPath;
@@ -217,4 +211,22 @@ public class FabContextMutant implements I_FabContext {
   public Object getFromMemory(String key) {
     return memory_.get(key);
   }
+
+
+
+  @Override
+  public I_FabricateConstants getConstants() {
+    return constants_;
+  }
+  
+  public I_ProjectContext getProjectContext() {
+    return projectContext_;
+  }
+
+
+
+  public void setProjectContext(I_ProjectContext projectContext) {
+    this.projectContext_ = projectContext;
+  }
+
 }

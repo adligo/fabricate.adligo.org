@@ -1,4 +1,4 @@
-package org.adligo.fabricate.external.files;
+package org.adligo.fabricate.files;
 
 public interface I_FileMatcher {
   /**

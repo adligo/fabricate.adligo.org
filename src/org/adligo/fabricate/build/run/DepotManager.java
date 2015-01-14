@@ -5,16 +5,13 @@ import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_DepotEntry;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.files.FabFiles;
 import org.adligo.fabricate.files.I_FabFiles;
-import org.adligo.fabricate.files.xml_io.DepotIO;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class DepotManager {
   private I_FabFiles files_ = FabFiles.INSTANCE;
@@ -121,8 +118,7 @@ public class DepotManager {
             }
           } else {
             try {
-              FileUtils fus = new FileUtils(ctx_);
-              fus.removeRecursive(Paths.get(f.toURI()));
+              files_.removeRecursive(f.getAbsolutePath());
             } catch (IOException x) {
               throw new RuntimeException(x);
             }

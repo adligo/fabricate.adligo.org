@@ -14,10 +14,8 @@ import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.files.FabFiles;
 import org.adligo.fabricate.files.I_FabFiles;
-import org.adligo.fabricate.files.xml_io.DevIO;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingType;
@@ -26,7 +24,6 @@ import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -112,6 +109,7 @@ public class DefaultSetup implements I_FabSetupStage {
         fcm.setProjectsPath(fabricateDir + File.separator + "projects");
       }
     }
+    FabFiles.INSTANCE.setContext(fcm);
     return fcm;
   }
 
@@ -133,8 +131,7 @@ public class DefaultSetup implements I_FabSetupStage {
         if (fcm.isLogEnabled(DefaultSetup.class)) {
           ThreadLocalPrintStream.println("Cleaning " + fullDir);
         }
-        FileUtils fus = new FileUtils(fcm);
-        fus.removeRecursive(Paths.get(dirFile.toURI()));
+        files_.removeRecursive(fullDir);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -186,7 +183,7 @@ public class DefaultSetup implements I_FabSetupStage {
     fcm.checkDefaultLog(CompileJarAndDeposit.class, true);
     fcm.checkDefaultLog(DefaultSetup.class, true);
     fcm.checkDefaultLog(DepotManager.class, true);
-    fcm.checkDefaultLog(FileUtils.class, true);
+    fcm.checkDefaultLog(FabFiles.class, true);
     fcm.checkDefaultLog(GitObtainer.class, true);
     fcm.checkDefaultLog(JavaJar.class, true);
     fcm.checkDefaultLog(LoadAndCleanProjects.class, true);
@@ -203,5 +200,12 @@ public class DefaultSetup implements I_FabSetupStage {
     
   }
   
-
+  private void log(String message) {
+    I_FabContext ctx = files_.getContext();
+    if (ctx == null) {
+      ThreadLocalPrintStream.println(message);
+    } else if (ctx.isLogEnabled(DefaultSetup.class)) {
+      ThreadLocalPrintStream.println(message);
+    }
+  }
 }

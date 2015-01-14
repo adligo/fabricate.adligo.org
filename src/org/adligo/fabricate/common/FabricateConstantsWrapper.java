@@ -1,6 +1,7 @@
 package org.adligo.fabricate.common;
 
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 
 import java.util.ArrayList;
@@ -28,6 +29,16 @@ public class FabricateConstantsWrapper implements I_FabricateConstants {
     classNames.add("org.adligo.fabricate_tests.mocks.FabricateConstantsMock");
     new MethodBlocker(FabricateConstantsWrapper.class,"setConstants" , classNames);
     this.constants_ = constants;
+  }
+
+  @Override
+  public I_FileMessages getFileMessages() {
+    return constants_.getFileMessages();
+  }
+
+  @Override
+  public String getLineSeperator() {
+    return constants_.getLineSeperator();
   }
 
   

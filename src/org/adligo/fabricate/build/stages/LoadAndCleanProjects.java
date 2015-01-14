@@ -5,10 +5,8 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.external.files.FileUtils;
 import org.adligo.fabricate.files.FabFiles;
 import org.adligo.fabricate.files.I_FabFiles;
-import org.adligo.fabricate.files.xml_io.ProjectIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectsType;
@@ -20,7 +18,6 @@ import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -169,9 +166,7 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
     File buildDir = new File(buildPath);
     if (buildDir.exists()) {
       try {
-        FileUtils fus = new FileUtils(ctx_);
-        fus.removeRecursive(
-            Paths.get(new File(buildPath).toURI()));
+        files_.removeRecursive(buildPath);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
