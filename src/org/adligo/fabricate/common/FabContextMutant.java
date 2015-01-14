@@ -2,6 +2,11 @@ package org.adligo.fabricate.common;
 
 import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
@@ -13,6 +18,7 @@ public class FabContextMutant implements I_FabContext {
 
   private I_FabricateConstants constants_ = FabricateEnConstants.INSTANCE;
   private FabRunType runType;
+  private I_FabLog log_;
   private Map<String,String> args_ = new HashMap<String,String>();
   private String fabricateXmlPath;
   private String fabricateDirPath;
@@ -22,7 +28,7 @@ public class FabContextMutant implements I_FabContext {
   private I_Depot depot;
   private String initialPath;
   private String outputPath;
-  private Map<Class<?>,Boolean> logSettings = new HashMap<Class<?>,Boolean>();
+  
   private FabricateType fabricate_;
   private FabricateProjectType project_;
   private String localRepositoryPath_;
@@ -31,6 +37,8 @@ public class FabContextMutant implements I_FabContext {
   private String fabricateVersion_;
   private I_ProjectContext projectContext_;
   private ConcurrentHashMap<String, Object> memory_ = new ConcurrentHashMap<String, Object>();
+  private I_FabFileIO fileIO_ = FabFileIO.INSTANCE;
+  private I_FabXmlFileIO xmlFileIO_ = FabXmlFileIO.INSTANCE;
   
   public FabContextMutant() {
   }
@@ -92,20 +100,7 @@ public class FabContextMutant implements I_FabContext {
     return outputPath;
   }
 
-  @SuppressWarnings("boxing")
-  @Override
-  public boolean isLogEnabled(Class<?> clazz) {
-    Boolean toRet = logSettings.get(clazz);
-    if (toRet != null) {
-      return toRet;
-    }
-    return false;
-  }
-  
-  @SuppressWarnings("boxing")
-  public void setLogSetting(Class<?> clazz, boolean b) {
-    logSettings.put(clazz, b);
-  }
+
 
   public void setRunType(FabRunType runType) {
     this.runType = runType;
@@ -141,13 +136,6 @@ public class FabContextMutant implements I_FabContext {
 
   public void setOutputPath(String outputPath) {
     this.outputPath = outputPath;
-  }
-  
-  @SuppressWarnings("boxing")
-  public void checkDefaultLog(Class<?> c, boolean setting) {
-    if (!logSettings.containsKey(c)) {
-      logSettings.put(c, setting);
-    }
   }
 
   public FabricateType getFabricate() {
@@ -223,10 +211,28 @@ public class FabContextMutant implements I_FabContext {
     return projectContext_;
   }
 
-
-
   public void setProjectContext(I_ProjectContext projectContext) {
     this.projectContext_ = projectContext;
   }
 
+  public I_FabLog getLog() {
+    return log_;
+  }
+
+  public void setLog(I_FabLog log) {
+    this.log_ = log;
+  }
+  
+  public I_FabFileIO getFileIO() {
+    return fileIO_;
+  }
+  public void setFileIO(I_FabFileIO fileIO) {
+    this.fileIO_ = fileIO;
+  }
+  public I_FabXmlFileIO getXmlFileIO() {
+    return xmlFileIO_;
+  }
+  public void setXmlFileIO(I_FabXmlFileIO xmlFileIO) {
+    this.xmlFileIO_ = xmlFileIO;
+  }
 }

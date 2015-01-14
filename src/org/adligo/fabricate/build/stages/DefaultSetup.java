@@ -10,12 +10,17 @@ import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.en.FabricateEnConstants;
+import org.adligo.fabricate.common.log.FabLog;
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingType;
@@ -24,11 +29,14 @@ import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DefaultSetup implements I_FabSetupStage {
-  private I_FabFiles files_ = FabFiles.INSTANCE; 
+  private final I_FabFileIO files_; 
+  private final I_FabXmlFileIO xmlFiles_; 
+  private I_FabLog log_;
   private String initalDir_;
   private FabricateType fabricate_;
   private FabricateProjectType project_;
@@ -36,6 +44,16 @@ public class DefaultSetup implements I_FabSetupStage {
   private String projectXmlPath_;
   private DepotManager depotManager_;
   private I_Depot depot_;
+  
+  public DefaultSetup() {
+    files_ = FabFileIO.INSTANCE; 
+    xmlFiles_ = FabXmlFileIO.INSTANCE; 
+  }
+  
+  public DefaultSetup(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
+    files_ = files; 
+    xmlFiles_ = xmlFiles; 
+  }
   
   @Override
   public void setInitalDirPath(String initalDir) {
@@ -76,7 +94,8 @@ public class DefaultSetup implements I_FabSetupStage {
     } else {
       depot = fabricateDir + File.separator + "depot";
     }
-    depotManager_ = new DepotManager(fcm, depot);
+    depotManager_ = new DepotManager();
+    depotManager_.setup(fcm, depot);
     depot_ = depotManager_.getDepot();
     fcm.setDepot(depot_);
     
@@ -109,7 +128,6 @@ public class DefaultSetup implements I_FabSetupStage {
         fcm.setProjectsPath(fabricateDir + File.separator + "projects");
       }
     }
-    FabFiles.INSTANCE.setContext(fcm);
     return fcm;
   }
 
@@ -117,7 +135,7 @@ public class DefaultSetup implements I_FabSetupStage {
     FabricateDevType fdt = new FabricateDevType();
     fdt.setProjectGroup(content);
     try {
-      files_.writeDev_v1_0(file, fdt);
+      xmlFiles_.writeDev_v1_0(file, fdt);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -128,8 +146,8 @@ public class DefaultSetup implements I_FabSetupStage {
     File dirFile = new File(fullDir);
     if (dirFile.exists()) {
       try {
-        if (fcm.isLogEnabled(DefaultSetup.class)) {
-          ThreadLocalPrintStream.println("Cleaning " + fullDir);
+        if (log_.isLogEnabled(DefaultSetup.class)) {
+          log_.println("Cleaning " + fullDir);
         }
         files_.removeRecursive(fullDir);
       } catch (IOException e) {
@@ -161,6 +179,7 @@ public class DefaultSetup implements I_FabSetupStage {
   @SuppressWarnings("boxing")
   public void setupLogging(FabContextMutant fcm) {
     LogSettingsType logs = fabricate_.getLogs();
+    Map<String,Boolean> settings = new HashMap<String,Boolean>();
     if (logs != null) {
       List<LogSettingType> logTypes = logs.getLog();
       for (LogSettingType setting: logTypes) {
@@ -171,41 +190,42 @@ public class DefaultSetup implements I_FabSetupStage {
         }
         try {
           Class<?> c = Class.forName(clazz);
-          fcm.setLogSetting(c, b);
+          settings.put(c.getName(), b);
         } catch (ClassNotFoundException e) {
           throw new RuntimeException(e);
         }
       }
     }
     //alpha ordered default ons
-    fcm.checkDefaultLog(BaseConcurrentStage.class, true);
-    fcm.checkDefaultLog(CompileTask.class, true);
-    fcm.checkDefaultLog(CompileJarAndDeposit.class, true);
-    fcm.checkDefaultLog(DefaultSetup.class, true);
-    fcm.checkDefaultLog(DepotManager.class, true);
-    fcm.checkDefaultLog(FabFiles.class, true);
-    fcm.checkDefaultLog(GitObtainer.class, true);
-    fcm.checkDefaultLog(JavaJar.class, true);
-    fcm.checkDefaultLog(LoadAndCleanProjects.class, true);
-    fcm.checkDefaultLog(DependencyDownloader.class, true);
-    fcm.checkDefaultLog(StageManager.class, true);
-    fcm.checkDefaultLog(CompileTask.class, true);
+    checkDefaultLog(BaseConcurrentStage.class, true, settings);
+    checkDefaultLog(CompileTask.class, true, settings);
+    checkDefaultLog(CompileJarAndDeposit.class, true, settings);
+    checkDefaultLog(DefaultSetup.class, true, settings);
+    checkDefaultLog(DepotManager.class, true, settings);
+    checkDefaultLog(FabFileIO.class, true, settings);
+    checkDefaultLog(GitObtainer.class, true, settings);
+    checkDefaultLog(JavaJar.class, true, settings);
+    checkDefaultLog(LoadAndCleanProjects.class, true, settings);
+    checkDefaultLog(DependencyDownloader.class, true, settings);
+    checkDefaultLog(StageManager.class, true, settings);
+    checkDefaultLog(CompileTask.class, true, settings);
     
-    fcm.checkDefaultLog(Depot.class, true);
+    checkDefaultLog(Depot.class, true, settings);
     
   //alpha ordered default offs
-    fcm.checkDefaultLog(GitCalls.class, false);
-    fcm.checkDefaultLog(RepositoryDownloader.class, false);
+    checkDefaultLog(GitCalls.class, false, settings);
+    checkDefaultLog(RepositoryDownloader.class, false, settings);
     //JavaJar true can cause the jar process to hang?
-    
+    log_ = new FabLog(FabricateEnConstants.INSTANCE, settings);
+    files_.setLog(log_);
+    fcm.setLog(log_);
   }
   
-  private void log(String message) {
-    I_FabContext ctx = files_.getContext();
-    if (ctx == null) {
-      ThreadLocalPrintStream.println(message);
-    } else if (ctx.isLogEnabled(DefaultSetup.class)) {
-      ThreadLocalPrintStream.println(message);
+  private void checkDefaultLog(Class<?> clazz, boolean value, Map<String,Boolean> settings) {
+    String className = clazz.getName();
+    if (settings.get(className) == null) {
+      settings.put(className, value);
     }
   }
+  
 }

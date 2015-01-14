@@ -3,9 +3,9 @@ package org.adligo.fabricate;
 import org.adligo.fabricate.build.run.StageManager;
 import org.adligo.fabricate.common.ArgsParser;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,15 +18,13 @@ import java.util.Set;
 
 
 public class Fabricate {
-  private I_FabFiles files_;
   
   @SuppressWarnings("unused")
   public static final void main(String [] args) {
-    new Fabricate(args, FabFiles.INSTANCE);
+    new Fabricate(args);
   }
   
-  public Fabricate(String [] args, I_FabFiles files) {
-    files_ = files;
+  public Fabricate(String [] args) {
     Map<String,String> argMap = ArgsParser.parseArgs(args);
     if (argMap.containsKey("debug")) {
       Set<Entry<String,String>> entries = argMap.entrySet();
@@ -34,7 +32,7 @@ public class Fabricate {
         ThreadLocalPrintStream.println(e.getKey() + " = " + e.getValue());
       }
     }
-    FabricateXmlDiscovery discovery = new FabricateXmlDiscovery(files_, argMap.containsKey("debug"));
+    FabricateXmlDiscovery discovery = new FabricateXmlDiscovery(argMap.containsKey("debug"));
     
     if (!discovery.hasFabricateXml()) {
       ThreadLocalPrintStream.println("Fabricate did not discover a fabricate.xml or project.xml.");
@@ -81,7 +79,8 @@ public class Fabricate {
       }
     }
     
-    StageManager tm = new StageManager(discovery, argMap);
+    StageManager tm = new StageManager();
+    tm.setup(discovery, argMap);
     tm.run();
   }
   

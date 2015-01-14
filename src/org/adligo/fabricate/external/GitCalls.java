@@ -2,6 +2,7 @@ package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.PrintStream;
 public class GitCalls {
   private static PrintStream OUT = System.out;
   private I_FabContext ctx_;
+  private I_FabLog log_;
   private String hostname_;
   private String user_;
   private String remotePath_;
@@ -24,8 +26,8 @@ public class GitCalls {
         command = user_ + "@" + hostname_ + ":" + remotePath_ + project;
       }
      result = Executor.executeProcess(new File(localProjectDir), "git", "clone", command);
-      if (ctx_.isLogEnabled(GitCalls.class)) {
-        OUT.println("In " + localProjectDir + System.lineSeparator() +
+      if (log_.isLogEnabled(GitCalls.class)) {
+        log_.println("In " + localProjectDir + System.lineSeparator() +
             "git clone " + command + System.lineSeparator() +
             "finished with the following output " + System.lineSeparator() +
             result + System.lineSeparator());
@@ -48,8 +50,8 @@ public class GitCalls {
     try {
       result = Executor.executeProcess(new File(localProjectDir + File.separator + project), 
           "git", "checkout", version);
-      if (ctx_.isLogEnabled(GitCalls.class)) {
-        OUT.println("In " + localProjectDir + File.separator + project + System.lineSeparator() +
+      if (log_.isLogEnabled(GitCalls.class)) {
+        log_.println("In " + localProjectDir + File.separator + project + System.lineSeparator() +
             "git checkout " + version + System.lineSeparator() +
             "finished with the following output " + System.lineSeparator() +
             result + System.lineSeparator());
@@ -72,8 +74,8 @@ public class GitCalls {
     try {
      result = Executor.executeProcess(new File(localProjectDir + File.separator + project), 
           "git", "pull", "-f","origin","master");
-      if (ctx_.isLogEnabled(GitCalls.class)) {
-        OUT.println("In " + localProjectDir + File.separator + project + System.lineSeparator() +
+      if (log_.isLogEnabled(GitCalls.class)) {
+        log_.println("In " + localProjectDir + File.separator + project + System.lineSeparator() +
             "git checkout origin master" + System.lineSeparator() +
             "finished with the following output " + System.lineSeparator() +
             result + System.lineSeparator());
@@ -168,5 +170,6 @@ public class GitCalls {
 
   public void setCtx(I_FabContext ctx) {
     ctx_ = ctx;
+    log_ = ctx.getLog();
   }
 }

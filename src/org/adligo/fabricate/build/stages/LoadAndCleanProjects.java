@@ -4,9 +4,10 @@ import org.adligo.fabricate.common.FabRunType;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectsType;
@@ -42,14 +43,16 @@ import java.util.concurrent.Semaphore;
  */
 public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabStage {
   public static final String COULD_NOT_FIND_THE_FILE = "Could not find the file ";
-  private I_FabFiles files_ = FabFiles.INSTANCE;
+
   private boolean run_ = true;
   private ConcurrentLinkedQueue<String> projectsQueue_ = new ConcurrentLinkedQueue<String>();
   private int projectsCount_;
   private final ConcurrentHashMap<String, NamedProject> projectsMemory_ = new ConcurrentHashMap<String, NamedProject>();
   private final Semaphore semaphore_ = new Semaphore(1);
   
-  @Override
+  
+  public LoadAndCleanProjects() {}
+  
   public void setup(I_FabContext ctx) {
     super.setup(ctx);
     FabRunType type =  ctx.getRunType();
@@ -72,8 +75,8 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
         StagesAndProjectsType stagesAndProjects = fabType.getProjectGroup();
         ProjectsType projectsType = stagesAndProjects.getProjects();
         List<ProjectType> pts =  projectsType.getProject();
-        if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
-          ThreadLocalPrintStream.println("There are " + pts.size() + " projects.");
+        if (log_.isLogEnabled(LoadAndCleanProjects.class)) {
+          log_.println("There are " + pts.size() + " projects.");
         }
         
         projectsCount_  = pts.size();
@@ -120,10 +123,10 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
       throw new FileNotFoundException(COULD_NOT_FIND_THE_FILE + 
           System.lineSeparator() + filePath);
     }
-    if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
-      ThreadLocalPrintStream.println("Reading " + filePath);
+    if (log_.isLogEnabled(LoadAndCleanProjects.class)) {
+      log_.println("Reading " + filePath);
     }
-    FabricateProjectType fabProject = files_.parseProject_v1_0(filePath);
+    FabricateProjectType fabProject = xmlFiles_.parseProject_v1_0(filePath);
     projectsMemory_.put(project, new NamedProject(project, fabProject));
     cleanBuildForProjectRun(projectsPath_ + File.separator + project);
   }
@@ -149,8 +152,8 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
     try {
       semaphore_.acquire();
       calcProjectDependencyOrder(ctx_);
-      if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
-        ThreadLocalPrintStream.println("LoadAndCleanProjects is finished.");
+      if (log_.isLogEnabled(LoadAndCleanProjects.class)) {
+        log_.println("LoadAndCleanProjects is finished.");
       }
       super.finish();
       semaphore_.release();
@@ -185,8 +188,8 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
    * @throws IllegalStateException
    */
   private void calcProjectDependencyOrder(I_FabContext ctx_) throws IllegalStateException {
-    if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
-      ThreadLocalPrintStream.println("Calculating project dependency order for " + 
+    if (log_.isLogEnabled(LoadAndCleanProjects.class)) {
+      log_.println("Calculating project dependency order for " + 
           projectsMemory_.size() + " projects.");
     }
     if (projectsMemory_.size() == 1) {
@@ -219,11 +222,11 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
           count = projects.size();
         }
       }
-      if (ctx_.isLogEnabled(LoadAndCleanProjects.class)) {
+      if (log_.isLogEnabled(LoadAndCleanProjects.class)) {
         if (order.contains(name)) {
-          ThreadLocalPrintStream.println("The following project had NO project dependencies " + name);
+          log_.println("The following project had NO project dependencies " + name);
         } else {
-          ThreadLocalPrintStream.println("The following project had " + count + 
+          log_.println("The following project had " + count + 
               " project dependencies " + name);
         }
       }

@@ -1,8 +1,12 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
 import org.adligo.fabricate.files.xml_io.DepotIO;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.ArtifactType;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 
@@ -37,10 +41,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class Depot implements I_Depot {
-  private I_FabFiles files_ = FabFiles.INSTANCE;
+  private final I_FabFileIO files_;
+  private final I_FabXmlFileIO xmlFiles_;
   private String dir_;
   private I_FabContext ctx_;
-  
+  private I_FabLog log_;
   /**
    * This is the main runtime index of what is in the 
    * depot directory, it is generally created
@@ -56,6 +61,9 @@ public class Depot implements I_Depot {
   public Depot(String dir, I_FabContext ctx, DepotType depot) {
     dir_ = dir;
     ctx_ = ctx;
+    files_ = ctx.getFileIO();
+    xmlFiles_ = ctx.getXmlFileIO();
+    log_ = ctx.getLog();
     List<ArtifactType> artifacts = depot.getArtifact();
     for (ArtifactType art: artifacts) {
       String type = art.getType();
@@ -103,8 +111,8 @@ public class Depot implements I_Depot {
           "\t" + depotFileName);
     }
     File out = new File(depotFileName);
-    if (ctx_.isLogEnabled(Depot.class)) {
-      ThreadLocalPrintStream.println("Moving file " + externalFile + System.lineSeparator() +
+    if (log_.isLogEnabled(Depot.class)) {
+      log_.println("Moving file " + externalFile + System.lineSeparator() +
             "\tto " + depotFileName + System.lineSeparator());
     }
     try {
@@ -119,8 +127,8 @@ public class Depot implements I_Depot {
       subMap = artifactTypesToProjectsToArtifacts_.get(artifactType);
     }
     subMap.put(projectName, depotFileName);
-    if (ctx_.isLogEnabled(Depot.class)) {
-      ThreadLocalPrintStream.println("Depot now has " + artifactType + "/" + projectName + "/" + depotFileName);
+    if (log_.isLogEnabled(Depot.class)) {
+      log_.println("Depot now has " + artifactType + "/" + projectName + "/" + depotFileName);
     }
     return true;
   }
@@ -150,7 +158,7 @@ public class Depot implements I_Depot {
       }
     }
     try {
-      files_.writeDepot_v1_0(dir_ + File.separator + "depot.xml", type);
+      xmlFiles_.writeDepot_v1_0(dir_ + File.separator + "depot.xml", type);
     } catch (Exception x) {
         throw new RuntimeException(x);
     }

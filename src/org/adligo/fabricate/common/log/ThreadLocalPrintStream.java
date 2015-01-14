@@ -1,4 +1,4 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.common.log;
 
 import java.io.PrintStream;
 
@@ -14,11 +14,20 @@ public class ThreadLocalPrintStream {
   private static final PrintStream ORIGINAL = System.out;
   private static final ThreadLocal<PrintStream> OUT = new ThreadLocal<PrintStream>();
   
+  /**
+   * This method should only be used if there 
+   * is no I_FabLog available.
+   * @param p
+   */
   public static final void println(String p) {
     PrintStream out = getProtected();
     out.println(p);
   }
-  
+  /**
+   * This method should only be used if there 
+   * is no I_FabLog available.
+   * @param p
+   */
   public static final void printTrace(Throwable t) {
     PrintStream out = getProtected();
     t.printStackTrace(out);

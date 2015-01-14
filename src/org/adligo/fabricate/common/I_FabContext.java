@@ -1,6 +1,9 @@
 package org.adligo.fabricate.common;
 
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
@@ -14,7 +17,9 @@ import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
  */
 public interface I_FabContext {
   public FabRunType getRunType();
-  public boolean isLogEnabled(Class<?> clazz);
+  public I_FabLog getLog();
+  public I_FabFileIO getFileIO();
+  public I_FabXmlFileIO getXmlFileIO();
   public boolean hasArg(String key);
   public String getArgValue(String key);
   public String getFabricateDirPath();

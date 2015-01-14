@@ -1,7 +1,7 @@
 package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,11 +10,13 @@ import java.util.List;
 
 public class JavaJar {
   private I_FabContext ctx_;
+  private I_FabLog log_;
   private String inDir_;
   private String javaC_;
   
   public JavaJar(I_FabContext ctx, String inDir, String javaC) {
     ctx_ = ctx;
+    log_ = ctx.getLog();
     inDir_ = inDir;
     javaC_ = javaC;
     
@@ -33,13 +35,13 @@ public class JavaJar {
     }
     try {
       String [] allArray = all.toArray(new String[all.size()]);
-      if (ctx_.isLogEnabled(JavaJar.class)) {
+      if (log_.isLogEnabled(JavaJar.class)) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < allArray.length; i++) {
           sb.append(allArray[i]);
           sb.append(" ");
         }
-        ThreadLocalPrintStream.println("executing " + sb.toString());
+        log_.println("executing " + sb.toString());
       }
       Executor.executeProcess(new File(inDir_), allArray);
     } catch (InterruptedException e) {

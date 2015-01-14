@@ -8,7 +8,7 @@ import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.IOException;
 
-public interface I_FabXmlFiles {
+public interface I_FabXmlFileIO {
   public DepotType parseDepot_v1_0(String xmlFilePath) throws IOException;
   public FabricateDevType parseDev_v1_0(String xmlFilePath) throws IOException;
   public FabricateType parseFabricate_v1_0(String xmlFilePath) throws IOException;

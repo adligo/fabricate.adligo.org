@@ -1,7 +1,7 @@
 package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -44,12 +44,14 @@ public class RepositoryDownloader {
   
   private I_RepositoryPathBuilder pathBuilder_;
   private I_FabContext ctx_;
+  private I_FabLog log_;
   private String localRepo_;
   
   @SuppressWarnings("boxing")
   public RepositoryDownloader(List<String> repositories, 
       I_RepositoryPathBuilder pathBuilder, I_FabContext ctx) {
     ctx_ = ctx;
+    log_ = ctx.getLog();
     localRepo_ = ctx.getLocalRepositoryPath();
     
     pathBuilder_ = pathBuilder;
@@ -116,8 +118,8 @@ public class RepositoryDownloader {
       if (new File(filePath).exists()) {
         downloadedFile = true;
       } else {
-        if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-          OUT.println("Trying to download "  + System.lineSeparator() +
+        if (log_.isLogEnabled(RepositoryDownloader.class)) {
+          log_.println("Trying to download "  + System.lineSeparator() +
               "\t" + repo + System.lineSeparator() +
               "\t" + url.substring(repo.length(), url.length()) + System.lineSeparator() +
               "\tto" + System.lineSeparator() + 
@@ -126,14 +128,14 @@ public class RepositoryDownloader {
         try {
           
           downloadFile(httpClient, url, filePath);
-          if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-            OUT.println("Successful downloaded to " + System.lineSeparator() +
+          if (log_.isLogEnabled(RepositoryDownloader.class)) {
+            log_.println("Successful downloaded to " + System.lineSeparator() +
                 "\t" + filePath);
           }
           downloadedFile = true;
         } catch (IOException e) {
-          if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-            OUT.println("problem downloading " + url);
+          if (log_.isLogEnabled(RepositoryDownloader.class)) {
+            log_.println("problem downloading " + url);
             e.printStackTrace();
           }
         }
@@ -147,8 +149,8 @@ public class RepositoryDownloader {
           downloadedSha = true;
         } else {
           String md5Url = url + ".md5";
-          if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-            OUT.println("Trying to download "  + System.lineSeparator() +
+          if (log_.isLogEnabled(RepositoryDownloader.class)) {
+            log_.println("Trying to download "  + System.lineSeparator() +
                 "\t" + repo + System.lineSeparator() +
                 "\t" + md5Url.substring(repo.length(), md5Url.length()) + System.lineSeparator() +
                 "\tto" + System.lineSeparator() + 
@@ -156,14 +158,14 @@ public class RepositoryDownloader {
           }
           try {
             downloadFile(httpClient, md5Url, md5File);
-            if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-              OUT.println("Successful downloaded to " + System.lineSeparator() +
+            if (log_.isLogEnabled(RepositoryDownloader.class)) {
+              log_.println("Successful downloaded to " + System.lineSeparator() +
                   "\t" + md5File);
             }
             downloadedSha = true;
           } catch (IOException e) {
-            if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-              OUT.println("problem downloading " + url);
+            if (log_.isLogEnabled(RepositoryDownloader.class)) {
+              log_.println("problem downloading " + url);
               e.printStackTrace();
             }
           }
@@ -199,8 +201,8 @@ public class RepositoryDownloader {
                 successfulDownloads = true;
                 break;
               } else {
-                if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
-                  OUT.println("The file md5 " + System.lineSeparator() +
+                if (log_.isLogEnabled(RepositoryDownloader.class)) {
+                  log_.println("The file md5 " + System.lineSeparator() +
                       actual + System.lineSeparator() +
                       "did not match the .md5 " + System.lineSeparator() +
                       md5File + System.lineSeparator() + 
@@ -228,10 +230,10 @@ public class RepositoryDownloader {
       }
     }
 
-    if (ctx_.isLogEnabled(RepositoryDownloader.class)) {
+    if (log_.isLogEnabled(RepositoryDownloader.class)) {
       DefaultRepositoryPathBuilder builder = 
           new DefaultRepositoryPathBuilder("", "/");
-      ThreadLocalPrintStream.println(builder.getUrl(dep) +
+      log_.println(builder.getUrl(dep) +
           " was sucessful? " + successfulDownloads);
     }
     if (!successfulDownloads) {

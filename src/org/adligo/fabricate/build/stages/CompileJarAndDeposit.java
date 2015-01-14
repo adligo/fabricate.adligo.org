@@ -7,7 +7,7 @@ import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.ManifestParser;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
@@ -40,8 +40,8 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
         didOne = true;
         String projectName = p.getName();
         
-        if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-          ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " working on project " +
+        if (log_.isLogEnabled(CompileJarAndDeposit.class)) {
+          log_.println(this.getClass().getSimpleName() + " working on project " +
               projectName);
         }
         FabricateProjectType fpt = p.getProject();
@@ -92,8 +92,8 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
       }
       
       if (didOne) {
-        if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-          ThreadLocalPrintStream.println( " projectsQueueSize_ = " + projectsQueueSize_ +
+        if (log_.isLogEnabled(CompileJarAndDeposit.class)) {
+          log_.println( " projectsQueueSize_ = " + projectsQueueSize_ +
               " projectsFinished_ = " + projectsFinished_.get());
         }
         if (projectsQueueSize_ == projectsFinished_.get()) {
@@ -109,8 +109,8 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
   public void finish() {
     try {
       semaphore_.acquire();
-      if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-        ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " finishing.");
+      if (log_.isLogEnabled(CompileJarAndDeposit.class)) {
+        log_.println(this.getClass().getSimpleName() + " finishing.");
       }
       I_Depot depot =  ctx_.getDepot();
       depot.store();

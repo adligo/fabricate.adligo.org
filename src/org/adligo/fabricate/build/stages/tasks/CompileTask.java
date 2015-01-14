@@ -6,18 +6,19 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.I_RepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCParam;
 import org.adligo.fabricate.external.JavaCompiler;
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
 import org.adligo.fabricate.files.I_FileMatcher;
 import org.adligo.fabricate.files.IncludesExcludesFileMatcher;
 import org.adligo.fabricate.files.PatternFileMatcher;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
@@ -41,7 +42,8 @@ public class CompileTask extends BaseTask implements I_FabTask {
   
   public static final String INCLUDES = "includes";
   public static final String EXCLUDES = "excludes";
-  private static I_FabFiles files_ = FabFiles.INSTANCE;
+  private final I_FabFileIO files_;
+  private final I_FabXmlFileIO xmlFiles_;
   
   private Map<JavaCParam,String> compilerParams_;
   private String [] srcDirs_;
@@ -51,17 +53,27 @@ public class CompileTask extends BaseTask implements I_FabTask {
   private Map<String,List<String>> srcFiles_ = new HashMap<String,List<String>>();
   private I_RepositoryPathBuilder repositoryPathBuilder_;
   
+  public CompileTask() {
+    files_ = FabFileIO.INSTANCE;
+    xmlFiles_ = FabXmlFileIO.INSTANCE;
+  }
+  
+  public CompileTask(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
+    files_ = files; 
+    xmlFiles_ = xmlFiles; 
+  }
+  
   @Override
   public void setup(I_FabContext ctx, NamedProject project, Map<String, String> params) {
     super.setup(ctx, project, params);
     srcDirs_ = getDelimitedValue(DefaultTaskHelper.SRC_DIRS, ",",params);
-    if (ctx_.isLogEnabled(CompileTask.class)) {
+    if (log_.isLogEnabled(CompileTask.class)) {
       StringBuilder sb = new StringBuilder();
       for (int i = 0; i < srcDirs_.length; i++) {
         sb.append(srcDirs_[i]);
         sb.append(" ");
       }
-      ThreadLocalPrintStream.println("Project " + project.getName() + " has srcDirs " + System.lineSeparator() +
+      log_.println("Project " + project.getName() + " has srcDirs " + System.lineSeparator() +
           sb.toString());
     }
     compilerParams_ = new HashMap<JavaCParam, String>();
@@ -84,9 +96,9 @@ public class CompileTask extends BaseTask implements I_FabTask {
     String inParam = params.get(INCLUDES);
     String exParam = params.get(EXCLUDES);
     if (inParam == null && exParam == null) {
-      matcher = new PatternFileMatcher(ctx_, "*/*.java", true);
+      matcher = new PatternFileMatcher(log_, "*/*.java", true);
     } else {
-      matcher = new IncludesExcludesFileMatcher(ctx_, inParam, "*/*.java", exParam, null);
+      matcher = new IncludesExcludesFileMatcher(log_, inParam, "*/*.java", exParam, null);
     }
     compilerParams_.put(JavaCParam.D, destDir_);
     for (int i = 0; i < srcDirs_.length; i++) {
@@ -133,7 +145,7 @@ public class CompileTask extends BaseTask implements I_FabTask {
           String libFile = ctx_.getFabricateDirPath() + File.separator + "lib" +
               File.separator + libName + ".xml";
           try {
-            LibraryType libType = files_.parseLibrary_v1_0(libFile);
+            LibraryType libType = xmlFiles_.parseLibrary_v1_0(libFile);
             DependenciesType subDepsType = libType.getDependencies();
             buildClasspath(subDepsType, completedLibraries, sb);
           } catch (IOException e) {
@@ -177,8 +189,8 @@ public class CompileTask extends BaseTask implements I_FabTask {
       I_ProjectMessages messages = CONSTANTS.getProjectMessages();
       String cp = buildClasspath();
       if (!StringUtils.isEmpty(cp)) {
-        if (ctx_.isLogEnabled(CompileTask.class)) {
-          ThreadLocalPrintStream.println("Project " + projectName_ + " has classpath" + System.lineSeparator() +
+        if (log_.isLogEnabled(CompileTask.class)) {
+          log_.println("Project " + projectName_ + " has classpath" + System.lineSeparator() +
                 cp); 
         }
         params.put(JavaCParam.CP, cp);
@@ -193,8 +205,8 @@ public class CompileTask extends BaseTask implements I_FabTask {
           params.put(JavaCParam.CP, cp);
         }
         List<String> javaFiles = srcFiles_.get(srcDir);
-        if (ctx_.isLogEnabled(CompileTask.class)) {
-          ThreadLocalPrintStream.println("adding source files from " + srcDir + System.lineSeparator() +
+        if (log_.isLogEnabled(CompileTask.class)) {
+          log_.println("adding source files from " + srcDir + System.lineSeparator() +
                 "\tfor compile to " + destDir_);
         }
         allFiles.addAll(javaFiles);

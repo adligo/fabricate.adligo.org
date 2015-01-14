@@ -1,13 +1,14 @@
 package org.adligo.fabricate.files;
 
 import org.adligo.fabricate.common.I_FabContext;
+import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class IncludesExcludesFileMatcher implements I_FileMatcher {
-  private final I_FabContext ctx_;
+  private final I_FabLog log_;
   private List<I_FileMatcher> exclueds_ = new ArrayList<I_FileMatcher>();
   private List<I_FileMatcher> includes_ = new ArrayList<I_FileMatcher>();
   
@@ -19,9 +20,9 @@ public class IncludesExcludesFileMatcher implements I_FileMatcher {
    * @param excludes if null use the excludesDefault
    * @param excludesDefault if used and null, nothing is excluded
    */
-  public IncludesExcludesFileMatcher(I_FabContext ctx, String includes, 
+  public IncludesExcludesFileMatcher(I_FabLog log, String includes, 
       String includesDefault, String excludes, String excludesDefault) {
-      ctx_ = ctx;
+      log_ = log;
       if (includes != null) {
         addIncludes(includes);
       } else if (includesDefault != null) {
@@ -36,8 +37,8 @@ public class IncludesExcludesFileMatcher implements I_FileMatcher {
 
   
   
-  public IncludesExcludesFileMatcher(I_FabContext ctx, List<I_FileMatcher> includes, List<I_FileMatcher> excludes_ ) {
-    ctx_ = ctx;
+  public IncludesExcludesFileMatcher(I_FabLog log, List<I_FileMatcher> includes, List<I_FileMatcher> excludes_ ) {
+    log_ = log;
     includes_.addAll(includes);
     excludes_.addAll(excludes_);
   }
@@ -61,7 +62,7 @@ public class IncludesExcludesFileMatcher implements I_FileMatcher {
     StringTokenizer tokens = new StringTokenizer(includes, ",");
     while (tokens.hasMoreTokens()) {
       String pattern = tokens.nextToken();
-      includes_.add(new PatternFileMatcher(ctx_, pattern, true));
+      includes_.add(new PatternFileMatcher(log_, pattern, true));
     }
   }
   
@@ -69,7 +70,7 @@ public class IncludesExcludesFileMatcher implements I_FileMatcher {
     StringTokenizer tokens = new StringTokenizer(excludes, ",");
     while (tokens.hasMoreTokens()) {
       String pattern = tokens.nextToken();
-      exclueds_.add(new PatternFileMatcher(ctx_, pattern, false));
+      exclueds_.add(new PatternFileMatcher(log_, pattern, false));
     }
   }
 }

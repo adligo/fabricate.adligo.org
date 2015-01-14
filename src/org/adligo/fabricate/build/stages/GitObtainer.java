@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
-  private static PrintStream OUT = System.out;
   private ConcurrentLinkedQueue<ProjectType> projects_ = new ConcurrentLinkedQueue<ProjectType>();
   private int projectCount_;
   private AtomicInteger finishedCount_ = new AtomicInteger(0);
@@ -44,8 +43,8 @@ public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
     super.setup(ctx);
     ctx_ = ctx;
     projectsPath_ = ctx_.getProjectsPath();
-    if (ctx_.isLogEnabled(GitObtainer.class)) {
-      OUT.println("The project directory is " + projectsPath_);
+    if (log_.isLogEnabled(GitObtainer.class)) {
+      log_.println("The project directory is " + projectsPath_);
     }
     FabricateType fab = ctx.getFabricate();
     StagesAndProjectsType stageAndProj = fab.getProjectGroup();
@@ -58,8 +57,8 @@ public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
     
     List<ProjectType> projTypes =  projects.getProject();
     projects_.clear();
-    if (ctx_.isLogEnabled(GitObtainer.class)) {
-      OUT.println("Found " + projTypes.size() + " projects.");
+    if (log_.isLogEnabled(GitObtainer.class)) {
+      log_.println("Found " + projTypes.size() + " projects.");
     }
     projects_.addAll(projTypes);
     projectCount_ = projTypes.size();
@@ -93,8 +92,8 @@ public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
               cloneAndCheckout(project, gc, proj);
             } else {
               if ("pull".equals(gitCommand)) {
-                if (ctx_.isLogEnabled(GitObtainer.class)) {
-                  OUT.println("Starting git pull for " + proj);
+                if (log_.isLogEnabled(GitObtainer.class)) {
+                  log_.println("Starting git pull for " + proj);
                 }
                 try {
                   gc.pull(proj, projectsPath_);
@@ -102,8 +101,8 @@ public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
                   super.finish(e);
                   return;
                 }
-                if (ctx_.isLogEnabled(GitObtainer.class)) {
-                  OUT.println("Finished git pull for " + proj);
+                if (log_.isLogEnabled(GitObtainer.class)) {
+                  log_.println("Finished git pull for " + proj);
                 }
               }
             }
@@ -126,8 +125,8 @@ public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
   public void finish() {
     try {
       semaphore_.acquire();
-      if (ctx_.isLogEnabled(GitObtainer.class)) {
-        OUT.println("GitObtainer setting finished ");
+      if (log_.isLogEnabled(GitObtainer.class)) {
+        log_.println("GitObtainer setting finished ");
       }
       super.finish();
       semaphore_.release();
@@ -137,8 +136,8 @@ public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
   }
 
   public void cloneAndCheckout(ProjectType project, GitCalls gc, String proj) {
-    if (ctx_.isLogEnabled(GitObtainer.class)) {
-      OUT.println("Starting git clone for " + proj);
+    if (log_.isLogEnabled(GitObtainer.class)) {
+      log_.println("Starting git clone for " + proj);
     }
     try {
       gc.clone(proj, projectsPath_);
@@ -146,13 +145,13 @@ public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
       super.finish(e);
       return;
     }
-    if (ctx_.isLogEnabled(GitObtainer.class)) {
-      OUT.println("Finished git clone for " + proj);
+    if (log_.isLogEnabled(GitObtainer.class)) {
+      log_.println("Finished git clone for " + proj);
     }
     String version = project.getVersion();
     if (!StringUtils.isEmpty(version)) {
-      if (ctx_.isLogEnabled(GitObtainer.class)) {
-        OUT.println("Starting git checkout for " + proj);
+      if (log_.isLogEnabled(GitObtainer.class)) {
+        log_.println("Starting git checkout for " + proj);
       }
       try {
         gc.checkout(proj, projectsPath_, version);
@@ -160,8 +159,8 @@ public class GitObtainer extends BaseConcurrentStage implements I_FabStage {
         super.finish(e);
         return;
       }
-      if (ctx_.isLogEnabled(GitObtainer.class)) {
-        OUT.println("Finished git checkout for " + proj);
+      if (log_.isLogEnabled(GitObtainer.class)) {
+        log_.println("Finished git checkout for " + proj);
       }
     }
   }

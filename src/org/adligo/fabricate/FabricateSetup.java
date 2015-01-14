@@ -6,14 +6,15 @@ import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.common.StringUtils;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCalls;
 import org.adligo.fabricate.external.ManifestParser;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
-import org.adligo.fabricate.files.xml_io.FabricateIO;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
@@ -24,15 +25,18 @@ import java.util.List;
 import java.util.Map;
 
 public class FabricateSetup {
-  private  I_FabFiles files_;
+  @SuppressWarnings("unused")
+  private final I_FabFileIO files_;
+  private final I_FabXmlFileIO xmlFiles_;
   
 	@SuppressWarnings("unused")
   public static void main(String [] args) {
-	  new FabricateSetup(args, FabFiles.INSTANCE);
+	  new FabricateSetup(args, FabFileIO.INSTANCE, FabXmlFileIO.INSTANCE);
 	}
 	
-	public FabricateSetup(String [] args, I_FabFiles files) {
+	public FabricateSetup(String [] args, I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
 	  files_ = files;
+	  xmlFiles_ = xmlFiles;
 	  Map<String,String> argMap = ArgsParser.parseArgs(args);
     if (argMap.containsKey("args")) {
       doArgs(argMap);
@@ -43,7 +47,7 @@ public class FabricateSetup {
 
   private void doOpts(Map<String,String> argMap) {
     String fabHome = System.getenv("FABRICATE_HOME");
-    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(files_, argMap.containsKey("debug"));
+    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(argMap.containsKey("debug"));
     if (!fd.hasFabricateXml()) {
       System.out.println("Exception no fabricate.xml or project.xml found.");
     } else {
@@ -82,7 +86,7 @@ public class FabricateSetup {
     String fabricateXmlPath = new File(fd.getFabricateXmlPath()).getAbsolutePath();
     
     try {
-      FabricateType fab =  files_.parseFabricate_v1_0(fabricateXmlPath);
+      FabricateType fab =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
       FabricateHelper fh = new FabricateHelper(fab);
      
       downloadFabricateRunClasspathDependencies(fab);

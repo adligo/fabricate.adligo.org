@@ -11,17 +11,17 @@ import java.io.IOException;
 
 import javax.xml.validation.Schema;
 
-public class FabXmlFiles implements I_FabXmlFiles {
+public class FabXmlFileIO implements I_FabXmlFileIO {
   /**
    * Please don't use directly use I_FabFiles(FabFiles) for stubbing
    * (and by stubbing I mean putting something in the program
    * to get called in a way that a test can mock out the stub later
    * using something like mockito).
    */
-  public static final FabXmlFiles INSTANCE = new FabXmlFiles();
+  public static final FabXmlFileIO INSTANCE = new FabXmlFileIO();
   public static Schema SCHEMA = SchemaLoader.INSTANCE.get();
   
-  private FabXmlFiles() {
+  private FabXmlFileIO() {
     
   }
 

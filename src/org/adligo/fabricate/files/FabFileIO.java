@@ -1,15 +1,7 @@
 package org.adligo.fabricate.files;
 
 import org.adligo.fabricate.build.stages.DefaultSetup;
-import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.files.xml_io.FabXmlFiles;
-import org.adligo.fabricate.files.xml_io.I_FabXmlFiles;
-import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
-import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
-import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryType;
-import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
+import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,12 +13,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FabFiles implements I_FabFiles {
-  public static final FabFiles INSTANCE = new FabFiles();
-  private static I_FabXmlFiles XML_FILES = FabXmlFiles.INSTANCE;
-  private I_FabContext ctx_;
+public class FabFileIO implements I_FabFileIO {
+  public static final FabFileIO INSTANCE = new FabFileIO();
+  private I_FabLog log_;
   
-  private FabFiles() {
+  private FabFileIO() {
   }
   
   @Override
@@ -47,42 +38,6 @@ public class FabFiles implements I_FabFiles {
   @Override
   public boolean exists(String filePath) {
     return new File(filePath).exists();
-  }
-
-  @Override
-  public DepotType parseDepot_v1_0(String xmlFilePath) throws IOException {
-    return XML_FILES.parseDepot_v1_0(xmlFilePath);
-  }
-
-  
-  @Override
-  public FabricateDevType parseDev_v1_0(String xmlFilePath) throws IOException {
-    return XML_FILES.parseDev_v1_0(xmlFilePath);
-  }
-
-  @Override
-  public FabricateType parseFabricate_v1_0(String xmlFilePath) throws IOException {
-    return XML_FILES.parseFabricate_v1_0(xmlFilePath);
-  }
-
-  @Override
-  public FabricateProjectType parseProject_v1_0(String xmlFilePath) throws IOException {
-    return XML_FILES.parseProject_v1_0(xmlFilePath);
-  }
-
-  @Override
-  public LibraryType parseLibrary_v1_0(String xmlFilePath) throws IOException {
-    return XML_FILES.parseLibrary_v1_0(xmlFilePath);
-  }
-
-  @Override
-  public void writeDev_v1_0(String filePath, FabricateDevType dev) throws IOException {
-    XML_FILES.writeDev_v1_0(filePath, dev);
-  }
-
-  @Override
-  public void writeDepot_v1_0(String filePath, DepotType depot) throws IOException {
-    XML_FILES.writeDepot_v1_0(filePath, depot);
   }
 
   @Override
@@ -195,22 +150,41 @@ public class FabFiles implements I_FabFiles {
       return list;
   }
   
-  public I_FabContext getContext() {
-    return ctx_;
-  }
-
-  public void setContext(I_FabContext ctx) {
-    ctx_ = ctx;
-  }
-
   private void log(String message) {
-    if (ctx_ == null) {
-      ThreadLocalPrintStream.println(message);
-    } else if (ctx_.isLogEnabled(DefaultSetup.class)) {
-      ThreadLocalPrintStream.println(message);
+    if (log_ == null) {
+      log_.println(message);
+    } else if (log_.isLogEnabled(DefaultSetup.class)) {
+      log_.println(message);
     }
   }
 
-  
+  @Override
+  public I_FabLog getLog() {
+    return log_;
+  }
 
+  @Override
+  public void setLog(I_FabLog log) {
+    log_ = log;
+  }
+
+  @Override
+  public String getNameSeparator() {
+    return File.pathSeparator;
+  }
+
+  @Override
+  public String getSlashPath(String absolutePath) {
+    char [] chars = absolutePath.toCharArray();
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < chars.length; i++) {
+      char c = chars[i];
+      if (c == '\\') {
+          sb.append("/");
+      } else {
+        sb.append(c);
+      }
+    }
+    return sb.toString();
+  }
 }

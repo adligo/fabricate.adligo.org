@@ -1,16 +1,34 @@
 package org.adligo.fabricate.files;
 
-import org.adligo.fabricate.common.FabricateConstants;
-import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
+import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.io.File;
 
+/**
+ * This class provides a implementation of {@link I_FileMatcher} which matches
+ * based on a pattern.   The pattern is applied to include files or exclude files.
+ * The pattern may contain directory information and must contain file information.
+ * File information may contain a wild card character (*) at the left or right 
+ * of the file name.<br/>
+ * <br/>
+ * File Information Examples;<br/>
+ * /*Test.java<br/>
+ * \*Test.java<br/>
+ * *Tests.java<br/>
+ * <br/>
+ * 
+ * 
+ * @see I_FileMatcher
+ * @author scott
+ *
+ */
 public class PatternFileMatcher implements I_FileMatcher {
   private final I_FabricateConstants constants_;
-  private I_FabContext ctx_;
+  
+  private I_FabLog log_;
+  private String fileSeparator_;
   private boolean anyDir_ = false;
   private String parentDir_;
   private boolean startFileWild_ = false;
@@ -22,9 +40,9 @@ public class PatternFileMatcher implements I_FileMatcher {
    */
   private boolean includes_;
   
-  public PatternFileMatcher(I_FabContext ctx, String pattern, boolean includes) {
-    ctx_ = ctx;
-    constants_  = ctx.getConstants();
+  public PatternFileMatcher(I_FabLog log, String pattern, boolean includes) {
+    log_ = log;
+    constants_  = log.getConstants();
     pattern_ = pattern;
     includes_ = includes;
     int slash = pattern.indexOf("/");
@@ -115,12 +133,12 @@ public class PatternFileMatcher implements I_FileMatcher {
 
   public void log(File file, boolean matched) {
     I_FileMessages fileMessages = constants_.getFileMessages();
-    if (ctx_.isLogEnabled(PatternFileMatcher.class)) {
+    if (log_.isLogEnabled(PatternFileMatcher.class)) {
       String message = fileMessages.getTheFollowingFile() + constants_.getLineSeperator() +
           file.getAbsolutePath() + constants_.getLineSeperator() +
           fileMessages.getDidNotMatchedTheFollowingPattren() + constants_.getLineSeperator() +
           pattern_;
-      ThreadLocalPrintStream.println(message);
+      log_.println(message);
     }
   }
 

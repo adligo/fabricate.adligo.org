@@ -4,11 +4,12 @@ import org.adligo.fabricate.common.DependencyTypeHelper;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
@@ -42,7 +43,7 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
   private CopyOnWriteArraySet<String> libsDone_ = new CopyOnWriteArraySet<String>();
   private CopyOnWriteArraySet<DependencyTypeHelper> uniqueDeps_ = new CopyOnWriteArraySet<DependencyTypeHelper>();
   
-  private I_FabFiles files_ = FabFiles.INSTANCE;
+
   private int projectCount_;
   private AtomicInteger finishedProjectCount_ = new AtomicInteger(0);
   private AtomicInteger depCount_ = new AtomicInteger(0);
@@ -52,6 +53,16 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
   private RepositoryDownloader repoDown_;
   private final Semaphore semaphore4Deps_ = new Semaphore(1);
   private final Semaphore semaphore_ = new Semaphore(1);
+  
+  public DependencyDownloader() {
+    files_ = FabFileIO.INSTANCE;
+    xmlFiles_ = FabXmlFileIO.INSTANCE;
+  }
+  
+  public DependencyDownloader(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
+    files_ = files;
+    xmlFiles_ = xmlFiles;
+  }
   
   @Override
   public void setup(I_FabContext ctx) {
@@ -64,8 +75,8 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
         File.separator), ctx);
     
     projectsPath_ = ctx_.getProjectsPath();
-    if (ctx_.isLogEnabled(DependencyDownloader.class)) {
-      ThreadLocalPrintStream.println("Finding dependencies for projects in " + projectsPath_);
+    if (log_.isLogEnabled(DependencyDownloader.class)) {
+      log_.println("Finding dependencies for projects in " + projectsPath_);
     }
     
     projects_ = new ConcurrentLinkedQueue<NamedProject>((List<NamedProject>)
@@ -91,8 +102,8 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
           if (libs != null) {
             for (LibraryReferenceType lib: libs) {
               String libName = lib.getValue();
-              if (ctx_.isLogEnabled(DependencyDownloader.class)) {
-                ThreadLocalPrintStream.println("project " + projectName + " has library " + libName);
+              if (log_.isLogEnabled(DependencyDownloader.class)) {
+                log_.println("project " + projectName + " has library " + libName);
               }
               addLibrary(fabricateDir, libName);
             }
@@ -115,8 +126,8 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
       DependencyTypeHelper dep = deps_.poll();
       while (dep != null) {
         DependencyType depType = dep.getDependencyType();
-        if (ctx_.isLogEnabled(DependencyDownloader.class)) {
-          ThreadLocalPrintStream.println("Checking dependency " + pathBuilder.getFileName(depType));
+        if (log_.isLogEnabled(DependencyDownloader.class)) {
+          log_.println("Checking dependency " + pathBuilder.getFileName(depType));
         }
         String type = depType.getType();
         if (type == null || !"ide".equalsIgnoreCase(type)) {
@@ -139,8 +150,8 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
    
       try {
         semaphore_.acquire();
-        if (ctx_.isLogEnabled(DependencyDownloader.class)) {
-          ThreadLocalPrintStream.println("Finished all MavenObtainer downloads.");
+        if (log_.isLogEnabled(DependencyDownloader.class)) {
+          log_.println("Finished all MavenObtainer downloads.");
         }
         super.finish();
         semaphore_.release();
@@ -154,8 +165,8 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
     if (!finishedProjects_.get()) {
       try {
         semaphore4Deps_.acquire();
-        if (ctx_.isLogEnabled(DependencyDownloader.class)) {
-          ThreadLocalPrintStream.println("Finished finding dependencies for projects in " + projectsPath_ + 
+        if (log_.isLogEnabled(DependencyDownloader.class)) {
+          log_.println("Finished finding dependencies for projects in " + projectsPath_ + 
               System.lineSeparator() + " there are " + uniqueDeps_.size());
         }
         finishedProjects_.set(true);
@@ -181,7 +192,7 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
       return;
     }
     libsDone_.add(lib);
-    LibraryType libDeps = files_.parseLibrary_v1_0(fabricateDir + 
+    LibraryType libDeps = xmlFiles_.parseLibrary_v1_0(fabricateDir + 
         File.separator + "lib" + File.separator + lib + ".xml");
     DependenciesType depsType = libDeps.getDependencies();
     

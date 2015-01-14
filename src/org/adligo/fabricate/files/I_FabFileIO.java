@@ -1,7 +1,6 @@
 package org.adligo.fabricate.files;
 
-import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.files.xml_io.I_FabXmlFiles;
+import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,29 +14,47 @@ import java.util.List;
  *
  */
 
-public interface I_FabFiles extends I_FabXmlFiles {
-  public I_FabContext getContext();
+public interface I_FabFileIO {
+  public I_FabLog getLog();
 
-  public void setContext(I_FabContext ctx);
+  public void setLog(I_FabLog ctx);
   /**
-   * Stubs to new File(String filePath).exists();
-   * 
    * @param filePath
    * @return
+   * new File(String filePath).exists();
    */
   public boolean exists(String filePath);
   
   /**
-   * Stubs to new File(String filePath).getAbsolutePath()
    * 
    * @param filePath
-   * @return
+   * @return new File(String filePath).getAbsolutePath()
+   * the system dependent path.
    */
   public String getAbsolutePath(String filePath);
   /**
-   * Stubs to new File(String dirsPath).mkDirs();
    * 
+   * @return the system dependent directory
+   * separator (Unix and Mac '\', Windows '/')
+   */
+  public String getNameSeparator();
+  /**
+   * 
+   * @param absolutePath a system dependent 
+   * path.
+   * @return a path which contains / for path separators,
+   * for Unix (Mac) paths this returns a unchanged value.
+   * For Windows paths this will return a strange value;<br/>
+   * Input;<br/>
+   * C:\foo\bar\etc<br/>
+   * Output;<br/>
+   * C:/foo/bar/etc<br/>
+   */
+  public String getSlashPath(String absolutePath);
+  
+  /**
    * @param dirsPath
+   * new File(String dirsPath).mkDirs();
    * @return
    */
   public boolean mkdirs(String dirsPath);
@@ -70,6 +87,8 @@ public interface I_FabFiles extends I_FabXmlFiles {
    * @return
    */
   public File create(String filePath) throws IOException;
+  
+
   /**
    * 
    * @param filePath

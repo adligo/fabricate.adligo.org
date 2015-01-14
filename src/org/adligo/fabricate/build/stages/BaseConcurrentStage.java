@@ -4,7 +4,10 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ProjectBlock;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.TaskType;
@@ -41,6 +44,9 @@ public abstract class BaseConcurrentStage implements I_FabStage {
   protected String stageName_;
   protected String projectsPath_;
   protected I_FabContext ctx_;
+  protected I_FabFileIO files_;
+  protected I_FabXmlFileIO xmlFiles_;
+  protected I_FabLog log_;
   protected FabricateType fabricate_;
   private final ArrayBlockingQueue<Boolean> finished_ = new ArrayBlockingQueue<Boolean>(1);
   private volatile Exception lastException_ = null;
@@ -60,6 +66,9 @@ public abstract class BaseConcurrentStage implements I_FabStage {
   @Override
   public void setup(I_FabContext ctx) {
     ctx_ = ctx;
+    files_ = ctx.getFileIO();
+    xmlFiles_ = ctx.getXmlFileIO();
+    log_ = ctx.getLog();
     fabricate_ = ctx_.getFabricate();
     projectsPath_ = ctx_.getProjectsPath();
     
@@ -136,8 +145,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
   
   protected void finish(Exception x) {
     lastException_ = x;
-    if (ctx_.isLogEnabled(BaseConcurrentStage.class)) {
-      ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " had a exception.");
+    if (log_.isLogEnabled(BaseConcurrentStage.class)) {
+      log_.println(this.getClass().getSimpleName() + " had a exception.");
     }
     try {
       
@@ -252,8 +261,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
         }
       }
     }
-    if (ctx_.isLogEnabled(BaseConcurrentStage.class)) {
-      ThreadLocalPrintStream.println("Task " + task + " has params " + toRet);
+    if (log_.isLogEnabled(BaseConcurrentStage.class)) {
+      log_.println("Task " + task + " has params " + toRet);
     }
     return toRet;
   }
@@ -356,8 +365,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
     
     //notify the projects which are blocked
     Enumeration<ProjectBlock> keys =  projectBlockMap_.keys();
-    if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-      ThreadLocalPrintStream.println(projectName + " is checking necessary dependent project notifications." +
+    if (log_.isLogEnabled(CompileJarAndDeposit.class)) {
+      log_.println(projectName + " is checking necessary dependent project notifications." +
           projectBlockMap_.size());
     }
     while (keys.hasMoreElements()) {
@@ -365,8 +374,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
       
       if (projectName.equals(key.getBlockingProject())) {
         ArrayBlockingQueue<Boolean> block =  projectBlockMap_.get(key);
-        if (ctx_.isLogEnabled(CompileJarAndDeposit.class)) {
-          ThreadLocalPrintStream.println(projectName + " is  notifying " +
+        if (log_.isLogEnabled(CompileJarAndDeposit.class)) {
+          log_.println(projectName + " is  notifying " +
               key.getProject());
         }
         block.add(Boolean.TRUE);

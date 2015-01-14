@@ -6,10 +6,13 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.SystemHelper;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
 import org.adligo.fabricate.files.xml_io.FabricateIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.files.xml_io.ProjectIO;
 import org.adligo.fabricate.files.xml_io.ResultIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
@@ -42,7 +45,8 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
 public class StageManager {
-  private I_FabFiles files_ = FabFiles.INSTANCE;
+  private final I_FabFileIO files_;
+  private final I_FabXmlFileIO xmlFiles_;
   private List<StageType> stages_ = new ArrayList<StageType>();
   private Map<String, Object> stageMap_ = new HashMap<String, Object>();
   private List<String> sucessfulTasks_ = new ArrayList<String>();
@@ -55,10 +59,21 @@ public class StageManager {
   private String fabricateXmlPath_;
   private String projectXmlPath_;
   private I_FabContext ctx_;
+  private I_FabLog log_;
   private String failureStage_;
   private String failureProject_;
   
-  public StageManager(FabricateXmlDiscovery xmlDiscovery, Map<String,String> args) {
+  public StageManager() {
+    files_ = FabFileIO.INSTANCE;
+    xmlFiles_ = FabXmlFileIO.INSTANCE;
+  }
+  
+  public StageManager(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
+    files_ = files;
+    xmlFiles_ = xmlFiles;
+  }
+ 
+  public void setup(FabricateXmlDiscovery xmlDiscovery, Map<String,String> args) {
     File file = new File(".");
     initalDirPath = file.getAbsolutePath();
     initalDirPath = initalDirPath.substring(0, initalDirPath.length() - 2);
@@ -68,7 +83,7 @@ public class StageManager {
     try {
       fabricateXmlPath_ = fabricateXml;
       ThreadLocalPrintStream.println("reading " + fabricateXml);
-      fab_ = files_.parseFabricate_v1_0(fabricateXml);
+      fab_ = xmlFiles_.parseFabricate_v1_0(fabricateXml);
     } catch (IOException e) {
       failureException_ = e;
     }
@@ -77,7 +92,7 @@ public class StageManager {
         if (xmlDiscovery.hasProjectXml()) {
           projectXmlPath_ = xmlDiscovery.getProjectXml();
           ThreadLocalPrintStream.println("reading " + projectXmlPath_);
-          project_ = files_.parseProject_v1_0(projectXmlPath_);
+          project_ = xmlFiles_.parseProject_v1_0(projectXmlPath_);
         }
       } catch (IOException e) {
         failureException_ = e;
@@ -149,8 +164,8 @@ public class StageManager {
         if (ctx_ == null) {
           ThreadLocalPrintStream.println("Starting stage " + stageName);
         } else {
-          if (ctx_.isLogEnabled(StageManager.class)) {
-            ThreadLocalPrintStream.println("Starting stage " + stageName);
+          if (log_.isLogEnabled(StageManager.class)) {
+            log_.println("Starting stage " + stageName);
           }
         }
         Object obj = stageMap_.get(stageName);
@@ -162,6 +177,7 @@ public class StageManager {
           setupStage.setFabricateXmlPath(fabricateXmlPath_);
           setupStage.setProjectXmlPath(projectXmlPath_);
           ctx_ = setupStage.setup(args_);
+          log_ = ctx_.getLog();
           setup = true;
           sucessfulTasks_.add(stageName);
         } else {
@@ -172,8 +188,8 @@ public class StageManager {
           
           if (fabTask.isConcurrent()) {
             concurrentExecutor.setTask(fabTask);
-            if (ctx_.isLogEnabled(StageManager.class)) {
-              ThreadLocalPrintStream.println("Starting concurrent execution with " + 
+            if (log_.isLogEnabled(StageManager.class)) {
+              log_.println("Starting concurrent execution with " + 
                   concurrentExecutor.getThreads() + " threads");
             }
             concurrentExecutor.execute();
@@ -184,13 +200,13 @@ public class StageManager {
             fabTask.run();
           }
           if (fabTask.hadException()) {
-            if (ctx_.isLogEnabled(StageManager.class)) {
-              ThreadLocalPrintStream.println("Finished stage " + stageName + " with an exception.");
+            if (log_.isLogEnabled(StageManager.class)) {
+              log_.println("Finished stage " + stageName + " with an exception.");
             }
             throw fabTask.getException();
           } else {
-            if (ctx_.isLogEnabled(StageManager.class)) {
-              ThreadLocalPrintStream.println("Finished stage " + stageName + " succesfuly");
+            if (log_.isLogEnabled(StageManager.class)) {
+              log_.println("Finished stage " + stageName + " succesfuly");
             }
           }
         }
@@ -219,9 +235,9 @@ public class StageManager {
         x.printStackTrace();
       }
     }
-    if (ctx_ != null) {
-      if (ctx_.isLogEnabled(StageManager.class)) {
-        ThreadLocalPrintStream.println("Writing " + resultFile.getAbsolutePath());
+    if (log_ != null) {
+      if (log_.isLogEnabled(StageManager.class)) {
+        log_.println("Writing " + resultFile.getAbsolutePath());
       }
     } else {
       ThreadLocalPrintStream.println("Writing " + resultFile.getAbsolutePath());
@@ -275,8 +291,8 @@ public class StageManager {
     String startString = args_.get("start");
     long start = new Long(startString);
     long dur = end - start;
-    if (ctx_ != null) {
-      if (ctx_.isLogEnabled(StageManager.class)) {
+    if (log_ != null) {
+      if (log_.isLogEnabled(StageManager.class)) {
          logDuration(dur);
       }
     } else {
@@ -312,7 +328,7 @@ public class StageManager {
   
   public void logDuration(long duration) {
     if (duration < 1000) {
-      ThreadLocalPrintStream.println("Duration was " + duration + " milliseconds.");
+      log_.println("Duration was " + duration + " milliseconds.");
     } else if (duration > 1000 * 60) {
       double mins = duration;
       double divisor = 1000 * 60;
@@ -320,14 +336,19 @@ public class StageManager {
       BigDecimal bd = new BigDecimal(mins);
       bd = bd.setScale(2, RoundingMode.HALF_UP);
       
-      ThreadLocalPrintStream.println("Duration was " + bd.toPlainString() + " minutes.");
+      log_.println("Duration was " + bd.toPlainString() + " minutes.");
     } else {
       double secs = duration;
       double divisor = 1000;
       secs = secs / divisor;
       BigDecimal bd = new BigDecimal(secs);
       bd = bd.setScale(2, RoundingMode.HALF_UP);
-      ThreadLocalPrintStream.println("Duration was " + bd.toPlainString() + " seconds.");
+      String message = "Duration was " + bd.toPlainString() + " seconds.";
+      if (log_ != null) {
+        log_.println(message);
+      } else {
+        ThreadLocalPrintStream.println(message);
+      }
     }
   }
 }

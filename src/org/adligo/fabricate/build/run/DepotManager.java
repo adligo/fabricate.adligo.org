@@ -4,9 +4,11 @@ import org.adligo.fabricate.common.Depot;
 import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_DepotEntry;
 import org.adligo.fabricate.common.I_FabContext;
-import org.adligo.fabricate.common.ThreadLocalPrintStream;
-import org.adligo.fabricate.files.FabFiles;
-import org.adligo.fabricate.files.I_FabFiles;
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.files.FabFileIO;
+import org.adligo.fabricate.files.I_FabFileIO;
+import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 
 import java.io.File;
@@ -14,8 +16,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class DepotManager {
-  private I_FabFiles files_ = FabFiles.INSTANCE;
+  private final I_FabFileIO files_;
+  private final I_FabXmlFileIO xmlFiles_;
   private I_FabContext ctx_;
+  private I_FabLog log_;
   private DepotType depotType_;
   private String dir_;
   private String depotXml_;
@@ -23,16 +27,27 @@ public class DepotManager {
   private I_Depot depot_;
   private boolean cleaning_;
   
-  public DepotManager(I_FabContext ctx, String dir) {
+  public DepotManager() {
+    files_ = FabFileIO.INSTANCE;
+    xmlFiles_ = FabXmlFileIO.INSTANCE;
+  }
+  
+  public DepotManager(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
+    files_ = files;
+    xmlFiles_ = xmlFiles;
+  }
+
+  public void setup(I_FabContext ctx, String dir) {
     ctx_ = ctx;
+    log_ = ctx.getLog();
     dir_ = dir;
     depotXml_ = dir_ + File.separator + "depot.xml";
     depotRunningXml_ = dir_ + File.separator + ".running";
     if (!exists()) {
       create();
     }
-    if (ctx_.isLogEnabled(Depot.class)) {
-      ThreadLocalPrintStream.println(depotRunningXml_);
+    if (log_.isLogEnabled(Depot.class)) {
+      log_.println(depotRunningXml_);
     }
     File fabricate = new File(dir_ + File.separator + ".running");
     if (fabricate.exists()) {
@@ -50,7 +65,7 @@ public class DepotManager {
     }
     
     try {
-      depotType_ = files_.parseDepot_v1_0(depotXml_);
+      depotType_ = xmlFiles_.parseDepot_v1_0(depotXml_);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -65,8 +80,8 @@ public class DepotManager {
   
   private void create() {
     if (!cleaning_) {
-      if (ctx_.isLogEnabled(DepotManager.class)) {
-        ThreadLocalPrintStream.println("DepotManager creating depot " + dir_);
+      if (log_.isLogEnabled(DepotManager.class)) {
+        log_.println("DepotManager creating depot " + dir_);
       }
     }
     if (!files_.exists(dir_)) { 
@@ -77,7 +92,7 @@ public class DepotManager {
     if (!files_.exists(depotXml_)) {
       try {
         depotType_ = new DepotType();
-        files_.writeDepot_v1_0(depotXml_, depotType_);
+        xmlFiles_.writeDepot_v1_0(depotXml_, depotType_);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -85,8 +100,8 @@ public class DepotManager {
   }
   public void clean()  {
     cleaning_ = true;
-    if (ctx_.isLogEnabled(DepotManager.class)) {
-      ThreadLocalPrintStream.println("DepotManager cleaning depot " + dir_);
+    if (log_.isLogEnabled(DepotManager.class)) {
+      log_.println("DepotManager cleaning depot " + dir_);
     }
     File dir = new File(dir_);
     
@@ -108,8 +123,8 @@ public class DepotManager {
         File f = files[i];
         if (!".running".equals(f.getName())) {
           if (f.isFile()) {
-            if (ctx_.isLogEnabled(DepotManager.class)) {
-              ThreadLocalPrintStream.println("DepotManager cleaning depot deleting " + f.getAbsolutePath());
+            if (log_.isLogEnabled(DepotManager.class)) {
+              log_.println("DepotManager cleaning depot deleting " + f.getAbsolutePath());
             }
             try {
               Files.delete(f.toPath());
@@ -132,7 +147,8 @@ public class DepotManager {
 
   public I_Depot getDepot() {
     if (depot_ == null) {
-      depot_ = new Depot(dir_, ctx_, depotType_);
+      Depot depot = new Depot(dir_, ctx_, depotType_);
+      depot_ = depot;
     }
     return depot_;
   }

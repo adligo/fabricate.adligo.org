@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.StringTokenizer;
 public abstract class BaseTask implements I_FabTask {
   protected String projectsPath_;
   protected I_FabContext ctx_;
+  protected I_FabLog log_;
   protected NamedProject project_;
   protected String projectName_;
   protected Map<String, String> params_;
@@ -23,6 +25,7 @@ public abstract class BaseTask implements I_FabTask {
   @Override
   public void setup(I_FabContext ctx, NamedProject project, Map<String, String> params) {
     ctx_ = ctx;
+    log_ = ctx.getLog();
     project_ = project;
     projectName_ = project.getName();
     projectsPath_ = ctx_.getProjectsPath();
