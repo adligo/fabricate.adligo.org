@@ -1,4 +1,4 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.models;
 
 /**
  * This is fundamentally a immutable
@@ -12,6 +12,5 @@ package org.adligo.fabricate.common;
 public interface I_ParamsTree {
   public String getKey();
   public String getValue();
-  public int getChildren();
   public I_ParamsTree getParams();
 }

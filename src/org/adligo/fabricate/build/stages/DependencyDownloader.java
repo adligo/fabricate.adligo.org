@@ -1,8 +1,8 @@
 package org.adligo.fabricate.build.stages;
 
 import org.adligo.fabricate.common.DependencyTypeHelper;
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.RepositoryDownloader;
@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author scott
  *
  */
-public class DependencyDownloader extends BaseConcurrentStage implements I_FabStage {
+public class DependencyDownloader extends OldBaseConcurrentStage implements I_FabStage {
    private ConcurrentLinkedQueue<NamedProject> projects_;
   private ConcurrentLinkedQueue<DependencyTypeHelper> deps_ = new ConcurrentLinkedQueue<DependencyTypeHelper>();
   private CopyOnWriteArraySet<String> libsDone_ = new CopyOnWriteArraySet<String>();
@@ -65,7 +65,7 @@ public class DependencyDownloader extends BaseConcurrentStage implements I_FabSt
   }
   
   @Override
-  public void setup(I_FabContext ctx) {
+  public void setup(I_RunContext ctx) {
     super.setup(ctx);
     FabricateType fab = ctx_.getFabricate();
     FabricateDependencies fabDeps = fab.getDependencies();

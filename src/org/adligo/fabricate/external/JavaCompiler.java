@@ -1,6 +1,6 @@
 package org.adligo.fabricate.external;
 
-import org.adligo.fabricate.common.I_FabContext;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.StringUtils;
 
 import java.io.File;
@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 public class JavaCompiler {
-  private I_FabContext ctx_;
+  private I_RunContext ctx_;
   private String inDir_;
   private String javaC_;
   
-  public JavaCompiler(I_FabContext ctx, String inDir, String javaC) {
+  public JavaCompiler(I_RunContext ctx, String inDir, String javaC) {
     ctx_ = ctx;
     inDir_ = inDir;
     javaC_ = javaC;

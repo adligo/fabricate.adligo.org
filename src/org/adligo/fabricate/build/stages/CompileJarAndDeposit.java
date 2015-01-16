@@ -3,11 +3,11 @@ package org.adligo.fabricate.build.stages;
 import org.adligo.fabricate.build.stages.tasks.OldCompileTask;
 import org.adligo.fabricate.build.stages.tasks.OldDepositTask;
 import org.adligo.fabricate.build.stages.tasks.OldJarTask;
-import org.adligo.fabricate.common.I_Depot;
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.ManifestParser;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
@@ -18,14 +18,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabStage {
+public class CompileJarAndDeposit extends OldBaseConcurrentStage implements I_FabStage {
   private ConcurrentLinkedQueue<NamedProject> projectsQueue_;
   private final Semaphore semaphore_ = new Semaphore(1);
   private AtomicInteger projectsFinished_ = new AtomicInteger(0);
 
   private int projectsQueueSize_;
   @Override
-  public void setup(I_FabContext ctx) {
+  public void setup(I_RunContext ctx) {
     super.setup(ctx);
     projectsQueue_ = super.getParticipantQueue();
     projectsQueueSize_ = projectsQueue_.size();

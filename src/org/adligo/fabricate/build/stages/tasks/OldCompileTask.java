@@ -1,14 +1,13 @@
 package org.adligo.fabricate.build.stages.tasks;
 
-import org.adligo.fabricate.common.I_Depot;
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
-import org.adligo.fabricate.common.I_ParamsTree;
 import org.adligo.fabricate.common.I_ProjectContext;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
+import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.I_RepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCParam;
@@ -20,6 +19,7 @@ import org.adligo.fabricate.files.IncludesExcludesFileMatcher;
 import org.adligo.fabricate.files.PatternFileMatcher;
 import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
 import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.models.I_ParamsTree;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
@@ -63,7 +63,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
   }
   
   @Override
-  public void setup(I_FabContext ctx, NamedProject project, Map<String, String> params) {
+  public void setup(I_RunContext ctx, NamedProject project, Map<String, String> params) {
     super.setup(ctx, project, params);
     srcDirs_ = getDelimitedValue(OldDefaultTaskHelper.SRC_DIRS, ",",params);
     if (log_.isLogEnabled(OldCompileTask.class)) {
@@ -215,7 +215,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
   }
 
   @Override
-  public void setup(I_FabContext ctx, I_StageContext stageCtx, I_ProjectContext project) {
+  public void setup(I_RunContext ctx, I_StageContext stageCtx, I_ProjectContext project) {
     // TODO Auto-generated method stub
     
   }

@@ -2,8 +2,8 @@ package org.adligo.fabricate.build.stages;
 
 import org.adligo.fabricate.common.ConsolePasswordDialog;
 import org.adligo.fabricate.common.FabRunType;
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author scott
  *
  */
-public class GitStage extends BaseConcurrentStage implements I_FabStage {
+public class GitStage extends OldBaseConcurrentStage implements I_FabStage {
   private final ConsolePasswordDialog consolePasswordDialog_;
   private ConcurrentLinkedQueue<ProjectType> projects_ = new ConcurrentLinkedQueue<ProjectType>();
   private int projectCount_;
@@ -36,7 +36,7 @@ public class GitStage extends BaseConcurrentStage implements I_FabStage {
   private String gitHost_;
   private String gitPath_;
   private String projectsPath_;
-  private I_FabContext ctx_;
+  private I_RunContext ctx_;
   private final Semaphore semaphore_ = new Semaphore(1);
   
   public GitStage() {
@@ -47,7 +47,7 @@ public class GitStage extends BaseConcurrentStage implements I_FabStage {
     consolePasswordDialog_ = dialog;
   }
   @Override
-  public void setup(I_FabContext ctx) {
+  public void setup(I_RunContext ctx) {
     super.setup(ctx);
     ctx_ = ctx;
     

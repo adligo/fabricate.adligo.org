@@ -1,6 +1,5 @@
 package org.adligo.fabricate.files;
 
-import org.adligo.fabricate.build.stages.DefaultSetup;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 
@@ -154,7 +153,7 @@ public class FabFileIO implements I_FabFileIO {
   private void log(String message) {
     if (log_ == null) {
       ThreadLocalPrintStream.println(message);
-    } else if (log_.isLogEnabled(DefaultSetup.class)) {
+    } else if (log_.isLogEnabled(FabFileIO.class)) {
       log_.println(message);
     }
   }

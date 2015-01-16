@@ -1,6 +1,6 @@
 package org.adligo.fabricate.external;
 
-import org.adligo.fabricate.common.I_FabContext;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.io.File;
@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JavaJar {
-  private I_FabContext ctx_;
+  private I_RunContext ctx_;
   private I_FabLog log_;
   private String inDir_;
   private String javaC_;
   
-  public JavaJar(I_FabContext ctx, String inDir, String javaC) {
+  public JavaJar(I_RunContext ctx, String inDir, String javaC) {
     ctx_ = ctx;
     log_ = ctx.getLog();
     inDir_ = inDir;

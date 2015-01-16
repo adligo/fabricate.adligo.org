@@ -8,12 +8,7 @@ import org.adligo.fabricate.common.I_FabStage;
  * @author scott
  *
  */
-public class TasksStage extends BaseConcurrentStage implements I_FabStage {
+public class TasksStage  {
 
-  @Override
-  public void run() {
-    // TODO Auto-generated method stub
-    
-  }
 
 }

@@ -28,5 +28,5 @@ public interface I_FabSetupStage {
    * @param args the parsed arguments from the initial call to java
    * @return
    */
-  public I_FabContext setup(Map<String,String> args);
+  public I_RunContext setup(Map<String,String> args);
 }

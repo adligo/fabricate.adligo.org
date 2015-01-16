@@ -1,4 +1,5 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.depot;
+
 
 public class DepotEntryMutant implements I_DepotEntry {
 

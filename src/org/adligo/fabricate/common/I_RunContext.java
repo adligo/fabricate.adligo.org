@@ -2,6 +2,7 @@ package org.adligo.fabricate.common;
 
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.files.I_FabFileIO;
 import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
@@ -15,7 +16,7 @@ import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
  * @author scott
  *
  */
-public interface I_FabContext {
+public interface I_RunContext {
   public FabRunType getRunType();
   public I_FabLog getLog();
   public I_FabFileIO getFileIO();

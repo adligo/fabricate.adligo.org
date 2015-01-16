@@ -1,6 +1,7 @@
 package org.adligo.fabricate.common;
 
 
+
 /**
  * I_FabTask is a interface to allow plug-able
  * tasks to be called from fabricate.  It is generally
@@ -16,7 +17,7 @@ package org.adligo.fabricate.common;
  */
 public interface I_FabStage extends Runnable {
   public void setStageName(String stageName);
-  public void setup(I_FabContext ctx);
+  public void setup(I_RunContext ctx);
   public boolean isConcurrent();
   /**
    * The thread that calls this method

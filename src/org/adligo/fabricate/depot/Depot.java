@@ -1,11 +1,9 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.depot;
 
+import org.adligo.fabricate.common.I_RunContext;
+import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
-import org.adligo.fabricate.files.FabFileIO;
 import org.adligo.fabricate.files.I_FabFileIO;
-import org.adligo.fabricate.files.xml_io.DepotIO;
-import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
 import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.ArtifactType;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
@@ -44,7 +42,6 @@ public class Depot implements I_Depot {
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
   private String dir_;
-  private I_FabContext ctx_;
   private I_FabLog log_;
   /**
    * This is the main runtime index of what is in the 
@@ -55,14 +52,11 @@ public class Depot implements I_Depot {
   private ConcurrentHashMap<String,ConcurrentHashMap<String,String>> 
       artifactTypesToProjectsToArtifacts_ = 
       new ConcurrentHashMap<String, ConcurrentHashMap<String,String>>();
-  private ConcurrentHashMap<String,ArtifactType> projectsToArtifacts_ = 
-      new ConcurrentHashMap<String, ArtifactType>();
   
-  public Depot(String dir, I_FabContext ctx, DepotType depot) {
+  public Depot(String dir, DepotContext ctx, DepotType depot) {
     dir_ = dir;
-    ctx_ = ctx;
-    files_ = ctx.getFileIO();
-    xmlFiles_ = ctx.getXmlFileIO();
+    files_ = ctx.getFiles();
+    xmlFiles_ = ctx.getXmlFiles();
     log_ = ctx.getLog();
     List<ArtifactType> artifacts = depot.getArtifact();
     for (ArtifactType art: artifacts) {

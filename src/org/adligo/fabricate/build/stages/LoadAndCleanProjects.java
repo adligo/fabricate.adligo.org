@@ -1,8 +1,8 @@
 package org.adligo.fabricate.build.stages;
 
 import org.adligo.fabricate.common.FabRunType;
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.files.FabFileIO;
 import org.adligo.fabricate.files.I_FabFileIO;
@@ -41,7 +41,7 @@ import java.util.concurrent.Semaphore;
  * @author scott
  *
  */
-public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabStage {
+public class LoadAndCleanProjects extends OldBaseConcurrentStage implements I_FabStage {
   public static final String COULD_NOT_FIND_THE_FILE = "Could not find the file ";
 
   private boolean run_ = true;
@@ -53,7 +53,7 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
   
   public LoadAndCleanProjects() {}
   
-  public void setup(I_FabContext ctx) {
+  public void setup(I_RunContext ctx) {
     super.setup(ctx);
     FabRunType type =  ctx.getRunType();
     switch (type) {
@@ -187,7 +187,7 @@ public class LoadAndCleanProjects extends BaseConcurrentStage implements I_FabSt
    * @param ctx_
    * @throws IllegalStateException
    */
-  private void calcProjectDependencyOrder(I_FabContext ctx_) throws IllegalStateException {
+  private void calcProjectDependencyOrder(I_RunContext ctx_) throws IllegalStateException {
     if (log_.isLogEnabled(LoadAndCleanProjects.class)) {
       log_.println("Calculating project dependency order for " + 
           projectsMemory_.size() + " projects.");

@@ -1,17 +1,17 @@
 package org.adligo.fabricate.build.stages.tasks;
 
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
-import org.adligo.fabricate.common.I_ParamsTree;
 import org.adligo.fabricate.common.I_ProjectContext;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.models.I_ParamsTree;
 
 import java.io.File;
 
 public abstract class BaseTask implements I_FabTask {
   protected String projectsPath_;
-  protected I_FabContext ctx_;
+  protected I_RunContext ctx_;
   protected I_FabLog log_;
   protected I_ProjectContext project_;
   protected String projectName_;
@@ -19,7 +19,7 @@ public abstract class BaseTask implements I_FabTask {
   protected String projectPath_;
 
   @Override
-  public void setup(I_FabContext ctx, I_StageContext stageContext, I_ProjectContext project) {
+  public void setup(I_RunContext ctx, I_StageContext stageContext, I_ProjectContext project) {
     ctx_ = ctx;
     log_ = ctx.getLog();
     project_ = project;

@@ -1,7 +1,7 @@
 package org.adligo.fabricate.build.stages;
 
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ProjectBlock;
 import org.adligo.fabricate.common.log.I_FabLog;
@@ -40,10 +40,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author scott
  *
  */
-public abstract class BaseConcurrentStage implements I_FabStage {
+public abstract class OldBaseConcurrentStage implements I_FabStage {
   protected String stageName_;
   protected String projectsPath_;
-  protected I_FabContext ctx_;
+  protected I_RunContext ctx_;
   protected I_FabFileIO files_;
   protected I_FabXmlFileIO xmlFiles_;
   protected I_FabLog log_;
@@ -64,7 +64,7 @@ public abstract class BaseConcurrentStage implements I_FabStage {
   
   @SuppressWarnings("unchecked")
   @Override
-  public void setup(I_FabContext ctx) {
+  public void setup(I_RunContext ctx) {
     ctx_ = ctx;
     files_ = ctx.getFileIO();
     xmlFiles_ = ctx.getXmlFileIO();
@@ -146,7 +146,7 @@ public abstract class BaseConcurrentStage implements I_FabStage {
   
   protected void finish(Exception x) {
     lastException_ = x;
-    if (log_.isLogEnabled(BaseConcurrentStage.class)) {
+    if (log_.isLogEnabled(OldBaseConcurrentStage.class)) {
       log_.println(this.getClass().getSimpleName() + " had a exception.");
     }
     try {
@@ -263,7 +263,7 @@ public abstract class BaseConcurrentStage implements I_FabStage {
         }
       }
     }
-    if (log_.isLogEnabled(BaseConcurrentStage.class)) {
+    if (log_.isLogEnabled(OldBaseConcurrentStage.class)) {
       log_.println("Task " + task + " has params " + toRet);
     }
     return toRet;

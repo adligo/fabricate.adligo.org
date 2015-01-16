@@ -1,19 +1,20 @@
 package org.adligo.fabricate.build.stages;
 
-import org.adligo.fabricate.build.run.DepotManager;
 import org.adligo.fabricate.build.run.StageManager;
 import org.adligo.fabricate.build.stages.tasks.OldCompileTask;
-import org.adligo.fabricate.common.Depot;
-import org.adligo.fabricate.common.FabContextMutant;
 import org.adligo.fabricate.common.FabRunType;
-import org.adligo.fabricate.common.I_Depot;
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupStage;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
+import org.adligo.fabricate.common.RunContextMutant;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.depot.Depot;
+import org.adligo.fabricate.depot.DepotContext;
+import org.adligo.fabricate.depot.DepotManager;
+import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.RepositoryDownloader;
@@ -71,8 +72,8 @@ public class DefaultSetup implements I_FabSetupStage {
   }
 
   @Override
-  public I_FabContext setup(Map<String, String> args) {
-    FabContextMutant fcm = new FabContextMutant();
+  public I_RunContext setup(Map<String, String> args) {
+    RunContextMutant fcm = new RunContextMutant();
     setupLogging(fcm);
     fcm.setArgs(args);
     fcm.setFabricate(fabricate_);
@@ -94,8 +95,8 @@ public class DefaultSetup implements I_FabSetupStage {
     } else {
       depot = fabricateDir + File.separator + "depot";
     }
-    depotManager_ = new DepotManager();
-    depotManager_.setup(fcm, depot);
+    depotManager_ = new DepotManager(log_);
+    depotManager_.setup(depot);
     depot_ = depotManager_.getDepot();
     fcm.setDepot(depot_);
     
@@ -141,7 +142,7 @@ public class DefaultSetup implements I_FabSetupStage {
     }
   }
   
-  public void cleanDir(FabContextMutant fcm, String fabricateDir, String dir) {
+  public void cleanDir(RunContextMutant fcm, String fabricateDir, String dir) {
     String fullDir = fabricateDir + File.separator + dir;
     File dirFile = new File(fullDir);
     if (dirFile.exists()) {
@@ -177,7 +178,7 @@ public class DefaultSetup implements I_FabSetupStage {
   }
 
   @SuppressWarnings("boxing")
-  public void setupLogging(FabContextMutant fcm) {
+  public void setupLogging(RunContextMutant fcm) {
     LogSettingsType logs = fabricate_.getLogs();
     Map<String,Boolean> settings = new HashMap<String,Boolean>();
     if (logs != null) {
@@ -197,7 +198,7 @@ public class DefaultSetup implements I_FabSetupStage {
       }
     }
     //alpha ordered default ons
-    checkDefaultLog(BaseConcurrentStage.class, true, settings);
+    checkDefaultLog(OldBaseConcurrentStage.class, true, settings);
     checkDefaultLog(OldCompileTask.class, true, settings);
     checkDefaultLog(CompileJarAndDeposit.class, true, settings);
     checkDefaultLog(DefaultSetup.class, true, settings);

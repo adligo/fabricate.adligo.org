@@ -1,9 +1,6 @@
-package org.adligo.fabricate.build.run;
+package org.adligo.fabricate.depot;
 
-import org.adligo.fabricate.common.Depot;
-import org.adligo.fabricate.common.I_Depot;
-import org.adligo.fabricate.common.I_DepotEntry;
-import org.adligo.fabricate.common.I_FabContext;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.files.FabFileIO;
 import org.adligo.fabricate.files.I_FabFileIO;
@@ -16,10 +13,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class DepotManager {
+  private final I_FabLog log_;
+  private final DepotContext ctx_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
-  private I_FabContext ctx_;
-  private I_FabLog log_;
+  
   private DepotType depotType_;
   private String dir_;
   private String depotXml_;
@@ -27,19 +25,23 @@ public class DepotManager {
   private I_Depot depot_;
   private boolean cleaning_;
   
-  public DepotManager() {
+  public DepotManager(I_FabLog log) {
+    log_ = log;
+    ctx_ = new DepotContext(log_);
     files_ = FabFileIO.INSTANCE;
     xmlFiles_ = FabXmlFileIO.INSTANCE;
   }
   
-  public DepotManager(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
-    files_ = files;
-    xmlFiles_ = xmlFiles;
-  }
-
-  public void setup(I_FabContext ctx, String dir) {
+  public DepotManager(DepotContext ctx) {
     ctx_ = ctx;
     log_ = ctx.getLog();
+    files_ = ctx.getFiles();
+    xmlFiles_ = ctx.getXmlFiles();
+  }
+
+  public void setup( String dir) {
+ 
+    
     dir_ = dir;
     depotXml_ = dir_ + File.separator + "depot.xml";
     depotRunningXml_ = dir_ + File.separator + ".running";

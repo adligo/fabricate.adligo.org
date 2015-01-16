@@ -3,6 +3,7 @@ package org.adligo.fabricate.common;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.files.FabFileIO;
 import org.adligo.fabricate.files.I_FabFileIO;
 import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FabContextMutant implements I_FabContext {
+public class RunContextMutant implements I_RunContext {
 
   private I_FabricateConstants constants_ = FabricateEnConstants.INSTANCE;
   private FabRunType runType;
@@ -40,7 +41,7 @@ public class FabContextMutant implements I_FabContext {
   private I_FabFileIO fileIO_ = FabFileIO.INSTANCE;
   private I_FabXmlFileIO xmlFileIO_ = FabXmlFileIO.INSTANCE;
   
-  public FabContextMutant() {
+  public RunContextMutant() {
   }
 
 

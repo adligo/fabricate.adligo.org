@@ -1,4 +1,4 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.depot;
 
 public interface I_Depot {
 

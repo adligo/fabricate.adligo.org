@@ -1,10 +1,10 @@
 package org.adligo.fabricate;
 
 import org.adligo.fabricate.common.ArgsParser;
-import org.adligo.fabricate.common.FabContextMutant;
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
+import org.adligo.fabricate.common.RunContextMutant;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
@@ -184,7 +184,7 @@ public class FabricateSetup {
       if (depTypes != null) {
         LocalRepositoryHelper lrh = new LocalRepositoryHelper();
         String localRepository = lrh.getRepositoryPath(fab);
-        FabContextMutant fcm = new FabContextMutant();
+        RunContextMutant fcm = new RunContextMutant();
         fcm.setLocalRepositoryPath(localRepository);
         //leave logs empty here
         List<String> repos = deps.getRemoteRepository();

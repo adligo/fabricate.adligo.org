@@ -1,9 +1,8 @@
 package org.adligo.fabricate.build.stages.tasks;
 
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
-import org.adligo.fabricate.common.I_ParamsTree;
 import org.adligo.fabricate.common.I_ProjectContext;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
@@ -11,6 +10,7 @@ import org.adligo.fabricate.external.JarParam;
 import org.adligo.fabricate.external.JavaCParam;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.ManifestParser;
+import org.adligo.fabricate.models.I_ParamsTree;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,7 +57,7 @@ public class OldJarTask extends OldBaseTask implements I_FabTask {
   
   @SuppressWarnings("boxing")
   @Override
-  public void setup(I_FabContext ctx, NamedProject project, Map<String, String> params) {
+  public void setup(I_RunContext ctx, NamedProject project, Map<String, String> params) {
     super.setup(ctx, project, params);
     
     String include = params.get(INCLUDE_SOURCEFILES);
@@ -194,7 +194,7 @@ public class OldJarTask extends OldBaseTask implements I_FabTask {
   }
   
   @Override
-  public void setup(I_FabContext ctx, I_StageContext stageCtx, I_ProjectContext project) {
+  public void setup(I_RunContext ctx, I_StageContext stageCtx, I_ProjectContext project) {
     // TODO Auto-generated method stub
     
   }

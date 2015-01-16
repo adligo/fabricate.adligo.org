@@ -2,9 +2,9 @@ package org.adligo.fabricate.build.run;
 
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.FabricateXmlDiscovery;
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.I_FabStage;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.SystemHelper;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
@@ -58,7 +58,7 @@ public class StageManager {
   private boolean setup = false;
   private String fabricateXmlPath_;
   private String projectXmlPath_;
-  private I_FabContext ctx_;
+  private I_RunContext ctx_;
   private I_FabLog log_;
   private String failureStage_;
   private String failureProject_;

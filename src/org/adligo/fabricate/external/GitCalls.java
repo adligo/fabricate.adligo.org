@@ -1,6 +1,6 @@
 package org.adligo.fabricate.external;
 
-import org.adligo.fabricate.common.I_FabContext;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.log.I_FabLog;
 
@@ -10,7 +10,7 @@ import java.io.PrintStream;
 
 public class GitCalls {
   private static PrintStream OUT = System.out;
-  private I_FabContext ctx_;
+  private I_RunContext ctx_;
   private I_FabLog log_;
   private String hostname_;
   private String user_;
@@ -164,11 +164,11 @@ public class GitCalls {
     remotePath_ = remotePath;
   }
 
-  public I_FabContext getCtx() {
+  public I_RunContext getCtx() {
     return ctx_;
   }
 
-  public void setCtx(I_FabContext ctx) {
+  public void setCtx(I_RunContext ctx) {
     ctx_ = ctx;
     log_ = ctx.getLog();
   }

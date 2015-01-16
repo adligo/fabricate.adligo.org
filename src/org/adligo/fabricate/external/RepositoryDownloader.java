@@ -1,6 +1,6 @@
 package org.adligo.fabricate.external;
 
-import org.adligo.fabricate.common.I_FabContext;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.apache.http.HttpEntity;
@@ -43,13 +43,13 @@ public class RepositoryDownloader {
   private List<String> repositories_ = new ArrayList<String>();
   
   private I_RepositoryPathBuilder pathBuilder_;
-  private I_FabContext ctx_;
+  private I_RunContext ctx_;
   private I_FabLog log_;
   private String localRepo_;
   
   @SuppressWarnings("boxing")
   public RepositoryDownloader(List<String> repositories, 
-      I_RepositoryPathBuilder pathBuilder, I_FabContext ctx) {
+      I_RepositoryPathBuilder pathBuilder, I_RunContext ctx) {
     ctx_ = ctx;
     log_ = ctx.getLog();
     localRepo_ = ctx.getLocalRepositoryPath();

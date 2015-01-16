@@ -1,7 +1,7 @@
 package org.adligo.fabricate.build.stages.tasks;
 
-import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
+import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 
 public abstract class OldBaseTask implements I_FabTask {
   protected String projectsPath_;
-  protected I_FabContext ctx_;
+  protected I_RunContext ctx_;
   protected I_FabLog log_;
   protected I_FabricateConstants constants_;
   protected NamedProject project_;
@@ -25,7 +25,7 @@ public abstract class OldBaseTask implements I_FabTask {
   protected String projectPath_;
 
   @Override
-  public void setup(I_FabContext ctx, NamedProject project, Map<String, String> params) {
+  public void setup(I_RunContext ctx, NamedProject project, Map<String, String> params) {
     ctx_ = ctx;
     log_ = ctx.getLog();
     constants_ = ctx.getConstants();
