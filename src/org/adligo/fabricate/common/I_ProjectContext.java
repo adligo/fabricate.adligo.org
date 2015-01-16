@@ -1,6 +1,5 @@
 package org.adligo.fabricate.common;
 
-import java.util.Set;
 
 /**
  * This will probably eventually contain
@@ -14,11 +13,14 @@ import java.util.Set;
  * @author scott
  */
 public interface I_ProjectContext {
-  public String getProjectDir();
-  public String getProjectName();
-  public I_FabContext getFabContext();
-  public Set<String> getProjectDependencies();
-  public String getProjectJar(String project);
-  public Set<String> getDependencies();
-  public String getDependencyJar(String project);
+  /**
+   * This is the system dependent absolute path 
+   * of the project.
+   * @return
+   */
+  public String getDir();
+  public String getName();
+  public String getShortName();
+  public String getDomainName();
+  public String getVersion();
 }

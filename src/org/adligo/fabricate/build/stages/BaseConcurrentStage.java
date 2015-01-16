@@ -5,21 +5,21 @@ import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.ProjectBlock;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.files.I_FabFileIO;
 import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
-import org.adligo.fabricate.xml.io_v1.common_v1_0.TaskType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.TaskType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.ProjectDependencyType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectStageType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectStagesType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectTaskType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,7 +98,8 @@ public abstract class BaseConcurrentStage implements I_FabStage {
         if (tasks != null) {
           for (TaskType task: tasks) {
             String taskName = task.getName();
-            Map<String,String> paramMap = toMap(task.getParam());
+            ParamsType params = task.getParams();
+            Map<String,String> paramMap = toMap(params.getParam());
             if (taskParams_  == null) {
               taskParams_ = new HashMap<String,Map<String,String>>();
             }
@@ -246,12 +247,13 @@ public abstract class BaseConcurrentStage implements I_FabStage {
             Map<String,String> toAdd = toMap(params);
             toRet.putAll(toAdd);
             
-            List<TaskType> tasks = stage.getTask();
+            List<ProjectTaskType> tasks = stage.getTask();
             if (tasks != null) {
-              for (TaskType taskType: tasks) {
+              for (ProjectTaskType taskType: tasks) {
                 String projTaskName = taskType.getName();
                 if (task.equals(projTaskName)) {
-                  toAdd = toMap(taskType.getParam());
+                  ParamsType taskParams = taskType.getParams();
+                  toAdd = toMap(taskParams.getParam());
                   toRet.putAll(toAdd);
                   break;
                 }

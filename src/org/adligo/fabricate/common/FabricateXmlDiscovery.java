@@ -40,12 +40,26 @@ public class FabricateXmlDiscovery {
   }
   
   public FabricateXmlDiscovery(boolean debug) {
-    files_ = FabFileIO.INSTANCE;
-    xmlFiles_ = FabXmlFileIO.INSTANCE;
-    setup(debug);
+    this(null, null, debug);
   }
   
+  public String getFabricateXmlPath() {
+    return fabricateXml_.getAbsolutePath();
+  }
+
+
+  public String getProjectXml() {
+    return projectXml_.getAbsolutePath();
+  }
   
+  public I_FabFileIO getFiles() {
+    return files_;
+  }
+  
+
+  public I_FabXmlFileIO getXmlFiles() {
+    return xmlFiles_;
+  }
   
   public boolean hasFabricateXml() {
     if (fabricateXml_ == null) {
@@ -56,11 +70,7 @@ public class FabricateXmlDiscovery {
     }
     return false;
   }
-
-  public String getFabricateXmlPath() {
-    return fabricateXml_.getAbsolutePath();
-  }
-
+  
   public boolean hasProjectXml() {
     if (projectXml_ == null) {
       return false;
@@ -71,33 +81,26 @@ public class FabricateXmlDiscovery {
     return false;
   }
   
-  public String getProjectXml() {
-    return projectXml_.getAbsolutePath();
-  }
   
-  public I_FabFileIO getFiles() {
-    return files_;
-  }
-  
-private void setup(boolean debug) {
+  private void setup(boolean debug) {
     
     if (files_.exists("fabricate.xml")) {
-      fabricateXml_ = new File("fabricate.xml");
+      fabricateXml_ = files_.instance("fabricate.xml");
     } else {
       if (files_.exists("project.xml")) {
-        String projectXmlAbs = new File("project.xml").getAbsolutePath();
-        File dir = new File(projectXmlAbs.substring(0, projectXmlAbs.length() -12));
+        String projectXmlAbs = files_.instance("project.xml").getAbsolutePath();
+        File dir = files_.instance(projectXmlAbs.substring(0, projectXmlAbs.length() -12));
         File dirParent = dir.getParentFile();
         String devXmlFilePath = dirParent.getAbsolutePath() + File.separator + "dev.xml";
         
         if (!files_.exists(devXmlFilePath)) {
           File projectsDir = dirParent.getParentFile();
-          fabricateXml_ = new File(projectsDir.getAbsolutePath() + File.separator + "fabricate.xml");
+          fabricateXml_ = files_.instance(projectsDir.getAbsolutePath() + File.separator + "fabricate.xml");
         } else {
           try {
            FabricateDevType dev = xmlFiles_.parseDev_v1_0(devXmlFilePath);
            String projectGroup = dev.getProjectGroup();
-           fabricateXml_ = new File(dirParent.getAbsolutePath() + File.separator + 
+           fabricateXml_ = files_.instance(dirParent.getAbsolutePath() + File.separator + 
                projectGroup + File.separator + "fabricate.xml");
           } catch (IOException e) {
             if (debug) {

@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -18,6 +19,7 @@ import java.util.Map;
  */
 public interface I_FabTask {
   /**
+   * @deprecated
    * Many tasks in a stage will be concurrently executing this method
    * on their local instance implementations of this class.
    * 
@@ -26,4 +28,21 @@ public interface I_FabTask {
    * @param params
    */
   public void setup(I_FabContext ctx, NamedProject project, Map<String,String> params);
+  
+  /**
+   * 
+   * @param ctx
+   * @param stageCtx may be null if the task is running from a command.
+   *   They are the merged params from the fabricate.xml and project.xml files.
+   */
+  public void setup(I_FabContext ctx, I_StageContext stageCtx, I_ProjectContext project);
+  
+  /**
+   * 
+   * @param taskParams the merged params from the fabricate.xml/stage/task/params
+   * and project.xml/stage/task/params or or 
+   * fabricate.xml/command/params and project.xml/command/params.
+   * @throws IOException
+   */
+  public void execute(I_ParamsTree taskParams) throws IOException;
 }

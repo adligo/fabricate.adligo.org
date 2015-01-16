@@ -64,17 +64,22 @@
     </complexType>
 
     <complexType name="git_server_type">
-    		<attribute name="user" type="string" use="optional"></attribute>
-    		<attribute name="hostname" type="string" use="required"></attribute>
-    		<attribute name="path" type="string" use="required">
-    			<annotation>
-		    		<documentation>
-		    			This is the remote path, and must contain a
-		    			final slash in the remote servers file syntax
-		    			which I think is always /.
-		    		</documentation>
-		    	</annotation>
-    		</attribute>
+    	<attribute name="user" type="string" use="optional"></attribute>
+    	<attribute name="hostname" type="string" use="required"></attribute>
+    	<attribute name="path" type="string" use="required">
+    		<annotation>
+    			<documentation>
+    				This is the remote path, and must contain a final
+    				slash in the remote servers file syntax which I
+    				think is always /.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="protocol" type="string" use="optional">
+    		<annotation>
+    			<documentation>This defaults to ssh, but could be https.
+</documentation>
+    		</annotation></attribute>
     </complexType>
 
     <complexType name="projects_type">
@@ -172,9 +177,18 @@
 
     
     <complexType name="stage_type">
-    	<sequence>
+        <annotation>
+        	<documentation>
+Fabricate stages are templates that may be applied to projects
+if the project has a stage with a matching stage name.   By default
+all tasks for a stage are executed on the project, however 
+if a task is optional, then the project must have the task node
+under the stage with matching respective names
+in order for the task to be executed on the project.</documentation>
+        </annotation>
+        <sequence>
     		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
-    		<element name="task" type="cns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="task" type="fns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     	<attribute name="name" type="string"></attribute>
     	<attribute name="class" type="string">
@@ -191,8 +205,8 @@
     		<annotation>
     			<documentation>
     				When this is set to true, the task/stage name must
-    				be set to true for the stage to execute. This is
-    				done so that external users of the build do not need
+    				be set to true on the command line for the stage to execute. 
+				This was originally done so that external users of the build do not need
     				to push to a intelligence4j server.
     			</documentation>
     		</annotation>
@@ -267,5 +281,28 @@ fabricate will be able to delegate to other fabrications.</documentation>
     		</element>
     		<element name="project" type="fns:project_type" minOccurs="1" maxOccurs="1"></element>
     	</sequence>
+    </complexType>
+    
+    <complexType name="task_type">
+    	<sequence>
+    		<element name="params" type="cns:params_type" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Each task is called by main fabricate run
+    					(fabricate.xml) there may be many tasks to one
+    					stage. Each task gets params which are formed by
+    					the project.xml's task params overriding the
+    					fabricate.xml's task params.
+    				</documentation>
+    			</annotation>
+    		</element>
+    	</sequence>
+    	<attribute name="name" type="string"></attribute>
+    	<attribute name="class" type="string" use="required">
+    		<annotation>
+    			<documentation>This must be the name of a org.adligo.fabricate.common.I_FabTask implementation.</documentation>
+    		</annotation></attribute>
+        <attribute name="optional" type="boolean" use="optional"></attribute>
     </complexType>
 </schema>

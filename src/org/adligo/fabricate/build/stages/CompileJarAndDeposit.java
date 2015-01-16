@@ -1,8 +1,8 @@
 package org.adligo.fabricate.build.stages;
 
-import org.adligo.fabricate.build.stages.tasks.CompileTask;
-import org.adligo.fabricate.build.stages.tasks.DepositTask;
-import org.adligo.fabricate.build.stages.tasks.JarTask;
+import org.adligo.fabricate.build.stages.tasks.OldCompileTask;
+import org.adligo.fabricate.build.stages.tasks.OldDepositTask;
+import org.adligo.fabricate.build.stages.tasks.OldJarTask;
 import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabStage;
@@ -46,7 +46,7 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
         }
         FabricateProjectType fpt = p.getProject();
         Map<String,String> params = super.getParams("compile",fpt);
-        CompileTask compile = new CompileTask();
+        OldCompileTask compile = new OldCompileTask();
         compile.setup(ctx_, p, params);
         
         if (compile.hadSetupException()) {
@@ -56,7 +56,7 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
         waitForDependentProjectsToFinish(p);
         compile.execute();
         String projectVersion = GitCalls.describe(compile.getProjectPath());
-        JarTask jar = new JarTask();
+        OldJarTask jar = new OldJarTask();
         if ( !params.containsKey(ManifestParser.SPECIFICATION_VERSION)) {
           params.put(ManifestParser.SPECIFICATION_VERSION, projectVersion);
         }
@@ -72,7 +72,7 @@ public class CompileJarAndDeposit extends BaseConcurrentStage implements I_FabSt
         
         String jarName = jar.getFileName();
         
-        DepositTask deposit = new DepositTask();
+        OldDepositTask deposit = new OldDepositTask();
         deposit.setup(ctx_, p, params);
         if (deposit.hadSetupException()) {
           super.finish(deposit.getLastSetupException());

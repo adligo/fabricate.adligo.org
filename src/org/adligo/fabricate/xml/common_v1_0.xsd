@@ -4,22 +4,6 @@
 	elementFormDefault="qualified"
 	xmlns:tns="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd" >
 	
-    <complexType name="task_type">
-    	<sequence>
-    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded">
-    			<annotation>
-					<documentation>
-						Each task is called by main fabricate run (fabricate.xml)
-						there may be many tasks to one stage.  Each task gets params
-						which are formed by the project.xml's task params overriding
-						the fabricate.xml's task params.
-					</documentation>
-				</annotation>
-    		</element>
-    	</sequence>
-    	<attribute name="name" type="string"></attribute>
-    </complexType>
-    
     <complexType name="command_type">
     	<annotation>
     		<documentation>
@@ -33,7 +17,7 @@
     		</documentation>
     	</annotation>
     	<sequence>
-    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="params" type="tns:params_type" minOccurs="0" maxOccurs="1"></element>
     	</sequence>
     	<attribute name="name" type="string" use="required"></attribute>
     	<attribute name="class" type="string" use="required">
@@ -43,7 +27,7 @@
     				dependencies in this file, also any dependent
     				classes must be available in the fabricate
     				dependencies.  Also this class must implement
-    				org.adligo.fabricate.common.I_Plugin.
+    				org.adligo.fabricate.common.I_FabTask.
     			</documentation>
     		</annotation>
     	</attribute>

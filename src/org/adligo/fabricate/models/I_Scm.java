@@ -1,4 +1,4 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.models;
 
 /** 
  * a marker interface for a source control management system

@@ -2,7 +2,7 @@ package org.adligo.fabricate.build.stages;
 
 import org.adligo.fabricate.build.run.DepotManager;
 import org.adligo.fabricate.build.run.StageManager;
-import org.adligo.fabricate.build.stages.tasks.CompileTask;
+import org.adligo.fabricate.build.stages.tasks.OldCompileTask;
 import org.adligo.fabricate.common.Depot;
 import org.adligo.fabricate.common.FabContextMutant;
 import org.adligo.fabricate.common.FabRunType;
@@ -198,17 +198,17 @@ public class DefaultSetup implements I_FabSetupStage {
     }
     //alpha ordered default ons
     checkDefaultLog(BaseConcurrentStage.class, true, settings);
-    checkDefaultLog(CompileTask.class, true, settings);
+    checkDefaultLog(OldCompileTask.class, true, settings);
     checkDefaultLog(CompileJarAndDeposit.class, true, settings);
     checkDefaultLog(DefaultSetup.class, true, settings);
     checkDefaultLog(DepotManager.class, true, settings);
     checkDefaultLog(FabFileIO.class, true, settings);
-    checkDefaultLog(GitObtainer.class, true, settings);
+    checkDefaultLog(GitStage.class, true, settings);
     checkDefaultLog(JavaJar.class, true, settings);
     checkDefaultLog(LoadAndCleanProjects.class, true, settings);
     checkDefaultLog(DependencyDownloader.class, true, settings);
     checkDefaultLog(StageManager.class, true, settings);
-    checkDefaultLog(CompileTask.class, true, settings);
+    checkDefaultLog(OldCompileTask.class, true, settings);
     
     checkDefaultLog(Depot.class, true, settings);
     

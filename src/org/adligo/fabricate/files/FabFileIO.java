@@ -2,6 +2,7 @@ package org.adligo.fabricate.files;
 
 import org.adligo.fabricate.build.stages.DefaultSetup;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -152,7 +153,7 @@ public class FabFileIO implements I_FabFileIO {
   
   private void log(String message) {
     if (log_ == null) {
-      log_.println(message);
+      ThreadLocalPrintStream.println(message);
     } else if (log_.isLogEnabled(DefaultSetup.class)) {
       log_.println(message);
     }
@@ -170,7 +171,7 @@ public class FabFileIO implements I_FabFileIO {
 
   @Override
   public String getNameSeparator() {
-    return File.pathSeparator;
+    return File.separator;
   }
 
   @Override
@@ -186,5 +187,10 @@ public class FabFileIO implements I_FabFileIO {
       }
     }
     return sb.toString();
+  }
+
+  @Override
+  public File instance(String filePath) {
+    return new File(filePath);
   }
 }

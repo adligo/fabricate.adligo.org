@@ -1,12 +1,13 @@
 package org.adligo.fabricate.build.stages.tasks;
 
-import org.adligo.fabricate.common.FabricateConstants;
 import org.adligo.fabricate.common.I_Depot;
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
+import org.adligo.fabricate.common.I_ParamsTree;
+import org.adligo.fabricate.common.I_ProjectContext;
+import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
-import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.I_RepositoryPathBuilder;
@@ -37,9 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class CompileTask extends BaseTask implements I_FabTask {
-  private static final I_FabricateConstants CONSTANTS = FabricateConstants.INSTANCE;
-  
+public class OldCompileTask extends OldBaseTask implements I_FabTask {
   public static final String INCLUDES = "includes";
   public static final String EXCLUDES = "excludes";
   private final I_FabFileIO files_;
@@ -53,12 +52,12 @@ public class CompileTask extends BaseTask implements I_FabTask {
   private Map<String,List<String>> srcFiles_ = new HashMap<String,List<String>>();
   private I_RepositoryPathBuilder repositoryPathBuilder_;
   
-  public CompileTask() {
+  public OldCompileTask() {
     files_ = FabFileIO.INSTANCE;
     xmlFiles_ = FabXmlFileIO.INSTANCE;
   }
   
-  public CompileTask(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
+  public OldCompileTask(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
     files_ = files; 
     xmlFiles_ = xmlFiles; 
   }
@@ -66,8 +65,8 @@ public class CompileTask extends BaseTask implements I_FabTask {
   @Override
   public void setup(I_FabContext ctx, NamedProject project, Map<String, String> params) {
     super.setup(ctx, project, params);
-    srcDirs_ = getDelimitedValue(DefaultTaskHelper.SRC_DIRS, ",",params);
-    if (log_.isLogEnabled(CompileTask.class)) {
+    srcDirs_ = getDelimitedValue(OldDefaultTaskHelper.SRC_DIRS, ",",params);
+    if (log_.isLogEnabled(OldCompileTask.class)) {
       StringBuilder sb = new StringBuilder();
       for (int i = 0; i < srcDirs_.length; i++) {
         sb.append(srcDirs_[i]);
@@ -96,9 +95,10 @@ public class CompileTask extends BaseTask implements I_FabTask {
     String inParam = params.get(INCLUDES);
     String exParam = params.get(EXCLUDES);
     if (inParam == null && exParam == null) {
-      matcher = new PatternFileMatcher(log_, "*/*.java", true);
+      matcher = new PatternFileMatcher(files_, log_, "*/*.java", true);
     } else {
-      matcher = new IncludesExcludesFileMatcher(log_, inParam, "*/*.java", exParam, null);
+      matcher = new IncludesExcludesFileMatcher(null, Collections.singletonList(
+          new PatternFileMatcher(files_, log_, "*/*.java", true)));
     }
     compilerParams_.put(JavaCParam.D, destDir_);
     for (int i = 0; i < srcDirs_.length; i++) {
@@ -186,10 +186,10 @@ public class CompileTask extends BaseTask implements I_FabTask {
       Map<JavaCParam,String> params = new HashMap<JavaCParam, String>();
       params.putAll(compilerParams_);
       
-      I_ProjectMessages messages = CONSTANTS.getProjectMessages();
+      I_ProjectMessages messages = constants_.getProjectMessages();
       String cp = buildClasspath();
       if (!StringUtils.isEmpty(cp)) {
-        if (log_.isLogEnabled(CompileTask.class)) {
+        if (log_.isLogEnabled(OldCompileTask.class)) {
           log_.println("Project " + projectName_ + " has classpath" + System.lineSeparator() +
                 cp); 
         }
@@ -205,7 +205,7 @@ public class CompileTask extends BaseTask implements I_FabTask {
           params.put(JavaCParam.CP, cp);
         }
         List<String> javaFiles = srcFiles_.get(srcDir);
-        if (log_.isLogEnabled(CompileTask.class)) {
+        if (log_.isLogEnabled(OldCompileTask.class)) {
           log_.println("adding source files from " + srcDir + System.lineSeparator() +
                 "\tfor compile to " + destDir_);
         }
@@ -213,5 +213,18 @@ public class CompileTask extends BaseTask implements I_FabTask {
       }
       jcc.compile(params, allFiles);
   }
+
+  @Override
+  public void setup(I_FabContext ctx, I_StageContext stageCtx, I_ProjectContext project) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void execute(I_ParamsTree taskParams) throws IOException {
+    // TODO Auto-generated method stub
+    
+  }
+
 
 }

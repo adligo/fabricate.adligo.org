@@ -2,6 +2,9 @@ package org.adligo.fabricate.build.stages.tasks;
 
 import org.adligo.fabricate.common.I_FabContext;
 import org.adligo.fabricate.common.I_FabTask;
+import org.adligo.fabricate.common.I_ParamsTree;
+import org.adligo.fabricate.common.I_ProjectContext;
+import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.external.JarParam;
@@ -21,7 +24,7 @@ import java.util.Map;
  * @author scott
  *
  */
-public class JarTask extends BaseTask implements I_FabTask {
+public class OldJarTask extends OldBaseTask implements I_FabTask {
   public static final String DEFAULT_VENDOR = "Default-Vendor";
   public static final String INCLUDE_SOURCEFILES = "includeSourceFiles";
   public static final String FILE_NAME = "fileName";
@@ -61,7 +64,7 @@ public class JarTask extends BaseTask implements I_FabTask {
     if (!StringUtils.isEmpty(include)) {
       includeSrc_ = Boolean.valueOf(include);
       if (includeSrc_) {
-        srcDirs_ = getDelimitedValue(DefaultTaskHelper.SRC_DIRS, ",", params);
+        srcDirs_ = getDelimitedValue(OldDefaultTaskHelper.SRC_DIRS, ",", params);
       }
     }
     params_.add(JarParam.c);
@@ -189,4 +192,17 @@ public class JarTask extends BaseTask implements I_FabTask {
   public String getFileName() {
     return fileName_;
   }
+  
+  @Override
+  public void setup(I_FabContext ctx, I_StageContext stageCtx, I_ProjectContext project) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void execute(I_ParamsTree taskParams) throws IOException {
+    // TODO Auto-generated method stub
+    
+  }
+
 }

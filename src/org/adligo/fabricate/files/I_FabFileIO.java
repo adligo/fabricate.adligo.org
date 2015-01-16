@@ -82,12 +82,19 @@ public interface I_FabFileIO {
    */
   public void deleteOnExit(String path);
   /**
-   * Creates a new file
+   * Creates a new file;<br/>
+   * new File(filePath).createNewFile();
    * @param filePath
    * @return
    */
   public File create(String filePath) throws IOException;
-  
+  /**
+   * Creates a File instance;<br/>
+   * return new File(filePath);
+   * @param filePath
+   * @return
+   */
+  public File instance(String filePath);
 
   /**
    * 

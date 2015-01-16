@@ -6,7 +6,11 @@ package org.adligo.fabricate.common.i18n;
  */
 public interface I_FileMessages {
   public String getDidNotMatchedTheFollowingPattren();
+  public String getExcludes();
+  public String getIncludes();
   public String getMatchedTheFollowingPattern();
   public String getTheFollowingFile();
-  public String getTheWildCardCharacterIsNotAllowedInMiddle();
+  public String getTheWildCardCharacterIsNotAllowedInMiddleFileName();
+  public String getTheWildCardCharacterIsNotAllowedAtTheLeftOrMiddleDirectoryPath();
+  public String getFileMatchingPatternsMayNotBeEmpty();
 }
