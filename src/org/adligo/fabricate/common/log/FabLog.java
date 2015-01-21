@@ -49,13 +49,8 @@ public class FabLog implements I_FabLog {
   }
 
   private Map<String,Boolean> logSettings_ = new HashMap<String,Boolean>();
-  private I_FabricateConstants constants_;
   
-  public FabLog(I_FabricateConstants constants, Map<String,Boolean> logSettings) {
-    if (constants == null) {
-      throw new NullPointerException();
-    }
-    constants_ = constants;
+  public FabLog(Map<String,Boolean> logSettings) {
     if (logSettings != null) {
       logSettings_.putAll(logSettings);
     }
@@ -82,10 +77,4 @@ public class FabLog implements I_FabLog {
   public void printTrace(Throwable t) {
     ThreadLocalPrintStream.printTrace(t);
   }
-  @Override
-  public I_FabricateConstants getConstants() {
-    return constants_;
-  }
-  
-  
 }

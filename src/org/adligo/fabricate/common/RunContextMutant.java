@@ -1,13 +1,14 @@
 package org.adligo.fabricate.common;
 
 import org.adligo.fabricate.common.en.FabricateEnConstants;
+import org.adligo.fabricate.common.files.FabFileIO;
+import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.depot.I_Depot;
-import org.adligo.fabricate.files.FabFileIO;
-import org.adligo.fabricate.files.I_FabFileIO;
-import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
-import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
@@ -38,8 +39,8 @@ public class RunContextMutant implements I_RunContext {
   private String fabricateVersion_;
   private I_ProjectContext projectContext_;
   private ConcurrentHashMap<String, Object> memory_ = new ConcurrentHashMap<String, Object>();
-  private I_FabFileIO fileIO_ = FabFileIO.INSTANCE;
-  private I_FabXmlFileIO xmlFileIO_ = FabXmlFileIO.INSTANCE;
+  private I_FabFileIO fileIO_ = new FabFileIO(new DeferredLog());
+  private I_FabXmlFileIO xmlFileIO_ = new FabXmlFileIO();
   
   public RunContextMutant() {
   }

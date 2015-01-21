@@ -1,4 +1,4 @@
-package org.adligo.fabricate.files.xml_io;
+package org.adligo.fabricate.common.files.xml_io;
 
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 

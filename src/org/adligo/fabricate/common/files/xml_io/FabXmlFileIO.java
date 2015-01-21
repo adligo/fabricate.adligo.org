@@ -1,4 +1,4 @@
-package org.adligo.fabricate.files.xml_io;
+package org.adligo.fabricate.common.files.xml_io;
 
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
@@ -18,13 +18,9 @@ public class FabXmlFileIO implements I_FabXmlFileIO {
    * to get called in a way that a test can mock out the stub later
    * using something like mockito).
    */
-  public static final FabXmlFileIO INSTANCE = new FabXmlFileIO();
   public static Schema SCHEMA = SchemaLoader.INSTANCE.get();
   
-  private FabXmlFileIO() {
-    
-  }
-
+  public FabXmlFileIO() {}
 
   @Override
   public FabricateDevType parseDev_v1_0(String xmlFilePath) throws IOException {

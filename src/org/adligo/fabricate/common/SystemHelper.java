@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.external.Executor;
 
 import java.io.File;

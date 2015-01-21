@@ -54,8 +54,11 @@
   	  		        token="@SPEC_VENDOR@" value="Adligo Inc."/>
   	    <replace file="build/MANIFEST.MF" 
   	  		        token="@IMPL_TITLE@" value="${fabricate_name}"/>
+		<tstamp>
+			<format property="compile_time" pattern="MM/dd/yyyy hh:mm:ss a SSS" locale="en,US"/>
+	 	</tstamp>
   	  	<replace file="build/MANIFEST.MF" 
-  	  		        token="@IMPL_VERSION@" value="${fabricate_version}"/>
+  	  		        token="@IMPL_VERSION@" value="${compile_time}"/>
   	  	<replace file="build/MANIFEST.MF" 
   	  		        token="@IMPL_VENDOR@" value="Adligo Inc."/>
   	  	<copy todir="build/classes/org/adligo/fabricate/xml">

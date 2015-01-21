@@ -13,40 +13,59 @@ CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpcore-4.3.2.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpclient-4.3.5.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/@FABRICATE_NAME@.jar 
 
-EXCEPTION=Exception
 DEBUG=debug
-VERSION=-version
 ARGS="$@"
-#echo command line args are "$@"
+if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
+		echo "ARGS;" 
+		echo "$ARGS"
+fi
+
+# @diagram_sync on 1/18/2014 with Overview.seq
+# main(String [] args) setup Fabricate args.
 ARGS_FROM_SETUP=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup args "$@" `
 if [ -z "$ARGS_FROM_SETUP" ]; then
     exit 1
 fi
 
-if [ "${ARGS_FROM_SETUP#*$EXCEPTION}" != "$ARGS_FROM_SETUP" ]; then
-	echo "Fabrication Failed!"
+IFS=$'\n'
+LINES=($ARGS_FROM_SETUP)
+
+if [ "Message" == "${LINES[0]}" ]; then
+	
+	LINE_COUNT=${#LINES[@]}
+	for (( i=1 ; i < ${LINE_COUNT} ; i++ ))
+	do
+	    echo "${LINES[$i]}"
+	done
+	exit 0
 else
-	if [ "${ARGS#*$VERSION}" != "$ARGS" ]; then
-		echo "Fabricate by Adligo."
-		VERSION=`echo $ARGS_FROM_SETUP | cut -f4 -d"="`
-		echo "Version $VERSION" 
-		exit 0
-	fi
 	if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
-		echo ARGS_FROM_SETUP are $ARGS_FROM_SETUP
+		echo "ARGS_FROM_SETUP;" 
+		echo "$ARGS_FROM_SETUP"
 	fi
+	
+	# @diagram_sync on 1/18/2014 with Overview.seq
+	# main(String [] args) setup Fabricate opts.
 	OPTIONS_FROM_FILE=`java -cp $CLASSPATH org.adligo.fabricate.FabricateSetup opts "$@" $ARGS_FROM_SETUP`
 	if [ -z "$OPTIONS_FROM_FILE" ]; then
     	exit 1
 	fi
 
-	if [ "${OPTIONS_FROM_FILE#*$EXCEPTION}" != "$OPTIONS_FROM_FILE" ]; then
-		echo "$OPTIONS_FROM_FILE"
-		echo "Fabrication Failed!"
+	LINES=($OPTIONS_FROM_FILE)
+	if [ "Message" == "${LINES[0]}" ]; then
+		LINE_COUNT=${#LINES[@]}
+		for (( i=1 ; i < ${LINE_COUNT} ; i++ ))
+		do
+		    echo "${LINES[$i]}"
+		done
+		exit 0
 	else
 		if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
 			echo OPTIONS_FROM_FILE are $OPTIONS_FROM_FILE
 		fi
+		
+		# @diagram_sync on 1/18/2014 with Overview.seq
+		# main(String [] args) run Fabricate.
 		java  $OPTIONS_FROM_FILE org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 
 	fi
 fi

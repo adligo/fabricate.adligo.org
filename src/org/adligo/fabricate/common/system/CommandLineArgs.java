@@ -1,9 +1,21 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.common.system;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ArgsParser {
+public class CommandLineArgs {
+  /**
+   * This is printed out to the console 
+   * so that the script knows there is a error
+   * regardless of the language.
+   */ 
+  public static final String MESSAGE = "Message";
+  /**
+   * If passed in should return language underscore country;<br/>
+   * (i.e. "en_US")
+   */
+  public static final String LOCALE = "locale";
+  
   public static Map<String,String> parseArgs(String [] args) {
     Map<String,String> toRet = new HashMap<String,String>();
     for (int i = 0; i < args.length; i++) {
@@ -15,9 +27,9 @@ public class ArgsParser {
         if (arg.length() > eq + 1) {
           value = arg.substring(eq + 1, arg.length());
         } 
-        toRet.put(key, value);
+        toRet.put(key.toLowerCase(), value);
       } else {
-        toRet.put(arg,null);
+        toRet.put(arg.toLowerCase(),null);
       }
     }
     return toRet;

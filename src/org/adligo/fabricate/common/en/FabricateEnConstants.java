@@ -4,6 +4,9 @@ import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.i18n.I_GitMessages;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
+
+import java.util.Locale;
 
 public class FabricateEnConstants  implements I_FabricateConstants {
   public static final FabricateEnConstants INSTANCE = new FabricateEnConstants();
@@ -34,6 +37,19 @@ public class FabricateEnConstants  implements I_FabricateConstants {
   public boolean isLeftToRight() {
     return true;
   }
+
+  @Override
+  public I_SystemMessages getSystemMessages() {
+    return SystemEnMessages.INSTANCE;
+  }
+
+  @Override
+  public String getLanguage() {
+    return "en";
+  }
   
-  
+  @Override
+  public String getCountry() {
+    return "US";
+  }
 }

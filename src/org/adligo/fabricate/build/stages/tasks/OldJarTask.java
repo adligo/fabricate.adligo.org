@@ -5,7 +5,7 @@ import org.adligo.fabricate.common.I_ProjectContext;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.external.JarParam;
 import org.adligo.fabricate.external.JavaCParam;
 import org.adligo.fabricate.external.JavaJar;

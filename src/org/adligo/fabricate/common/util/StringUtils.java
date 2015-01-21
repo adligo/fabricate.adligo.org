@@ -1,4 +1,4 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.common.util;
 
 public class StringUtils {
   public static boolean isEmpty(String p) {

@@ -4,12 +4,9 @@ import org.adligo.fabricate.common.DependencyTypeHelper;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.files.FabFileIO;
-import org.adligo.fabricate.files.I_FabFileIO;
-import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
-import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
@@ -54,14 +51,10 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
   private final Semaphore semaphore4Deps_ = new Semaphore(1);
   private final Semaphore semaphore_ = new Semaphore(1);
   
-  public DependencyDownloader() {
-    files_ = FabFileIO.INSTANCE;
-    xmlFiles_ = FabXmlFileIO.INSTANCE;
-  }
   
-  public DependencyDownloader(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
-    files_ = files;
-    xmlFiles_ = xmlFiles;
+  public DependencyDownloader(I_FabSystem sys) {
+    files_ = sys.getFileIO();
+    xmlFiles_ = sys.getXmlFileIO();
   }
   
   @Override

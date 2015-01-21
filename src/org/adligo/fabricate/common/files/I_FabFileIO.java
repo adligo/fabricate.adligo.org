@@ -1,4 +1,4 @@
-package org.adligo.fabricate.files;
+package org.adligo.fabricate.common.files;
 
 import org.adligo.fabricate.common.log.I_FabLog;
 
@@ -15,9 +15,7 @@ import java.util.List;
  */
 
 public interface I_FabFileIO {
-  public I_FabLog getLog();
 
-  public void setLog(I_FabLog ctx);
   /**
    * @param filePath
    * @return

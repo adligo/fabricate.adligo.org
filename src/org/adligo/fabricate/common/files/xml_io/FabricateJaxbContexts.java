@@ -1,4 +1,4 @@
-package org.adligo.fabricate.files.xml_io;
+package org.adligo.fabricate.common.files.xml_io;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

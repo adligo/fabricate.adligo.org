@@ -1,4 +1,4 @@
-package org.adligo.fabricate.files;
+package org.adligo.fabricate.common.files;
 
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FabFileIO implements I_FabFileIO {
-  public static final FabFileIO INSTANCE = new FabFileIO();
-  private I_FabLog log_;
+  private final I_FabLog log_;
   
-  private FabFileIO() {
+  public FabFileIO(I_FabLog log) {
+    log_ = log;
   }
   
   @Override
@@ -158,15 +158,6 @@ public class FabFileIO implements I_FabFileIO {
     }
   }
 
-  @Override
-  public I_FabLog getLog() {
-    return log_;
-  }
-
-  @Override
-  public void setLog(I_FabLog log) {
-    log_ = log;
-  }
 
   @Override
   public String getNameSeparator() {
@@ -192,4 +183,5 @@ public class FabFileIO implements I_FabFileIO {
   public File instance(String filePath) {
     return new File(filePath);
   }
+
 }

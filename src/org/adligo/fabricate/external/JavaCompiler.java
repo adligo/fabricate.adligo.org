@@ -1,7 +1,7 @@
 package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.I_RunContext;
-import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;

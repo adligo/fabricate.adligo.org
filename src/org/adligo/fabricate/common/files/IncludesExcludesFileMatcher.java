@@ -1,4 +1,4 @@
-package org.adligo.fabricate.files;
+package org.adligo.fabricate.common.files;
 
 import java.util.ArrayList;
 import java.util.Collection;

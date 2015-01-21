@@ -1,20 +1,18 @@
 package org.adligo.fabricate.build.run;
 
 import org.adligo.fabricate.common.FabricateHelper;
-import org.adligo.fabricate.common.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.SystemHelper;
+import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.files.xml_io.ResultIO;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
-import org.adligo.fabricate.files.FabFileIO;
-import org.adligo.fabricate.files.I_FabFileIO;
-import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
-import org.adligo.fabricate.files.xml_io.FabricateIO;
-import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
-import org.adligo.fabricate.files.xml_io.ProjectIO;
-import org.adligo.fabricate.files.xml_io.ResultIO;
+import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.JavaType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectGroupsType;
@@ -63,9 +61,9 @@ public class StageManager {
   private String failureStage_;
   private String failureProject_;
   
-  public StageManager() {
-    files_ = FabFileIO.INSTANCE;
-    xmlFiles_ = FabXmlFileIO.INSTANCE;
+  public StageManager(I_FabSystem sys) {
+    files_ = sys.getFileIO();
+    xmlFiles_ = sys.getXmlFileIO();
   }
   
   public StageManager(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {

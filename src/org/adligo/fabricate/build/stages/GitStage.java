@@ -4,7 +4,7 @@ import org.adligo.fabricate.common.ConsolePasswordDialog;
 import org.adligo.fabricate.common.FabRunType;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
-import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.GitServerType;

@@ -1,4 +1,4 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.common.util;
 
 import java.util.Collection;
 import java.util.Set;

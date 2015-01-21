@@ -1,4 +1,4 @@
-package org.adligo.fabricate.files.xml_io;
+package org.adligo.fabricate.common.files.xml_io;
 
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;

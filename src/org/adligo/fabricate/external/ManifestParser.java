@@ -20,9 +20,15 @@ import java.util.zip.ZipInputStream;
  */
 public class ManifestParser {
 	public static final String IMPLEMENTATION_VENDOR = "Implementation-Vendor";
+	/**
+	 * Note Adligo uses this for the public version
+	 */
 	public static final String IMPLEMENTATION_VERSION = "Implementation-Version";
 	public static final String IMPLEMENTATION_TITLE = "Implementation-Title";
 	public static final String SPECIFICATION_VENDOR = "Specification-Vendor";
+	/**
+	 * Note Adligo uses this for the compile date.
+	 */
 	public static final String SPECIFICATION_VERSION = "Specification-Version";
 	public static final String SPECIFICATION_TITLE = "Specification-Title";
 	private Map<String,String> attributes = new HashMap<String,String>();

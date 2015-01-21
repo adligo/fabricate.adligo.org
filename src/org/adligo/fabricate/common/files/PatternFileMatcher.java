@@ -1,9 +1,10 @@
-package org.adligo.fabricate.files;
+package org.adligo.fabricate.common.files;
 
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.log.I_FabLogSystem;
 
 import java.io.File;
 
@@ -59,12 +60,12 @@ public class PatternFileMatcher implements I_FileMatcher {
    */
   private boolean includes_;
   
-  public PatternFileMatcher(I_FabFileIO fileIO, I_FabLog log, String pattern, boolean includes) {
+  public PatternFileMatcher(I_FabFileIO fileIO, I_FabLogSystem sys, String pattern, boolean includes) {
     files_ = fileIO;
     nameSeparator_ = files_.getNameSeparator();
     
-    log_ = log;
-    constants_  = log.getConstants();
+    log_ = sys.getLog();
+    constants_  = sys.getConstants();
     if (pattern == null || pattern.trim().length() == 0) {
       I_FileMessages messages = constants_.getFileMessages();
       throw new IllegalArgumentException(messages.getFileMatchingPatternsMayNotBeEmpty());

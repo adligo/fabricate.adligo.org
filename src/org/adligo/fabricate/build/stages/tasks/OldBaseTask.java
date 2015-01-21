@@ -3,9 +3,9 @@ package org.adligo.fabricate.build.stages.tasks;
 import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.common.StringUtils;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;

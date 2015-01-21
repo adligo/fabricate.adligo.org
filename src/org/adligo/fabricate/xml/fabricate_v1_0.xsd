@@ -39,8 +39,11 @@
     		<element name="dependencies"
     			type="fns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
     		</element>
-            <element name="command" type="cns:command_type" minOccurs="0" maxOccurs="unbounded"></element>
-            <choice>
+            <element name="trait" type="fns:trait_type" minOccurs="0" maxOccurs="unbounded"></element>
+            <element name="command" type="fns:command_type"
+    			minOccurs="0" maxOccurs="unbounded">
+    		</element>
+    		<choice>
     			<element name="groups" type="fns:project_groups_type"
     				minOccurs="0" maxOccurs="1">
     			</element>
@@ -284,6 +287,70 @@ fabricate will be able to delegate to other fabrications.</documentation>
     </complexType>
     
     <complexType name="task_type">
+    	<complexContent>
+	    	<extension base="fns:command_task_type">
+	        <attribute name="optional" type="boolean" use="optional">
+	        	<annotation>
+	        		<documentation>
+	        			When this is set to true, the project
+	        			must have a corresponding stage/task
+	        			in order for the project to have this task
+	        			executed on it.
+	        		</documentation>
+	        	</annotation></attribute>
+	        </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="trait_type">
+        <annotation>
+        	<documentation>
+        		A trait is simply a java class with a zero argument constructor
+				that is placed in the fabricate context.  Any command,
+				stage or task may require a trait to be a specific java 
+				interface.  Trait classes should always be immutable
+				and any methods should be thread safe.</documentation>
+        </annotation>
+        <sequence>
+    		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
+    	</sequence>
+    	<attribute name="name" type="string" use="required"></attribute>
+    	<attribute name="class" type="string" use="required"></attribute>
+    </complexType>
+    
+    <complexType name="command_type">
+    	<annotation>
+    		<documentation>
+    			Note commands are not part of the general build process,
+    			but are executed on each project in concurrent project
+    			dependency order (although the command implementation
+    			could contain any kind of project filter/selection
+    			process). They were originally added for creating
+    			eclipse .classpath files from fabricates project.xml
+    			files, however they could be used for any purpose.
+    		</documentation>
+    	</annotation>
+    	<sequence>
+    		<element name="params" type="cns:params_type" minOccurs="0"
+    			maxOccurs="1">
+    		</element>
+    		<element name="task" type="fns:command_task_type" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="name" type="string" use="required"></attribute>
+    	<attribute name="class" type="string" use="required">
+    		<annotation>
+    			<documentation>
+    				This class must be available in the fabricate
+    				dependencies in this file, also any dependent
+    				classes must be available in the fabricate
+    				dependencies.  Also this class must implement
+    				org.adligo.fabricate.common.I_FabTask.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    </complexType>
+
+    <complexType name="command_task_type">
     	<sequence>
     		<element name="params" type="cns:params_type" minOccurs="0"
     			maxOccurs="1">
@@ -303,6 +370,5 @@ fabricate will be able to delegate to other fabrications.</documentation>
     		<annotation>
     			<documentation>This must be the name of a org.adligo.fabricate.common.I_FabTask implementation.</documentation>
     		</annotation></attribute>
-        <attribute name="optional" type="boolean" use="optional"></attribute>
     </complexType>
 </schema>

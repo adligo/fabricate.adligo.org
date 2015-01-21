@@ -8,9 +8,15 @@ import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.common.RunContextMutant;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
+import org.adligo.fabricate.common.files.FabFileIO;
+import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.system.FabSystem;
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.depot.Depot;
 import org.adligo.fabricate.depot.DepotContext;
 import org.adligo.fabricate.depot.DepotManager;
@@ -18,10 +24,6 @@ import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.external.GitCalls;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.files.FabFileIO;
-import org.adligo.fabricate.files.I_FabFileIO;
-import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
-import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingType;
@@ -35,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultSetup implements I_FabSetupStage {
+  private final I_FabSystem sys_;
   private final I_FabFileIO files_; 
   private final I_FabXmlFileIO xmlFiles_; 
   private I_FabLog log_;
@@ -47,13 +50,9 @@ public class DefaultSetup implements I_FabSetupStage {
   private I_Depot depot_;
   
   public DefaultSetup() {
-    files_ = FabFileIO.INSTANCE; 
-    xmlFiles_ = FabXmlFileIO.INSTANCE; 
-  }
-  
-  public DefaultSetup(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
-    files_ = files; 
-    xmlFiles_ = xmlFiles; 
+    sys_ = new FabSystem();
+    files_ = sys_.getFileIO(); 
+    xmlFiles_ = sys_.getXmlFileIO(); 
   }
   
   @Override
@@ -95,7 +94,7 @@ public class DefaultSetup implements I_FabSetupStage {
     } else {
       depot = fabricateDir + File.separator + "depot";
     }
-    depotManager_ = new DepotManager(log_);
+    depotManager_ = new DepotManager(sys_);
     depotManager_.setup(depot);
     depot_ = depotManager_.getDepot();
     fcm.setDepot(depot_);
@@ -217,8 +216,7 @@ public class DefaultSetup implements I_FabSetupStage {
     checkDefaultLog(GitCalls.class, false, settings);
     checkDefaultLog(RepositoryDownloader.class, false, settings);
     //JavaJar true can cause the jar process to hang?
-    log_ = new FabLog(FabricateEnConstants.INSTANCE, settings);
-    files_.setLog(log_);
+    log_ = sys_.getLog();
     fcm.setLog(log_);
   }
   

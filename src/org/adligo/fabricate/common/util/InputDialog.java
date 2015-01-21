@@ -1,10 +1,6 @@
-package org.adligo.fabricate.common;
-
-import com.sun.jndi.url.corbaname.corbanameURLContextFactory;
+package org.adligo.fabricate.common.util;
 
 import java.io.Console;
-import java.util.ArrayList;
-import java.util.List;
 
 public class InputDialog {
   private static final Console CONSOLE = System.console();

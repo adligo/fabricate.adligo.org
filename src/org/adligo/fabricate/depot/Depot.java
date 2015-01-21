@@ -1,10 +1,10 @@
 package org.adligo.fabricate.depot;
 
 import org.adligo.fabricate.common.I_RunContext;
-import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.files.I_FabFileIO;
-import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.ArtifactType;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 

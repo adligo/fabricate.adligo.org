@@ -5,20 +5,23 @@ import org.adligo.fabricate.common.I_ProjectContext;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.common.StringUtils;
+import org.adligo.fabricate.common.files.FabFileIO;
+import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.files.I_FileMatcher;
+import org.adligo.fabricate.common.files.IncludesExcludesFileMatcher;
+import org.adligo.fabricate.common.files.PatternFileMatcher;
+import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
+import org.adligo.fabricate.common.log.DeferredLog;
+import org.adligo.fabricate.common.system.FabSystem;
+import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.I_RepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCParam;
 import org.adligo.fabricate.external.JavaCompiler;
-import org.adligo.fabricate.files.FabFileIO;
-import org.adligo.fabricate.files.I_FabFileIO;
-import org.adligo.fabricate.files.I_FileMatcher;
-import org.adligo.fabricate.files.IncludesExcludesFileMatcher;
-import org.adligo.fabricate.files.PatternFileMatcher;
-import org.adligo.fabricate.files.xml_io.FabXmlFileIO;
-import org.adligo.fabricate.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.models.I_ParamsTree;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
@@ -41,6 +44,7 @@ import java.util.Set;
 public class OldCompileTask extends OldBaseTask implements I_FabTask {
   public static final String INCLUDES = "includes";
   public static final String EXCLUDES = "excludes";
+  private final I_FabSystem sys_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
   
@@ -53,14 +57,11 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
   private I_RepositoryPathBuilder repositoryPathBuilder_;
   
   public OldCompileTask() {
-    files_ = FabFileIO.INSTANCE;
-    xmlFiles_ = FabXmlFileIO.INSTANCE;
+    sys_ = new FabSystem();
+    files_ = sys_.getFileIO();
+    xmlFiles_ = sys_.getXmlFileIO();
   }
   
-  public OldCompileTask(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
-    files_ = files; 
-    xmlFiles_ = xmlFiles; 
-  }
   
   @Override
   public void setup(I_RunContext ctx, NamedProject project, Map<String, String> params) {
@@ -95,10 +96,10 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
     String inParam = params.get(INCLUDES);
     String exParam = params.get(EXCLUDES);
     if (inParam == null && exParam == null) {
-      matcher = new PatternFileMatcher(files_, log_, "*/*.java", true);
+      matcher = new PatternFileMatcher(files_, sys_, "*/*.java", true);
     } else {
       matcher = new IncludesExcludesFileMatcher(null, Collections.singletonList(
-          new PatternFileMatcher(files_, log_, "*/*.java", true)));
+          new PatternFileMatcher(files_, sys_, "*/*.java", true)));
     }
     compilerParams_.put(JavaCParam.D, destDir_);
     for (int i = 0; i < srcDirs_.length; i++) {
