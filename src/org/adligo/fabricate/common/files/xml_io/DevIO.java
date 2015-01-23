@@ -5,7 +5,6 @@ import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 import java.io.File;
 import java.io.IOException;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
