@@ -1,14 +1,14 @@
-package org.adligo.fabricate.models;
+package org.adligo.fabricate.models.scm;
 
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.GitServerType;
 
-public class ScmGit implements I_ScmGit {
+public class GitScm implements I_GitScm {
   private String host;
   private String path;
   private String user;
   private String protocol = "ssh";
   
-  public ScmGit(GitServerType delegate) {
+  public GitScm(GitServerType delegate) {
     host = delegate.getHostname();
     path = delegate.getPath();
     if ("github.com".equals(host)) {

@@ -1,19 +1,15 @@
 package org.adligo.fabricate.build.stages.tasks;
 
 import org.adligo.fabricate.common.I_FabTask;
-import org.adligo.fabricate.common.I_ProjectContext;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.common.files.FabFileIO;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.I_FileMatcher;
 import org.adligo.fabricate.common.files.IncludesExcludesFileMatcher;
 import org.adligo.fabricate.common.files.PatternFileMatcher;
-import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
-import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
@@ -22,7 +18,8 @@ import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.I_RepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCParam;
 import org.adligo.fabricate.external.JavaCompiler;
-import org.adligo.fabricate.models.I_ParamsTree;
+import org.adligo.fabricate.models.common.I_KeyValue;
+import org.adligo.fabricate.models.project.I_Project;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
@@ -216,13 +213,13 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
   }
 
   @Override
-  public void setup(I_RunContext ctx, I_StageContext stageCtx, I_ProjectContext project) {
+  public void setup(I_RunContext ctx, I_StageContext stageCtx, I_Project project) {
     // TODO Auto-generated method stub
     
   }
 
   @Override
-  public void execute(I_ParamsTree taskParams) throws IOException {
+  public void execute(I_KeyValue taskParams) throws IOException {
     // TODO Auto-generated method stub
     
   }

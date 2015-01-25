@@ -1,4 +1,5 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.models.project;
+
 
 
 /**
@@ -12,15 +13,13 @@ package org.adligo.fabricate.common;
  * 
  * @author scott
  */
-public interface I_ProjectContext {
+public interface I_Project extends I_ProjectBrief {
   /**
    * This is the system dependent absolute path 
    * of the project.
    * @return
    */
   public String getDir();
-  public String getName();
   public String getShortName();
   public String getDomainName();
-  public String getVersion();
 }

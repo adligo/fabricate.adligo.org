@@ -1,6 +1,7 @@
-package org.adligo.fabricate.models;
+package org.adligo.fabricate.models.scm;
 
-public interface I_ScmGit extends I_Scm {
+
+public interface I_GitScm extends I_Scm {
   public String getHost();
   public String getPath();
   public String getUsername();
