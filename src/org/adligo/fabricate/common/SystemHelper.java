@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SystemHelper {
+  private static Executor EXE = Executor.INSTANCE;
   private static final Set<String> OS_WITH_SYSCTL = getOsWithSysCtl();
   
   public static Set<String> getOsWithSysCtl() {
@@ -43,7 +44,7 @@ public class SystemHelper {
   public static String getOperatingSystemVersion(String os) {
     if ("mac".equals(os)) {
       try {
-        String ver = Executor.executeProcess(new File("."), "sw_vers", "-productVersion");
+        String ver = EXE.executeProcess(new File("."), "sw_vers", "-productVersion");
         if (ver != null) {
           return ver;
         }
@@ -77,7 +78,7 @@ public class SystemHelper {
     try {
       if (OS_WITH_SYSCTL.contains(os)) {
        
-        String cpu = Executor.executeProcess(new File("."), "sysctl", "-a");
+        String cpu = EXE.executeProcess(new File("."), "sysctl", "-a");
         int index = cpu.indexOf(".cpu.brand_string") + 18;
         if (index != -1) {
           char[] cpuChars = cpu.toCharArray();

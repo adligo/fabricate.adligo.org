@@ -4,13 +4,22 @@ import java.io.File;
 import java.io.IOException;
 
 public class JavaCalls {
-
-  public static String getJavaVersion() throws IOException, InterruptedException {
-    return getJavaVersion(new File("."));
+  private static Executor EXE = Executor.INSTANCE;
+  public static final JavaCalls INSTANCE = new JavaCalls();
+  
+  private JavaCalls() {}
+  
+  public String getJavaHome() throws IllegalStateException {
+    String home = System.getenv("JAVA_HOME");
+    if (home == null) {
+      throw new IllegalStateException();
+    }
+    return home;
   }
   
-  public static String getJavaVersion(File dir) throws IOException, InterruptedException {
-    String version = Executor.executeProcess(dir, "java", "-version");
+  public String getJavaVersion(String homeDir, String seperator) throws IOException, InterruptedException {
+    String version = EXE.executeProcess(new File("."), 
+        homeDir + seperator + "bin" + seperator + "java", "-version");
     
     char [] chars = version.toCharArray();
     StringBuilder sb = new StringBuilder();
@@ -33,7 +42,7 @@ public class JavaCalls {
     return versionNbrString;
   } 
   
-  public static double getJavaMajorVersion(String javaVersion) {
+  public double getJavaMajorVersion(String javaVersion) {
    
     char [] chars = javaVersion.toCharArray();
     int dots = 0;

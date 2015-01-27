@@ -29,7 +29,22 @@ public class CommandLineArgs {
         } 
         toRet.put(key.toLowerCase(), value);
       } else {
-        toRet.put(arg.toLowerCase(),null);
+        String argCased = arg.toLowerCase();
+        boolean abbreviations = false;
+        if (argCased.length() >= 3) {
+          if (argCased.indexOf("-") == 0 && argCased.indexOf("--") != 0) {
+            char [] chars = argCased.toCharArray();
+            for (int j = 0; j < chars.length; j++) {
+              char c = chars[i];
+              if (c != '-') {
+                toRet.put("-" + c,null);
+              }
+            }
+          }
+        }
+        if (!abbreviations) {
+          toRet.put(arg.toLowerCase(),null);
+        }
       }
     }
     return toRet;

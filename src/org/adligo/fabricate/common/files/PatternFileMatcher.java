@@ -12,7 +12,7 @@ import java.io.File;
  * This class provides a implementation of {@link I_FileMatcher} which matches
  * based on a pattern.   The pattern is defined with Unix directory name separation 
  * and is applied to include files or exclude files.  Unix directory name separation (/)
- * in the pattern name will match up to windows absolute directory name separtation 
+ * in the pattern name will match up to windows absolute directory name separation 
  * in the isMatch method.
  * The pattern may contain directory information and must contain file information.
  * File information may contain a wild card character (*) at the left or right 

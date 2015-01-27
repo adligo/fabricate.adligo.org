@@ -5,9 +5,8 @@ import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.common.RunContextMutant;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
-import org.adligo.fabricate.common.files.FabFileIO;
 import org.adligo.fabricate.common.files.I_FabFileIO;
-import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
+import org.adligo.fabricate.common.files.PatternFileMatcher;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
@@ -37,7 +36,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public class FabricateSetup {
-  @SuppressWarnings("unused")
+  private static JavaCalls JAVA_CALLS = JavaCalls.INSTANCE;
+  
+  private ManifestParser manifestParser_;
   private final I_FabSystem sys_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
@@ -52,11 +53,12 @@ public class FabricateSetup {
    */
 	@SuppressWarnings("unused")
   public static void main(String [] args) {
-	  new FabricateSetup(args, new FabSystem());
+	  new FabricateSetup(args, new FabSystem(), new ManifestParser());
 	}
 	
-	public FabricateSetup(String [] args, FabSystem sys) {
+	public FabricateSetup(String [] args, FabSystem sys, ManifestParser manifestParser) {
 	  sys_ = sys;
+	  manifestParser_ = manifestParser;
 	  files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
@@ -86,40 +88,7 @@ public class FabricateSetup {
     }
 	}
 
-  private void doOpts(Map<String,String> argMap) {
-    String fabHome = System.getenv("FABRICATE_HOME");
-    //@diagram_sync on 1/18/2014 with Overview.seq
-    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(sys_);
-    if (!fd.hasFabricateXml()) {
-      System.out.println("Exception no fabricate.xml or project.xml found.");
-    } else {
-      String javaHome = System.getenv("JAVA_HOME");
-      if (StringUtils.isEmpty(javaHome)) {
-        ThreadLocalPrintStream.println(
-            "No $JAVA_HOME environment variable set.");
-        return;
-      } else {
-        String version = argMap.get("java");
-        if (StringUtils.isEmpty(javaHome)) {
-          ThreadLocalPrintStream.println("Java version parameter expected.");
-          return;
-        }
-        try {
-          String javaHomeVersion = JavaCalls.getJavaVersion(
-              new File(javaHome + File.separator + "bin"));
-          if (!javaHomeVersion.equals(version)) {
-            ThreadLocalPrintStream.println("Expected $JAVA_HOME to have version "
-                + version + " but was " + javaHomeVersion);
-            return;
-          }
-        } catch (IOException | InterruptedException e) {
-          e.printStackTrace();
-          return;
-        }
-      }
-      workWithFabricateXml(fabHome, fd, argMap);
-    }
-  }
+ 
 
   private void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd, 
       Map<String,String> argMap) {
@@ -142,27 +111,66 @@ public class FabricateSetup {
   private void doArgs(Map<String,String> argMap) {
     long now = sys_.getCurrentTime();
     
+    String homeDir = null;
     try {
-      String versionNbrString = JavaCalls.getJavaVersion();
-      double versionDouble = JavaCalls.getJavaMajorVersion(versionNbrString);
-      if (versionDouble < 1.8) {
-        throw new IllegalStateException("Fabricate requires Java 1.7 or greater.");
-      }
-
-      File fabricateJar = locateFabricateJar();
-      
-     if (fabricateJar != null) {
-        if (hasDisplayVersionArg(argMap)) {
-          displayFabricateJarManifestVersionAndEnd(fabricateJar);
-        } else {
-          sendOptsToScript(now, versionNbrString);
-        }
-      }
-    } catch (IOException | InterruptedException | IllegalStateException e) {
-      e.printStackTrace();
+       homeDir = JAVA_CALLS.getJavaHome();
+    } catch (IllegalStateException x) {
+      ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
+      I_SystemMessages sysMessages = constants_.getSystemMessages();
+      String message = sysMessages.getExceptionNoJavaHomeSet();
+      ThreadLocalPrintStream.println(message);
+      return;
     }
+    String versionNbrString = null;
+    try {
+      versionNbrString = JAVA_CALLS.getJavaVersion(homeDir, files_.getNameSeparator());
+      double versionDouble = JAVA_CALLS.getJavaMajorVersion(versionNbrString);
+      if (versionDouble < 1.7) {
+        ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
+        I_SystemMessages sysMessages = constants_.getSystemMessages();
+        String message = sysMessages.getExceptionFabricateRequiresJava1_7OrGreater();
+        ThreadLocalPrintStream.println(message);
+      }
+    } catch (IOException | InterruptedException e) {
+      ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
+      I_SystemMessages sysMessages = constants_.getSystemMessages();
+      String message = sysMessages.getExceptionExecutingJavaWithTheFollowingJavaHome();
+      ThreadLocalPrintStream.println(
+          message + constants_.getLineSeperator() +
+          homeDir);
+      ThreadLocalPrintStream.printTrace(e);
+      return;
+    }
+    File fabricateJar = locateFabricateJarAndVerifyFabricateHomeJars();
+    
+    if (fabricateJar != null) {
+      if (hasDisplayVersionArg(argMap)) {
+        displayFabricateJarManifestVersionAndEnd(fabricateJar);
+      } else {
+        sendOptsToScript(now, versionNbrString);
+      }
+    }
+   
   }
 
+  private void doOpts(Map<String,String> argMap) {
+    String fabHome = System.getenv("FABRICATE_HOME");
+    //@diagram_sync on 1/18/2014 with Overview.seq
+    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(sys_);
+    if (!fd.hasFabricateXml()) {
+      System.out.println("Exception no fabricate.xml or project.xml found.");
+    } else {
+      
+      String version = argMap.get("java");
+      if (StringUtils.isEmpty(version)) {
+        
+        ThreadLocalPrintStream.println("Java version parameter expected.");
+        return;
+      }
+      workWithFabricateXml(fabHome, fd, argMap);
+    }
+  }
+  
   public boolean hasDisplayVersionArg(Map<String, String> argMap) {
     I_SystemMessages messages = constants_.getSystemMessages();
     if ( argMap.containsKey(messages.getClaVersion())) {
@@ -178,40 +186,96 @@ public class FabricateSetup {
     ThreadLocalPrintStream.println("start=" + now + " java=" + javaVersionNbr );
   }
 
-  public File locateFabricateJar() {
-    String fabricateHome = System.getenv("FABRICATE_HOME");
+  public File locateFabricateJarAndVerifyFabricateHomeJars() {
+    String fabricateHome = sys_.getenv("FABRICATE_HOME");
     if (fabricateHome == null) {
-      ThreadLocalPrintStream.println("Exception no fabricate home.");
+      ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
+      I_SystemMessages sysMessages = constants_.getSystemMessages();
+      String message = sysMessages.getExceptionNoFabricateHomeSet();
+      ThreadLocalPrintStream.println(message);
       return null;
-    }
-    File lib = new File(fabricateHome + File.separator + "lib");
-    File [] files = lib.listFiles();
-    File fabricateJar = null;
-    for (int i = 0; i < files.length; i++) {
-      File file = files[i];
-      String fileName = file.getName();
-      if (fileName.indexOf("fabricate_") == 0) {
-        fabricateJar = file;
-        break;
+    } else {
+      if (sys_.isDebug()) {
+        ThreadLocalPrintStream.println("FABRICATE_HOME is;");
+        ThreadLocalPrintStream.println(fabricateHome);
       }
     }
+    File fabricateJar = null;
+    boolean hasLogging = false;
+    boolean hasHttpCore = false;
+    boolean hasHttpClient = false;
+    try {
+      List<String> files = files_.list(fabricateHome + files_.getNameSeparator() + "lib", 
+          new PatternFileMatcher(files_, sys_, "*.jar", true));
+      
+      if (files.size() != 4) {
+        logTheFollowingFabricateHomeLibShouldHaveTheseJars(fabricateHome);
+        if (sys_.isDebug()) {
+          ThreadLocalPrintStream.println("files " + files);
+          ThreadLocalPrintStream.println("files_.getNameSeparator()  " + files_.getNameSeparator());
+        }
+        return null;
+      }
+      
+      for (String absPath: files) {
+        File file = files_.instance(absPath);
+        String fileName = file.getName();
+        if (fileName.indexOf("fabricate_") == 0 && fileName.indexOf(".jar") != -1) {
+          fabricateJar = file;
+        } else if (fileName.indexOf("commons-logging-1.2.jar") == 0) {
+          hasLogging = true;
+        } else if (fileName.indexOf("httpclient-4.3.5.jar") == 0) {
+          hasHttpClient = true;
+        } else if (fileName.indexOf("httpcore-4.3.2.jar") == 0) {
+          hasHttpCore = true;
+        }
+      }
+    } catch (IOException x) {
+      logTheFollowingFabricateHomeLibShouldHaveTheseJars(fabricateHome);
+      ThreadLocalPrintStream.printTrace(x);
+      return null;
+    }
     if (fabricateJar == null) {
-      ThreadLocalPrintStream.println("No fabricate_*.jar in $FABRICATE_HOME/lib for the following $FABRICATE_HOME;" + 
-            fabricateHome + "/lib!");
+      ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
+      I_SystemMessages sysMessages = constants_.getSystemMessages();
+      String message = sysMessages.getExceptionNoFabricateJarInFabricateHomeLib();
+      ThreadLocalPrintStream.println(message);
+      ThreadLocalPrintStream.println(fabricateHome);
+      return null;
+    }
+    //NOTE fabricate_*.jar is checked for first
+    if (!hasLogging || !hasHttpClient || !hasHttpCore) {
+      logTheFollowingFabricateHomeLibShouldHaveTheseJars(fabricateHome);
+      if (sys_.isDebug()) {
+        ThreadLocalPrintStream.println("hasLogging" + hasLogging);
+        ThreadLocalPrintStream.println("hasHttpClient" + hasHttpClient);
+        ThreadLocalPrintStream.println("hasHttpCore" + hasHttpCore);
+      }
       return null;
     }
     return fabricateJar;
   }
+
+  public void logTheFollowingFabricateHomeLibShouldHaveTheseJars(String fabricateHome) {
+    ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
+    I_SystemMessages sysMessages = constants_.getSystemMessages();
+    String message = sysMessages.getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars();
+    ThreadLocalPrintStream.println(message);
+    ThreadLocalPrintStream.println(fabricateHome);
+    ThreadLocalPrintStream.println("commons-logging-1.2.jar");
+    ThreadLocalPrintStream.println("fabricate_*.jar");
+    ThreadLocalPrintStream.println("httpclient-4.3.5.jar");
+    ThreadLocalPrintStream.println("httpcore-4.3.2.jar");
+  }
   
   private void displayFabricateJarManifestVersionAndEnd(File fabricateJar) {
-    ManifestParser mp = new ManifestParser();
-    mp.readManifest(fabricateJar.getAbsolutePath());
-    String fabricateVersion = mp.get(ManifestParser.SPECIFICATION_VERSION);
+    manifestParser_.readManifest(fabricateJar.getAbsolutePath());
+    String fabricateVersion = manifestParser_.get(ManifestParser.SPECIFICATION_VERSION);
     I_SystemMessages systemMessages =  constants_.getSystemMessages();
     String versionX = systemMessages.getVersionX();
     versionX = versionX.replaceAll("<X/>", fabricateVersion);
     
-    String compileDate = mp.get(ManifestParser.IMPLEMENTATION_VERSION);
+    String compileDate = manifestParser_.get(ManifestParser.IMPLEMENTATION_VERSION);
     Date parsedDate = null;
     try {
       //This time format string must match the build.xml file
@@ -290,5 +354,18 @@ public class FabricateSetup {
 
   public I_FabricateConstants getConstants() {
     return constants_;
+  }
+
+  public static JavaCalls getJAVA_CALLS() {
+    return JAVA_CALLS;
+  }
+
+  /**
+   * This method is for injecting a mock 
+   * for testing only.
+   * @param jAVA_CALLS
+   */
+  public static void setJAVA_CALLS(JavaCalls jc) {
+    JAVA_CALLS = jc;
   }
 }

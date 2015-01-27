@@ -61,7 +61,7 @@ public interface I_FabFileIO {
    * This method lists the files under the path which match the file matcher.
    * @param path
    * @param matcher
-   * @return
+   * @return The list of absolute path names.
    * @throws IOException
    */
   public List<String> list(String path, final I_FileMatcher matcher) throws IOException;

@@ -23,7 +23,21 @@ import java.util.concurrent.ForkJoinPool;
  *
  */
 public class Executor {
-  public static String executeProcess(File inDir, String ... args) throws IOException, InterruptedException {
+  public static final Executor INSTANCE = new Executor();
+  
+  
+  private static String toString(String [] args) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < args.length; i++) {
+      sb.append(args[i]);
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
+  
+  private Executor() {}
+  
+  public String executeProcess(File inDir, String ... args) throws IOException, InterruptedException {
     ProcessBuilder pb = new ProcessBuilder(args);
     pb.redirectErrorStream(true);
     
@@ -71,13 +85,5 @@ public class Executor {
     }
     return new String(baos.toByteArray());
   }
-  
-  private static String toString(String [] args) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < args.length; i++) {
-      sb.append(args[i]);
-      sb.append(" ");
-    }
-    return sb.toString();
-  }
+
 }

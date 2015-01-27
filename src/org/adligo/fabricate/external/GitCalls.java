@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public class GitCalls {
+  private static Executor EXE = Executor.INSTANCE;
   private static PrintStream OUT = System.out;
   private I_RunContext ctx_;
   private I_FabLog log_;
@@ -25,7 +26,7 @@ public class GitCalls {
       } else {
         command = user_ + "@" + hostname_ + ":" + remotePath_ + project;
       }
-     result = Executor.executeProcess(new File(localProjectDir), "git", "clone", command);
+     result = EXE.executeProcess(new File(localProjectDir), "git", "clone", command);
       if (log_.isLogEnabled(GitCalls.class)) {
         log_.println("In " + localProjectDir + System.lineSeparator() +
             "git clone " + command + System.lineSeparator() +
@@ -48,7 +49,7 @@ public class GitCalls {
   public boolean checkout(String project, String localProjectDir, String version) throws IOException {
     String result;
     try {
-      result = Executor.executeProcess(new File(localProjectDir + File.separator + project), 
+      result = EXE.executeProcess(new File(localProjectDir + File.separator + project), 
           "git", "checkout", version);
       if (log_.isLogEnabled(GitCalls.class)) {
         log_.println("In " + localProjectDir + File.separator + project + System.lineSeparator() +
@@ -72,7 +73,7 @@ public class GitCalls {
   public boolean pull(String project, String localProjectDir) throws IOException {
     String result;
     try {
-     result = Executor.executeProcess(new File(localProjectDir + File.separator + project), 
+     result = EXE.executeProcess(new File(localProjectDir + File.separator + project), 
           "git", "pull", "-f","origin","master");
       if (log_.isLogEnabled(GitCalls.class)) {
         log_.println("In " + localProjectDir + File.separator + project + System.lineSeparator() +
@@ -103,7 +104,7 @@ public class GitCalls {
   public static boolean check() throws IOException {
     String result;
     try {
-      result = Executor.executeProcess(new File("."), "git", "--version");
+      result = EXE.executeProcess(new File("."), "git", "--version");
     } catch (InterruptedException e) {
       throw new IOException(e);
     }
@@ -123,7 +124,7 @@ public class GitCalls {
   public static String describe(String where) {
     String result = null;
     try {
-      result = Executor.executeProcess(new File(where), "git", "describe");
+      result = EXE.executeProcess(new File(where), "git", "describe");
     } catch (InterruptedException | IOException e) {
       //do nothing it has a exit code of 128 when there are no tags.
     }

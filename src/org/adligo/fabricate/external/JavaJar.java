@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JavaJar {
+  private static Executor EXE = Executor.INSTANCE;
   private I_RunContext ctx_;
   private I_FabLog log_;
   private String inDir_;
@@ -43,7 +44,7 @@ public class JavaJar {
         }
         log_.println("executing " + sb.toString());
       }
-      Executor.executeProcess(new File(inDir_), allArray);
+      EXE.executeProcess(new File(inDir_), allArray);
     } catch (InterruptedException e) {
       throw new IOException(e);
     }

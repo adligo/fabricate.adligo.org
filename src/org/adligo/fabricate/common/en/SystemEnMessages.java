@@ -17,8 +17,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "Exception: No $JAVA_HOME environment variable set.";
 
   
-  private static final String EXCEPTION_EXPECTED_$JAVA_HOME_TO_HAVE_VERSION_X_BUT_IS_Y = 
-      "Exception: Expected $JAVA_HOME to have version <X/> but is <Y/>.";
+  private static final String EXCEPTION_EXECUTING_JAVA_WITH_THE_FOLLOWING_JAVA_HOME = 
+      "Exception: There was a problem executing java with the following $JAVA_HOME;";
   private static final String EXCEPTION_FABRICATE_REQUIRES_JAVA_1_7_OR_GREATER = 
       "Exception: Fabricate requires Java 1.7 or greater.";
   private static final String EXCEPTION_JAVA_VERSION_PARAMETER_EXPECTED = 
@@ -27,6 +27,9 @@ public class SystemEnMessages implements I_SystemMessages {
       "Exception: No fabricate.xml or project.xml found.";
   
   private static final String FABRICATE_BY_ADLIGO = "Fabricate by Adligo.";
+  private static final String THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS = 
+      "The following Fabricate Home should have only these jars;";
+  
   private static final String V = "-v";
   private static final String VERSION = "--version";
   private static final String VERSION_X = "Version <X/>.";
@@ -40,8 +43,8 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
-  public String getExceptionExpectedJavaHomVersionXbutIsY() {
-    return EXCEPTION_EXPECTED_$JAVA_HOME_TO_HAVE_VERSION_X_BUT_IS_Y;
+  public String getExceptionExecutingJavaWithTheFollowingJavaHome() {
+    return EXCEPTION_EXECUTING_JAVA_WITH_THE_FOLLOWING_JAVA_HOME;
   }
   
   @Override
@@ -99,4 +102,8 @@ public class SystemEnMessages implements I_SystemMessages {
     return VERSION;
   }
 
+  @Override
+  public String getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars() {
+    return THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS;
+  }
 }

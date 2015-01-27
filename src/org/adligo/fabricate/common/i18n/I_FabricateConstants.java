@@ -6,6 +6,11 @@ public interface I_FabricateConstants {
   public boolean isLeftToRight();
   public I_FileMessages getFileMessages();
   public I_GitMessages getGitMessages();
+  /**
+   * Try to use I_FabSystem.lineSeperator
+   * instead of this method if possible.
+   * @return
+   */
   public String getLineSeperator();
   public I_ProjectMessages getProjectMessages();
   public I_SystemMessages getSystemMessages();

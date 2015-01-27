@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class JavaCompiler {
+  private static Executor EXE = Executor.INSTANCE;
   private I_RunContext ctx_;
   private String inDir_;
   private String javaC_;
@@ -25,7 +26,7 @@ public class JavaCompiler {
     List<String> args = buildArgs(javaC_, params);
     args.addAll(javaFiles);
     try {
-      Executor.executeProcess(new File(inDir_), args.toArray(new String[args.size()]));
+      EXE.executeProcess(new File(inDir_), args.toArray(new String[args.size()]));
     } catch (InterruptedException e) {
       throw new IOException(e);
     }

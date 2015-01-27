@@ -2,7 +2,7 @@ package org.adligo.fabricate.common.i18n;
 
 public interface I_SystemMessages {
   public String getCompiledOnX();
-  public String getExceptionExpectedJavaHomVersionXbutIsY();
+  public String getExceptionExecutingJavaWithTheFollowingJavaHome();
   public String getExceptionFabricateRequiresJava1_7OrGreater();
   public String getExceptionJavaVersionParameterExpected();
   
@@ -20,6 +20,15 @@ public interface I_SystemMessages {
    * @return
    */
   public String getFabricationFailed();
+  /**
+   * This message should contain the jars that come
+   * with fabricate only, to make sure that plug-ins are
+   * using the fabricate.xml dependencies correctly 
+   * and not the Fabricate Home/lib directory.
+   * @return
+   */
+  public String getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars();
+  
   public String getVersionX();
   /**
    * CLA means Command Line Argument

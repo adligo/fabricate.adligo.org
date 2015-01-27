@@ -102,15 +102,16 @@ public class FabFileIO implements I_FabFileIO {
    * 
    * @throws IOException
    */
-  public List<String> list(String path, final I_FileMatcher matcher) throws IOException
+  public List<String> list(final String path, final I_FileMatcher matcher) throws IOException
   {
       Path dir = new File(path).toPath();
       final List<String> list = new ArrayList<String>();
       File pathFile = dir.toFile();
       final String absPath = pathFile.getAbsolutePath();
-      final String simplePathName = pathFile.getName();
+     
+      final int start = absPath.indexOf(path) + 1;
+      final int length = path.length();
       
-      final int length = absPath.length();
       Files.walkFileTree(dir, new SimpleFileVisitor<Path>()
       {
           @Override
@@ -118,11 +119,10 @@ public class FabFileIO implements I_FabFileIO {
                   throws IOException
           {
               File f = file.toFile();
-              String absPath = f.getAbsolutePath();
-              absPath = simplePathName + 
-                  absPath.substring(length, absPath.length());
-              if (matcher.isMatch(absPath)) {
-                list.add(absPath);
+              String fpath = f.getAbsolutePath();
+              String relPath = fpath.substring(start + length, fpath.length());
+              if (matcher.isMatch(relPath)) {
+                list.add(fpath);
               }
               return FileVisitResult.CONTINUE;
           }

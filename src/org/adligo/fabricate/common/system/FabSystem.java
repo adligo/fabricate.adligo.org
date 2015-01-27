@@ -67,4 +67,14 @@ public class FabSystem implements I_FabSystem {
   public synchronized void setDebug(boolean debug) {
     this.debug_ = debug;
   }
+
+  @Override
+  public String getenv(String key) {
+    return System.getenv(key);
+  }
+
+  @Override
+  public String lineSeperator() {
+    return System.lineSeparator();
+  }
 }
