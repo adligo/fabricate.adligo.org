@@ -63,9 +63,10 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
     FabricateType fab = ctx_.getFabricate();
     FabricateDependencies fabDeps = fab.getDependencies();
     List<String> remoteRepos = fabDeps.getRemoteRepository();
-    repoDown_ = new RepositoryDownloader(remoteRepos, 
-        new DefaultRepositoryPathBuilder(ctx_.getLocalRepositoryPath(), 
-        File.separator), ctx);
+    repoDown_ = new RepositoryDownloader(ctx_.getLog(), ctx_.getLocalRepositoryPath());
+    repoDown_.setPathBuilder(new DefaultRepositoryPathBuilder(ctx_.getLocalRepositoryPath(), 
+        File.separator));
+    repoDown_.setRepositories(remoteRepos);
     
     projectsPath_ = ctx_.getProjectsPath();
     if (log_.isLogEnabled(DependencyDownloader.class)) {
@@ -124,7 +125,7 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
         }
         String type = depType.getType();
         if (type == null || !"ide".equalsIgnoreCase(type)) {
-          repoDown_.findOrDownloadAndSha1(depType);
+          repoDown_.findOrDownloadAndMd5(depType);
         }
         finishedDepCount_.incrementAndGet();
         dep = deps_.poll();

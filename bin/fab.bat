@@ -36,9 +36,9 @@ IF "%FABRICATE_HOME%" ==  "" (
 	)
 	SET MESSAGE=false
 	
-	REM @diagram_sync on 1/18/2014 with Overview.seq
+	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) setup Fabricate args.
-	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateSetup args !ARGS!') do (
+	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateArgsSetup !ARGS!') do (
 		set LINE=%%i
 		if "!MESSAGE!" == "true" (
 			@ECHO !LINE!
@@ -57,9 +57,9 @@ IF "%FABRICATE_HOME%" ==  "" (
 	)
 	SET MESSAGE=false
 	
-	REM @diagram_sync on 1/18/2014 with Overview.seq
+	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) setup Fabricate opts.
-	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateSetup opts !ARGS_FROM_SETUP!') do (
+	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateOptsSetup !ARGS_FROM_SETUP!') do (
 		set LINE=%%i
 		if "!MESSAGE!" == "true" (
 			@ECHO !LINE!
@@ -76,7 +76,7 @@ IF "%FABRICATE_HOME%" ==  "" (
 		@ECHO OPTS_FROM_SETUP;
 		@ECHO !OPTS_FROM_SETUP!
 	)
-	REM @diagram_sync on 1/18/2014 with Overview.seq
+	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) run Fabricate.
 	java !OPTIONS_FROM_SETUP! org.adligo.fabricate.Fabricate !ARGS! !ARGS_FROM_SETUP! 
 )

@@ -35,7 +35,7 @@ public class CommandLineArgs {
           if (argCased.indexOf("-") == 0 && argCased.indexOf("--") != 0) {
             char [] chars = argCased.toCharArray();
             for (int j = 0; j < chars.length; j++) {
-              char c = chars[i];
+              char c = chars[j];
               if (c != '-') {
                 toRet.put("-" + c,null);
               }

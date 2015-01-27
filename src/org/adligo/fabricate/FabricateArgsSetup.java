@@ -1,28 +1,17 @@
 package org.adligo.fabricate;
 
 import org.adligo.fabricate.common.FabConstantsDiscovery;
-import org.adligo.fabricate.common.FabricateHelper;
-import org.adligo.fabricate.common.LocalRepositoryHelper;
-import org.adligo.fabricate.common.RunContextMutant;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.PatternFileMatcher;
-import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
-import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.I_FabSystem;
-import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCalls;
 import org.adligo.fabricate.external.ManifestParser;
-import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
-import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,32 +24,29 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-public class FabricateSetup {
+public class FabricateArgsSetup {
   private static JavaCalls JAVA_CALLS = JavaCalls.INSTANCE;
   
   private ManifestParser manifestParser_;
   private final I_FabSystem sys_;
   private final I_FabFileIO files_;
-  private final I_FabXmlFileIO xmlFiles_;
   private String language_;
   private String country_;
   private I_FabricateConstants constants_;
-  private FabricateType fab_;
   
   /**
-   * @diagram_sync on 1/18/2014 with Overview.seq
+   * @diagram_sync on 1/26/2014 with Overview.seq
    * @param args
    */
 	@SuppressWarnings("unused")
   public static void main(String [] args) {
-	  new FabricateSetup(args, new FabSystem(), new ManifestParser());
+	  new FabricateArgsSetup(args, new FabSystem(), new ManifestParser());
 	}
 	
-	public FabricateSetup(String [] args, FabSystem sys, ManifestParser manifestParser) {
+	public FabricateArgsSetup(String [] args, FabSystem sys, ManifestParser manifestParser) {
 	  sys_ = sys;
 	  manifestParser_ = manifestParser;
 	  files_ = sys.getFileIO();
-    xmlFiles_ = sys.getXmlFileIO();
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
     sys.setDebug(argMap.containsKey("debug"));
     
@@ -81,34 +67,6 @@ public class FabricateSetup {
 	    constants_ = FabricateEnConstants.INSTANCE;
 	  }
 	 
-    if (argMap.containsKey("args")) {
-      doArgs(argMap);
-    } else if (argMap.containsKey("opts")) {
-      doOpts(argMap);
-    }
-	}
-
- 
-
-  private void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd, 
-      Map<String,String> argMap) {
-    String fabricateXmlPath = new File(fd.getFabricateXmlPath()).getAbsolutePath();
-    
-    try {
-      fab_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
-      FabricateHelper fh = new FabricateHelper(fab_);
-     
-      downloadFabricateRunClasspathDependencies();
-      
-      System.out.println(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
-          buildClasspath(fabricateXmlPath, fabHome));
-    } catch (IOException e) {
-      //this should also de-rail the fabricate run, as there will be no classpath
-      e.printStackTrace();
-    }
-  }
-
-  private void doArgs(Map<String,String> argMap) {
     long now = sys_.getCurrentTime();
     
     String homeDir = null;
@@ -143,34 +101,25 @@ public class FabricateSetup {
     }
     File fabricateJar = locateFabricateJarAndVerifyFabricateHomeJars();
     
+    // @diagram_sync on 1/26/2014 with Overview.seq
     if (fabricateJar != null) {
+     // @diagram_sync on 1/26/2014 with Overview.seq
       if (hasDisplayVersionArg(argMap)) {
+        //@diagram_sync on 1/26/2014 with Overview.seq
         displayFabricateJarManifestVersionAndEnd(fabricateJar);
       } else {
-        sendOptsToScript(now, versionNbrString);
+        sendArgsToScript(now, versionNbrString);
       }
     }
    
   }
 
-  private void doOpts(Map<String,String> argMap) {
-    String fabHome = System.getenv("FABRICATE_HOME");
-    //@diagram_sync on 1/18/2014 with Overview.seq
-    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(sys_);
-    if (!fd.hasFabricateXml()) {
-      System.out.println("Exception no fabricate.xml or project.xml found.");
-    } else {
-      
-      String version = argMap.get("java");
-      if (StringUtils.isEmpty(version)) {
-        
-        ThreadLocalPrintStream.println("Java version parameter expected.");
-        return;
-      }
-      workWithFabricateXml(fabHome, fd, argMap);
-    }
-  }
-  
+ 
+  /**
+   * @diagram_sync on 1/26/2014 with Overview.seq
+   * @param argMap
+   * @return
+   */
   public boolean hasDisplayVersionArg(Map<String, String> argMap) {
     I_SystemMessages messages = constants_.getSystemMessages();
     if ( argMap.containsKey(messages.getClaVersion())) {
@@ -182,10 +131,14 @@ public class FabricateSetup {
     return false;
   }
 
-  public void sendOptsToScript(long now, String javaVersionNbr) {
+  public void sendArgsToScript(long now, String javaVersionNbr) {
     ThreadLocalPrintStream.println("start=" + now + " java=" + javaVersionNbr );
   }
 
+  /**
+   * @diagram_sync on 1/26/2014 with Overview.seq
+   * @param args
+   */
   public File locateFabricateJarAndVerifyFabricateHomeJars() {
     String fabricateHome = sys_.getenv("FABRICATE_HOME");
     if (fabricateHome == null) {
@@ -210,10 +163,6 @@ public class FabricateSetup {
       
       if (files.size() != 4) {
         logTheFollowingFabricateHomeLibShouldHaveTheseJars(fabricateHome);
-        if (sys_.isDebug()) {
-          ThreadLocalPrintStream.println("files " + files);
-          ThreadLocalPrintStream.println("files_.getNameSeparator()  " + files_.getNameSeparator());
-        }
         return null;
       }
       
@@ -246,11 +195,6 @@ public class FabricateSetup {
     //NOTE fabricate_*.jar is checked for first
     if (!hasLogging || !hasHttpClient || !hasHttpCore) {
       logTheFollowingFabricateHomeLibShouldHaveTheseJars(fabricateHome);
-      if (sys_.isDebug()) {
-        ThreadLocalPrintStream.println("hasLogging" + hasLogging);
-        ThreadLocalPrintStream.println("hasHttpClient" + hasHttpClient);
-        ThreadLocalPrintStream.println("hasHttpCore" + hasHttpCore);
-      }
       return null;
     }
     return fabricateJar;
@@ -268,6 +212,10 @@ public class FabricateSetup {
     ThreadLocalPrintStream.println("httpcore-4.3.2.jar");
   }
   
+  /**
+   * @diagram_sync on 1/26/2014 with Overview.seq
+   * @param fabricateJar
+   */
   private void displayFabricateJarManifestVersionAndEnd(File fabricateJar) {
     manifestParser_.readManifest(fabricateJar.getAbsolutePath());
     String fabricateVersion = manifestParser_.get(ManifestParser.SPECIFICATION_VERSION);
@@ -293,63 +241,6 @@ public class FabricateSetup {
     ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
     ThreadLocalPrintStream.println(versionX);
     ThreadLocalPrintStream.println(compiledOnX);
-  }
-  
-  private String buildClasspath(String fabricateXml, String fabricateHome) {
-    StringBuilder sb = new StringBuilder();
-    
-    File file = new File(fabricateHome + File.separator + "lib");
-    if (file.exists()) {
-      String [] files = file.list();
-      if (files != null) {
-        for (int i = 0; i < files.length; i++) {
-          if (i != 0) {
-            sb.append(File.pathSeparator);
-          }
-          sb.append(file.getAbsolutePath() + File.separator + files[i]);
-        }
-      }
-    }
-    int idx = fabricateXml.indexOf("fabricate.xml");
-    String fabricatePath = fabricateXml.substring(0, idx);
-    File fabLib = new File(fabricatePath + File.separator + "lib");
-    if (fabLib.exists()) {
-      String [] files = fabLib.list();
-      if (files != null) {
-        for (int i = 0; i < files.length; i++) {
-          sb.append(File.pathSeparator + file.getAbsolutePath() + File.separator + files[i]);
-        }
-      }
-    }
-    String result = sb.toString();
-    return result;
-  }
-  
-  /**
-   * throws a fatal error when one of the 
-   * dependencies requested for the fabricate 
-   * class path can not be down loaded
-   * @param fab
-   * @throws IOException
-   */
-  private void downloadFabricateRunClasspathDependencies() throws IOException {
-    FabricateDependencies deps =  fab_.getDependencies();
-    if (deps != null) {
-      List<DependencyType> depTypes = deps.getDependency();
-      if (depTypes != null) {
-        LocalRepositoryHelper lrh = new LocalRepositoryHelper();
-        String localRepository = lrh.getRepositoryPath(fab_);
-        RunContextMutant fcm = new RunContextMutant();
-        fcm.setLocalRepositoryPath(localRepository);
-        //leave logs empty here
-        List<String> repos = deps.getRemoteRepository();
-        RepositoryDownloader rdl = new RepositoryDownloader(repos, 
-            new DefaultRepositoryPathBuilder(localRepository, File.separator), fcm);
-        for (DependencyType dep: depTypes) {
-          rdl.findOrDownloadAndSha1(dep);
-        }
-      }
-    }
   }
 
   public I_FabricateConstants getConstants() {

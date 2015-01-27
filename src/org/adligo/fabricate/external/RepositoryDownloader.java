@@ -1,6 +1,5 @@
 package org.adligo.fabricate.external;
 
-import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.apache.http.HttpEntity;
@@ -43,18 +42,21 @@ public class RepositoryDownloader {
   private List<String> repositories_ = new ArrayList<String>();
   
   private I_RepositoryPathBuilder pathBuilder_;
-  private I_RunContext ctx_;
   private I_FabLog log_;
   private String localRepo_;
   
   @SuppressWarnings("boxing")
-  public RepositoryDownloader(List<String> repositories, 
-      I_RepositoryPathBuilder pathBuilder, I_RunContext ctx) {
-    ctx_ = ctx;
-    log_ = ctx.getLog();
-    localRepo_ = ctx.getLocalRepositoryPath();
-    
+  public RepositoryDownloader(I_FabLog log, String repositoryPath) {
+    log_ = log;
+    localRepo_ = repositoryPath;
+  }
+  
+  
+  public void setPathBuilder(I_RepositoryPathBuilder pathBuilder) {
     pathBuilder_ = pathBuilder;
+  }
+
+  public void setRepositories(List<String> repositories ) {
     CloseableHttpClient httpClient = HttpClients.createDefault();
     for (String repo: repositories) {
       final String repoUrl = repo;
@@ -97,7 +99,7 @@ public class RepositoryDownloader {
    * @throws ExecutionException for a not standard purpose
    * of the download and sha check sum attempts failed
    */
-  public void findOrDownloadAndSha1(DependencyType dep) throws IOException {
+  public void findOrDownloadAndMd5(DependencyType dep) throws IOException {
     if (find(dep)) {
       return;
     }
