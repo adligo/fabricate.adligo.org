@@ -19,7 +19,7 @@ public class ThreadLocalPrintStream {
    * is no I_FabLog available.
    * @param p
    */
-  public static final void println(String p) {
+  protected static final void println(String p) {
     PrintStream out = getProtected();
     out.println(p);
   }
@@ -28,7 +28,7 @@ public class ThreadLocalPrintStream {
    * is no I_FabLog available.
    * @param p
    */
-  public static final void printTrace(Throwable t) {
+  protected static final void printTrace(Throwable t) {
     PrintStream out = getProtected();
     t.printStackTrace(out);
     Throwable cause = t.getCause();

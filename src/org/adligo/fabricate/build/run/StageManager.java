@@ -80,7 +80,7 @@ public class StageManager {
     
     try {
       fabricateXmlPath_ = fabricateXml;
-      ThreadLocalPrintStream.println("reading " + fabricateXml);
+      log_.println("reading " + fabricateXml);
       fab_ = xmlFiles_.parseFabricate_v1_0(fabricateXml);
     } catch (IOException e) {
       failureException_ = e;
@@ -89,7 +89,7 @@ public class StageManager {
       try {
         if (xmlDiscovery.hasProjectXml()) {
           projectXmlPath_ = xmlDiscovery.getProjectXml();
-          ThreadLocalPrintStream.println("reading " + projectXmlPath_);
+          log_.println("reading " + projectXmlPath_);
           project_ = xmlFiles_.parseProject_v1_0(projectXmlPath_);
         }
       } catch (IOException e) {
@@ -160,7 +160,7 @@ public class StageManager {
       }
       if (execute) {
         if (ctx_ == null) {
-          ThreadLocalPrintStream.println("Starting stage " + stageName);
+          log_.println("Starting stage " + stageName);
         } else {
           if (log_.isLogEnabled(StageManager.class)) {
             log_.println("Starting stage " + stageName);
@@ -238,7 +238,7 @@ public class StageManager {
         log_.println("Writing " + resultFile.getAbsolutePath());
       }
     } else {
-      ThreadLocalPrintStream.println("Writing " + resultFile.getAbsolutePath());
+      log_.println("Writing " + resultFile.getAbsolutePath());
     }
     ResultType result = new ResultType();
     File fabricatePath = new File(fabricateXmlPath_.substring(0, fabricateXmlPath_.length() - 14));
@@ -314,12 +314,12 @@ public class StageManager {
       e.printStackTrace();
     } 
     if (result.isSuccessful()) {
-      ThreadLocalPrintStream.println("Fabrication Successful!");
+      log_.println("Fabrication Successful!");
     } else {
       if (failureException_ != null) {
-        ThreadLocalPrintStream.printTrace(failureException_);
+        log_.printTrace(failureException_);
       }
-      ThreadLocalPrintStream.println("Fabrication Failed!");
+      log_.println("Fabrication Failed!");
     }
     System.exit(0);
   }
@@ -342,11 +342,7 @@ public class StageManager {
       BigDecimal bd = new BigDecimal(secs);
       bd = bd.setScale(2, RoundingMode.HALF_UP);
       String message = "Duration was " + bd.toPlainString() + " seconds.";
-      if (log_ != null) {
-        log_.println(message);
-      } else {
-        ThreadLocalPrintStream.println(message);
-      }
+      log_.println(message);
     }
   }
 }

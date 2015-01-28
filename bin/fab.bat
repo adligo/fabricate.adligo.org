@@ -18,40 +18,38 @@ IF "%FABRICATE_HOME%" ==  "" (
 	SET CLASSPATH=!CLASSPATH!%FABRICATE_HOME%/lib/httpclient-4.3.5.jar;
 	SET CLASSPATH=!CLASSPATH!%FABRICATE_HOME%/lib/fabricate_snapshot.jar
 	
-	SET MESSAGE=false
+	SET ARGS_FROM_SETUP="Empty"
 	
 	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) setup Fabricate args.
 	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateArgsSetup !ARGS!') do (
 		set LINE=%%i
-		if "!MESSAGE!" == "true" (
+		if "!ARGS_FROM_SETUP!" == "Empty" (
+			SET ARGS_FROM_SETUP=!LINE!
+		) else (
 			@ECHO !LINE!
 		)
-		if "!LINE!" == "Message" (
-			SET MESSAGE=true
-		)
 	)
-	IF "!MESSAGE!" == "true" (
+	IF "!ARGS_FROM_SETUP!" == "END" (
 		GOTO END
 	)
-	SET ARGS_FROM_SETUP=!LINE!
-	SET MESSAGE=false
+	
+	SET OPTS_FROM_SETUP="Empty"
 	
 	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) setup Fabricate opts.
 	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateOptsSetup !ARGS_FROM_SETUP!') do (
 		set LINE=%%i
-		if "!MESSAGE!" == "true" (
+		if "!OPTS_FROM_SETUP!" == "Empty" (
+			SET OPTS_FROM_SETUP=!LINE!
+			
+		) else (
 			@ECHO !LINE!
 		)
-		if "!LINE!" == "Message" (
-			SET MESSAGE=true
-		)
 	)
-	IF "!MESSAGE!" == "true" (
+	IF "!OPTS_FROM_SETUP!" == "END" (
 		GOTO END
 	)
-	SET OPTS_FROM_SETUP=!LINE!
 
 	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) run Fabricate.

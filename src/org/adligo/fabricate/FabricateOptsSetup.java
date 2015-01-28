@@ -1,19 +1,18 @@
 package org.adligo.fabricate;
 
-import org.adligo.fabricate.common.FabConstantsDiscovery;
 import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.common.RunContextMutant;
-import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
-import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.log.DeferredLog;
+import org.adligo.fabricate.common.log.DelayedLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
+import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
-import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.RepositoryDownloader;
@@ -26,16 +25,13 @@ import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 public class FabricateOptsSetup {
   
-  private final I_FabSystem sys_;
+  private final FabSystem sys_;
+  private final DelayedLog log_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
-  private String language_;
-  private String country_;
   private I_FabricateConstants constants_;
   private FabricateType fab_;
   private final RepositoryDownloaderFactory factory_;
@@ -54,45 +50,28 @@ public class FabricateOptsSetup {
 	  files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
     factory_ = factory;
-    Map<String,String> argMap = CommandLineArgs.parseArgs(args);
-    sys.setDebug(argMap.containsKey("debug"));
-    
-    
-    
-	  language_ = sys.getDefaultLanguage();
-	  country_ = sys.getDefaultCountry();
-	  
-	  String argLoc = argMap.get(CommandLineArgs.LOCALE);
-	  if (argLoc != null) {
-	    StringTokenizer st = new StringTokenizer(argLoc, "_");
-	    String tempLang = st.nextToken();
-	    String tempCountry = st.nextToken();
-	    language_ = tempLang;
-	    country_ = tempCountry;
-	  }
-	  try {
-	    constants_ = new FabConstantsDiscovery(language_, country_);
-	  } catch (IOException x) {
-	    constants_ = FabricateEnConstants.INSTANCE;
-	  }
-	 
+    FabSystemSetup.setupWithDelayedLog(sys, args);
+    log_ = (DelayedLog) ((DeferredLog) sys.getLog()).getDelegate();
     String fabHome = System.getenv("FABRICATE_HOME");
     
     FabricateXmlDiscovery fd = new FabricateXmlDiscovery(sys_);
     if (!fd.hasFabricateXml()) {
-      ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
+      log_.printlnNow(CommandLineArgs.END);
       I_SystemMessages sysMessages = constants_.getSystemMessages();
-      ThreadLocalPrintStream.println(sysMessages.getExceptionNoFabricateXmlOrProjectXmlFound());
+      log_.printlnNow(sysMessages.getExceptionNoFabricateXmlOrProjectXmlFound());
+      log_.render();
+      return;
     } else {
       
-      String version = argMap.get("java");
+      String version = sys.getArgValue("java");
       if (StringUtils.isEmpty(version)) {
-        ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
+        log_.println(CommandLineArgs.END);
         I_SystemMessages sysMessages = constants_.getSystemMessages();
-        ThreadLocalPrintStream.println(sysMessages.getExceptionJavaVersionParameterExpected());
+        log_.println(sysMessages.getExceptionJavaVersionParameterExpected());
+        log_.render();
         return;
       }
-      workWithFabricateXml(fabHome, fd, argMap);
+      workWithFabricateXml(fabHome, fd);
     }
   }
 
@@ -102,8 +81,7 @@ public class FabricateOptsSetup {
 	 * @param fd
 	 * @param argMap
 	 */
-  private void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd, 
-      Map<String,String> argMap) {
+  private void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd) {
     String fabricateXmlPath = files_.instance(fd.getFabricateXmlPath()).getAbsolutePath();
     
     try {
@@ -117,8 +95,10 @@ public class FabricateOptsSetup {
       //@diagram_sync on 1/26/2014 with Overview.seq
       sendOptsToScript(fh, classpath);
     } catch (IOException e) {
-      ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
-      ThreadLocalPrintStream.printTrace(e);
+      log_.printlnNow(CommandLineArgs.END);
+      log_.printTraceNow(e);
+      log_.render();
+      return;
     }
   }
 
@@ -128,8 +108,9 @@ public class FabricateOptsSetup {
    * @param classpath
    */
   private void sendOptsToScript(FabricateHelper fh, String classpath) {
-    ThreadLocalPrintStream.println(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
+    log_.printlnNow(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
         classpath);
+    log_.render();
   }
 
 

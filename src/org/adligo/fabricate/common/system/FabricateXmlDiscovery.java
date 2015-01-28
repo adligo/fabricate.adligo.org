@@ -2,6 +2,7 @@ package org.adligo.fabricate.common.system;
 
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 
@@ -17,7 +18,7 @@ import java.io.IOException;
  */
 public class FabricateXmlDiscovery {
 
-  private final I_FabSystem sys_;
+  private final I_FabLog log_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
   private File fabricateXml_;
@@ -25,7 +26,7 @@ public class FabricateXmlDiscovery {
   private boolean devParseException_ = false;
   
   public FabricateXmlDiscovery(I_FabSystem sys) {
-    sys_ = sys;
+    log_ = sys.getLog();
     files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
     setup();
@@ -103,9 +104,8 @@ public class FabricateXmlDiscovery {
                   fabricateXml_ = files_.instance(fabPath);
                  } catch (IOException e) {
                    devParseException_ = true;
-                   if (sys_.isDebug()) {
-                     ThreadLocalPrintStream.println(CommandLineArgs.MESSAGE);
-                     ThreadLocalPrintStream.printTrace(e);
+                   if (log_.isLogEnabled(FabricateXmlDiscovery.class)) {
+                     log_.printTrace(e);
                    }
                  } 
               } else {

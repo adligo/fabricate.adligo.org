@@ -23,14 +23,14 @@ fi
 
 IFS=$'\n'
 LINES=($ARGS_FROM_SETUP)
+LINE_COUNT=${#LINES[@]}
+for (( i=1 ; i < ${LINE_COUNT} ; i++ ))
+do
+    echo ${LINES[$i]}
+done
+ARGS_FROM_SETUP=${LINES[0]}
 
-if [ "Message" == "${LINES[0]}" ]; then
-	
-	LINE_COUNT=${#LINES[@]}
-	for (( i=1 ; i < ${LINE_COUNT} ; i++ ))
-	do
-	    echo "${LINES[$i]}"
-	done
+if [ "END" == "${LINES[0]}" ]; then
 	exit 0
 else
 	
@@ -40,14 +40,15 @@ else
 	if [ -z "$OPTIONS_FROM_SETUP" ]; then
     	exit 1
 	fi
-
 	LINES=($OPTIONS_FROM_SETUP)
-	if [ "Message" == "${LINES[0]}" ]; then
-		LINE_COUNT=${#LINES[@]}
-		for (( i=1 ; i < ${LINE_COUNT} ; i++ ))
-		do
-		    echo "${LINES[$i]}"
-		done
+	LINE_COUNT=${#LINES[@]}
+	for (( i=1 ; i < ${LINE_COUNT} ; i++ ))
+	do
+	    echo "${LINES[$i]}"
+	done
+	OPTIONS_FROM_SETUP=${LINES[0]}
+	
+	if [ "END" == "${LINES[0]}" ]; then
 		exit 0
 	else
 		

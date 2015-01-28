@@ -13,9 +13,10 @@ public class CommandLineArgs {
   /**
    * This is printed out to the console 
    * so that the script knows there is a error
-   * regardless of the language.
+   * regardless of the language, so that it ends the
+   * run of the script.
    */ 
-  public static final String MESSAGE = "Message";
+  public static final String END = "END";
   /**
    * This is a optional command line argument which allows
    * the user of Fabricate to override the default locale of the JVM.

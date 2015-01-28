@@ -53,5 +53,13 @@ public class DeferredLog implements I_FabLog {
       delegate_.printTrace(t);
     }
   }
+  @Override
+  public boolean hasAllLogsEnabled() {
+    if (delegate_ == null) {
+      return false;
+    } else {
+      return delegate_.hasAllLogsEnabled();
+    }
+  }
 
 }

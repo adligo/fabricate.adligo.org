@@ -151,9 +151,7 @@ public class FabFileIO implements I_FabFileIO {
   }
   
   private void log(String message) {
-    if (log_ == null) {
-      ThreadLocalPrintStream.println(message);
-    } else if (log_.isLogEnabled(FabFileIO.class)) {
+    if (log_.isLogEnabled(FabFileIO.class)) {
       log_.println(message);
     }
   }

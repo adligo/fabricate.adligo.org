@@ -107,14 +107,14 @@ public class DefaultSetup implements I_FabSetupStage {
     
     
     if (project_ != null) {
-      ThreadLocalPrintStream.println("running in project mode");
+      log_.println("running in project mode");
       fcm.setRunType(FabRunType.PROJECT);
       fcm.setProjectPath(initalDir_);
     } else {
       depotManager_.clean();
       
       if (args.containsKey("dev")) {
-        ThreadLocalPrintStream.println("running in developer mode");
+        log_.println("running in developer mode");
         fcm.setRunType(FabRunType.DEVELOPMENT);
         File fabDir = new File(fabricateDir);
         File file = fabDir.getParentFile();
@@ -122,7 +122,7 @@ public class DefaultSetup implements I_FabSetupStage {
         createDevFile(file.getAbsolutePath() + File.separator + "dev.xml",fabDir.getName());
       } else {
         //must be the default setting
-        ThreadLocalPrintStream.println("running in default mode");
+        log_.println("running in default mode");
         fcm.setRunType(FabRunType.DEFAULT);
         cleanDir(fcm, fabricateDir,"projects");
         fcm.setProjectsPath(fabricateDir + File.separator + "projects");

@@ -81,7 +81,7 @@ public class CompileJarAndDeposit extends OldBaseConcurrentStage implements I_Fa
         
         String fileName = projectsPath_ + File.separator + projectName + 
             File.separator + "build" + File.separator + jarName;
-        ThreadLocalPrintStream.println(this.getClass().getSimpleName() + " adding jar to depot " +
+        log_.println(this.getClass().getSimpleName() + " adding jar to depot " +
             fileName);
        deposit.execute(fileName, "jar");
         

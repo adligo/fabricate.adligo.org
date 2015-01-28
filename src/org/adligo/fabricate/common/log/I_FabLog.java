@@ -9,6 +9,7 @@ package org.adligo.fabricate.common.log;
  *
  */
 public interface I_FabLog {
+  public boolean hasAllLogsEnabled();
   public boolean isLogEnabled(Class<?> clazz);
   public void println(String p);
   public void printTrace(Throwable t);

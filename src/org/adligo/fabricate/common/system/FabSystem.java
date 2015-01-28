@@ -10,13 +10,15 @@ import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class FabSystem implements I_FabSystem {
   private I_FabricateConstants constants_ = FabricateEnConstants.INSTANCE;
   private DeferredLog log_ = new DeferredLog();
   private I_FabFileIO fileIO_ = new FabFileIO(log_);
   private I_FabXmlFileIO xmlFileIO_ = new FabXmlFileIO();
-  private volatile boolean debug_;
+  private Map<String,String> argMap = new TreeMap<String,String>();
   
   @Override
   public I_FabLog getLog() {
@@ -60,13 +62,6 @@ public class FabSystem implements I_FabSystem {
     return xmlFileIO_;
   }
 
-  public boolean isDebug() {
-    return debug_;
-  }
-
-  public synchronized void setDebug(boolean debug) {
-    this.debug_ = debug;
-  }
 
   @Override
   public String getenv(String key) {
@@ -76,5 +71,29 @@ public class FabSystem implements I_FabSystem {
   @Override
   public String lineSeperator() {
     return System.lineSeparator();
+  }
+
+  @Override
+  public boolean hasArg(String arg) {
+    return argMap.containsKey(arg);
+  }
+
+  @Override
+  public String getArgValue(String key) {
+    return argMap.get(key);
+  }
+
+  @Override
+  public String toScriptArgs() {
+    StringBuilder sb = new StringBuilder();
+    CommandLineArgs.appendArgs(sb, argMap);
+    return sb.toString();
+  }
+  
+  public void setArgs(Map<String,String> argsIn) {
+    argMap.clear();
+    if (argsIn != null) {
+      argMap.putAll(argsIn);
+    }
   }
 }

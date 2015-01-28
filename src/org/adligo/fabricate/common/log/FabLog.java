@@ -85,4 +85,8 @@ public class FabLog implements I_FabLog {
   public void printTrace(Throwable t) {
     ThreadLocalPrintStream.printTrace(t);
   }
+  @Override
+  public boolean hasAllLogsEnabled() {
+    return allOn_;
+  }
 }

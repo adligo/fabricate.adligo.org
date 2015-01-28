@@ -3,9 +3,11 @@ package org.adligo.fabricate;
 import org.adligo.fabricate.build.run.StageManager;
 import org.adligo.fabricate.common.files.FabFileIO;
 import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.log.DelayedLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
+import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 
 import java.io.File;
@@ -19,33 +21,30 @@ import java.util.Set;
 
 
 public class Fabricate {
+  private final FabSystem sys_;
+  private final DelayedLog log_;
   
   @SuppressWarnings("unused")
   public static final void main(String [] args) {
-    new Fabricate(args);
+    new Fabricate(new FabSystem(), args);
   }
   
-  public Fabricate(String [] args) {
+  public Fabricate(FabSystem sys, String [] args) {
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
-    if (argMap.containsKey("debug")) {
-      Set<Entry<String,String>> entries = argMap.entrySet();
-      for (Entry<String,String> e: entries) {
-        ThreadLocalPrintStream.println(e.getKey() + " = " + e.getValue());
-      }
-    }
-    FabSystem sys = new FabSystem();
-    sys.setDebug(argMap.containsKey("debug"));
+    sys_ = sys;
+    FabSystemSetup.setupWithDelayedLog(sys, args);
+    log_ = (DelayedLog) sys.getLog();
     FabricateXmlDiscovery discovery = new FabricateXmlDiscovery(sys);
     
     if (!discovery.hasFabricateXml()) {
-      ThreadLocalPrintStream.println("Fabricate did not discover a fabricate.xml or project.xml.");
+      log_.println("Fabricate did not discover a fabricate.xml or project.xml.");
       return;
     }
     String fabricateXmlPath = discovery.getFabricateXmlPath();
     String fabricateDir = fabricateXmlPath.substring(0,  fabricateXmlPath.length() - 13);
     File runMarker = new File(fabricateDir + File.separator + "run.marker");
     if (runMarker.exists()) {
-      ThreadLocalPrintStream.println("Fabricate appears to already be running " + System.lineSeparator() +
+      log_.println("Fabricate appears to already be running " + System.lineSeparator() +
             "(run.marker is in the same directory as fabricate.xml).");
       return;
     }
@@ -54,10 +53,10 @@ public class Fabricate {
     FileOutputStream fos = null;
     try {
       if (!runMarker.createNewFile()) {
-        ThreadLocalPrintStream.println("There was a problem creating run.marker in the directory with fabricate.xml.");
+        log_.println("There was a problem creating run.marker in the directory with fabricate.xml.");
         return;
       }
-      ThreadLocalPrintStream.println("Fabricateing...");
+      log_.println("Fabricateing...");
       runMarker.deleteOnExit();
       
       
@@ -72,7 +71,7 @@ public class Fabricate {
     } catch (IOException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();
-      ThreadLocalPrintStream.println("There was a problem creating run.marker in the directory with fabricate.xml.");
+      log_.println("There was a problem creating run.marker in the directory with fabricate.xml.");
       return;
     } finally {
       try {

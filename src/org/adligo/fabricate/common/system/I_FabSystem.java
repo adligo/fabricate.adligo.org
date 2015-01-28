@@ -6,7 +6,6 @@ import org.adligo.fabricate.common.log.I_FabLogSystem;
 
 
 public interface I_FabSystem extends I_FabLogSystem {
-  public boolean isDebug();
   public I_FabFileIO getFileIO();
   public I_FabXmlFileIO getXmlFileIO();
   /**
@@ -22,4 +21,25 @@ public interface I_FabSystem extends I_FabLogSystem {
    * @return
    */
   public String lineSeperator();
+  
+  /**
+   * backed by the CommandLineArgs map.
+   * @param arg
+   * @return
+   */
+  public boolean hasArg(String arg);
+  
+  /**
+   * backed by the CommandLineArgs map.
+   * @param arg
+   * @return
+   */
+  public String getArgValue(String key);
+  
+  /**
+   * the command line arguments that came
+   * in as a normalized string
+   * @return
+   */
+  public String toScriptArgs();
 }
