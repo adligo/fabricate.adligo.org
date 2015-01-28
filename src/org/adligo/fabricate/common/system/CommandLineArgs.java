@@ -1,7 +1,13 @@
 package org.adligo.fabricate.common.system;
 
-import java.util.HashMap;
+import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
+
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class CommandLineArgs {
   /**
@@ -11,13 +17,21 @@ public class CommandLineArgs {
    */ 
   public static final String MESSAGE = "Message";
   /**
-   * If passed in should return language underscore country;<br/>
-   * (i.e. "en_US")
+   * This is a optional command line argument which allows
+   * the user of Fabricate to override the default locale of the JVM.
+   * It must be set to language code underscore country code,
+   * and will default to United States English when there is
+   * no implementation of the specified locale;<br/>
+   * In Example;<br/>
+   *   fab --=en_US<br/>
+   *   fab --=fr_CA<br/>
+   *   fab --=en_CA<br/>
+   *   fab --=fr_FR<br/>
    */
-  public static final String LOCALE = "locale";
+  public static final String LOCALE = "--";
   
   public static Map<String,String> parseArgs(String [] args) {
-    Map<String,String> toRet = new HashMap<String,String>();
+    Map<String,String> toRet = new TreeMap<String,String>();
     for (int i = 0; i < args.length; i++) {
       String arg = args[i];
       int eq = arg.indexOf("=");
@@ -30,23 +44,58 @@ public class CommandLineArgs {
         toRet.put(key.toLowerCase(), value);
       } else {
         String argCased = arg.toLowerCase();
-        boolean abbreviations = false;
-        if (argCased.length() >= 3) {
-          if (argCased.indexOf("-") == 0 && argCased.indexOf("--") != 0) {
-            char [] chars = argCased.toCharArray();
-            for (int j = 0; j < chars.length; j++) {
-              char c = chars[j];
-              if (c != '-') {
-                toRet.put("-" + c,null);
-              }
+        boolean added = false;
+        if (argCased.indexOf("--") == 0) {
+          toRet.put(argCased, null);
+          added = true;
+        } else if (argCased.indexOf("-") == 0) {
+          char [] chars = argCased.toCharArray();
+          for (int j = 0; j < chars.length; j++) {
+            char c = chars[j];
+            if (c != '-') {
+              toRet.put("-" + c,null);
+              added = true;
             }
           }
         }
-        if (!abbreviations) {
+        if (!added) {
           toRet.put(arg.toLowerCase(),null);
         }
       }
     }
     return toRet;
+  }
+  public static Map<String,String> normalizeArgs(Map<String,String> args, I_CommandLineConstants constants) {
+    Set<Entry<String,String>> entries = new HashSet<Entry<String,String>>(args.entrySet());
+    
+    for (Entry<String,String> e: entries) {
+      String key = e.getKey();
+      String value = e.getValue();
+      if (key.indexOf("--") == 0 && !LOCALE.equals(key)) {
+        String alias = constants.getAlias(key);
+        if (alias != null) {
+          //replace the value with the alias
+          args.remove(key);
+          args.put(alias, value);
+        }
+      }
+    }
+    return Collections.unmodifiableMap(args);
+  }
+  
+  public static void appendArgs(StringBuilder sb, Map<String,String> args) {
+    Set<Entry<String,String>> entries = args.entrySet();
+    for (Entry<String,String> e: entries) {
+      String key = e.getKey();
+      String value = e.getValue();
+      sb.append(" ");
+      if (value != null) {
+        sb.append(key);
+        sb.append("=");
+        sb.append(value);
+      } else {
+        sb.append(key);
+      }
+    }
   }
 }

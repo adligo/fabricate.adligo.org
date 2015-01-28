@@ -30,8 +30,7 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS = 
       "The following Fabricate Home should have only these jars;";
   
-  private static final String V = "-v";
-  private static final String VERSION = "--version";
+
   private static final String VERSION_X = "Version <X/>.";
   
   private SystemEnMessages() {
@@ -90,16 +89,6 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getVersionX() {
     return VERSION_X;
-  }
-
-  @Override
-  public String getClaVersionShort() {
-    return V;
-  }
-
-  @Override
-  public String getClaVersion() {
-    return VERSION;
   }
 
   @Override

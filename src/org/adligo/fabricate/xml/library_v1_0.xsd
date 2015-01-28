@@ -2,8 +2,13 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
 	targetNamespace="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd" 
 	xmlns:tns="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd" 
+	xmlns:cns="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd"
 	elementFormDefault="qualified">
 
+	<import schemaLocation="common_v1_0.xsd" 
+		namespace="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd">
+	</import>
+	
     <complexType name="library_type">
     	<sequence>
     		<element name="dependencies" type="tns:dependencies_type"></element>
@@ -138,7 +143,7 @@ the default value is ALL, common platforms are JSE, JME and GWT.</documentation>
     		</documentation>
     	</annotation>
     	<sequence>
-    		<element name="arg" type="tns:ide_argument_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="args" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
     	</sequence>
     	<attribute name="name" type="string"></attribute>
     </complexType>

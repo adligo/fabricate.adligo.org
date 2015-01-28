@@ -12,13 +12,7 @@ CLASSPATH=$FABRICATE_HOME/lib/commons-logging-1.2.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpcore-4.3.2.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpclient-4.3.5.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/@FABRICATE_NAME@.jar 
-
-DEBUG=debug
 ARGS="$@"
-if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
-		echo "ARGS;" 
-		echo "$ARGS"
-fi
 
 # @diagram_sync on 1/26/2014 with Overview.seq
 # main(String [] args) setup Fabricate args.
@@ -39,14 +33,10 @@ if [ "Message" == "${LINES[0]}" ]; then
 	done
 	exit 0
 else
-	if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
-		echo "ARGS_FROM_SETUP;" 
-		echo "$ARGS_FROM_SETUP"
-	fi
 	
 	# @diagram_sync on 1/26/2014 with Overview.seq
 	# main(String [] args) setup Fabricate opts.
-	OPTIONS_FROM_SETUP=`java -cp $CLASSPATH org.adligo.fabricate.FabricateOptsSetup "$@" $ARGS_FROM_SETUP`
+	OPTIONS_FROM_SETUP=`java -cp $CLASSPATH org.adligo.fabricate.FabricateOptsSetup $ARGS_FROM_SETUP`
 	if [ -z "$OPTIONS_FROM_SETUP" ]; then
     	exit 1
 	fi
@@ -60,13 +50,10 @@ else
 		done
 		exit 0
 	else
-		if [ "${ARGS#*$DEBUG}" != "$ARGS" ]; then
-			echo OPTIONS_FROM_SETUP are $OPTIONS_FROM_SETUP
-		fi
 		
 		# @diagram_sync on 1/26/2014 with Overview.seq
 		# main(String [] args) run Fabricate.
-		java  $OPTIONS_FROM_SETUP org.adligo.fabricate.Fabricate "$@" $ARGS_FROM_SETUP 
+		java  $OPTIONS_FROM_SETUP org.adligo.fabricate.Fabricate $ARGS_FROM_SETUP 
 	fi
 fi
 

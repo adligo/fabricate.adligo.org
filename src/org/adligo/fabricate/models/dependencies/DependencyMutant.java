@@ -1,10 +1,73 @@
 package org.adligo.fabricate.models.dependencies;
 
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class DependencyMutant implements I_Dependency {
+  public static List<I_Dependency> convert(List<DependencyType> types) {
+    List<I_Dependency> toRet = new ArrayList<I_Dependency>();
+    if (types != null) {
+      for (DependencyType type: types) {
+        if (type != null) {
+          toRet.add(new DependencyMutant(type));
+        }
+      }
+    }
+    return toRet;
+  }
   
+  public static boolean equals(I_Dependency me, Object other) {
+    if (me == other)
+      return true;
+    if (other == null)
+      return false;
+    
+    I_Dependency obj = (I_Dependency) other;
+    if (me.getArtifact() == null) {
+      if (obj.getArtifact() != null)
+        return false;
+    } else if (!me.getArtifact().equals(obj.getArtifact()))
+      return false;
+    if (me.getFileName() == null) {
+      if (obj.getFileName() != null)
+        return false;
+    } else if (!me.getFileName().equals(obj.getFileName()))
+      return false;
+    if (me.getGroup() == null) {
+      if (obj.getGroup() != null)
+        return false;
+    } else if (!me.getGroup().equals(obj.getGroup()))
+      return false;
+    if (me.getType() == null) {
+      if (obj.getType()  != null)
+        return false;
+    } else if (!me.getType().equals(obj.getType()))
+      return false;
+    if (me.getVersion() == null) {
+      if (obj.getVersion() != null)
+        return false;
+    } else if (!me.getVersion().equals(obj.getVersion()))
+      return false;
+    return true;
+  }
+  
+  public static int hashCode(I_Dependency dep) {
+    final int prime = 31;
+    int result = 1;
+    String artifact = dep.getArtifact();
+    result = prime * result + ((artifact == null) ? 0 : artifact.hashCode());
+    String fileName = dep.getFileName();
+    result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+    String group = dep.getGroup();
+    result = prime * result + ((group == null) ? 0 : group.hashCode());
+    String type = dep.getType();
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    String version = dep.getVersion();
+    result = prime * result + ((version == null) ? 0 : version.hashCode());
+    return result;
+  }
   private String artifact_;
   private List<IdeMutant> children_ = new ArrayList<IdeMutant>(); 
   private boolean extract_;
@@ -26,6 +89,24 @@ public class DependencyMutant implements I_Dependency {
     type_ = other.getType();
     version_ = other.getVersion();
   }
+  
+  @SuppressWarnings("boxing")
+  public DependencyMutant(DependencyType other) {
+    artifact_ = other.getArtifact();
+    setChildren(IdeMutant.convert(other.getIde()));
+    extract_ = other.isExtract();
+    fileName_ = other.getFileName();
+    group_ = other.getGroup();
+    platform_ = other.getPlatform();
+    type_ = other.getType();
+    version_ = other.getVersion();
+  }
+  
+  @Override
+  public boolean equals(Object obj) {
+     return equals(this, obj);
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getArtifact()
    */
@@ -82,6 +163,12 @@ public class DependencyMutant implements I_Dependency {
   public String getVersion() {
     return version_;
   }
+  
+  @Override
+  public int hashCode() {
+    return hashCode(this);
+  }
+  
   public void setArtifact(String artifact) {
     this.artifact_ = artifact;
   }
@@ -122,6 +209,5 @@ public class DependencyMutant implements I_Dependency {
   @Override
   public int size() {
     return children_.size();
-  } 
-  
+  }  
 }

@@ -1,6 +1,7 @@
 package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -88,7 +89,7 @@ public class RepositoryDownloader {
     }
   }
   
-  public boolean find(DependencyType dep) {
+  public boolean find(I_Dependency dep) {
     String filePath = pathBuilder_.getPath(dep);
     return new File(filePath).exists();
    }
@@ -99,7 +100,7 @@ public class RepositoryDownloader {
    * @throws ExecutionException for a not standard purpose
    * of the download and sha check sum attempts failed
    */
-  public void findOrDownloadAndMd5(DependencyType dep) throws IOException {
+  public void findOrDownloadAndMd5(I_Dependency dep) throws IOException {
     if (find(dep)) {
       return;
     }

@@ -1,7 +1,7 @@
 package org.adligo.fabricate.external;
 
 import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
+import org.adligo.fabricate.models.dependencies.I_Dependency;
 
 /**
  * This can be used with a local or remote repository
@@ -22,12 +22,12 @@ public class DefaultRepositoryPathBuilder implements I_RepositoryPathBuilder {
   
   
   @Override
-  public String getPath(DependencyType dependency) {
+  public String getPath(I_Dependency dependency) {
     return getFolderPath(dependency) + seperator_ +
         getFileName(dependency);
   }
 
-  public String getFileName(DependencyType dependency) {
+  public String getFileName(I_Dependency dependency) {
     String fileName  = dependency.getFileName();
     if (!StringUtils.isEmpty(fileName)) {
       return fileName;
@@ -41,12 +41,12 @@ public class DefaultRepositoryPathBuilder implements I_RepositoryPathBuilder {
     return artifact + DASH + version + "." + type;
   }
   
-  public String getFolderPath(DependencyType dependency) {
+  public String getFolderPath(I_Dependency dependency) {
     String group = dependency.getGroup();
     return repo_ + group;
   }
   
-  public String getUrl(DependencyType dependency) {
+  public String getUrl(I_Dependency dependency) {
     String type = dependency.getType();
     if (type == null) {
       type = "jar";
@@ -55,7 +55,7 @@ public class DefaultRepositoryPathBuilder implements I_RepositoryPathBuilder {
     return getFolderUrl(dependency) + seperator_ + getFileName(dependency);
   }
 
-  public String getFolderUrl(DependencyType dependency) {
+  public String getFolderUrl(I_Dependency dependency) {
     String group = dependency.getGroup();
     String artifact = dependency.getArtifact();
     String version = dependency.getVersion();

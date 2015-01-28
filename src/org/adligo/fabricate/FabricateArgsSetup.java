@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.FabConstantsDiscovery;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.PatternFileMatcher;
+import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
@@ -24,6 +25,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+/**
+ * This class parses the command line arguments manipulates them 
+ * and then passes them to the FabricateOptsSetup, so it must either
+ * print a error message or the command line arguments 
+ * for FabricateOptsSetup.
+ * 
+ * @author scott
+ *
+ */
 public class FabricateArgsSetup {
   private static JavaCalls JAVA_CALLS = JavaCalls.INSTANCE;
   
@@ -48,7 +58,6 @@ public class FabricateArgsSetup {
 	  manifestParser_ = manifestParser;
 	  files_ = sys.getFileIO();
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
-    sys.setDebug(argMap.containsKey("debug"));
     
 	  language_ = sys.getDefaultLanguage();
 	  country_ = sys.getDefaultCountry();
@@ -66,7 +75,11 @@ public class FabricateArgsSetup {
 	  } catch (IOException x) {
 	    constants_ = FabricateEnConstants.INSTANCE;
 	  }
-	 
+	  I_CommandLineConstants clConstants = constants_.getCommandLineConstants();
+	  argMap = CommandLineArgs.normalizeArgs(argMap, clConstants);
+	  String logAlias = clConstants.getLog(true);
+	  sys.setDebug(argMap.containsKey(logAlias));
+    
     long now = sys_.getCurrentTime();
     
     String homeDir = null;
@@ -108,7 +121,7 @@ public class FabricateArgsSetup {
         //@diagram_sync on 1/26/2014 with Overview.seq
         displayFabricateJarManifestVersionAndEnd(fabricateJar);
       } else {
-        sendArgsToScript(now, versionNbrString);
+        sendArgsToScript(argMap, now, versionNbrString);
       }
     }
    
@@ -121,18 +134,19 @@ public class FabricateArgsSetup {
    * @return
    */
   public boolean hasDisplayVersionArg(Map<String, String> argMap) {
-    I_SystemMessages messages = constants_.getSystemMessages();
-    if ( argMap.containsKey(messages.getClaVersion())) {
-      return true;
-    }
-    if (argMap.containsKey(messages.getClaVersionShort())) {
+    I_CommandLineConstants messages = constants_.getCommandLineConstants();
+    String version = messages.getVersion(true);
+    if ( argMap.containsKey(version)) {
       return true;
     }
     return false;
   }
 
-  public void sendArgsToScript(long now, String javaVersionNbr) {
-    ThreadLocalPrintStream.println("start=" + now + " java=" + javaVersionNbr );
+  public void sendArgsToScript(Map<String,String> args, long now, String javaVersionNbr) {
+    StringBuilder sb = new StringBuilder();
+    CommandLineArgs.appendArgs(sb, args);
+    ThreadLocalPrintStream.println("start=" + now + " java=" + javaVersionNbr +
+        sb.toString());
   }
 
   /**
@@ -147,12 +161,7 @@ public class FabricateArgsSetup {
       String message = sysMessages.getExceptionNoFabricateHomeSet();
       ThreadLocalPrintStream.println(message);
       return null;
-    } else {
-      if (sys_.isDebug()) {
-        ThreadLocalPrintStream.println("FABRICATE_HOME is;");
-        ThreadLocalPrintStream.println(fabricateHome);
-      }
-    }
+    } 
     File fabricateJar = null;
     boolean hasLogging = false;
     boolean hasHttpCore = false;

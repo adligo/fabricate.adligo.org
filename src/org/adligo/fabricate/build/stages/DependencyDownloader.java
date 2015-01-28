@@ -1,12 +1,12 @@
 package org.adligo.fabricate.build.stages;
 
-import org.adligo.fabricate.common.DependencyTypeHelper;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.RepositoryDownloader;
+import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
@@ -36,9 +36,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DependencyDownloader extends OldBaseConcurrentStage implements I_FabStage {
    private ConcurrentLinkedQueue<NamedProject> projects_;
-  private ConcurrentLinkedQueue<DependencyTypeHelper> deps_ = new ConcurrentLinkedQueue<DependencyTypeHelper>();
+  private ConcurrentLinkedQueue<Dependency> deps_ = new ConcurrentLinkedQueue<Dependency>();
   private CopyOnWriteArraySet<String> libsDone_ = new CopyOnWriteArraySet<String>();
-  private CopyOnWriteArraySet<DependencyTypeHelper> uniqueDeps_ = new CopyOnWriteArraySet<DependencyTypeHelper>();
+  private CopyOnWriteArraySet<Dependency> uniqueDeps_ = new CopyOnWriteArraySet<Dependency>();
   
 
   private int projectCount_;
@@ -104,7 +104,7 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
           }
           List<DependencyType> depsList = deps.getDependency();
           for (DependencyType dep: depsList) {
-            uniqueDeps_.add(new DependencyTypeHelper(dep));
+            uniqueDeps_.add(new Dependency(dep));
           }
         }
         finishedProjectCount_.incrementAndGet();
@@ -117,15 +117,14 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
         }
       }
       DefaultRepositoryPathBuilder pathBuilder = new DefaultRepositoryPathBuilder("", "");
-      DependencyTypeHelper dep = deps_.poll();
+      Dependency dep = deps_.poll();
       while (dep != null) {
-        DependencyType depType = dep.getDependencyType();
         if (log_.isLogEnabled(DependencyDownloader.class)) {
-          log_.println("Checking dependency " + pathBuilder.getFileName(depType));
+          log_.println("Checking dependency " + pathBuilder.getFileName(dep));
         }
-        String type = depType.getType();
+        String type = dep.getType();
         if (type == null || !"ide".equalsIgnoreCase(type)) {
-          repoDown_.findOrDownloadAndMd5(depType);
+          repoDown_.findOrDownloadAndMd5(dep);
         }
         finishedDepCount_.incrementAndGet();
         dep = deps_.poll();
@@ -198,7 +197,7 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
       }
       List<DependencyType> deps = depsType.getDependency();
       for (DependencyType dep: deps) {
-        uniqueDeps_.add(new DependencyTypeHelper(dep));
+        uniqueDeps_.add(new Dependency(dep));
       }
     }
   }

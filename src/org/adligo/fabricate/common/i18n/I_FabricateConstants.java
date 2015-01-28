@@ -4,6 +4,7 @@ public interface I_FabricateConstants {
   public String getLanguage();
   public String getCountry();
   public boolean isLeftToRight();
+  public I_CommandLineConstants getCommandLineConstants();
   public I_FileMessages getFileMessages();
   public I_GitMessages getGitMessages();
   /**

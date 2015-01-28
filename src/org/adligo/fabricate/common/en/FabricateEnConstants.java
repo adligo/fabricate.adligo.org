@@ -1,17 +1,21 @@
 package org.adligo.fabricate.common.en;
 
+import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.i18n.I_GitMessages;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
-import java.util.Locale;
-
 public class FabricateEnConstants  implements I_FabricateConstants {
   public static final FabricateEnConstants INSTANCE = new FabricateEnConstants();
   
   private FabricateEnConstants() {
+  }
+  
+  @Override
+  public I_CommandLineConstants getCommandLineConstants() {
+    return CommandLineEnConstants.INSTANCE;
   }
   
   @Override
@@ -52,4 +56,5 @@ public class FabricateEnConstants  implements I_FabricateConstants {
   public String getCountry() {
     return "US";
   }
+
 }

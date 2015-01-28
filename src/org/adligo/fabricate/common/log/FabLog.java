@@ -49,15 +49,23 @@ public class FabLog implements I_FabLog {
   }
 
   private Map<String,Boolean> logSettings_ = new HashMap<String,Boolean>();
+  private boolean allOn_ = false;
   
-  public FabLog(Map<String,Boolean> logSettings) {
-    if (logSettings != null) {
-      logSettings_.putAll(logSettings);
+  public FabLog(Map<String,Boolean> logSettings, boolean allOn) {
+    if (allOn) {
+      allOn_ = allOn;
+    } else {
+      if (logSettings != null) {
+        logSettings_.putAll(logSettings);
+      }
     }
   }
   @SuppressWarnings("boxing")
   @Override
   public boolean isLogEnabled(Class<?> clazz) {
+    if (allOn_) {
+      return true;
+    }
     String className = clazz.getName();
     Boolean toRet = logSettings_.get(className);
     if (toRet != null) {

@@ -2,6 +2,19 @@ package org.adligo.fabricate.models.dependencies;
 
 import java.util.List;
 
+/**
+ * Represents a dependency which has been read
+ * from the xml file.  Implementation may be immutable
+ * or mutable.  Equals and hashCode are done performing the following fields;
+ * Artifact
+ * FileName
+ * Group
+ * Platform
+ * Type
+ * Version
+ * @author scott
+ *
+ */
 public interface I_Dependency {
   public I_Ide get(int child);
   

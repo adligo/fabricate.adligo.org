@@ -1,6 +1,6 @@
 package org.adligo.fabricate.external;
 
-import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
+import org.adligo.fabricate.models.dependencies.I_Dependency;
 /**
  * Implementations of this class create the full path name
  * of a directory under the local_repository
@@ -12,7 +12,7 @@ import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
  *
  */
 public interface I_RepositoryPathBuilder {
-  public String getUrl(DependencyType dependency);
-  public String getPath(DependencyType dependency);
-  public String getFolderPath(DependencyType dependency);
+  public String getUrl(I_Dependency dependency);
+  public String getPath(I_Dependency dependency);
+  public String getFolderPath(I_Dependency dependency);
 }

@@ -1,6 +1,6 @@
 package org.adligo.fabricate.common;
 
-import org.adligo.fabricate.models.common.I_KeyValue;
+import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.project.I_Project;
 
 import java.io.IOException;
@@ -47,5 +47,5 @@ public interface I_FabTask {
    * fabricate.xml/command/params and project.xml/command/params.
    * @throws IOException
    */
-  public void execute(I_KeyValue taskParams) throws IOException;
+  public void execute(I_Parameter taskParams) throws IOException;
 }

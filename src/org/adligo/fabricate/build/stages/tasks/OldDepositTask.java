@@ -6,7 +6,7 @@ import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.depot.DepotEntryMutant;
 import org.adligo.fabricate.depot.I_Depot;
-import org.adligo.fabricate.models.common.I_KeyValue;
+import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.project.I_Project;
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class OldDepositTask extends OldBaseTask implements I_FabTask {
   }
 
   @Override
-  public void execute(I_KeyValue taskParams) throws IOException {
+  public void execute(I_Parameter taskParams) throws IOException {
     // TODO Auto-generated method stub
     
   }

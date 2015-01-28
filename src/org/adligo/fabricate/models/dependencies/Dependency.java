@@ -1,10 +1,23 @@
 package org.adligo.fabricate.models.dependencies;
 
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Dependency implements I_Dependency {
+  public static List<I_Dependency> convert(List<DependencyType> types) {
+    List<I_Dependency> toRet = new ArrayList<I_Dependency>();
+    if (types != null) {
+      for (DependencyType type: types) {
+        if (type != null) {
+          toRet.add(new Dependency(type));
+        }
+      }
+    }
+    return toRet;
+  }
   
   private String artifact_;
   private List<I_Ide> children_; 
@@ -14,8 +27,6 @@ public class Dependency implements I_Dependency {
   private String platform_;
   private String type_;
   private String version_;
-  
-  public Dependency() {}
   
   public Dependency(I_Dependency other) {
     artifact_ = other.getArtifact();
@@ -27,6 +38,24 @@ public class Dependency implements I_Dependency {
     type_ = other.getType();
     version_ = other.getVersion();
   }
+  
+  @SuppressWarnings("boxing")
+  public Dependency(DependencyType other) {
+    artifact_ = other.getArtifact();
+    setChildren(IdeMutant.convert(other.getIde()));
+    extract_ = other.isExtract();
+    fileName_ = other.getFileName();
+    group_ = other.getGroup();
+    platform_ = other.getPlatform();
+    type_ = other.getType();
+    version_ = other.getVersion();
+  }
+  
+  @Override
+  public boolean equals(Object o) {
+    return DependencyMutant.equals(this, o);
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getArtifact()
    */
@@ -83,9 +112,12 @@ public class Dependency implements I_Dependency {
   public String getVersion() {
     return version_;
   }
-  public void setArtifact(String artifact) {
-    this.artifact_ = artifact;
+  
+  @Override
+  public int hashCode() {
+    return DependencyMutant.hashCode(this);
   }
+  
   private void setChildren(List<I_Ide> children) {
     List<Ide> toAdd = new ArrayList<Ide>();
     if (children != null) {

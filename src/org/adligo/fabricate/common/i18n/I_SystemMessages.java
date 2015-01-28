@@ -30,14 +30,4 @@ public interface I_SystemMessages {
   public String getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars();
   
   public String getVersionX();
-  /**
-   * CLA means Command Line Argument
-   * @return
-   */
-  public String getClaVersionShort();
-  /**
-   * CLA means Command Line Argument
-   * @return
-   */
-  public String getClaVersion();
 }

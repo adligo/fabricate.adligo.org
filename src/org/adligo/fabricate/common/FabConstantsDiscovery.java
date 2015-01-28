@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.i18n.I_GitMessages;
@@ -77,6 +78,12 @@ public class FabConstantsDiscovery implements I_FabricateConstants {
   @Override
   public String getCountry() {
     return country_;
+  }
+
+  @Override
+  public I_CommandLineConstants getCommandLineConstants() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

@@ -9,7 +9,7 @@ import org.adligo.fabricate.external.JarParam;
 import org.adligo.fabricate.external.JavaCParam;
 import org.adligo.fabricate.external.JavaJar;
 import org.adligo.fabricate.external.ManifestParser;
-import org.adligo.fabricate.models.common.I_KeyValue;
+import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.project.I_Project;
 
 import java.io.File;
@@ -200,7 +200,7 @@ public class OldJarTask extends OldBaseTask implements I_FabTask {
   }
 
   @Override
-  public void execute(I_KeyValue taskParams) throws IOException {
+  public void execute(I_Parameter taskParams) throws IOException {
     // TODO Auto-generated method stub
     
   }

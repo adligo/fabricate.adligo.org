@@ -18,7 +18,8 @@ import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.external.I_RepositoryPathBuilder;
 import org.adligo.fabricate.external.JavaCParam;
 import org.adligo.fabricate.external.JavaCompiler;
-import org.adligo.fabricate.models.common.I_KeyValue;
+import org.adligo.fabricate.models.common.I_Parameter;
+import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.project.I_Project;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
@@ -155,7 +156,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
     List<DependencyType> deps = depsType.getDependency();
     if (deps != null) {
       for (DependencyType dep: deps) {
-        String jarFilePath = repositoryPathBuilder_.getPath(dep);
+        String jarFilePath = repositoryPathBuilder_.getPath(new Dependency(dep));
         if (sb.length() >= 1) {
           sb.append(File.pathSeparator);
         }
@@ -219,7 +220,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
   }
 
   @Override
-  public void execute(I_KeyValue taskParams) throws IOException {
+  public void execute(I_Parameter taskParams) throws IOException {
     // TODO Auto-generated method stub
     
   }
