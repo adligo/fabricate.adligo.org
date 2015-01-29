@@ -7,9 +7,10 @@ import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.depot.I_Depot;
-import org.adligo.fabricate.external.GitCalls;
-import org.adligo.fabricate.external.ManifestParser;
+import org.adligo.fabricate.git.GitCalls;
+import org.adligo.fabricate.java.ManifestParser;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.File;
@@ -55,7 +56,8 @@ public class CompileJarAndDeposit extends OldBaseConcurrentStage implements I_Fa
         }
         waitForDependentProjectsToFinish(p);
         compile.execute();
-        String projectVersion = GitCalls.describe(compile.getProjectPath());
+        //TODO this system should be passed not created
+        String projectVersion = GitCalls.describe(new FabSystem(), compile.getProjectPath());
         OldJarTask jar = new OldJarTask();
         if ( !params.containsKey(ManifestParser.SPECIFICATION_VERSION)) {
           params.put(ManifestParser.SPECIFICATION_VERSION, projectVersion);

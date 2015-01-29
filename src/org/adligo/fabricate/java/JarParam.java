@@ -1,4 +1,4 @@
-package org.adligo.fabricate.external;
+package org.adligo.fabricate.java;
 
 public enum JarParam {
   c("-c"),t("-t"),x("-x"),u("-u"),//no verbose it looks for the JavaJar log to be on

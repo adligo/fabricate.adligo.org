@@ -4,9 +4,9 @@ import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.system.I_FabSystem;
-import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
-import org.adligo.fabricate.external.RepositoryDownloader;
 import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.repository.DefaultRepositoryPathBuilder;
+import org.adligo.fabricate.repository.RepositoryDownloader;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
@@ -124,7 +124,7 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
         }
         String type = dep.getType();
         if (type == null || !"ide".equalsIgnoreCase(type)) {
-          repoDown_.findOrDownloadAndMd5(dep);
+          repoDown_.findOrDownloadAndVerify(dep);
         }
         finishedDepCount_.incrementAndGet();
         dep = deps_.poll();

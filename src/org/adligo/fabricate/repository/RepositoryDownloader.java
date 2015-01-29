@@ -1,4 +1,4 @@
-package org.adligo.fabricate.external;
+package org.adligo.fabricate.repository;
 
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
@@ -100,7 +100,7 @@ public class RepositoryDownloader {
    * @throws ExecutionException for a not standard purpose
    * of the download and sha check sum attempts failed
    */
-  public void findOrDownloadAndMd5(I_Dependency dep) throws IOException {
+  public void findOrDownloadAndVerify(I_Dependency dep) throws IOException {
     if (find(dep)) {
       return;
     }

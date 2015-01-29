@@ -1,13 +1,19 @@
-package org.adligo.fabricate.external;
+package org.adligo.fabricate.java;
+
+import org.adligo.fabricate.common.system.Executor;
+import org.adligo.fabricate.common.system.I_ExecutionResult;
+import org.adligo.fabricate.common.system.I_Executor;
+import org.adligo.fabricate.common.system.I_FabSystem;
 
 import java.io.File;
 import java.io.IOException;
 
 public class JavaCalls {
-  private static Executor EXE = Executor.INSTANCE;
-  public static final JavaCalls INSTANCE = new JavaCalls();
+  private final I_FabSystem sys_;
   
-  private JavaCalls() {}
+  public JavaCalls(I_FabSystem sys) {
+    sys_ = sys;
+  }
   
   public String getJavaHome() throws IllegalStateException {
     String home = System.getenv("JAVA_HOME");
@@ -18,8 +24,10 @@ public class JavaCalls {
   }
   
   public String getJavaVersion(String homeDir, String seperator) throws IOException, InterruptedException {
-    String version = EXE.executeProcess(new File("."), 
+    I_Executor exe = sys_.getExecutor();
+    I_ExecutionResult er = exe.executeProcess(".", 
         homeDir + seperator + "bin" + seperator + "java", "-version");
+    String version = er.getOutput();
     
     char [] chars = version.toCharArray();
     StringBuilder sb = new StringBuilder();

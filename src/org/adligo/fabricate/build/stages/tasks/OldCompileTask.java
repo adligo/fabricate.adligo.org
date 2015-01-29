@@ -14,13 +14,13 @@ import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.depot.I_Depot;
-import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
-import org.adligo.fabricate.external.I_RepositoryPathBuilder;
-import org.adligo.fabricate.external.JavaCParam;
-import org.adligo.fabricate.external.JavaCompiler;
+import org.adligo.fabricate.java.JavaCParam;
+import org.adligo.fabricate.java.JavaCompiler;
 import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.project.I_Project;
+import org.adligo.fabricate.repository.DefaultRepositoryPathBuilder;
+import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
@@ -180,7 +180,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
   
   
   public void execute() throws IOException {
-      JavaCompiler jcc = new JavaCompiler(ctx_, dir_, whichJavaC_);
+      JavaCompiler jcc = new JavaCompiler(sys_, dir_, whichJavaC_);
       
       Map<JavaCParam,String> params = new HashMap<JavaCParam, String>();
       params.putAll(compilerParams_);

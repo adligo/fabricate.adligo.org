@@ -1,4 +1,4 @@
-package org.adligo.fabricate.external;
+package org.adligo.fabricate.java;
 
 import java.util.Collections;
 import java.util.HashMap;

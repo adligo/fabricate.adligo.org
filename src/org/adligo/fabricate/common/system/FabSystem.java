@@ -7,8 +7,13 @@ import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.DeferredLog;
+import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -19,6 +24,12 @@ public class FabSystem implements I_FabSystem {
   private I_FabFileIO fileIO_ = new FabFileIO(log_);
   private I_FabXmlFileIO xmlFileIO_ = new FabXmlFileIO();
   private Map<String,String> argMap = new TreeMap<String,String>();
+  private Executor executor_;
+  
+  public FabSystem() {
+    FabLog log = new FabLog(Collections.emptyMap(), true);
+    log_.setDelegate(log);
+  }
   
   @Override
   public I_FabLog getLog() {
@@ -95,5 +106,33 @@ public class FabSystem implements I_FabSystem {
     if (argsIn != null) {
       argMap.putAll(argsIn);
     }
+  }
+
+  @Override
+  public synchronized I_Executor getExecutor() {
+    if (executor_ == null) {
+      executor_ = new Executor(this);
+    }
+    return executor_;
+  }
+
+  @Override
+  public ProcessBuilderWrapper newProcessBuilder(String[] args) {
+    return new ProcessBuilderWrapper(new ProcessBuilder(args));
+  }
+
+  @Override
+  public Thread currentThread() {
+    return Thread.currentThread();
+  }
+
+  @Override
+  public ByteArrayOutputStream newByteArrayOutputStream() {
+    return new ByteArrayOutputStream();
+  }
+
+  @Override
+  public BufferedInputStream newBufferedInputStream(InputStream in) {
+    return new BufferedInputStream(in);
   }
 }

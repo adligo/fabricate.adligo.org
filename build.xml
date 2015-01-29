@@ -24,7 +24,10 @@
 	         classpathref="lib.path.ref"
 	  	/>
 	    <echo> compile complete </echo>
-	    <java classname="org.adligo.fabricate.external.AntHelper" classpath="build/classes" >
+		<copy todir="build/classes/org/adligo/fabricate/xml" >
+		    <fileset dir="src/org/adligo/fabricate/xml" includes="**/*.xsd" />
+		</copy>
+	    <java classname="org.adligo.fabricate.git.AntHelper" classpath="build/classes" >
 	       <arg value="build"/>
 	    </java>
 	    <loadproperties>
@@ -61,9 +64,7 @@
   	  		        token="@IMPL_VERSION@" value="${compile_time}"/>
   	  	<replace file="build/MANIFEST.MF" 
   	  		        token="@IMPL_VENDOR@" value="Adligo Inc."/>
-  	  	<copy todir="build/classes/org/adligo/fabricate/xml">
-		    <fileset dir="src/org/adligo/fabricate/xml" excludes="**/*.java" />
-		</copy>
+  	  	
   	  	<jar destfile="build/${fabricate_name}/${fabricate_name}/lib/${fabricate_name}.jar" 
   	  	    manifest="build/MANIFEST.MF">
 		    <fileset dir="build/classes"

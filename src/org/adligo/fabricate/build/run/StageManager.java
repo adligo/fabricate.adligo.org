@@ -4,7 +4,6 @@ import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
-import org.adligo.fabricate.common.SystemHelper;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
@@ -13,6 +12,7 @@ import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.common.system.ComputerInfoDiscovery;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.JavaType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectGroupsType;
@@ -43,6 +43,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
 public class StageManager {
+  private final I_FabSystem sys_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
   private List<StageType> stages_ = new ArrayList<StageType>();
@@ -62,15 +63,11 @@ public class StageManager {
   private String failureProject_;
   
   public StageManager(I_FabSystem sys) {
+    sys_ = sys;
     files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
   }
   
-  public StageManager(I_FabFileIO files, I_FabXmlFileIO xmlFiles) {
-    files_ = files;
-    xmlFiles_ = xmlFiles;
-  }
- 
   public void setup(FabricateXmlDiscovery xmlDiscovery, Map<String,String> args) {
     File file = new File(".");
     initalDirPath = file.getAbsolutePath();
@@ -245,9 +242,9 @@ public class StageManager {
     
     
     result.setName(fabricatePath.getName());
-    String os = SystemHelper.getOperatingSystem();
+    String os = ComputerInfoDiscovery.getOperatingSystem();
     result.setOs(os);
-    String osVersion = SystemHelper.getOperatingSystemVersion(os);
+    String osVersion = ComputerInfoDiscovery.getOperatingSystemVersion(sys_, os);
     result.setOsVersion(osVersion);
     if (failureException_ == null) {
       result.setSuccessful(true);
@@ -269,17 +266,17 @@ public class StageManager {
       result.setFailure(failure);
       
     }
-    String hostName = SystemHelper.getHostname();
+    String hostName = ComputerInfoDiscovery.getHostname();
     
     MachineInfoType machine = new MachineInfoType();
     machine.setHostname(hostName);
     machine.setProcessors("" + Runtime.getRuntime().availableProcessors());
     FabricateHelper fh = new FabricateHelper(fab_);
     machine.setRam(fh.getXms());
-    String[] cpu = SystemHelper.getCpuInfo(os);
+    String[] cpu = ComputerInfoDiscovery.getCpuInfo(sys_, os);
     machine.setCpuName(cpu[0]);
     machine.setCpuSpeed(cpu[1]);
-    String jv = SystemHelper.getJavaVersion();
+    String jv = ComputerInfoDiscovery.getJavaVersion();
     machine.setJavaVersion(jv);
     result.setMachine(machine);
     

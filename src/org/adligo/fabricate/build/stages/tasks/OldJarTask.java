@@ -4,11 +4,12 @@ import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
+import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.external.JarParam;
-import org.adligo.fabricate.external.JavaCParam;
-import org.adligo.fabricate.external.JavaJar;
-import org.adligo.fabricate.external.ManifestParser;
+import org.adligo.fabricate.java.JarParam;
+import org.adligo.fabricate.java.JavaCParam;
+import org.adligo.fabricate.java.JavaJar;
+import org.adligo.fabricate.java.ManifestParser;
 import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.project.I_Project;
 
@@ -102,7 +103,8 @@ public class OldJarTask extends OldBaseTask implements I_FabTask {
   }
 
   public void execute() throws IOException {
-    JavaJar jj = new JavaJar(ctx_, dir_, whichJar_);
+    //TODO this system should be passed
+    JavaJar jj = new JavaJar(new FabSystem(), dir_, whichJar_);
     List<String> params = new ArrayList<String>();
     
     params.add(fileName_);

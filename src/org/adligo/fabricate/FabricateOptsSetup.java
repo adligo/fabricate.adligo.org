@@ -14,10 +14,10 @@ import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.external.DefaultRepositoryPathBuilder;
-import org.adligo.fabricate.external.RepositoryDownloader;
-import org.adligo.fabricate.external.RepositoryDownloaderFactory;
 import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.repository.DefaultRepositoryPathBuilder;
+import org.adligo.fabricate.repository.RepositoryDownloader;
+import org.adligo.fabricate.repository.RepositoryDownloaderFactory;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
@@ -86,6 +86,7 @@ public class FabricateOptsSetup {
     
     try {
       fab_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
+      FabSystemSetup.setupWithDelayedLog(sys_, fab_);
       FabricateHelper fh = new FabricateHelper(fab_);
      
       //@diagram_sync on 1/26/2014 with Overview.seq
@@ -166,16 +167,15 @@ public class FabricateOptsSetup {
       if (depTypes != null) {
         LocalRepositoryHelper lrh = new LocalRepositoryHelper();
         String localRepository = lrh.getRepositoryPath(fab_);
-        RunContextMutant fcm = new RunContextMutant();
-        fcm.setLocalRepositoryPath(localRepository);
+        
         //leave logs empty here
         List<String> repos = deps.getRemoteRepository();
-        RepositoryDownloader rdl = factory_.create(fcm.getLog(), fcm.getLocalRepositoryPath());
+        RepositoryDownloader rdl = factory_.create(sys_.getLog(), localRepository);
         rdl.setPathBuilder(new DefaultRepositoryPathBuilder(localRepository, File.separator));
         rdl.setRepositories(repos);
        
         for (DependencyType dep: depTypes) {
-          rdl.findOrDownloadAndMd5(new Dependency(dep));
+          rdl.findOrDownloadAndVerify(new Dependency(dep));
         }
       }
     }

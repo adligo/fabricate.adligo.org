@@ -1,4 +1,4 @@
-package org.adligo.fabricate.external;
+package org.adligo.fabricate.repository;
 
 import org.adligo.fabricate.common.log.I_FabLog;
 

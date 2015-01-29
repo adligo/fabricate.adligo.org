@@ -1,6 +1,10 @@
-package org.adligo.fabricate.external;
+package org.adligo.fabricate.java;
 
 import org.adligo.fabricate.common.I_RunContext;
+import org.adligo.fabricate.common.system.Executor;
+import org.adligo.fabricate.common.system.I_ExecutionResult;
+import org.adligo.fabricate.common.system.I_Executor;
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
 
 import java.io.File;
@@ -10,13 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 public class JavaCompiler {
-  private static Executor EXE = Executor.INSTANCE;
-  private I_RunContext ctx_;
+  private I_FabSystem sys_;
   private String inDir_;
   private String javaC_;
   
-  public JavaCompiler(I_RunContext ctx, String inDir, String javaC) {
-    ctx_ = ctx;
+  public JavaCompiler(I_FabSystem sys, String inDir, String javaC) {
+    sys_ = sys;
     inDir_ = inDir;
     javaC_ = javaC;
     
@@ -25,10 +28,10 @@ public class JavaCompiler {
 
     List<String> args = buildArgs(javaC_, params);
     args.addAll(javaFiles);
-    try {
-      EXE.executeProcess(new File(inDir_), args.toArray(new String[args.size()]));
-    } catch (InterruptedException e) {
-      throw new IOException(e);
+    I_Executor exe = sys_.getExecutor();
+    I_ExecutionResult er = exe.executeProcess(inDir_, args.toArray(new String[args.size()]));
+    if (er.getExitCode() != 0) {
+      throw new IOException(er.getOutput());
     }
   }
   

@@ -1,15 +1,16 @@
-package org.adligo.fabricate.external;
+package org.adligo.fabricate.git;
 
-import org.adligo.fabricate.external.GitCalls;
+import org.adligo.fabricate.common.system.FabSystem;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * This class helps the ant/build.xml
+ * This class helps the fabricate.adligo.org/build.xml
  * determine the tag from git for 
- * this project's build.
+ * this project's build.  This is used when
+ * fabricate is developed so that
  * 
  * @author scott
  *
@@ -22,11 +23,12 @@ public class AntHelper {
 	  }
 	  String dir = args[0];
 		try {
-      if (!GitCalls.check()) {
+		  FabSystem sys = new FabSystem();
+      if (!GitCalls.check(sys.getExecutor())) {
         System.out.println("Git does NOT appear to be installed, please install it.");
         return;
       }
-      String desc = GitCalls.describe();
+      String desc = GitCalls.describe(sys);
       File file = new File(dir + File.separator + "version.properties");
       System.out.println("writing " + file.getAbsolutePath());
       FileOutputStream fos = new FileOutputStream(file);
@@ -36,7 +38,6 @@ public class AntHelper {
           System.lineSeparator()).getBytes("UTF-8"));
       fos.close();
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     

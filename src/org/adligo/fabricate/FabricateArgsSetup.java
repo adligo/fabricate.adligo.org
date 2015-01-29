@@ -11,8 +11,8 @@ import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.I_FabSystem;
-import org.adligo.fabricate.external.JavaCalls;
-import org.adligo.fabricate.external.ManifestParser;
+import org.adligo.fabricate.java.JavaCalls;
+import org.adligo.fabricate.java.ManifestParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.util.Locale;
  *
  */
 public class FabricateArgsSetup {
-  private static JavaCalls JAVA_CALLS = JavaCalls.INSTANCE;
+  private static JavaCalls JAVA_CALLS;
   
   private ManifestParser manifestParser_;
   private final I_FabSystem sys_;
@@ -47,7 +47,9 @@ public class FabricateArgsSetup {
    */
 	@SuppressWarnings("unused")
   public static void main(String [] args) {
-	  new FabricateArgsSetup(args, new FabSystem(), new ManifestParser());
+	  FabSystem sys = new FabSystem();
+	  JAVA_CALLS = new JavaCalls(sys);
+	  new FabricateArgsSetup(args, sys, new ManifestParser());
 	}
 	
 	public FabricateArgsSetup(String [] args, FabSystem sys, ManifestParser manifestParser) {

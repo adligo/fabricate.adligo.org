@@ -1,7 +1,11 @@
-package org.adligo.fabricate.external;
+package org.adligo.fabricate.java;
 
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.Executor;
+import org.adligo.fabricate.common.system.I_ExecutionResult;
+import org.adligo.fabricate.common.system.I_Executor;
+import org.adligo.fabricate.common.system.I_FabSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,15 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JavaJar {
-  private static Executor EXE = Executor.INSTANCE;
-  private I_RunContext ctx_;
+  private I_FabSystem sys_;
   private I_FabLog log_;
   private String inDir_;
   private String javaC_;
   
-  public JavaJar(I_RunContext ctx, String inDir, String javaC) {
-    ctx_ = ctx;
-    log_ = ctx.getLog();
+  public JavaJar(I_FabSystem sys, String inDir, String javaC) {
+    sys_ = sys;
+    log_ = sys.getLog();
     inDir_ = inDir;
     javaC_ = javaC;
     
@@ -34,19 +37,20 @@ public class JavaJar {
       all.add(c_arg);
       all.add(".");
     }
-    try {
-      String [] allArray = all.toArray(new String[all.size()]);
-      if (log_.isLogEnabled(JavaJar.class)) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < allArray.length; i++) {
-          sb.append(allArray[i]);
-          sb.append(" ");
-        }
-        log_.println("executing " + sb.toString());
+    
+    String [] allArray = all.toArray(new String[all.size()]);
+    if (log_.isLogEnabled(JavaJar.class)) {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < allArray.length; i++) {
+        sb.append(allArray[i]);
+        sb.append(" ");
       }
-      EXE.executeProcess(new File(inDir_), allArray);
-    } catch (InterruptedException e) {
-      throw new IOException(e);
+      log_.println("executing " + sb.toString());
+    }
+    I_Executor exe = sys_.getExecutor();
+    I_ExecutionResult er = exe.executeProcess(inDir_, allArray);
+    if (er.getExitCode() != 0) {
+      throw new IOException(er.getOutput());
     }
   }
   

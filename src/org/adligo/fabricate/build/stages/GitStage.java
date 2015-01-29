@@ -4,8 +4,9 @@ import org.adligo.fabricate.common.ConsolePasswordDialog;
 import org.adligo.fabricate.common.FabRunType;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
+import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.external.GitCalls;
+import org.adligo.fabricate.git.GitCalls;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.GitServerType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
@@ -82,8 +83,8 @@ public class GitStage extends OldBaseConcurrentStage implements I_FabStage {
       
       String gitCommand = ctx_.getArgValue("git");
       
-      GitCalls gc = new GitCalls();
-      gc.setCtx(ctx_);
+      //TODO this system should be passed
+      GitCalls gc = new GitCalls(new FabSystem());
       gc.setHostname(gitHost_);
       gc.setRemotePath(gitPath_);
       gc.setUser(gitUser_);

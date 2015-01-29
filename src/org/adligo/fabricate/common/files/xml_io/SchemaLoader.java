@@ -8,7 +8,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -91,18 +90,35 @@ public class SchemaLoader implements LSResourceResolver {
     try {
       load(new Source[] {
           //order may be important here
-          new StreamSource(SchemaLoader.class.getResourceAsStream(COMMON_SCHEMA_V1_0)),
-          new StreamSource(SchemaLoader.class.getResourceAsStream(DEPOT_SCHEMA_V1_0)),
-          new StreamSource(SchemaLoader.class.getResourceAsStream(DEV_SCHEMA_V1_0)),
-          new StreamSource(SchemaLoader.class.getResourceAsStream(LIB_SCHEMA_V1_0)),
-          new StreamSource(SchemaLoader.class.getResourceAsStream(FAB_SCHEMA_V1_0)),
-          new StreamSource(SchemaLoader.class.getResourceAsStream(PROJECT_SCHEMA_V1_0)),
-          new StreamSource(SchemaLoader.class.getResourceAsStream(RESULT_SCHEMA_V1_0))
+          new StreamSource(getInputStream(COMMON_SCHEMA_V1_0)),
+          new StreamSource(getInputStream(DEPOT_SCHEMA_V1_0)),
+          new StreamSource(getInputStream(DEV_SCHEMA_V1_0)),
+          new StreamSource(getInputStream(LIB_SCHEMA_V1_0)),
+          new StreamSource(getInputStream(FAB_SCHEMA_V1_0)),
+          new StreamSource(getInputStream(PROJECT_SCHEMA_V1_0)),
+          new StreamSource(getInputStream(RESULT_SCHEMA_V1_0))
       });
     } catch (IOException x) {
       x.printStackTrace();
     }
     
+  }
+  /**
+   * @param path
+   * @return
+   * @throws IOException
+   */
+  private InputStream getInputStream(String path) throws IOException {
+    InputStream in = SchemaLoader.class.getResourceAsStream(path);
+    if (in == null) {
+      // I actually consider this a bug implementation of Class.getResourceAsStream, 
+      // which could easily do this dumb double check for us.
+      in = SchemaLoader.class.getClassLoader().getResourceAsStream(path);
+      if (in == null) {
+        throw new IOException(path);
+      }
+    }
+    return in;
   }
   private void load(Source [] sources) throws IOException {
    InputStream in  = null;

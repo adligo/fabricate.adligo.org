@@ -1,17 +1,14 @@
-package org.adligo.fabricate.common;
+package org.adligo.fabricate.common.system;
 
 import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.external.Executor;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SystemHelper {
-  private static Executor EXE = Executor.INSTANCE;
+public class ComputerInfoDiscovery {
   private static final Set<String> OS_WITH_SYSCTL = getOsWithSysCtl();
   
   public static Set<String> getOsWithSysCtl() {
@@ -41,10 +38,12 @@ public class SystemHelper {
     return System.getProperty("java.version", "unknown");
   }
   
-  public static String getOperatingSystemVersion(String os) {
+  public static String getOperatingSystemVersion(I_FabSystem sys, String os) {
     if ("mac".equals(os)) {
       try {
-        String ver = EXE.executeProcess(new File("."), "sw_vers", "-productVersion");
+        I_Executor exe = sys.getExecutor();
+        I_ExecutionResult er = exe.executeProcess(".", "sw_vers", "-productVersion");
+        String ver = er.getOutput();
         if (ver != null) {
           return ver;
         }
@@ -74,11 +73,12 @@ public class SystemHelper {
     return host;
   }
   
-  public static String[] getCpuInfo(String os) {
+  public static String[] getCpuInfo(I_FabSystem sys, String os) {
     try {
       if (OS_WITH_SYSCTL.contains(os)) {
-       
-        String cpu = EXE.executeProcess(new File("."), "sysctl", "-a");
+        I_Executor exe = sys.getExecutor();
+        I_ExecutionResult er = exe.executeProcess(".", "sysctl", "-a"); 
+        String cpu = er.getOutput();
         int index = cpu.indexOf(".cpu.brand_string") + 18;
         if (index != -1) {
           char[] cpuChars = cpu.toCharArray();
