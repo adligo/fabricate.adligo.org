@@ -9,8 +9,11 @@ public interface I_FileMessages {
   public String getExcludes();
   public String getIncludes();
   public String getMatchedTheFollowingPattern();
+  public String getSubmittingAHttpGetToTheFollowingUrlReturnedAnInvalidStatusCodeX();
   public String getTheFollowingFile();
+  public String getThereWasAProblemCreatingTheFollowingFile();
   public String getTheWildCardCharacterIsNotAllowedInMiddleFileName();
   public String getTheWildCardCharacterIsNotAllowedAtTheLeftOrMiddleDirectoryPath();
   public String getFileMatchingPatternsMayNotBeEmpty();
+  
 }

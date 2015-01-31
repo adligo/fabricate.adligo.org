@@ -10,7 +10,6 @@ import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Collections;
@@ -19,14 +18,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class FabSystem implements I_FabSystem {
+  
+  private final DeferredLog log_ = new DeferredLog();
+  private final I_FabFileIO fileIO_;
+  private final I_FabXmlFileIO xmlFileIO_ = new FabXmlFileIO();
+  private final Map<String,String> argMap = new TreeMap<String,String>();
   private I_FabricateConstants constants_ = FabricateEnConstants.INSTANCE;
-  private DeferredLog log_ = new DeferredLog();
-  private I_FabFileIO fileIO_ = new FabFileIO(log_);
-  private I_FabXmlFileIO xmlFileIO_ = new FabXmlFileIO();
-  private Map<String,String> argMap = new TreeMap<String,String>();
   private Executor executor_;
   
   public FabSystem() {
+    fileIO_ = new FabFileIO(this);
     FabLog log = new FabLog(Collections.emptyMap(), true);
     log_.setDelegate(log);
   }

@@ -16,7 +16,6 @@
 		    <fileset dir="lib" includes="*.jar"/>
 		 </path>
 	    <javac srcdir="src"
-	         classpath="lib/httpclient-4.3.4.jar;lib/httpcore-4.3.2.jar"
 	         destdir="build/classes"
 	         debug="on"
 	         source="1.8"
@@ -27,7 +26,11 @@
 		<copy todir="build/classes/org/adligo/fabricate/xml" >
 		    <fileset dir="src/org/adligo/fabricate/xml" includes="**/*.xsd" />
 		</copy>
-	    <java classname="org.adligo.fabricate.git.AntHelper" classpath="build/classes" >
+		<path id="all.path.ref">
+		    <fileset dir="lib" includes="*.jar"/>
+			<pathelement location="build/classes" />
+		 </path>
+	    <java classname="org.adligo.fabricate.git.AntHelper" classpathref="all.path.ref">
 	       <arg value="build"/>
 	    </java>
 	    <loadproperties>

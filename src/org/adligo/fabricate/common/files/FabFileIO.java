@@ -1,23 +1,61 @@
 package org.adligo.fabricate.common.files;
 
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.log.I_FabLogSystem;
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
+import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FabFileIO implements I_FabFileIO {
+  /**
+   * This should be thread safe since the following class has
+   * the annotation @ThreadSafe; <br/>
+   * @see org.apache.http.impl.client.CloseableHttpClient
+   */
+  private final CloseableHttpClient httpClient_;
+  private final I_FabLogSystem sys_;
   private final I_FabLog log_;
+  private final I_FabricateConstants constants_;
   
-  public FabFileIO(I_FabLog log) {
-    log_ = log;
+  public FabFileIO(I_FabLogSystem sys) {
+    httpClient_ = HttpClients.createDefault();
+    sys_ = sys;
+    constants_ = sys.getConstants();
+    log_ = sys.getLog();
+  }
+
+  public FabFileIO(I_FabLogSystem sys, CloseableHttpClient httpClient) {
+    httpClient_ = httpClient;
+    sys_ = sys;
+    constants_ = sys.getConstants();
+    log_ = sys.getLog();
   }
   
   @Override
@@ -25,8 +63,12 @@ public class FabFileIO implements I_FabFileIO {
     File file = new File(filePath);
     if (file.createNewFile()) {
       return file;
+    } else {
+      I_FileMessages messages = constants_.getFileMessages();
+      String message = messages.getThereWasAProblemCreatingTheFollowingFile();
+      throw new IOException(message + sys_.lineSeperator() +
+          filePath);
     }
-    return null;
   }
   
   @Override
@@ -34,6 +76,93 @@ public class FabFileIO implements I_FabFileIO {
     new File(path).deleteOnExit();
   }
 
+  @Override
+  public void downloadFile(String url, String file) throws IOException {
+    HttpEntity entity = null;
+    try {
+      CloseableHttpResponse resp = httpClient_.execute(new HttpGet(url));
+      entity = resp.getEntity();
+      StatusLine status = resp.getStatusLine();
+      int statusCode = status.getStatusCode();
+      if (statusCode >= 300) {
+        I_FileMessages messages = constants_.getFileMessages();
+        String message = messages.getSubmittingAHttpGetToTheFollowingUrlReturnedAnInvalidStatusCodeX();
+        message = message.replace("<X/>", "" + statusCode);
+        throw new IOException(message + sys_.lineSeperator() +
+            url);
+      }
+    } catch (ClientProtocolException x) {
+      throw new IOException(x);
+    }
+    InputStream in = entity.getContent();
+    
+    try {
+      writeFile(in, newFileOutputStream(file), 16 * 1024);
+    } catch (FileNotFoundException x) {
+      throw new IOException(x);
+    }
+  }
+
+  public FileOutputStream newFileOutputStream(String file) throws IOException, FileNotFoundException {
+    return new FileOutputStream(file);
+  }
+  
+  /**
+   * https://thomaswabner.wordpress.com/2007/10/09/fast-stream-copy-using-javanio-channels/
+   * @param in
+   * @param fos
+   * @throws IOException
+   */
+  public void writeFile(InputStream in, FileOutputStream fos, int bufferSize) throws IOException {
+    try {
+      ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
+      ReadableByteChannel inputChannel = Channels.newChannel(in);
+      WritableByteChannel outputChannel = fos.getChannel();
+      
+      writeFile(buffer, inputChannel, outputChannel);
+    } catch (IOException x) {
+      throw x;
+    } finally {
+      close(fos);
+      close(in);
+    }
+  }
+
+  public void writeFile(ByteBuffer buffer, ReadableByteChannel inputChannel,
+      WritableByteChannel outputChannel) throws IOException {
+    try {
+      while (inputChannel.read(buffer) != -1) {
+        // prepare the buffer to be drained
+        buffer.flip();
+        // write to the channel, may block
+        outputChannel.write(buffer);
+        // If partial transfer, shift remainder down
+        // If buffer is empty, same as doing clear()
+        buffer.compact();
+      }
+      // EOF will leave buffer in fill state
+      buffer.flip();
+      // make sure the buffer is fully drained.
+      while (buffer.hasRemaining()) {
+        outputChannel.write(buffer);
+      }
+    } catch (IOException x) {
+      throw x;
+    } finally {
+      close(inputChannel);
+      close(outputChannel);
+    }
+  }
+
+  public void close(Closeable inputChannel) {
+    if (inputChannel != null) {
+      try {
+        inputChannel.close();
+      } catch (IOException x) {
+        //do nothing
+      }
+    }
+  }
   
   @Override
   public boolean exists(String filePath) {
@@ -91,7 +220,40 @@ public class FabFileIO implements I_FabFileIO {
           }
       });
   }
-  
+  public String readFile(String path) throws IOException {
+    return readFile(newBufferedReader(path));
+  }
+  public String readFile(BufferedReader reader) throws IOException {
+    StringBuilder sb = new StringBuilder();
+    try {
+      boolean lastLine = false;
+      for (String line; (line = reader.readLine()) != null;) {
+        if (lastLine) {
+          sb.append(sys_.lineSeperator());
+        } else {
+          lastLine = true;
+        }
+        sb.append(line);
+      }
+      sb.append(sys_.lineSeperator());
+    } catch (IOException x) {
+      throw x;
+    } finally {
+      if (reader != null) {
+        try {
+          reader.close();
+        } catch (IOException x) {
+          //do nothing
+        }
+      }
+    }
+    return sb.toString();
+  }
+
+  public BufferedReader newBufferedReader(String path) throws IOException {
+    BufferedReader rdr = Files.newBufferedReader(Paths.get(path));
+    return rdr;
+  }
   /**
    * 
    * @param path
@@ -182,4 +344,5 @@ public class FabFileIO implements I_FabFileIO {
     return new File(filePath);
   }
 
+  
 }

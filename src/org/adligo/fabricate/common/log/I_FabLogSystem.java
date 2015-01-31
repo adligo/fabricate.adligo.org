@@ -28,4 +28,10 @@ public interface I_FabLogSystem {
    * @return
    */
   public I_FabricateConstants getConstants();
+  /**
+   * Stub for System.lineSeperator()
+   * This method should be preferred over the one in I_FabricateConstants.
+   * @return
+   */
+  public String lineSeperator();
 }

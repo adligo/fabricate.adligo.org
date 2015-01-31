@@ -8,6 +8,7 @@ import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.models.project.I_Project;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
@@ -40,7 +41,7 @@ public class RunContextMutant implements I_RunContext {
   private String fabricateVersion_;
   private I_Project projectContext_;
   private ConcurrentHashMap<String, Object> memory_ = new ConcurrentHashMap<String, Object>();
-  private I_FabFileIO fileIO_ = new FabFileIO(new DeferredLog());
+  private I_FabFileIO fileIO_ = new FabFileIO(new FabSystem());
   private I_FabXmlFileIO xmlFileIO_ = new FabXmlFileIO();
   
   public RunContextMutant() {

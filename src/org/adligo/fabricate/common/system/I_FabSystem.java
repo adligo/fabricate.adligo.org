@@ -4,7 +4,6 @@ import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.log.I_FabLogSystem;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
@@ -18,13 +17,7 @@ public interface I_FabSystem extends I_FabLogSystem {
    * @return
    */
   public String getenv(String key);
-  
-  /**
-   * Stub for System.lineSeperator()
-   * This method should be preferred over the one in I_FabricateConstants.
-   * @return
-   */
-  public String lineSeperator();
+
   
   /**
    * backed by the CommandLineArgs map.
