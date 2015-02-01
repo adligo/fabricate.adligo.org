@@ -11,6 +11,7 @@ public interface I_FileMessages {
   public String getMatchedTheFollowingPattern();
   public String getSubmittingAHttpGetToTheFollowingUrlReturnedAnInvalidStatusCodeX();
   public String getTheFollowingFile();
+  public String getThereWasAProblemCreatingTheFollowingDirectory();
   public String getThereWasAProblemCreatingTheFollowingFile();
   public String getTheWildCardCharacterIsNotAllowedInMiddleFileName();
   public String getTheWildCardCharacterIsNotAllowedAtTheLeftOrMiddleDirectoryPath();

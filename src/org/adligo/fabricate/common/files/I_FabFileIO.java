@@ -1,7 +1,9 @@
 package org.adligo.fabricate.common.files;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -111,6 +113,25 @@ public interface I_FabFileIO {
    */
   public void removeRecursive(String path) throws IOException;
   
+  
+  /**
+   * This method writes a file out to disk from a input stream, using NIO 
+   * (ByteBuffer, ReadableByteChannel, FileChannel).  It uses
+   * a default buffer size of 16Kb.
+   * @param in
+   * @param fos
+   * @throws IOException
+   */
+  public void writeFile(InputStream in, FileOutputStream fos) throws IOException;
+  /**
+   * This method writes a file out to disk from a input stream, using NIO 
+   * (ByteBuffer, ReadableByteChannel, FileChannel).
+   * @param in
+   * @param fos
+   * @throws IOException
+   */
+  public void writeFile(InputStream in, FileOutputStream fos, int bufferSize) 
+      throws IOException;
   
 
   /**

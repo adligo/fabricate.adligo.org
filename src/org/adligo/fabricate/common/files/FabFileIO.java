@@ -13,15 +13,16 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.FileVisitResult;
@@ -30,10 +31,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
+import javax.xml.bind.DatatypeConverter;
 
 public class FabFileIO implements I_FabFileIO {
+  public static final String MD5 = "MD5";
   /**
    * This should be thread safe since the following class has
    * the annotation @ThreadSafe; <br/>
@@ -58,6 +68,11 @@ public class FabFileIO implements I_FabFileIO {
     log_ = sys.getLog();
   }
   
+
+  public String calculateMd5(String file) throws IOException {
+    return decode(file, MD5);
+  }
+  
   @Override
   public File create(String filePath) throws IOException {
     File file = new File(filePath);
@@ -68,6 +83,20 @@ public class FabFileIO implements I_FabFileIO {
       String message = messages.getThereWasAProblemCreatingTheFollowingFile();
       throw new IOException(message + sys_.lineSeperator() +
           filePath);
+    }
+  }
+  
+  public String decode(String file, String algorithm) throws IOException {
+    byte[] b = readAllBytes(file);
+    try {
+      MessageDigest md = MessageDigest.getInstance(algorithm);
+      md.reset();
+      md.update(b);
+      byte[] hash = md.digest();
+      String actual = DatatypeConverter.printHexBinary(hash);
+      return actual.toLowerCase();
+    } catch (NoSuchAlgorithmException x) {
+      throw new IOException(x);
     }
   }
   
@@ -97,7 +126,7 @@ public class FabFileIO implements I_FabFileIO {
     InputStream in = entity.getContent();
     
     try {
-      writeFile(in, newFileOutputStream(file), 16 * 1024);
+      writeFile(in, newFileOutputStream(file));
     } catch (FileNotFoundException x) {
       throw new IOException(x);
     }
@@ -107,29 +136,98 @@ public class FabFileIO implements I_FabFileIO {
     return new FileOutputStream(file);
   }
   
+  public void unzip(String file, String toDir) throws IOException {
+    if (toDir.lastIndexOf(getNameSeparator()) != toDir.length() - 1) {
+      toDir = toDir + getNameSeparator();
+    }
+    File dir = new File(toDir);
+    Path dirPath = dir.toPath();
+    if (Files.notExists(dirPath)) {
+      mkdirs(toDir);
+    }
+    ZipFile zip = new ZipFile(file);
+    String dirAbs = dir.getAbsolutePath();
+    extractZipFile(dirAbs, zip, DefaultIOCloseTracker.INSTANCE);
+  }
+
   /**
+   * @param dir a absolute path
+   * @param zip a file which is going to be extracted,
+   * by inspecting the entries.
+   * @throws FileNotFoundException
+   * @throws IOException
+   */
+  public void extractZipFile(String dir, ZipFile zip, I_IOCloseTracker tracker) throws FileNotFoundException, IOException {
+    Enumeration<? extends ZipEntry> zipEntries = zip.entries();
+    
+    try {
+      while(zipEntries.hasMoreElements()){
+        ZipEntry ze = zipEntries.nextElement();
+        String name = ze.getName();
+        
+        if (name.indexOf("/") == 0) {
+          name = name.substring(1, name.length());
+        }
+        name = dir + getNameSeparator() + name.replaceAll("/", getNameSeparator());
+        if (ze.isDirectory()) {
+          mkdirs(name);
+        } else {
+          InputStream is =  zip.getInputStream(ze);
+          FileOutputStream fos = new FileOutputStream(name);
+          writeFile(is, fos, 1024);
+        }
+      }
+    } catch (IOException x) {
+      throw x;
+    } finally {
+      IOException ce = close(zip);
+      if (ce != null) {
+        tracker.onCloseException(ce);
+      }
+    }
+  }
+  /**
+   * This method writes a file out to disk from a input stream, using NIO 
+   * (ByteBuffer, ReadableByteChannel, FileChannel).  It uses
+   * a default buffer size of 16Kb.
+   * @param in
+   * @param fos
+   * @throws IOException
+   */
+  public void writeFile(InputStream in, FileOutputStream fos) throws IOException {
+    writeFile(in, fos, 16 * 1024);
+  }
+  /**
+   * This method writes a file out to disk from a input stream, using NIO 
+   * (ByteBuffer, ReadableByteChannel, FileChannel).
+   * Thanks for this;
    * https://thomaswabner.wordpress.com/2007/10/09/fast-stream-copy-using-javanio-channels/
    * @param in
    * @param fos
    * @throws IOException
    */
   public void writeFile(InputStream in, FileOutputStream fos, int bufferSize) throws IOException {
+    writeFileWithCloseTracker(in,fos, bufferSize, DefaultIOCloseTracker.INSTANCE);
+  }
+
+  public void writeFileWithCloseTracker(InputStream in, FileOutputStream fos, int bufferSize,
+      I_IOCloseTracker tracker) throws IOException {
     try {
       ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
       ReadableByteChannel inputChannel = Channels.newChannel(in);
       WritableByteChannel outputChannel = fos.getChannel();
       
-      writeFile(buffer, inputChannel, outputChannel);
+      writeFileWithBuffers(buffer, inputChannel, outputChannel, tracker);
     } catch (IOException x) {
       throw x;
     } finally {
-      close(fos);
-      close(in);
+      closeIOPair(in, fos,tracker);
     }
   }
-
-  public void writeFile(ByteBuffer buffer, ReadableByteChannel inputChannel,
-      WritableByteChannel outputChannel) throws IOException {
+  
+  public void writeFileWithBuffers(ByteBuffer buffer, 
+      ReadableByteChannel inputChannel, WritableByteChannel outputChannel, 
+      I_IOCloseTracker tracker) throws IOException {
     try {
       while (inputChannel.read(buffer) != -1) {
         // prepare the buffer to be drained
@@ -149,18 +247,49 @@ public class FabFileIO implements I_FabFileIO {
     } catch (IOException x) {
       throw x;
     } finally {
-      close(inputChannel);
-      close(outputChannel);
+      closeIOPair(inputChannel, outputChannel,tracker);
     }
   }
 
-  public void close(Closeable inputChannel) {
-    if (inputChannel != null) {
+
+  public byte[] readAllBytes(String file) throws IOException {
+    return Files.readAllBytes(Paths.get(new File(file).toURI()));
+  }
+
+  
+  
+  /**
+   * This method closes the Closeable
+   * if it is NOT null, and then 
+   * returns the IOException if it was caught.
+   * @param inputChannel
+   * @return a null IOException when everything 
+   * runs smoothly, or the IOException that was caught.
+   * NOTE, this IOExcepion is almost always ignored by the caller,
+   * since there isn't a good way to recover from a IOException
+   * thrown from a close method.  The main reason for 
+   * returning it is testing of this method.
+   */
+  public IOException close(Closeable closeable) {
+    if (closeable != null) {
       try {
-        inputChannel.close();
+        closeable.close();
       } catch (IOException x) {
-        //do nothing
+        return x;
       }
+    }
+    return null;
+  }
+  
+
+  public void closeIOPair(Closeable in, Closeable out, I_IOCloseTracker tracker) {
+    IOException inEx = close(in);
+    if (inEx != null) {
+      tracker.onCloseException(inEx);
+    }
+    IOException outEx = close(out);
+    if (outEx != null) {
+      tracker.onCloseException(outEx);
     }
   }
   
@@ -220,9 +349,11 @@ public class FabFileIO implements I_FabFileIO {
           }
       });
   }
+  @Override
   public String readFile(String path) throws IOException {
     return readFile(newBufferedReader(path));
   }
+  
   public String readFile(BufferedReader reader) throws IOException {
     StringBuilder sb = new StringBuilder();
     try {
