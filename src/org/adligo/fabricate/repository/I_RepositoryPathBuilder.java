@@ -1,5 +1,6 @@
 package org.adligo.fabricate.repository;
 
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 /**
  * Implementations of this class create the full path name
@@ -12,7 +13,13 @@ import org.adligo.fabricate.models.dependencies.I_Dependency;
  *
  */
 public interface I_RepositoryPathBuilder {
-  public String getUrl(I_Dependency dependency);
-  public String getPath(I_Dependency dependency);
+  public String getArtifactPath(I_Dependency dependency);
+  public String getArtifactUrl(I_Dependency dependency);
+  
+  public String getExtractPath(I_Dependency dependency, I_FabricateConstants constants);
+  
+  public String getMd5Path(I_Dependency dependency);
+  public String getMd5Url(I_Dependency dependency);
+  
   public String getFolderPath(I_Dependency dependency);
 }

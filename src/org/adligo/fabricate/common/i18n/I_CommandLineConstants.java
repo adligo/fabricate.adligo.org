@@ -61,6 +61,22 @@ public interface I_CommandLineConstants {
    *    fab cmd="encrypt" password="secretPassword"<br/>
    */
   public String getCommand();
+  
+  /**
+   * This argument instructs Fabricate to confirm the 
+   * local repository integrity.  For the first few versions
+   * of Fabricate this will include; <br/>
+   * 1) Verifying the md5 files contents
+   * against the artifacts md5 check sum.
+   * 2) Verifying the extracted artifacts directories
+   * when compressed into a new zip file match the md5.
+   * 
+   * In far future versions of Fabricate this may 
+   * also run some sort of virus scanning or other checks.
+   * @param alias
+   * @return
+   */
+  public String getConfirmRepositoryIntegrity(boolean alias);
   /**
    * This argument instructs Fabricate to use the parent directory of the 
    * project group directory (where fabricate.xml was found) as the projects

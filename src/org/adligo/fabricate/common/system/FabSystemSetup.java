@@ -4,7 +4,6 @@ import org.adligo.fabricate.common.FabConstantsDiscovery;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
-import org.adligo.fabricate.common.log.DelayedLog;
 import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingType;
@@ -31,7 +30,7 @@ public class FabSystemSetup {
     return logSets;
   }
   
-  public static void setupWithDelayedLog(FabSystem sys, String [] args) {
+  public static void setup(FabSystem sys, String [] args) {
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
     
     String language = sys.getDefaultLanguage();
@@ -55,24 +54,13 @@ public class FabSystemSetup {
     argMap = CommandLineArgs.normalizeArgs(argMap, clConstants);
     String logAlias = clConstants.getLog(true);
     boolean debug = argMap.containsKey(logAlias);
-    DelayedLog log = new DelayedLog(Collections.emptyMap(), debug);
+    FabLog log = new FabLog(Collections.emptyMap(), debug);
     sys.setLog(log);
     sys.setConstants(constants);
     sys.setArgs(argMap);
   }
   
-  public static void setupWithDelayedLog(FabSystem sys, FabricateType fabricate) {
-    I_FabricateConstants constants = sys.getConstants();
-    I_CommandLineConstants clConstants = constants.getCommandLineConstants();
-    boolean debug = sys.hasArg(clConstants.getLog(true));
-    
-    Map<String, Boolean> logSets = getSettings(fabricate);
-    DelayedLog log = new DelayedLog(logSets, debug);
-    sys.setLog(log);
-    sys.setConstants(constants);
-  }
-  
-  public static void setupWithRegularLog(FabSystem sys, FabricateType fabricate) {
+  public static void setup(FabSystem sys, FabricateType fabricate) {
     I_FabricateConstants constants = sys.getConstants();
     I_CommandLineConstants clConstants = constants.getCommandLineConstants();
     boolean debug = sys.hasArg(clConstants.getLog(true));

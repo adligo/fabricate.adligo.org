@@ -8,6 +8,9 @@ import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class FabricateEnConstants  implements I_FabricateConstants {
+  private static final String EN = "en";
+  private static final String US = "US";
+  private static final String EXTRACT = "extract";
   public static final FabricateEnConstants INSTANCE = new FabricateEnConstants();
   
   private FabricateEnConstants() {
@@ -49,12 +52,17 @@ public class FabricateEnConstants  implements I_FabricateConstants {
 
   @Override
   public String getLanguage() {
-    return "en";
+    return EN;
   }
   
   @Override
   public String getCountry() {
-    return "US";
+    return US;
+  }
+
+  @Override
+  public String getExtractDirName() {
+    return EXTRACT;
   }
 
 }

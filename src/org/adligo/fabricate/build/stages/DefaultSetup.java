@@ -23,7 +23,7 @@ import org.adligo.fabricate.depot.DepotManager;
 import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.git.GitCalls;
 import org.adligo.fabricate.java.JavaJar;
-import org.adligo.fabricate.repository.RepositoryDownloader;
+import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingType;
@@ -214,7 +214,7 @@ public class DefaultSetup implements I_FabSetupStage {
     
   //alpha ordered default offs
     checkDefaultLog(GitCalls.class, false, settings);
-    checkDefaultLog(RepositoryDownloader.class, false, settings);
+    checkDefaultLog(RepositoryManager.class, false, settings);
     //JavaJar true can cause the jar process to hang?
     log_ = sys_.getLog();
     fcm.setLog(log_);

@@ -5,8 +5,7 @@ import org.adligo.fabricate.common.files.PatternFileMatcher;
 import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
-import org.adligo.fabricate.common.log.DeferredLog;
-import org.adligo.fabricate.common.log.DelayedLog;
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
@@ -37,7 +36,7 @@ public class FabricateArgsSetup {
   
   private ManifestParser manifestParser_;
   private final I_FabSystem sys_;
-  private DelayedLog log_;
+  private I_FabLog log_;
   private final I_FabFileIO files_;
   private final I_FabricateConstants constants_;
   
@@ -56,8 +55,8 @@ public class FabricateArgsSetup {
 	  sys_ = sys;
 	  manifestParser_ = manifestParser;
 	  files_ = sys.getFileIO();
-    FabSystemSetup.setupWithDelayedLog(sys, args);
-    log_ = (DelayedLog) ((DeferredLog) sys.getLog()).getDelegate();
+    FabSystemSetup.setup(sys, args);
+    log_ = sys.getLog();
     constants_ = sys.getConstants();
     long now = sys_.getCurrentTime();
     
@@ -65,11 +64,10 @@ public class FabricateArgsSetup {
     try {
        homeDir = JAVA_CALLS.getJavaHome();
     } catch (IllegalStateException x) {
-      log_.printlnNow(CommandLineArgs.END);
       I_SystemMessages sysMessages = constants_.getSystemMessages();
       String message = sysMessages.getExceptionNoJavaHomeSet();
-      log_.printlnNow(message);
-      log_.render();
+      log_.println(message);
+      log_.println(CommandLineArgs.END);
       return;
     }
     String versionNbrString = null;
@@ -77,22 +75,22 @@ public class FabricateArgsSetup {
       versionNbrString = JAVA_CALLS.getJavaVersion(homeDir, files_.getNameSeparator());
       double versionDouble = JAVA_CALLS.getJavaMajorVersion(versionNbrString);
       if (versionDouble < 1.7) {
-        log_.println(CommandLineArgs.END);
+        
         I_SystemMessages sysMessages = constants_.getSystemMessages();
         String message = sysMessages.getExceptionFabricateRequiresJava1_7OrGreater();
         log_.println(message);
-        log_.render();
+        log_.println(CommandLineArgs.END);
         return;
       }
     } catch (IOException | InterruptedException e) {
-      log_.println(CommandLineArgs.END);
+      
       I_SystemMessages sysMessages = constants_.getSystemMessages();
       String message = sysMessages.getExceptionExecutingJavaWithTheFollowingJavaHome();
       log_.println(
           message + constants_.getLineSeperator() +
           homeDir);
       log_.printTrace(e);
-      log_.render();
+      log_.println(CommandLineArgs.END);
       return;
     }
     File fabricateJar = locateFabricateJarAndVerifyFabricateHomeJars();
@@ -127,9 +125,8 @@ public class FabricateArgsSetup {
 
   public void sendArgsToScript(long now, String javaVersionNbr) {
 
-    log_.printlnNow("start=" + now + " java=" + javaVersionNbr +
+    log_.println(CommandLineArgs.LASTLINE + "start=" + now + " java=" + javaVersionNbr +
         sys_.toScriptArgs());
-    log_.render();
   }
 
   /**
@@ -139,11 +136,11 @@ public class FabricateArgsSetup {
   public File locateFabricateJarAndVerifyFabricateHomeJars() {
     String fabricateHome = sys_.getenv("FABRICATE_HOME");
     if (fabricateHome == null) {
-      log_.printlnNow(CommandLineArgs.END);
+      
       I_SystemMessages sysMessages = constants_.getSystemMessages();
       String message = sysMessages.getExceptionNoFabricateHomeSet();
-      log_.printlnNow(message);
-      log_.render();
+      log_.println(message);
+      log_.println(CommandLineArgs.END);
       return null;
     } 
     File fabricateJar = null;
@@ -156,6 +153,7 @@ public class FabricateArgsSetup {
       
       if (files.size() != 4) {
         logTheFollowingFabricateHomeLibShouldHaveTheseJars(fabricateHome);
+        log_.println(CommandLineArgs.END);
         return null;
       }
       
@@ -175,37 +173,37 @@ public class FabricateArgsSetup {
     } catch (IOException x) {
       logTheFollowingFabricateHomeLibShouldHaveTheseJars(fabricateHome);
       log_.printTrace(x);
-      log_.render();
+      log_.println(CommandLineArgs.END);
       return null;
     }
     if (fabricateJar == null) {
-      log_.println(CommandLineArgs.END);
+      
       I_SystemMessages sysMessages = constants_.getSystemMessages();
       String message = sysMessages.getExceptionNoFabricateJarInFabricateHomeLib();
       log_.println(message);
       log_.println(fabricateHome);
-      log_.render();
+      log_.println(CommandLineArgs.END);
       return null;
     }
     //NOTE fabricate_*.jar is checked for first
     if (!hasLogging || !hasHttpClient || !hasHttpCore) {
       logTheFollowingFabricateHomeLibShouldHaveTheseJars(fabricateHome);
+      log_.println(CommandLineArgs.END);
       return null;
     }
     return fabricateJar;
   }
 
   public void logTheFollowingFabricateHomeLibShouldHaveTheseJars(String fabricateHome) {
-    log_.printlnNow(CommandLineArgs.END);
+
     I_SystemMessages sysMessages = constants_.getSystemMessages();
     String message = sysMessages.getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars();
-    log_.printlnNow(message);
-    log_.printlnNow(fabricateHome);
-    log_.printlnNow("commons-logging-1.2.jar");
-    log_.printlnNow("fabricate_*.jar");
-    log_.printlnNow("httpclient-4.3.5.jar");
-    log_.printlnNow("httpcore-4.3.2.jar");
-    log_.render();
+    log_.println(message);
+    log_.println(fabricateHome);
+    log_.println("commons-logging-1.2.jar");
+    log_.println("fabricate_*.jar");
+    log_.println("httpclient-4.3.5.jar");
+    log_.println("httpcore-4.3.2.jar");
   }
   
   /**
@@ -234,10 +232,9 @@ public class FabricateArgsSetup {
     String compiledOnX = systemMessages.getCompiledOnX();
     compiledOnX = compiledOnX.replaceAll("<X/>", compileDate);
     
-    log_.printlnNow(CommandLineArgs.END);
-    log_.printlnNow(versionX);
-    log_.printlnNow(compiledOnX);
-    log_.render();
+    log_.println(versionX);
+    log_.println(compiledOnX);
+    log_.println(CommandLineArgs.END);
   }
 
   public I_FabricateConstants getConstants() {

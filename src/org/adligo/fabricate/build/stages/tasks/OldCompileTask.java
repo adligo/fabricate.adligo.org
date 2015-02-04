@@ -156,7 +156,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
     List<DependencyType> deps = depsType.getDependency();
     if (deps != null) {
       for (DependencyType dep: deps) {
-        String jarFilePath = repositoryPathBuilder_.getPath(new Dependency(dep));
+        String jarFilePath = repositoryPathBuilder_.getArtifactPath(new Dependency(dep));
         if (sb.length() >= 1) {
           sb.append(File.pathSeparator);
         }

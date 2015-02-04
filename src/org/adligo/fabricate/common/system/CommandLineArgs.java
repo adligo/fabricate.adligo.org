@@ -12,11 +12,24 @@ import java.util.TreeMap;
 public class CommandLineArgs {
   /**
    * This is printed out to the console 
+   * so that the script knows that the last
+   * line of one of the setup (args or opts)
+   * programs has completed.  This was added 
+   * for the fab shell (sh) script, which needed
+   * to read the output line by line while the 
+   * setup programs run so that the log will 
+   * show up correctly on the command line by 
+   * echoing to the terminals console while the
+   * setup programs run concurrently.
+   */ 
+  public static final String LASTLINE = "LASTLINE ";
+  /**
+   * This is printed out to the console 
    * so that the script knows there is a error
    * regardless of the language, so that it ends the
    * run of the script.
    */ 
-  public static final String END = "END";
+  public static final String END = LASTLINE + "END";
   /**
    * This is a optional command line argument which allows
    * the user of Fabricate to override the default locale of the JVM.

@@ -1,6 +1,8 @@
 package org.adligo.fabricate.repository;
 
+import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.apache.http.HttpEntity;
@@ -38,59 +40,29 @@ import javax.xml.bind.DatatypeConverter;
  * @author scott
  *
  */
-public class RepositoryDownloader {
+public class RepositoryManager {
   private static PrintStream OUT = System.out;
   private List<String> repositories_ = new ArrayList<String>();
+
+  private final I_FabLog log_;
+  private final I_FabFileIO fileIO_;
+  private final String localRepo_;
   
   private I_RepositoryPathBuilder pathBuilder_;
-  private I_FabLog log_;
-  private String localRepo_;
+  private int threads;
+
   
   @SuppressWarnings("boxing")
-  public RepositoryDownloader(I_FabLog log, String repositoryPath) {
-    log_ = log;
+  public RepositoryManager(I_FabSystem sys, String repositoryPath) {
+    log_ = sys.getLog();
+    fileIO_ = sys.getFileIO();
     localRepo_ = repositoryPath;
   }
   
-  
-  public void setPathBuilder(I_RepositoryPathBuilder pathBuilder) {
-    pathBuilder_ = pathBuilder;
-  }
-
-  public void setRepositories(List<String> repositories ) {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
-    for (String repo: repositories) {
-      final String repoUrl = repo;
-      HttpGet get = new HttpGet(repo);
-      try {
-        int status = httpClient.execute(get, new ResponseHandler<Integer>() {
-
-                  public Integer handleResponse(
-                          final HttpResponse response) throws ClientProtocolException, IOException {
-                    return response.getStatusLine().getStatusCode();
-                  }
-
-              });
-        if (status < 300) {
-          repositories_.add(repoUrl);
-        }
-      } catch (IOException e) {
-        //do nothing some server is down.
-      }
-      
-    }
-    try {
-      httpClient.close();
-    } catch (IOException e) {
-      //do nothing, what could you do close it again
-    }
-    if (repositories_.size() == 0) {
-      throw new RuntimeException("Unable to reach any remote repositories.");
-    }
-  }
+ 
   
   public boolean find(I_Dependency dep) {
-    String filePath = pathBuilder_.getPath(dep);
+    String filePath = pathBuilder_.getArtifactPath(dep);
     return new File(filePath).exists();
    }
   /**
@@ -112,8 +84,8 @@ public class RepositoryDownloader {
     for (String repo: threadRemoteRepos) {
       DefaultRepositoryPathBuilder remoteBuilder = 
           new DefaultRepositoryPathBuilder(repo, "/");
-      String url = remoteBuilder.getUrl(dep);
-      String filePath = pathBuilder_.getPath(dep);
+      String url = remoteBuilder.getArtifactUrl(dep);
+      String filePath = pathBuilder_.getArtifactPath(dep);
       String folderPath = pathBuilder_.getFolderPath(dep);
       new File(folderPath).mkdirs();
       
@@ -121,7 +93,7 @@ public class RepositoryDownloader {
       if (new File(filePath).exists()) {
         downloadedFile = true;
       } else {
-        if (log_.isLogEnabled(RepositoryDownloader.class)) {
+        if (log_.isLogEnabled(RepositoryManager.class)) {
           log_.println("Trying to download "  + System.lineSeparator() +
               "\t" + repo + System.lineSeparator() +
               "\t" + url.substring(repo.length(), url.length()) + System.lineSeparator() +
@@ -129,15 +101,14 @@ public class RepositoryDownloader {
               "\t" + filePath);
         }
         try {
-          
-          downloadFile(httpClient, url, filePath);
-          if (log_.isLogEnabled(RepositoryDownloader.class)) {
+          fileIO_.downloadFile(url, filePath);
+          if (log_.isLogEnabled(RepositoryManager.class)) {
             log_.println("Successful downloaded to " + System.lineSeparator() +
                 "\t" + filePath);
           }
           downloadedFile = true;
         } catch (IOException e) {
-          if (log_.isLogEnabled(RepositoryDownloader.class)) {
+          if (log_.isLogEnabled(RepositoryManager.class)) {
             log_.println("problem downloading " + url);
             e.printStackTrace();
           }
@@ -152,7 +123,7 @@ public class RepositoryDownloader {
           downloadedSha = true;
         } else {
           String md5Url = url + ".md5";
-          if (log_.isLogEnabled(RepositoryDownloader.class)) {
+          if (log_.isLogEnabled(RepositoryManager.class)) {
             log_.println("Trying to download "  + System.lineSeparator() +
                 "\t" + repo + System.lineSeparator() +
                 "\t" + md5Url.substring(repo.length(), md5Url.length()) + System.lineSeparator() +
@@ -160,14 +131,14 @@ public class RepositoryDownloader {
                 "\t" + md5File);
           }
           try {
-            downloadFile(httpClient, md5Url, md5File);
-            if (log_.isLogEnabled(RepositoryDownloader.class)) {
+            fileIO_.downloadFile(url, md5File);
+            if (log_.isLogEnabled(RepositoryManager.class)) {
               log_.println("Successful downloaded to " + System.lineSeparator() +
                   "\t" + md5File);
             }
             downloadedSha = true;
           } catch (IOException e) {
-            if (log_.isLogEnabled(RepositoryDownloader.class)) {
+            if (log_.isLogEnabled(RepositoryManager.class)) {
               log_.println("problem downloading " + url);
               e.printStackTrace();
             }
@@ -204,7 +175,7 @@ public class RepositoryDownloader {
                 successfulDownloads = true;
                 break;
               } else {
-                if (log_.isLogEnabled(RepositoryDownloader.class)) {
+                if (log_.isLogEnabled(RepositoryManager.class)) {
                   log_.println("The file md5 " + System.lineSeparator() +
                       actual + System.lineSeparator() +
                       "did not match the .md5 " + System.lineSeparator() +
@@ -233,60 +204,53 @@ public class RepositoryDownloader {
       }
     }
 
-    if (log_.isLogEnabled(RepositoryDownloader.class)) {
+    if (log_.isLogEnabled(RepositoryManager.class)) {
       DefaultRepositoryPathBuilder builder = 
           new DefaultRepositoryPathBuilder("", "/");
-      log_.println(builder.getUrl(dep) +
+      log_.println(builder.getArtifactUrl(dep) +
           " was sucessful? " + successfulDownloads);
     }
     if (!successfulDownloads) {
       DefaultRepositoryPathBuilder builder = 
             new DefaultRepositoryPathBuilder("any remote repository ", "/");
       throw new IllegalStateException("Unable to download from " + 
-          builder.getPath(dep));
+          builder.getArtifactPath(dep));
     }
   }
 
-  private void downloadFile(CloseableHttpClient httpClient, String url, String file) throws IOException {
-    HttpEntity entity = null;
-    try {
-      CloseableHttpResponse resp = httpClient.execute(new HttpGet(url));
-      entity = resp.getEntity();
-      StatusLine status = resp.getStatusLine();
-      if (status.getStatusCode() >= 300) {
-        throw new IOException("The following url returned a invalid status code " + status + System.lineSeparator() +
-            "\t" + url);
+  public void setPathBuilder(I_RepositoryPathBuilder pathBuilder) {
+    pathBuilder_ = pathBuilder;
+  }
+
+  public void setRepositories(List<String> repositories ) {
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    for (String repo: repositories) {
+      final String repoUrl = repo;
+      HttpGet get = new HttpGet(repo);
+      try {
+        int status = httpClient.execute(get, new ResponseHandler<Integer>() {
+
+                  public Integer handleResponse(
+                          final HttpResponse response) throws ClientProtocolException, IOException {
+                    return response.getStatusLine().getStatusCode();
+                  }
+
+              });
+        if (status < 300) {
+          repositories_.add(repoUrl);
+        }
+      } catch (IOException e) {
+        //do nothing some server is down.
       }
-    } catch (ClientProtocolException x) {
-      throw new IOException(x);
-    }
-    FileOutputStream fos = null;
-    try {
-      fos = new FileOutputStream(new File(file));
-    } catch (FileNotFoundException x) {
-      throw new IOException(x);
-    }
-    InputStream in = null;
-    try {
-      in = entity.getContent();
       
-      byte [] bytes = new byte[1];
-      while (in.read(bytes) != -1) {
-        fos.write(bytes);
-      }
-    } catch (IOException x) {
-      throw x;
-    } finally {
-      try {
-        fos.close();
-      } catch (IOException x) {
-        //do nothing
-      }
-      try {
-        in.close();
-      } catch (IOException x) {
-        //do nothing
-      }
+    }
+    try {
+      httpClient.close();
+    } catch (IOException e) {
+      //do nothing, what could you do close it again
+    }
+    if (repositories_.size() == 0) {
+      throw new RuntimeException("Unable to reach any remote repositories.");
     }
   }
 }

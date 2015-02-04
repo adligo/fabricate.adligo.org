@@ -17,6 +17,24 @@
 	would serve up library_v1_0.xsd.
 	In addition new versions could be mixed in i.e. library_v1_1.xsd, once v2_0 is started 
 	it would have a io_v2/
+	
+	Fabricate could also potentially work from xml files 
+	which schemas written in different languages. This would
+	add quite a lot of complexity to Fabricate if this is every
+	attempted the work path would be;
+	1) Create a new plug in project for each language.
+	2) Use a namespace like the following for the root namespace;
+		http://www.adligo.org/fabricate/xml/io_v1/fr
+		http://www.adligo.org/fabricate/xml/io_v1/fr_CA
+		Where the last path element is the language code or locale code.
+    3) Add a conversion interface so that language implementors
+    could call parse (other language) and convert 
+    (output being the regular English jaxb instances).
+    4) Implement the parse and convert interface
+    in the language specific project.
+    5) Add code to fabricate so that it would look for this
+    namespace in classes like FabricateXmlDiscovery, and
+    do conversions accordingly.
 	 -->
     <import schemaLocation="library_v1_0.xsd" 
 		namespace="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd">

@@ -1,23 +1,21 @@
 package org.adligo.fabricate;
 
-import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.LocalRepositoryHelper;
-import org.adligo.fabricate.common.RunContextMutant;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
-import org.adligo.fabricate.common.log.DeferredLog;
-import org.adligo.fabricate.common.log.DelayedLog;
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.models.fabricate.I_JavaSettings;
+import org.adligo.fabricate.models.fabricate.JavaSettings;
 import org.adligo.fabricate.repository.DefaultRepositoryPathBuilder;
-import org.adligo.fabricate.repository.RepositoryDownloader;
-import org.adligo.fabricate.repository.RepositoryDownloaderFactory;
+import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
@@ -29,12 +27,12 @@ import java.util.List;
 public class FabricateOptsSetup {
   
   private final FabSystem sys_;
-  private final DelayedLog log_;
+  private final I_FabLog log_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
   private I_FabricateConstants constants_;
   private FabricateType fab_;
-  private final RepositoryDownloaderFactory factory_;
+  private final FabricateFactory factory_;
   
   /**
    * @diagram_sync on 1/26/2014 with Overview.seq
@@ -42,33 +40,34 @@ public class FabricateOptsSetup {
    */
 	@SuppressWarnings("unused")
   public static void main(String [] args) {
-	  new FabricateOptsSetup(args, new FabSystem(), new RepositoryDownloaderFactory());
+	  new FabricateOptsSetup(args, new FabSystem(), new FabricateFactory());
 	}
 	
-	public FabricateOptsSetup(String [] args, FabSystem sys, RepositoryDownloaderFactory factory) {
+	public FabricateOptsSetup(String [] args, FabSystem sys, FabricateFactory factory) {
 	  sys_ = sys;
 	  files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
     factory_ = factory;
-    FabSystemSetup.setupWithDelayedLog(sys, args);
-    log_ = (DelayedLog) ((DeferredLog) sys.getLog()).getDelegate();
+    FabSystemSetup.setup(sys, args);
+    log_ = sys.getLog();
+    constants_ = sys.getConstants();
     String fabHome = System.getenv("FABRICATE_HOME");
     
-    FabricateXmlDiscovery fd = new FabricateXmlDiscovery(sys_);
+    FabricateXmlDiscovery fd = factory.createDiscovery(sys);
+    
     if (!fd.hasFabricateXml()) {
-      log_.printlnNow(CommandLineArgs.END);
+      
       I_SystemMessages sysMessages = constants_.getSystemMessages();
-      log_.printlnNow(sysMessages.getExceptionNoFabricateXmlOrProjectXmlFound());
-      log_.render();
+      log_.println(sysMessages.getExceptionNoFabricateXmlOrProjectXmlFound());
+      log_.println(CommandLineArgs.END);
       return;
     } else {
       
       String version = sys.getArgValue("java");
       if (StringUtils.isEmpty(version)) {
-        log_.println(CommandLineArgs.END);
         I_SystemMessages sysMessages = constants_.getSystemMessages();
         log_.println(sysMessages.getExceptionJavaVersionParameterExpected());
-        log_.render();
+        log_.println(CommandLineArgs.END);
         return;
       }
       workWithFabricateXml(fabHome, fd);
@@ -86,8 +85,8 @@ public class FabricateOptsSetup {
     
     try {
       fab_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
-      FabSystemSetup.setupWithDelayedLog(sys_, fab_);
-      FabricateHelper fh = new FabricateHelper(fab_);
+      FabSystemSetup.setup(sys_, fab_);
+      I_JavaSettings fh = new JavaSettings(fab_.getJava());
      
       //@diagram_sync on 1/26/2014 with Overview.seq
       downloadFabricateRunClasspathDependencies();
@@ -96,9 +95,8 @@ public class FabricateOptsSetup {
       //@diagram_sync on 1/26/2014 with Overview.seq
       sendOptsToScript(fh, classpath);
     } catch (IOException e) {
-      log_.printlnNow(CommandLineArgs.END);
-      log_.printTraceNow(e);
-      log_.render();
+      log_.printTrace(e);
+      log_.println(CommandLineArgs.END);
       return;
     }
   }
@@ -108,10 +106,9 @@ public class FabricateOptsSetup {
    * @param fh
    * @param classpath
    */
-  private void sendOptsToScript(FabricateHelper fh, String classpath) {
-    log_.printlnNow(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
+  private void sendOptsToScript(I_JavaSettings fh, String classpath) {
+    log_.println(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
         classpath);
-    log_.render();
   }
 
 
@@ -170,7 +167,7 @@ public class FabricateOptsSetup {
         
         //leave logs empty here
         List<String> repos = deps.getRemoteRepository();
-        RepositoryDownloader rdl = factory_.create(sys_.getLog(), localRepository);
+        RepositoryManager rdl = factory_.createRepositoryManager(sys_, localRepository);
         rdl.setPathBuilder(new DefaultRepositoryPathBuilder(localRepository, File.separator));
         rdl.setRepositories(repos);
        

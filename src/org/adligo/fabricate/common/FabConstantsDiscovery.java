@@ -86,4 +86,10 @@ public class FabConstantsDiscovery implements I_FabricateConstants {
     return null;
   }
 
+  @Override
+  public String getExtractDirName() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

@@ -1,10 +1,7 @@
 package org.adligo.fabricate;
 
 import org.adligo.fabricate.build.run.StageManager;
-import org.adligo.fabricate.common.files.FabFileIO;
-import org.adligo.fabricate.common.files.I_FabFileIO;
-import org.adligo.fabricate.common.log.DelayedLog;
-import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
@@ -16,24 +13,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 
-public class Fabricate {
+public class FabricateController {
   private final FabSystem sys_;
-  private final DelayedLog log_;
+  private final I_FabLog log_;
   
   @SuppressWarnings("unused")
   public static final void main(String [] args) {
-    new Fabricate(new FabSystem(), args);
+    new FabricateController(new FabSystem(), args);
   }
   
-  public Fabricate(FabSystem sys, String [] args) {
+  public FabricateController(FabSystem sys, String [] args) {
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
     sys_ = sys;
-    FabSystemSetup.setupWithDelayedLog(sys, args);
-    log_ = (DelayedLog) sys.getLog();
+    FabSystemSetup.setup(sys, args);
+    log_ = sys.getLog();
     FabricateXmlDiscovery discovery = new FabricateXmlDiscovery(sys);
     
     if (!discovery.hasFabricateXml()) {

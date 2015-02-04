@@ -23,8 +23,9 @@ IF "%FABRICATE_HOME%" ==  "" (
 	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) setup Fabricate args.
 	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateArgsSetup !ARGS!') do (
-		set LINE=%%i
-		if "!ARGS_FROM_SETUP!" == "Empty" (
+		SET LINE=%%i
+		SET END=%LINE:~0,2%
+		if "!END!" == "END" (
 			SET ARGS_FROM_SETUP=!LINE!
 		) else (
 			@ECHO !LINE!
@@ -53,7 +54,7 @@ IF "%FABRICATE_HOME%" ==  "" (
 
 	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) run Fabricate.
-	java !OPTIONS_FROM_SETUP! org.adligo.fabricate.Fabricate !ARGS_FROM_SETUP! 
+	java !OPTIONS_FROM_SETUP! org.adligo.fabricate.FabricateController !ARGS_FROM_SETUP! 
 )
 :END
 ENDLOCAL

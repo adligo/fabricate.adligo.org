@@ -9,6 +9,8 @@ import java.util.Map;
 public class CommandLineEnConstants implements I_CommandLineConstants {
   public static final CommandLineEnConstants INSTANCE = new CommandLineEnConstants();
   private static final String COMMAND = "cmd";
+  private static final String C = "-c";
+  private static final String CONFIRM = "--confirm-repository-integrity";
   private static final String D = "-d";
   private static final String DEVELOPMENT = "--development";
   private static final String L = "-l";
@@ -23,6 +25,7 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   
   private CommandLineEnConstants() {
     map_ = new HashMap<String, String>();
+    map_.put(CONFIRM, C);
     map_.put(DEVELOPMENT, D);
     map_.put(LOG, L);
     map_.put(REBUILD, R);
@@ -42,14 +45,20 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   }
 
   @Override
+  public String getConfirmRepositoryIntegrity(boolean alias) {
+    if (alias) {
+      return C;
+    }
+    return CONFIRM;
+  }
+  
+  @Override
   public String getDevelopment(boolean alias) {
     if (alias) {
       return D;
     }
     return DEVELOPMENT;
   }
-
-
 
   @Override
   public String getLog(boolean alias) {

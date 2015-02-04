@@ -3,10 +3,12 @@ package org.adligo.fabricate.build.stages;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
+import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.repository.DefaultRepositoryPathBuilder;
-import org.adligo.fabricate.repository.RepositoryDownloader;
+import org.adligo.fabricate.repository.DependenciesManager;
+import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
@@ -31,6 +33,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * This task is not participation aware, it doesn't check the project.xml file 
  * for the stage, it always executes.
  * 
+ * @deprecated
+ * @see DependenciesManager
  * @author scott
  *
  */
@@ -47,7 +51,7 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
   private AtomicInteger finishedDepCount_ = new AtomicInteger(0);
 
   private AtomicBoolean finishedProjects_ = new AtomicBoolean(false);
-  private RepositoryDownloader repoDown_;
+  private RepositoryManager repoDown_;
   private final Semaphore semaphore4Deps_ = new Semaphore(1);
   private final Semaphore semaphore_ = new Semaphore(1);
   
@@ -63,7 +67,8 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
     FabricateType fab = ctx_.getFabricate();
     FabricateDependencies fabDeps = fab.getDependencies();
     List<String> remoteRepos = fabDeps.getRemoteRepository();
-    repoDown_ = new RepositoryDownloader(ctx_.getLog(), ctx_.getLocalRepositoryPath());
+    //TODO system should be passed
+    repoDown_ = new RepositoryManager(new FabSystem(), ctx_.getLocalRepositoryPath());
     repoDown_.setPathBuilder(new DefaultRepositoryPathBuilder(ctx_.getLocalRepositoryPath(), 
         File.separator));
     repoDown_.setRepositories(remoteRepos);
@@ -120,7 +125,7 @@ public class DependencyDownloader extends OldBaseConcurrentStage implements I_Fa
       Dependency dep = deps_.poll();
       while (dep != null) {
         if (log_.isLogEnabled(DependencyDownloader.class)) {
-          log_.println("Checking dependency " + pathBuilder.getFileName(dep));
+          log_.println("Checking dependency " + pathBuilder.getArtifactFileName(dep));
         }
         String type = dep.getType();
         if (type == null || !"ide".equalsIgnoreCase(type)) {

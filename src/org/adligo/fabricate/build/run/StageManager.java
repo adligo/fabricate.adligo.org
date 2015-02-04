@@ -1,6 +1,5 @@
 package org.adligo.fabricate.build.run;
 
-import org.adligo.fabricate.common.FabricateHelper;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
@@ -13,6 +12,8 @@ import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.system.ComputerInfoDiscovery;
+import org.adligo.fabricate.models.fabricate.I_JavaSettings;
+import org.adligo.fabricate.models.fabricate.JavaSettings;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.JavaType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectGroupsType;
@@ -271,7 +272,7 @@ public class StageManager {
     MachineInfoType machine = new MachineInfoType();
     machine.setHostname(hostName);
     machine.setProcessors("" + Runtime.getRuntime().availableProcessors());
-    FabricateHelper fh = new FabricateHelper(fab_);
+    I_JavaSettings fh = new JavaSettings(fab_.getJava());
     machine.setRam(fh.getXms());
     String[] cpu = ComputerInfoDiscovery.getCpuInfo(sys_, os);
     machine.setCpuName(cpu[0]);
