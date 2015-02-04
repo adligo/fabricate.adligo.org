@@ -169,7 +169,7 @@ public class LoadAndCleanProjects extends OldBaseConcurrentStage implements I_Fa
     File buildDir = new File(buildPath);
     if (buildDir.exists()) {
       try {
-        files_.removeRecursive(buildPath);
+        files_.deleteRecursive(buildPath);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

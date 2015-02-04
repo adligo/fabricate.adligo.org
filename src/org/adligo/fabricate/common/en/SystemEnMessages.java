@@ -4,8 +4,14 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
   
-
-
+  private static final String DID_NOT_PASS_THE_EXTRACT_CHECK = "did not pass the extract check.";
+  private static final String DID_NOT_PASS_THE_MD5_CHECK = "did not pass the md5 check.";
+  
+  private static final String FAILED = "failed!";
+  private static final String FINISHED = "finished.";
+  
+  private static final String STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
+      "Starting download from the following url;";
   public static final SystemEnMessages INSTANCE = new SystemEnMessages();
   private static final String COMPILED_ON_X = "Compiled on <X/>.";
   private static final String FABRICATION_FAILED = "Fabrication failed!";
@@ -25,10 +31,23 @@ public class SystemEnMessages implements I_SystemMessages {
       "Exception: Java version parameter expected.";
   private static final String EXCEPTION_NO_FABRICATE_XML_OR_PROJECT_XML_FOUND = 
       "Exception: No fabricate.xml or project.xml found.";
+  private static final String EXTRACTION_OF_THE_FOLLOWING_ARTIFACT = 
+      "Extraction of the following artifact;";
+  private static final String EXTRACTING_THE_FOLLOWING_ARTIFACT = 
+      "Extracting the following artifact;";
+
   
   private static final String FABRICATE_BY_ADLIGO = "Fabricate by Adligo.";
+  
+  private static final String PASSED_THE_EXTRACT_CHECK = "passed the extract check.";
+  private static final String PASSED_THE_MD5_CHECK = "passed the md5 check.";
+  
+  private static final String THE_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
+      "The download from the following url;";
+  private static final String THE_FOLLOWING_ARTIFACT = "The following artifact;";
   private static final String THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS = 
       "The following Fabricate Home should have only these jars;";
+  private static final String TO_THE_FOLLOWING_FOLDER = "to the following folder;";
   
 
   private static final String VERSION_X = "Version <X/>.";
@@ -39,6 +58,13 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getCompiledOnX() {
     return COMPILED_ON_X;
+  }
+  
+  public String getDidNotPassTheMd5Check() {
+    return DID_NOT_PASS_THE_MD5_CHECK;
+  }
+  public String getDidNotPassTheExtractCheck() {
+    return DID_NOT_PASS_THE_EXTRACT_CHECK;
   }
   
   @Override
@@ -77,6 +103,16 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getExtractingTheFollowingArtifact() {
+    return EXTRACTING_THE_FOLLOWING_ARTIFACT;
+  }
+  
+  @Override
+  public String getExtractionOfTheFollowingArtifact() {
+    return EXTRACTION_OF_THE_FOLLOWING_ARTIFACT;
+  }
+  
+  @Override
   public String getFabricateByAdligo() {
     return FABRICATE_BY_ADLIGO;
   }
@@ -87,12 +123,48 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
-  public String getVersionX() {
-    return VERSION_X;
+  public String getFailed() {
+    return FAILED;
   }
 
   @Override
+  public String getFinished() {
+    return FINISHED;
+  }
+
+  public String getPassedTheMd5Check() {
+    return PASSED_THE_MD5_CHECK;
+  }
+  public String getPassedTheExtractCheck() {
+    return PASSED_THE_EXTRACT_CHECK;
+  }
+  
+  
+  @Override
+  public String getStartingDownloadFromTheFollowingUrl() {
+    return STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL;
+  }
+  
+  @Override
+  public String getToTheFollowingFolder() {
+    return TO_THE_FOLLOWING_FOLDER;
+  }
+  
+  @Override
+  public String getTheDownloadFromTheFollowingUrl() {
+    return THE_DOWNLOAD_FROM_THE_FOLLOWING_URL;
+  }
+  
+  public String getTheFollowingArtifact() {
+    return THE_FOLLOWING_ARTIFACT;
+  }
+  @Override
   public String getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars() {
     return THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS;
+  }
+  
+  @Override
+  public String getVersionX() {
+    return VERSION_X;
   }
 }

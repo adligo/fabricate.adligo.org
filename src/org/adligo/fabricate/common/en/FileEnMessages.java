@@ -8,6 +8,7 @@ import org.adligo.fabricate.common.i18n.I_FileMessages;
  *
  */
 public class FileEnMessages implements I_FileMessages {
+  
   private static final String EXCLUDES = "Excludes: ";
  
   private static final String DID_NOT_MATCH_THE_FOLLOWING_PATTERN = 
@@ -31,6 +32,9 @@ public class FileEnMessages implements I_FileMessages {
       "There was a problem creating the following directory;";
   private static final String THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_FILE = 
       "There was a problem creating the following file;";
+  private static final String THERE_WAS_A_PROBLEM_DELETING_THE_FOLLOWING_FILE = 
+      "There was a problem deleting the following file;";
+
   
   public static final FileEnMessages INSTANCE = new FileEnMessages();
     
@@ -70,6 +74,10 @@ public class FileEnMessages implements I_FileMessages {
   
   public String getThereWasAProblemCreatingTheFollowingFile() {
     return THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_FILE;
+  }
+  
+  public String getThereWasAProblemDeletingTheFollowingFile() {
+    return THERE_WAS_A_PROBLEM_DELETING_THE_FOLLOWING_FILE;
   }
 
   public String getFileMatchingPatternsMayNotBeEmpty() {

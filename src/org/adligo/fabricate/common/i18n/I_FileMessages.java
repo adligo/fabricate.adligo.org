@@ -13,6 +13,8 @@ public interface I_FileMessages {
   public String getTheFollowingFile();
   public String getThereWasAProblemCreatingTheFollowingDirectory();
   public String getThereWasAProblemCreatingTheFollowingFile();
+  public String getThereWasAProblemDeletingTheFollowingFile();
+  
   public String getTheWildCardCharacterIsNotAllowedInMiddleFileName();
   public String getTheWildCardCharacterIsNotAllowedAtTheLeftOrMiddleDirectoryPath();
   public String getFileMatchingPatternsMayNotBeEmpty();

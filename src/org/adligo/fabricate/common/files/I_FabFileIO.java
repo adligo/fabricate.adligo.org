@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.zip.ZipFile;
 
 /**
  * This is a way to stub out calls to the file system 
@@ -16,6 +17,13 @@ import java.util.List;
 
 public interface I_FabFileIO {
   /**
+   * calculate the md5 check sum of a file.
+   * @param file
+   * @return
+   * @throws IOException
+   */
+  public String calculateMd5(String file) throws IOException;
+  /**
    * Creates a new file;<br/>
    * new File(filePath).createNewFile();
    * @param filePath
@@ -24,11 +32,25 @@ public interface I_FabFileIO {
   public File create(String filePath) throws IOException;
   
   /**
+   * Delete the file now
+   * @param path
+   * @return
+   */
+  public void delete(String path) throws IOException ;
+  
+  /**
    * Calls new File(path).deleteOnExit();
    * @param path
    */
   public void deleteOnExit(String path);
   
+  /**
+   * This method deletes the files and folders under this path
+   * and the path itself.
+   * @param path
+   * @throws IOException
+   */
+  public void deleteRecursive(String path) throws IOException;
   /**
    * This method downloads a file from the url
    * to the file path (may be relative or absolute).
@@ -39,6 +61,7 @@ public interface I_FabFileIO {
    */
   public void downloadFile(String url, String file) throws IOException;
 
+  
   /**
    * @param filePath
    * @return
@@ -99,21 +122,36 @@ public interface I_FabFileIO {
   public boolean mkdirs(String dirsPath);
   
   /**
+   * simply creates a new ZipFile instance.
+   * @param file
+   * @return
+   * @throws IOException
+   */
+  public ZipFile newZipFile(String file) throws IOException;
+  
+  /**
    * Read the content of a file
    * @param path
    * @return
    * @throws IOException
    */
   public String readFile(String path) throws IOException; 
+  
   /**
-   * This method deletes the files and folders under this path
-   * and the path itself.
-   * @param path
+   * unzips a zip file.
+   * @param file
+   * @param toDir
    * @throws IOException
    */
-  public void removeRecursive(String path) throws IOException;
+  public void unzip(String file, String toDir) throws IOException;
   
-  
+  /**
+   * @param dir
+   * @param zip
+   * @return false when one of the zip file entries
+   * is not on the disk under the dir.
+   */
+  public boolean verifyZipFileExtract(String dir, ZipFile zip);
   /**
    * This method writes a file out to disk from a input stream, using NIO 
    * (ByteBuffer, ReadableByteChannel, FileChannel).  It uses

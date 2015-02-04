@@ -13,18 +13,19 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,12 +36,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import javax.xml.bind.DatatypeConverter;
+
+import sun.nio.ch.IOUtil;
 
 public class FabFileIO implements I_FabFileIO {
   public static final String MD5 = "MD5";
@@ -106,6 +110,15 @@ public class FabFileIO implements I_FabFileIO {
   }
 
   @Override
+  public void delete(String path) throws IOException {
+    if (!new File(path).delete()) {
+      I_FileMessages messages = constants_.getFileMessages();
+      throw new IOException(messages.getThereWasAProblemDeletingTheFollowingFile() + 
+          sys_.lineSeperator() + path);
+    }
+  }
+  
+  @Override
   public void downloadFile(String url, String file) throws IOException {
     HttpEntity entity = null;
     try {
@@ -135,7 +148,12 @@ public class FabFileIO implements I_FabFileIO {
   public FileOutputStream newFileOutputStream(String file) throws IOException, FileNotFoundException {
     return new FileOutputStream(file);
   }
+  @Override
+  public ZipFile newZipFile(String file) throws IOException {
+    return new ZipFile(file);
+  }
   
+  @Override
   public void unzip(String file, String toDir) throws IOException {
     if (toDir.lastIndexOf(getNameSeparator()) != toDir.length() - 1) {
       toDir = toDir + getNameSeparator();
@@ -185,6 +203,33 @@ public class FabFileIO implements I_FabFileIO {
         tracker.onCloseException(ce);
       }
     }
+  }
+  
+  /**
+   * @param dir
+   * @param zip
+   * @return false when one of the zip file entries
+   * is not on the disk under the dir.
+   */
+  public boolean verifyZipFileExtract(String dir, ZipFile zip) {
+    if (!exists(dir)) {
+      return false;
+    }
+    Enumeration<? extends ZipEntry> zipEntries = zip.entries();
+    
+    while(zipEntries.hasMoreElements()){
+      ZipEntry ze = zipEntries.nextElement();
+      String name = ze.getName();
+      
+      if (name.indexOf("/") == 0) {
+        name = name.substring(1, name.length());
+      }
+      name = dir + getNameSeparator() + name.replaceAll("/", getNameSeparator());
+      if (!exists(name)) {
+        return false;
+      }
+    }
+    return true;
   }
   /**
    * This method writes a file out to disk from a input stream, using NIO 
@@ -308,7 +353,7 @@ public class FabFileIO implements I_FabFileIO {
     return new File(filePath).getAbsolutePath();
   }
 
-  public void removeRecursive(String path) throws IOException
+  public void deleteRecursive(String path) throws IOException
   {
       File dir = new File(path);
       Path dirPath = dir.toPath();

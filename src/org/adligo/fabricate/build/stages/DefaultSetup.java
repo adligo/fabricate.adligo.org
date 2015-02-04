@@ -149,7 +149,7 @@ public class DefaultSetup implements I_FabSetupStage {
         if (log_.isLogEnabled(DefaultSetup.class)) {
           log_.println("Cleaning " + fullDir);
         }
-        files_.removeRecursive(fullDir);
+        files_.deleteRecursive(fullDir);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

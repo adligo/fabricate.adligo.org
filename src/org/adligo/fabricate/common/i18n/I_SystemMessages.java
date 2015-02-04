@@ -2,6 +2,11 @@ package org.adligo.fabricate.common.i18n;
 
 public interface I_SystemMessages {
   public String getCompiledOnX();
+  
+  
+  public String getDidNotPassTheMd5Check();
+  public String getDidNotPassTheExtractCheck();
+  
   public String getExceptionExecutingJavaWithTheFollowingJavaHome();
   public String getExceptionFabricateRequiresJava1_7OrGreater();
   public String getExceptionJavaVersionParameterExpected();
@@ -10,6 +15,9 @@ public interface I_SystemMessages {
   public String getExceptionNoFabricateHomeSet();
   public String getExceptionNoFabricateJarInFabricateHomeLib();
   public String getExceptionNoJavaHomeSet();
+  
+  public String getExtractingTheFollowingArtifact();
+  public String getExtractionOfTheFollowingArtifact();
   
   public String getFabricateByAdligo();
   /**
@@ -20,6 +28,17 @@ public interface I_SystemMessages {
    * @return
    */
   public String getFabricationFailed();
+  public String getFailed();
+  public String getFinished();
+  
+  public String getPassedTheMd5Check();
+  public String getPassedTheExtractCheck();
+  
+  public String getStartingDownloadFromTheFollowingUrl();
+  
+  public String getToTheFollowingFolder();
+  
+  public String getTheDownloadFromTheFollowingUrl();
   /**
    * This message should contain the jars that come
    * with fabricate only, to make sure that plug-ins are
@@ -28,6 +47,8 @@ public interface I_SystemMessages {
    * @return
    */
   public String getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars();
+  
+  public String getTheFollowingArtifact();
   
   public String getVersionX();
 }

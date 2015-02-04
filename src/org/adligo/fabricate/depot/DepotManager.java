@@ -135,7 +135,7 @@ public class DepotManager {
             }
           } else {
             try {
-              files_.removeRecursive(f.getAbsolutePath());
+              files_.deleteRecursive(f.getAbsolutePath());
             } catch (IOException x) {
               throw new RuntimeException(x);
             }
