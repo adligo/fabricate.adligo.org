@@ -14,6 +14,10 @@ To Use It;
 Setup the JAVA_HOME and FABRICATE_HOME environment variable
 which should point to a uncompressed copy of fabricate.
 
+Optionally the FABRICATE_REPOSITORY environment variable
+can be se to store the local repository in a location
+other than the default ${USER_HOME}/local_repository.
+
 Add fab (the shell script) to your path.
 
 To run in default mode simply type

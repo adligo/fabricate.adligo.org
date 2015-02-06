@@ -1,6 +1,5 @@
 package org.adligo.fabricate;
 
-import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
@@ -12,9 +11,10 @@ import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.models.dependencies.I_Dependency;
+import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.I_JavaSettings;
-import org.adligo.fabricate.models.fabricate.JavaSettings;
-import org.adligo.fabricate.repository.DefaultRepositoryPathBuilder;
+import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
@@ -22,6 +22,7 @@ import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FabricateOptsSetup {
@@ -31,11 +32,13 @@ public class FabricateOptsSetup {
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
   private I_FabricateConstants constants_;
-  private FabricateType fab_;
+  private Fabricate fab_;
   private final FabricateFactory factory_;
   
   /**
    * @diagram_sync on 1/26/2014 with Overview.seq
+   * Note this method lets Runtime Exceptions propagate
+   * out of the method, the JVM prints exception traces to the console.
    * @param args
    */
 	@SuppressWarnings("unused")
@@ -51,7 +54,7 @@ public class FabricateOptsSetup {
     FabSystemSetup.setup(sys, args);
     log_ = sys.getLog();
     constants_ = sys.getConstants();
-    String fabHome = System.getenv("FABRICATE_HOME");
+
     
     FabricateXmlDiscovery fd = factory.createDiscovery(sys);
     
@@ -70,7 +73,7 @@ public class FabricateOptsSetup {
         log_.println(CommandLineArgs.END);
         return;
       }
-      workWithFabricateXml(fabHome, fd);
+      workWithFabricateXml(fd);
     }
   }
 
@@ -80,20 +83,31 @@ public class FabricateOptsSetup {
 	 * @param fd
 	 * @param argMap
 	 */
-  private void workWithFabricateXml(String fabHome, FabricateXmlDiscovery fd) {
+  private void workWithFabricateXml(FabricateXmlDiscovery fd) {
     String fabricateXmlPath = files_.instance(fd.getFabricateXmlPath()).getAbsolutePath();
     
     try {
-      fab_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
-      FabSystemSetup.setup(sys_, fab_);
-      I_JavaSettings fh = new JavaSettings(fab_.getJava());
-     
+      FabricateType fabX =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
+      FabSystemSetup.setup(sys_, fabX);
+      fab_ = factory_.create(sys_, fabX);
+      
+      if (log_.isLogEnabled(FabricateOptsSetup.class)) {
+        log_.println("downloadFabricateRunClasspathDependencies");
+      }
       //@diagram_sync on 1/26/2014 with Overview.seq
       downloadFabricateRunClasspathDependencies();
+      if (log_.isLogEnabled(FabricateOptsSetup.class)) {
+        log_.println("buildClasspath");
+      }
+      String fabHome = fab_.getFabricateHome();
       //@diagram_sync on 1/26/2014 with Overview.seq
       String classpath = buildClasspath(fabricateXmlPath, fabHome);
-      //@diagram_sync on 1/26/2014 with Overview.seq
-      sendOptsToScript(fh, classpath);
+      if (log_.isLogEnabled(FabricateOptsSetup.class)) {
+        log_.println("sendOptsToScript");
+      }
+      I_JavaSettings js = fab_.getJavaSettings();
+    //@diagram_sync on 1/26/2014 with Overview.seq
+      sendOptsToScript(js, classpath);
     } catch (IOException e) {
       log_.printTrace(e);
       log_.println(CommandLineArgs.END);
@@ -107,7 +121,7 @@ public class FabricateOptsSetup {
    * @param classpath
    */
   private void sendOptsToScript(I_JavaSettings fh, String classpath) {
-    log_.println(" -Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
+    log_.println(CommandLineArgs.LASTLINE + "-Xmx" + fh.getXmx() + " -Xms" + fh.getXms() + " -cp " + 
         classpath);
   }
 
@@ -158,24 +172,8 @@ public class FabricateOptsSetup {
    * @throws IOException
    */
   private void downloadFabricateRunClasspathDependencies() throws IOException {
-    FabricateDependencies deps =  fab_.getDependencies();
-    if (deps != null) {
-      List<DependencyType> depTypes = deps.getDependency();
-      if (depTypes != null) {
-        LocalRepositoryHelper lrh = new LocalRepositoryHelper();
-        String localRepository = lrh.getRepositoryPath(fab_);
-        
-        //leave logs empty here
-        List<String> repos = deps.getRemoteRepository();
-        RepositoryManager rdl = factory_.createRepositoryManager(sys_, localRepository);
-        rdl.setPathBuilder(new DefaultRepositoryPathBuilder(localRepository, File.separator));
-        rdl.setRepositories(repos);
-       
-        for (DependencyType dep: depTypes) {
-          rdl.findOrDownloadAndVerify(new Dependency(dep));
-        }
-      }
-    }
+    RepositoryManager rm = factory_.createRepositoryManager(sys_, fab_);
+    rm.manageDependencies();
   }
 
   public I_FabricateConstants getConstants() {

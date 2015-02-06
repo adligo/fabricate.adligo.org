@@ -12,20 +12,27 @@ import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingsType;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class FabSystemSetup {
 
-  public static Map<String, Boolean> getSettings(FabricateType fabricate) {
+  public static Map<String, Boolean> getSettings(FabricateType fabricate, Set<String> defaultOns) {
     Map<String,Boolean> logSets = new HashMap<String,Boolean>();
     LogSettingsType logs = fabricate.getLogs();
     List<LogSettingType> settings = logs.getLog();
+    for (String clazz: defaultOns) {
+      logSets.put(clazz, true);
+    }
     for (LogSettingType set: settings) {
       String clazz = set.getClazz();
       Boolean value = set.isSetting();
-      logSets.put(clazz, value);
+      if (value != null) {
+        logSets.put(clazz, value);
+      }
     }
     return logSets;
   }
@@ -65,9 +72,18 @@ public class FabSystemSetup {
     I_CommandLineConstants clConstants = constants.getCommandLineConstants();
     boolean debug = sys.hasArg(clConstants.getLog(true));
     
-    Map<String, Boolean> logSets = getSettings(fabricate);
+    Set<String> defaultOns = getDefaultOns();
+    Map<String, Boolean> logSets = getSettings(fabricate, defaultOns);
     FabLog log = new FabLog(logSets, debug);
     sys.setLog(log);
     sys.setConstants(constants);
+  }
+  
+  private static Set<String> getDefaultOns() {
+    Set<String> toRet = new HashSet<String>();
+    
+    toRet.add("org.adligo.fabricate.repository.DependencyManager");
+    toRet.add("org.adligo.fabricate.repository.RepositoryManager");
+    return toRet;
   }
 }

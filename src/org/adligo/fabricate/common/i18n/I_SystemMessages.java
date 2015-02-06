@@ -1,6 +1,7 @@
 package org.adligo.fabricate.common.i18n;
 
 public interface I_SystemMessages {
+  public String getCheckingFabricateRuntimeDependencies();
   public String getCompiledOnX();
   
   
@@ -31,6 +32,7 @@ public interface I_SystemMessages {
   public String getFailed();
   public String getFinished();
   
+  public String getNoRemoteRepositoriesCouldBeReached();
   public String getPassedTheMd5Check();
   public String getPassedTheExtractCheck();
   
@@ -47,6 +49,10 @@ public interface I_SystemMessages {
    * @return
    */
   public String getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars();
+  
+  public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess();
+  
+  public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   
   public String getTheFollowingArtifact();
   

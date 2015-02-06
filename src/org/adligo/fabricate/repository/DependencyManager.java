@@ -2,8 +2,10 @@ package org.adligo.fabricate.repository;
 
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 
@@ -16,18 +18,24 @@ import java.util.zip.ZipFile;
 /**
  * This class deals with a single dependency,
  * downloads it, checks the md5 and extracts
- * it in the local repository.   
+ * it in the local repository.    It is NOT thread safe.
+ *  
  * @author scott
  *
  */
-public class DependencyManager {
+public class DependencyManager implements I_DependencyManager {
   private final I_FabSystem sys_;
   private final I_FabLog log_;
   private final I_FabricateConstants constants_;
   private final I_FabFileIO files_;
+  /**
+   * keeps a local copy
+   * so that concurrent iteration
+   * is not a issue.
+   */
   private final List<String> repositories_ = new ArrayList<String>();
   private I_RepositoryPathBuilder pathBuilder_;
-  private I_RepositoryPathBuilderFactory pathBuilderFactory_;
+  private I_RepositoryFactory factory_;
   
   private String depOnDisk_;
   private String md5OnDisk_;
@@ -48,6 +56,10 @@ public class DependencyManager {
   }
   
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_DependencyManager#manange(org.adligo.fabricate.models.dependencies.I_Dependency)
+   */
+  @Override
   public boolean manange(I_Dependency dep ) {
     reset();
    
@@ -96,8 +108,9 @@ public class DependencyManager {
     
     try {
       md5FromFile = files_.readFile(md5OnDisk_);
+      md5FromFile = md5FromFile.replaceAll(sys_.lineSeperator(), "");
     } catch (IOException x) {
-      logMd5Mismatch(messages);
+      logMd5Mismatch(messages,md5FromFile, "");
       lastIOException_ = x;
       return false;
     }
@@ -105,12 +118,12 @@ public class DependencyManager {
     try {
        md5 = files_.calculateMd5(depOnDisk_);
     } catch (IOException x) {
-      logMd5Mismatch(messages);
+      logMd5Mismatch(messages,md5FromFile, md5);
       lastIOException_ = x;
       return false;
     }
     if ( !md5FromFile.equals(md5)) {
-      logMd5Mismatch(messages);
+      logMd5Mismatch(messages, md5FromFile, md5);
       return false;
     }
     log_.println(
@@ -121,11 +134,13 @@ public class DependencyManager {
   }
 
 
-  public void logMd5Mismatch(I_SystemMessages messages) {
+  public void logMd5Mismatch(I_SystemMessages messages, String fileMd5, String md5) {
     log_.println(
         messages.getTheFollowingArtifact() + sys_.lineSeperator() +
         depOnDisk_ + sys_.lineSeperator() +
-        messages.getDidNotPassTheMd5Check());
+        messages.getDidNotPassTheMd5Check() + sys_.lineSeperator() + 
+        fileMd5 + sys_.lineSeperator() + 
+        md5);
   }
 
 
@@ -168,6 +183,7 @@ public class DependencyManager {
     try {
       files_.downloadFile(from, to);
     } catch (IOException x) {
+      log_.printTrace(x);
       log_.println(
           messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
           from + sys_.lineSeperator() +
@@ -193,6 +209,20 @@ public class DependencyManager {
   private boolean downloadMd5(I_RepositoryPathBuilder remotePathBuilder, I_Dependency dep) {
     String from = remotePathBuilder.getMd5Url(dep);
     String to = pathBuilder_.getMd5Path(dep);
+    String folder = pathBuilder_.getFolderPath(dep);
+    
+    if (!files_.exists(folder)) {
+      if (!files_.mkdirs(folder)) {
+        //it may be created by another thread :)_
+        if (!files_.exists(folder)) {
+          I_FileMessages messages = constants_.getFileMessages();
+          log_.println(messages.getThereWasAProblemCreatingTheFollowingDirectory() + sys_.lineSeperator() +
+              folder);
+          log_.println(CommandLineArgs.END);
+          throw new RuntimeException();
+        }
+      }
+    }
     I_SystemMessages messages = constants_.getSystemMessages();
     log_.println(
         messages.getStartingDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
@@ -202,6 +232,7 @@ public class DependencyManager {
     try {
       files_.downloadFile(from, to);
     } catch (IOException x) {
+      log_.printTrace(x);
       log_.println(
           messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
           from + sys_.lineSeperator() +
@@ -225,7 +256,7 @@ public class DependencyManager {
   
   private boolean downloadEtc(I_Dependency dep) {
     for (String remoteRepo: repositories_) {
-      I_RepositoryPathBuilder builder = pathBuilderFactory_.create(remoteRepo);
+      I_RepositoryPathBuilder builder = factory_.create(remoteRepo);
       if (downloadMd5(builder, dep)) {
         if (downloadArtifact(builder, dep)) {
           if (checkMd5s()) {
@@ -279,7 +310,6 @@ public class DependencyManager {
       logExtractFailure(messages);
       return false;
     }
-    logExtractVerificationSuccess(messages);
     return true;
   }
 
@@ -313,9 +343,7 @@ public class DependencyManager {
     if (dep.isExtract()) {
       extractOnDisk_ = pathBuilder_.getExtractPath(dep, constants_);
       if (!files_.exists(extractOnDisk_)) {
-        if (!extract(dep)) {
-          return false;
-        }
+        return false;
       }
     }
     if (!files_.exists(depOnDisk_)) {
@@ -356,11 +384,13 @@ public class DependencyManager {
 
 
   private void cleanExtract() {
-    if (files_.exists(extractOnDisk_)) {
-      try {
-        files_.deleteRecursive(extractOnDisk_);
-      } catch (IOException x) {
-        lastIOException_ = x;
+    if (extractOnDisk_ != null) {
+      if (files_.exists(extractOnDisk_)) {
+        try {
+          files_.deleteRecursive(extractOnDisk_);
+        } catch (IOException x) {
+          lastIOException_ = x;
+        }
       }
     }
   }
@@ -370,6 +400,10 @@ public class DependencyManager {
   }
 
 
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_DependencyManager#setLocalRepository(java.lang.String)
+   */
+  @Override
   public void setLocalRepository(String localRepository) {
     this.localRepository_ = localRepository;
   }
@@ -380,18 +414,26 @@ public class DependencyManager {
   }
 
 
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_DependencyManager#setConfirmIntegrity(boolean)
+   */
+  @Override
   public void setConfirmIntegrity(boolean confirmIntegrity) {
     this.confirmIntegrity_ = confirmIntegrity;
   }
 
 
-  public I_RepositoryPathBuilderFactory getPathBuilderFactory() {
-    return pathBuilderFactory_;
+  public I_RepositoryFactory getPathBuilderFactory() {
+    return factory_;
   }
 
 
-  public void setPathBuilderFactory(I_RepositoryPathBuilderFactory pathBuilderFactory) {
-    this.pathBuilderFactory_ = pathBuilderFactory;
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_DependencyManager#setPathBuilderFactory(org.adligo.fabricate.repository.I_RepositoryFactory)
+   */
+  @Override
+  public void setFactory(I_RepositoryFactory pathBuilderFactory) {
+    this.factory_ = pathBuilderFactory;
   }
 
 

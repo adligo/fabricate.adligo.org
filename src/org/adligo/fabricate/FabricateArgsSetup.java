@@ -9,6 +9,7 @@ import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
+import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.java.JavaCalls;
 import org.adligo.fabricate.java.ManifestParser;
@@ -33,6 +34,7 @@ import java.util.Locale;
  */
 public class FabricateArgsSetup {
   private static JavaCalls JAVA_CALLS;
+  private static FabricateEnvironment ENV = FabricateEnvironment.INSTANCE;
   
   private ManifestParser manifestParser_;
   private final I_FabSystem sys_;
@@ -42,6 +44,8 @@ public class FabricateArgsSetup {
   
   /**
    * @diagram_sync on 1/26/2014 with Overview.seq
+   * Note this method lets Runtime Exceptions propagate
+   * out of the method, the JVM prints exception traces to the console.
    * @param args
    */
 	@SuppressWarnings("unused")
@@ -60,19 +64,10 @@ public class FabricateArgsSetup {
     constants_ = sys.getConstants();
     long now = sys_.getCurrentTime();
     
-    String homeDir = null;
-    try {
-       homeDir = JAVA_CALLS.getJavaHome();
-    } catch (IllegalStateException x) {
-      I_SystemMessages sysMessages = constants_.getSystemMessages();
-      String message = sysMessages.getExceptionNoJavaHomeSet();
-      log_.println(message);
-      log_.println(CommandLineArgs.END);
-      return;
-    }
+    String javaHome = ENV.getJavaHome(sys_);
     String versionNbrString = null;
     try {
-      versionNbrString = JAVA_CALLS.getJavaVersion(homeDir, files_.getNameSeparator());
+      versionNbrString = JAVA_CALLS.getJavaVersion(javaHome, files_.getNameSeparator());
       double versionDouble = JAVA_CALLS.getJavaMajorVersion(versionNbrString);
       if (versionDouble < 1.7) {
         
@@ -88,7 +83,7 @@ public class FabricateArgsSetup {
       String message = sysMessages.getExceptionExecutingJavaWithTheFollowingJavaHome();
       log_.println(
           message + constants_.getLineSeperator() +
-          homeDir);
+          javaHome);
       log_.printTrace(e);
       log_.println(CommandLineArgs.END);
       return;
@@ -134,15 +129,9 @@ public class FabricateArgsSetup {
    * @param args
    */
   public File locateFabricateJarAndVerifyFabricateHomeJars() {
-    String fabricateHome = sys_.getenv("FABRICATE_HOME");
-    if (fabricateHome == null) {
-      
-      I_SystemMessages sysMessages = constants_.getSystemMessages();
-      String message = sysMessages.getExceptionNoFabricateHomeSet();
-      log_.println(message);
-      log_.println(CommandLineArgs.END);
-      return null;
-    } 
+    String fabricateHome = null;
+    fabricateHome = ENV.getFabricateHome(sys_);
+
     File fabricateJar = null;
     boolean hasLogging = false;
     boolean hasHttpCore = false;
@@ -245,6 +234,11 @@ public class FabricateArgsSetup {
     return JAVA_CALLS;
   }
 
+  public static FabricateEnvironment getENV() {
+    return ENV;
+  }
+
+  
   /**
    * This method is for injecting a mock 
    * for testing only.
@@ -252,5 +246,9 @@ public class FabricateArgsSetup {
    */
   public static void setJAVA_CALLS(JavaCalls jc) {
     JAVA_CALLS = jc;
+  }
+  
+  public static void setENV(FabricateEnvironment env) {
+    ENV = env;
   }
 }

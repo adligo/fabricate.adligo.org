@@ -1,16 +1,14 @@
 package org.adligo.fabricate.common.system;
 
 import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.files.I_FabFilesSystem;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
-import org.adligo.fabricate.common.log.I_FabLogSystem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 
-public interface I_FabSystem extends I_FabLogSystem {
-  public I_FabFileIO getFileIO();
-  public I_FabXmlFileIO getXmlFileIO();
+public interface I_FabSystem extends I_FabFilesSystem {
   /**
    * Stub for System.getenv(String key);
    * @param key
@@ -18,14 +16,6 @@ public interface I_FabSystem extends I_FabLogSystem {
    */
   public String getenv(String key);
 
-  
-  /**
-   * backed by the CommandLineArgs map.
-   * @param arg
-   * @return
-   */
-  public boolean hasArg(String arg);
-  
   /**
    * backed by the CommandLineArgs map.
    * @param arg
@@ -46,6 +36,30 @@ public interface I_FabSystem extends I_FabLogSystem {
    * @return
    */
   public I_Executor getExecutor();
+  
+  public I_FabFileIO getFileIO();
+  public I_FabXmlFileIO getXmlFileIO();
+  /**
+   * backed by the CommandLineArgs map.
+   * @param arg
+   * @return
+   */
+  public boolean hasArg(String arg);
+  
+  /**
+   * does this;<br/>
+   * <pre>
+   * <code>
+   *  try {
+   *    Thread.currentThread().join();
+   *  } catch (InterruptedException x) {
+   *    Thread.currentThread().interrupt();
+   *  }
+   * </code>
+   * </pre>
+   * Provides a stub to make sure it was called.
+   */
+  public void join();
   
   /**
    * This method provides a

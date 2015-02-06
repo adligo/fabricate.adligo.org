@@ -176,24 +176,6 @@
     			minOccurs="0" maxOccurs="unbounded">
     		</element>
     	</sequence>
-    	<attribute name="local_repository" type="string">
-    		<annotation>
-    			<documentation>
-    				This is where the local repository downloads are
-    				stored, it defaults to ${user.home}/local_repository
-    				Also the fab_repo uses a collapsed directory
-    				structure, do reduce the number of directories
-    				created.
-    				local_repository
-    				   |-org.apache.maven.plugins
-    				   |    |-maven-jar-plugin
-    				   |    |     |-3.2.3
-    				   |    |     |    |-maven-plugin-api-3.2.3.jar
-    				   |    |     |    |-maven-plugin-api-3.2.3.jar.sha1
-    			    A regular maven repository would have 4 directories for the group name
-    			</documentation>
-    		</annotation>
-    	</attribute>
     </complexType>
 
     

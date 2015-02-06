@@ -60,7 +60,8 @@ public class DefaultRepositoryPathBuilder implements I_RepositoryPathBuilder {
   
   @Override
   public String getExtractPath(I_Dependency dependency, I_FabricateConstants constants) {
-    return getFolderPath(dependency) + seperator_ + constants.getExtractDirName();
+    return getFolderPath(dependency) + seperator_ + 
+        getArtifactFileName(dependency) + DASH + constants.getExtractDirName();
   }
   
   public String getFolderPath(I_Dependency dependency) {

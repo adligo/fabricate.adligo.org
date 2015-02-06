@@ -5,20 +5,15 @@ import org.adligo.fabricate.build.stages.tasks.OldCompileTask;
 import org.adligo.fabricate.common.FabRunType;
 import org.adligo.fabricate.common.I_FabSetupStage;
 import org.adligo.fabricate.common.I_RunContext;
-import org.adligo.fabricate.common.LocalRepositoryHelper;
 import org.adligo.fabricate.common.RunContextMutant;
-import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.files.FabFileIO;
 import org.adligo.fabricate.common.files.I_FabFileIO;
-import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
-import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.system.FabSystem;
+import org.adligo.fabricate.common.system.FabricateDefaults;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.depot.Depot;
-import org.adligo.fabricate.depot.DepotContext;
 import org.adligo.fabricate.depot.DepotManager;
 import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.git.GitCalls;
@@ -101,9 +96,7 @@ public class DefaultSetup implements I_FabSetupStage {
     
     cleanDir(fcm, fabricateDir, "output");
     fcm.setOutputPath(fabricateDir + File.separator + "output");
-    LocalRepositoryHelper lrh = new LocalRepositoryHelper();
-    String localRepository = lrh.getRepositoryPath(fabricate_);
-    fcm.setLocalRepositoryPath(localRepository);
+    fcm.setLocalRepositoryPath(FabricateDefaults.LOCAL_REPOSITORY);
     
     
     if (project_ != null) {
@@ -206,7 +199,6 @@ public class DefaultSetup implements I_FabSetupStage {
     checkDefaultLog(GitStage.class, true, settings);
     checkDefaultLog(JavaJar.class, true, settings);
     checkDefaultLog(LoadAndCleanProjects.class, true, settings);
-    checkDefaultLog(DependencyDownloader.class, true, settings);
     checkDefaultLog(StageManager.class, true, settings);
     checkDefaultLog(OldCompileTask.class, true, settings);
     

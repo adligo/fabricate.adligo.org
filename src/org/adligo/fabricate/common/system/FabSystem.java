@@ -9,6 +9,8 @@ import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -90,6 +92,14 @@ public class FabSystem implements I_FabSystem {
     return argMap.containsKey(arg);
   }
 
+   public void join() {
+     try {
+       Thread.currentThread().join();
+     } catch (InterruptedException x) {
+       Thread.currentThread().interrupt();
+     }
+   }
+    
   @Override
   public String getArgValue(String key) {
     return argMap.get(key);
@@ -135,5 +145,10 @@ public class FabSystem implements I_FabSystem {
   @Override
   public BufferedInputStream newBufferedInputStream(InputStream in) {
     return new BufferedInputStream(in);
+  }
+
+  @Override
+  public CloseableHttpClient newHttpClient() {
+    return HttpClients.createDefault();
   }
 }

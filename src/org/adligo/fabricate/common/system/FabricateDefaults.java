@@ -1,4 +1,4 @@
-package org.adligo.fabricate.models.common;
+package org.adligo.fabricate.common.system;
 
 import java.io.File;
 
@@ -9,7 +9,7 @@ public class FabricateDefaults {
   public static final int JAVA_THREADS = Runtime.getRuntime().availableProcessors() * 2;
   
   public static final String LOCAL_REPOSITORY = System.getProperty("user.home") + 
-      File.separator + "local_repository";
+      File.separator + "local_repository" + File.separator;
   
   private FabricateDefaults() {}
 }

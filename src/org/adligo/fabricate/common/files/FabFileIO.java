@@ -3,7 +3,6 @@ package org.adligo.fabricate.common.files;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.log.I_FabLogSystem;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -19,13 +18,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,45 +32,76 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.xml.bind.DatatypeConverter;
 
-import sun.nio.ch.IOUtil;
-
 public class FabFileIO implements I_FabFileIO {
   public static final String MD5 = "MD5";
-  /**
-   * This should be thread safe since the following class has
-   * the annotation @ThreadSafe; <br/>
-   * @see org.apache.http.impl.client.CloseableHttpClient
-   */
-  private final CloseableHttpClient httpClient_;
-  private final I_FabLogSystem sys_;
+  private final I_FabFilesSystem sys_;
   private final I_FabLog log_;
   private final I_FabricateConstants constants_;
   
-  public FabFileIO(I_FabLogSystem sys) {
-    httpClient_ = HttpClients.createDefault();
+  public FabFileIO(I_FabFilesSystem sys) {
     sys_ = sys;
     constants_ = sys.getConstants();
     log_ = sys.getLog();
   }
-
-  public FabFileIO(I_FabLogSystem sys, CloseableHttpClient httpClient) {
-    httpClient_ = httpClient;
-    sys_ = sys;
-    constants_ = sys.getConstants();
-    log_ = sys.getLog();
-  }
-  
 
   public String calculateMd5(String file) throws IOException {
     return decode(file, MD5);
+  }
+  
+  @Override
+  public int check(String url) throws IOException {
+    CloseableHttpClient httpClient = sys_.newHttpClient();
+    CloseableHttpResponse resp = null;
+    try {
+      resp = httpClient.execute(new HttpGet(url));
+      StatusLine status = resp.getStatusLine();
+      return status.getStatusCode();
+    } catch (ClientProtocolException x) {
+      throw new IOException(x);
+    } finally {
+       close(resp);
+       close(httpClient);
+    }
+  }
+  /**
+   * This method closes the Closeable
+   * if it is NOT null, and then 
+   * returns the IOException if it was caught.
+   * @param inputChannel
+   * @return a null IOException when everything 
+   * runs smoothly, or the IOException that was caught.
+   * NOTE, this IOExcepion is almost always ignored by the caller,
+   * since there isn't a good way to recover from a IOException
+   * thrown from a close method.  The main reason for 
+   * returning it is testing of this method.
+   */
+  public IOException close(Closeable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (IOException x) {
+        return x;
+      }
+    }
+    return null;
+  }
+  
+
+  public void closeIOPair(Closeable in, Closeable out, I_IOCloseTracker tracker) {
+    IOException inEx = close(in);
+    if (inEx != null) {
+      tracker.onCloseException(inEx);
+    }
+    IOException outEx = close(out);
+    if (outEx != null) {
+      tracker.onCloseException(outEx);
+    }
   }
   
   @Override
@@ -120,9 +147,12 @@ public class FabFileIO implements I_FabFileIO {
   
   @Override
   public void downloadFile(String url, String file) throws IOException {
+    CloseableHttpClient httpClient = sys_.newHttpClient();
     HttpEntity entity = null;
+    CloseableHttpResponse resp = null;
+    boolean exiting = true;
     try {
-      CloseableHttpResponse resp = httpClient_.execute(new HttpGet(url));
+      resp = httpClient.execute(new HttpGet(url));
       entity = resp.getEntity();
       StatusLine status = resp.getStatusLine();
       int statusCode = status.getStatusCode();
@@ -133,8 +163,14 @@ public class FabFileIO implements I_FabFileIO {
         throw new IOException(message + sys_.lineSeperator() +
             url);
       }
+      exiting = false;
     } catch (ClientProtocolException x) {
       throw new IOException(x);
+    } finally {
+      if (exiting) {
+        close(resp);
+        close(httpClient);
+      }
     }
     InputStream in = entity.getContent();
     
@@ -142,6 +178,9 @@ public class FabFileIO implements I_FabFileIO {
       writeFile(in, newFileOutputStream(file));
     } catch (FileNotFoundException x) {
       throw new IOException(x);
+    } finally {
+      close(resp);
+      close(httpClient);
     }
   }
 
@@ -303,40 +342,7 @@ public class FabFileIO implements I_FabFileIO {
 
   
   
-  /**
-   * This method closes the Closeable
-   * if it is NOT null, and then 
-   * returns the IOException if it was caught.
-   * @param inputChannel
-   * @return a null IOException when everything 
-   * runs smoothly, or the IOException that was caught.
-   * NOTE, this IOExcepion is almost always ignored by the caller,
-   * since there isn't a good way to recover from a IOException
-   * thrown from a close method.  The main reason for 
-   * returning it is testing of this method.
-   */
-  public IOException close(Closeable closeable) {
-    if (closeable != null) {
-      try {
-        closeable.close();
-      } catch (IOException x) {
-        return x;
-      }
-    }
-    return null;
-  }
-  
 
-  public void closeIOPair(Closeable in, Closeable out, I_IOCloseTracker tracker) {
-    IOException inEx = close(in);
-    if (inEx != null) {
-      tracker.onCloseException(inEx);
-    }
-    IOException outEx = close(out);
-    if (outEx != null) {
-      tracker.onCloseException(outEx);
-    }
-  }
   
   @Override
   public boolean exists(String filePath) {

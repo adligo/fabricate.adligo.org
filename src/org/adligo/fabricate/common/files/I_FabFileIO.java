@@ -23,6 +23,13 @@ public interface I_FabFileIO {
    * @throws IOException
    */
   public String calculateMd5(String file) throws IOException;
+  
+  /**
+   * @param url
+   * @return the status code from the http gets response.
+   * @throws IOException
+   */
+  public int check(String url) throws IOException;
   /**
    * Creates a new file;<br/>
    * new File(filePath).createNewFile();

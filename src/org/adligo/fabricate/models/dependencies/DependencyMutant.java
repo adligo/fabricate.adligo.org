@@ -94,7 +94,13 @@ public class DependencyMutant implements I_Dependency {
   public DependencyMutant(DependencyType other) {
     artifact_ = other.getArtifact();
     setChildren(IdeMutant.convert(other.getIde()));
-    extract_ = other.isExtract();
+    Boolean oe = other.isExtract();
+    extract_ = false;
+    if (oe != null) {
+      if (oe) {
+        extract_ = true;
+      }
+    }
     fileName_ = other.getFileName();
     group_ = other.getGroup();
     platform_ = other.getPlatform();

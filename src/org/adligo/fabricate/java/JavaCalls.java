@@ -1,11 +1,9 @@
 package org.adligo.fabricate.java;
 
-import org.adligo.fabricate.common.system.Executor;
 import org.adligo.fabricate.common.system.I_ExecutionResult;
 import org.adligo.fabricate.common.system.I_Executor;
 import org.adligo.fabricate.common.system.I_FabSystem;
 
-import java.io.File;
 import java.io.IOException;
 
 public class JavaCalls {
@@ -13,14 +11,6 @@ public class JavaCalls {
   
   public JavaCalls(I_FabSystem sys) {
     sys_ = sys;
-  }
-  
-  public String getJavaHome() throws IllegalStateException {
-    String home = System.getenv("JAVA_HOME");
-    if (home == null) {
-      throw new IllegalStateException();
-    }
-    return home;
   }
   
   public String getJavaVersion(String homeDir, String seperator) throws IOException, InterruptedException {
