@@ -48,7 +48,7 @@ public class DependenciesManager implements I_DependenciesManager {
   @Override
   public void run() {
     String localRepo = fabricate.getFabricateRepository();
-    I_RepositoryPathBuilder builder = factory_.create(localRepo, 
+    I_RepositoryPathBuilder builder = factory_.createRepositoryPathBuilder(localRepo, 
         files_.getNameSeparator());
     I_DependencyManager dm = factory_.createDependencyManager(sys_, 
         remoteRepositories_, builder);

@@ -256,7 +256,7 @@ public class DependencyManager implements I_DependencyManager {
   
   private boolean downloadEtc(I_Dependency dep) {
     for (String remoteRepo: repositories_) {
-      I_RepositoryPathBuilder builder = factory_.create(remoteRepo);
+      I_RepositoryPathBuilder builder = factory_.createRepositoryPathBuilder(remoteRepo);
       if (downloadMd5(builder, dep)) {
         if (downloadArtifact(builder, dep)) {
           if (checkMd5s()) {

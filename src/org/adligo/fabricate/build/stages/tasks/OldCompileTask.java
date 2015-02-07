@@ -25,8 +25,9 @@ import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryType;
-import org.adligo.fabricate.xml.io_v1.library_v1_0.ProjectDependencyType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependencyType;
 
 import java.io.File;
 import java.io.IOException;
@@ -130,7 +131,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
     return sb.toString();
   }
 
-  public void buildClasspath(DependenciesType depsType, Set<String> completedLibraries,
+  public void buildClasspath(ProjectDependenciesType depsType, Set<String> completedLibraries,
       StringBuilder sb) {
     if (depsType == null) {
       return;
@@ -146,7 +147,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
           try {
             LibraryType libType = xmlFiles_.parseLibrary_v1_0(libFile);
             DependenciesType subDepsType = libType.getDependencies();
-            buildClasspath(subDepsType, completedLibraries, sb);
+            //buildClasspath(subDepsType, completedLibraries, sb);
           } catch (IOException e) {
             throw new IllegalStateException(e);
           }

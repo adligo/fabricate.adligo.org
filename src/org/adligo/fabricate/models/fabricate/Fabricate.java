@@ -10,19 +10,26 @@ import java.util.List;
 public class Fabricate implements I_Fabricate {
   private final List<I_Dependency> dependencies_;
   
-  private final String fabricateHome;
-  private final String fabricateRepository;
+  private final String fabricateHome_;
+  private final String fabricateDevXmlDir_;
   
-  private final String javaHome;
-  private final JavaSettings javaSettings;
+  private final String fabricateRepository_;
+  private final String fabricateProjectRunDir_;
+  private final String fabricateXmlRunDir_;
+  
+  private final String javaHome_;
+  private final JavaSettings javaSettings_;
   
   private final List<String> remoteRepositories_;
   
   public Fabricate(I_Fabricate other) {
-    fabricateHome = other.getFabricateHome();
-    fabricateRepository = other.getFabricateRepository();
-    javaHome = other.getJavaHome();
-    javaSettings = new JavaSettings(other.getJavaSettings());
+    fabricateHome_ = other.getFabricateHome();
+    fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
+    fabricateRepository_ = other.getFabricateRepository();
+    javaHome_ = other.getJavaHome();
+    javaSettings_ = new JavaSettings(other.getJavaSettings());
+    fabricateDevXmlDir_ = other.getFabricateDevXmlDir();
+    fabricateProjectRunDir_ = other.getFabricateProjectRunDir();
     
     List<String> remotRepos = other.getRemoteRepositories();
     if (remotRepos == null) {
@@ -60,20 +67,28 @@ public class Fabricate implements I_Fabricate {
     return dependencies_;
   }
   
+  public String getFabricateDevXmlDir() {
+    return fabricateDevXmlDir_;
+  }
+  
   public String getFabricateHome() {
-    return fabricateHome;
+    return fabricateHome_;
   }
 
+  public String getFabricateProjectRunDir() {
+    return fabricateProjectRunDir_;
+  }
+  
   public String getFabricateRepository() {
-    return fabricateRepository;
+    return fabricateRepository_;
   }
   
   public String getJavaHome() {
-    return javaHome;
+    return javaHome_;
   }
 
   public I_JavaSettings getJavaSettings() {
-    return javaSettings;
+    return javaSettings_;
   }
 
   @Override
@@ -83,7 +98,11 @@ public class Fabricate implements I_Fabricate {
   
   @Override
   public int getThreads() {
-    return javaSettings.getThreads();
+    return javaSettings_.getThreads();
+  }
+
+  public String getFabricateXmlRunDir() {
+    return fabricateXmlRunDir_;
   }
 
   

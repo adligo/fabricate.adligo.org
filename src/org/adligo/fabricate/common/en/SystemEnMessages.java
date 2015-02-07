@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
   
+ 
   private static final String CHECKING_FABRICATE_RUNTIME_DEPENDENCIES = "Checking Fabricate runtime dependencies.";
   private static final String THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS = "The following local repository is locked by another process;";
   private static final String DID_NOT_PASS_THE_EXTRACT_CHECK = "did not pass the extract check.";
@@ -51,8 +52,15 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String THE_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
       "The download from the following url;";
   private static final String THE_FOLLOWING_ARTIFACT = "The following artifact;";
+  
+  
   private static final String THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS = 
       "The following Fabricate Home should have only these jars;";
+  private static final String THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND = 
+      "The following Fabricate library can NOT be found;";
+  
+  private static final String THE_FOLLOWING_LIST_OF_FABRICATE_LIBRARIES_CONTAINS_A_CIRCULAR_REFERENCE =
+      "The following list of Fabricate libraries contains a circular reference;";
   private static final String THE_FOLLOWING_REMOTE_REPOSITORY_APPEARS_TO_BE_DOWN = 
       "The following remote repository appears to be down;";
   
@@ -178,10 +186,19 @@ public class SystemEnMessages implements I_SystemMessages {
   }
 
   @Override
+  public String getTheFollowingFabricateLibraryCanNotBeFound() {
+    return THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND;
+  }
+  @Override
   public String getTheFollowingRemoteRepositoryAppearsToBeDown() {
     return THE_FOLLOWING_REMOTE_REPOSITORY_APPEARS_TO_BE_DOWN;
   }
 
+  @Override
+  public String getTheFollowingListOfFabricateLibrariesContainsACircularReference() {
+    return THE_FOLLOWING_LIST_OF_FABRICATE_LIBRARIES_CONTAINS_A_CIRCULAR_REFERENCE;
+  }
+  
   @Override
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess() {
     return THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS;

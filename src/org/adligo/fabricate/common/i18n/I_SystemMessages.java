@@ -50,6 +50,9 @@ public interface I_SystemMessages {
    */
   public String getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars();
   
+  public String getTheFollowingFabricateLibraryCanNotBeFound();
+  
+  public String getTheFollowingListOfFabricateLibrariesContainsACircularReference();
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess();
   
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();

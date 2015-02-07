@@ -14,6 +14,9 @@ import java.util.List;
 
 public class FabricateMutant implements I_Fabricate {
   private String fabricateHome_;
+  private String fabricateXmlRunDir_;
+  private String fabricateProjectRunDir_;
+  private String fabricateDevXmlDir_;
   private String javaHome_;
   private String fabricateRepository_;
   private JavaSettingsMutant javaSettings_;
@@ -23,7 +26,7 @@ public class FabricateMutant implements I_Fabricate {
   public FabricateMutant() {
   }
   
-  public FabricateMutant(FabricateType fab) {
+  public FabricateMutant(FabricateType fab, I_FabricateXmlDiscovery xmlDisc) {
     javaSettings_ = new JavaSettingsMutant(fab.getJava());
     FabricateDependencies deps =  fab.getDependencies();
     if (deps != null) {
@@ -36,12 +39,19 @@ public class FabricateMutant implements I_Fabricate {
         }
       }
     }
+    fabricateXmlRunDir_ = xmlDisc.getFabricateXmlDir();
+    fabricateDevXmlDir_ = xmlDisc.getDevXmlDir();
+    fabricateProjectRunDir_ = xmlDisc.getProjectXmlDir();
   }
 
   public FabricateMutant(I_Fabricate other) {
     fabricateHome_ = other.getFabricateHome();
     fabricateRepository_ = other.getFabricateRepository();
     javaHome_ = other.getJavaHome();
+    fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
+    fabricateDevXmlDir_ = other.getFabricateDevXmlDir();
+    fabricateProjectRunDir_ = other.getFabricateProjectRunDir();
+    
     
     I_JavaSettings otherJava = other.getJavaSettings();
     if (otherJava == null) {
@@ -77,6 +87,11 @@ public class FabricateMutant implements I_Fabricate {
   public List<I_Dependency> getDependencies() {
     return dependencies_;
   }
+  
+  public String getFabricateDevXmlDir() {
+    return fabricateDevXmlDir_;
+  }
+
   
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getFabricateHome()
@@ -138,6 +153,10 @@ public class FabricateMutant implements I_Fabricate {
     this.fabricateRepository_ = fabricateRepository;
   }
 
+  public void setFabricateXmlRunDir(String fabricateXmlRunDir) {
+    this.fabricateXmlRunDir_ = fabricateXmlRunDir;
+  }
+  
   public void setJavaHome(String javaHome) {
     this.javaHome_ = javaHome;
   }
@@ -158,6 +177,25 @@ public class FabricateMutant implements I_Fabricate {
         addRemoteRepository(repo);
       }
     }
+  }
+
+  public String getFabricateXmlRunDir() {
+    return fabricateXmlRunDir_;
+  }
+
+
+
+  public String getFabricateProjectRunDir() {
+    return fabricateProjectRunDir_;
+  }
+
+
+  public void setFabricateProjectRunDir(String fabricateProjectRunDir) {
+    this.fabricateProjectRunDir_ = fabricateProjectRunDir;
+  }
+
+  public void setFabricateDevXmlDir(String fabricateDevXmlDir) {
+    this.fabricateDevXmlDir_ = fabricateDevXmlDir;
   }
   
 }

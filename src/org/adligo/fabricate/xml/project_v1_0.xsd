@@ -32,7 +32,7 @@ must document which attributes it pays attention to.</documentation>
     		<element name="stages" type="pns:project_stages_type"
     			minOccurs="1" maxOccurs="1">
     		</element>
-    		<element name="dependencies" type="lns:dependencies_type"
+    		<element name="dependencies" type="pns:project_dependencies_type"
     			minOccurs="0" maxOccurs="1">
     		</element>
     	</sequence>
@@ -76,4 +76,34 @@ must document which attributes it pays attention to.</documentation>
     	</sequence>
     	<attribute name="name" type="string" use="required"></attribute>
     </complexType>
+
+	<complexType name="project_dependency_type">
+    	<annotation>
+    		<documentation>
+    			This is a name of a project directory, the actual
+    			artifact ie (jar, war exc) is determined based on the
+    			context of the task running on the project for a
+    			particular stage. In other words there could be three
+    			jar files which are produced for a project (a gwt jar,
+    			jse jar and jme jar) so the artifact for a jme_jar task
+    			would be the jme jar.
+    		</documentation>
+    	</annotation>
+    	<simpleContent>
+    		<extension base="string">
+    			<attribute name="platform" type="lns:platform_type" use="optional"></attribute>
+    		</extension>
+    	</simpleContent>
+    </complexType>
+
+	<complexType name="project_dependencies_type">
+		<complexContent>
+			<extension base="lns:dependencies_type">
+				<sequence>
+					<element name="project" type="pns:project_dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
+				</sequence>
+			</extension>
+		</complexContent>
+
+	</complexType>
 </schema>

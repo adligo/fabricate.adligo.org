@@ -17,25 +17,6 @@
 
     <element name="library" type="tns:library_type"></element>
     
-    <complexType name="project_dependency_type">
-    	<annotation>
-    		<documentation>
-    			This is a name of a project directory, the actual
-    			artifact ie (jar, war exc) is determined based on the
-    			context of the task running on the project for a
-    			particular stage. In other words there could be three
-    			jar files which are produced for a project (a gwt jar,
-    			jse jar and jme jar) so the artifact for a jme_jar task
-    			would be the jme jar.
-    		</documentation>
-    	</annotation>
-    	<simpleContent>
-    		<extension base="string">
-    			<attribute name="platform" type="tns:platform_type" use="optional"></attribute>
-    		</extension>
-    	</simpleContent>
-    </complexType>
-
     <complexType name="dependency_type">
     	<sequence>
     		<element name="ide" type="tns:ide_type" minOccurs="0" maxOccurs="unbounded"></element>
@@ -96,7 +77,6 @@
     	<sequence>
     		<element name="library" type="tns:library_reference_type" minOccurs="0" maxOccurs="unbounded"></element>
     		<element name="dependency" type="tns:dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
-    		<element name="project" type="tns:project_dependency_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 

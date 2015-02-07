@@ -10,6 +10,12 @@ public interface I_Fabricate {
   
   public String getFabricateHome();
 
+  public String getFabricateProjectRunDir();
+
+  public String getFabricateDevXmlDir();
+  
+  public String getFabricateXmlRunDir();
+  
   public String getFabricateRepository();
   
   public String getJavaHome();

@@ -14,9 +14,9 @@ import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.TaskType;
-import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
-import org.adligo.fabricate.xml.io_v1.library_v1_0.ProjectDependencyType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependencyType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectStageType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectStagesType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectTaskType;
@@ -388,7 +388,7 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
   
   protected void waitForDependentProjectsToFinish(NamedProject np) {
     FabricateProjectType fpt =  np.getProject();
-    DependenciesType deps = fpt.getDependencies();
+    ProjectDependenciesType deps = fpt.getDependencies();
     
     if (deps != null) {
       List<ProjectDependencyType> projects = deps.getProject();

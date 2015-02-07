@@ -13,6 +13,7 @@ import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
+import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
 import org.adligo.fabricate.models.fabricate.I_JavaSettings;
 import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.repository.RepositoryManager;
@@ -83,13 +84,13 @@ public class FabricateOptsSetup {
 	 * @param fd
 	 * @param argMap
 	 */
-  private void workWithFabricateXml(FabricateXmlDiscovery fd) {
+  private void workWithFabricateXml(I_FabricateXmlDiscovery fd) {
     String fabricateXmlPath = files_.instance(fd.getFabricateXmlPath()).getAbsolutePath();
     
     try {
       FabricateType fabX =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
       FabSystemSetup.setup(sys_, fabX);
-      fab_ = factory_.create(sys_, fabX);
+      fab_ = factory_.create(sys_, fabX, fd);
       
       if (log_.isLogEnabled(FabricateOptsSetup.class)) {
         log_.println("downloadFabricateRunClasspathDependencies");

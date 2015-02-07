@@ -4,17 +4,13 @@ import org.adligo.fabricate.common.FabRunType;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.common.files.FabFileIO;
-import org.adligo.fabricate.common.files.I_FabFileIO;
-import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
-import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
-import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
-import org.adligo.fabricate.xml.io_v1.library_v1_0.ProjectDependencyType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependencyType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -208,7 +204,7 @@ public class LoadAndCleanProjects extends OldBaseConcurrentStage implements I_Fa
       NamedProject proj = oit.next();
       String name = proj.getName();
       FabricateProjectType fp = proj.getProject();
-      DependenciesType dt =  fp.getDependencies();
+      ProjectDependenciesType dt =  fp.getDependencies();
       int count = 0;
       if (dt == null) {
         order.add(name);
@@ -253,7 +249,7 @@ public class LoadAndCleanProjects extends OldBaseConcurrentStage implements I_Fa
         String name = proj.getName();
         if (!order.contains(name)) {
           FabricateProjectType fp = proj.getProject();
-          DependenciesType dt =  fp.getDependencies();
+          ProjectDependenciesType dt =  fp.getDependencies();
           List<ProjectDependencyType> projectDeps =  dt.getProject();
           List<String> projects = new ArrayList<String>();
           for (ProjectDependencyType pdt: projectDeps) {

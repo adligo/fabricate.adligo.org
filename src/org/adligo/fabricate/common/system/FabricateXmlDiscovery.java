@@ -1,9 +1,10 @@
 package org.adligo.fabricate.common.system;
 
+import org.adligo.fabricate.common.files.FabFileUtils;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
+import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 
 import java.io.File;
@@ -16,13 +17,14 @@ import java.io.IOException;
  * @author scott
  *
  */
-public class FabricateXmlDiscovery {
+public class FabricateXmlDiscovery implements I_FabricateXmlDiscovery {
 
   private final I_FabLog log_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
   private File fabricateXml_;
   private File projectXml_;
+  private File devXml_;
   private boolean devParseException_ = false;
   
   public FabricateXmlDiscovery(I_FabSystem sys) {
@@ -31,6 +33,7 @@ public class FabricateXmlDiscovery {
     xmlFiles_ = sys.getXmlFileIO();
     setup();
   }
+  
   public String getFabricateXmlPath() {
     if (fabricateXml_ == null) {
       return null;
@@ -96,6 +99,7 @@ public class FabricateXmlDiscovery {
             File projectsParentDir = projectsDir.getParentFile();
             if (projectsParentDir != null) {
               if (files_.exists(devXmlFilePath)) {
+                devXml_ = files_.instance(devXmlFilePath);
                 try {
                   FabricateDevType dev = xmlFiles_.parseDev_v1_0(devXmlFilePath);
                   String projectGroup = dev.getProjectGroup();
@@ -121,5 +125,37 @@ public class FabricateXmlDiscovery {
 
   public boolean isDevParseException() {
     return devParseException_;
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_FabricateXmlDiscovery#getFabricateXmlDir()
+   */
+  @Override
+  public String getFabricateXmlDir() {
+    String absPath = fabricateXml_.getAbsolutePath();
+    return FabFileUtils.getAbsoluteDir(absPath);
+  }
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_FabricateXmlDiscovery#getProjectXmlDir()
+   */
+  @Override
+  public String getProjectXmlDir() {
+    if (projectXml_ == null) {
+      return "";
+    }
+    String absPath = projectXml_.getAbsolutePath();
+    return FabFileUtils.getAbsoluteDir(absPath);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_FabricateXmlDiscovery#getDevXmlDir()
+   */
+  @Override
+  public String getDevXmlDir() {
+    if (devXml_ == null) {
+      return "";
+    }
+    String absPath = devXml_.getAbsolutePath();
+    return FabFileUtils.getAbsoluteDir(absPath);
   }
 }

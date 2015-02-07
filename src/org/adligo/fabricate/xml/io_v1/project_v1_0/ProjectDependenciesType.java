@@ -6,28 +6,29 @@
 //
 
 
-package org.adligo.fabricate.xml.io_v1.fabricate_v1_0;
+package org.adligo.fabricate.xml.io_v1.project_v1_0;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
 
 
 /**
- * <p>Java class for log_settings_type complex type.
+ * <p>Java class for project_dependencies_type complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="log_settings_type"&gt;
+ * &lt;complexType name="project_dependencies_type"&gt;
  *   &lt;complexContent&gt;
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *     &lt;extension base="{http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd}dependencies_type"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="log" type="{http://www.adligo.org/fabricate/xml/io_v1/fabricate_v1_0.xsd}log_setting_type" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="project" type="{http://www.adligo.org/fabricate/xml/io_v1/project_v1_0.xsd}project_dependency_type" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
- *     &lt;/restriction&gt;
+ *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
@@ -35,40 +36,42 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "log_settings_type", propOrder = {
-    "log"
+@XmlType(name = "project_dependencies_type", propOrder = {
+    "project"
 })
-public class LogSettingsType {
+public class ProjectDependenciesType
+    extends DependenciesType
+{
 
-    protected List<LogSettingType> log;
+    protected List<ProjectDependencyType> project;
 
     /**
-     * Gets the value of the log property.
+     * Gets the value of the project property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the log property.
+     * This is why there is not a <CODE>set</CODE> method for the project property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getLog().add(newItem);
+     *    getProject().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link LogSettingType }
+     * {@link ProjectDependencyType }
      * 
      * 
      */
-    public List<LogSettingType> getLog() {
-        if (log == null) {
-            log = new ArrayList<LogSettingType>();
+    public List<ProjectDependencyType> getProject() {
+        if (project == null) {
+            project = new ArrayList<ProjectDependencyType>();
         }
-        return this.log;
+        return this.project;
     }
 
 }
