@@ -9,7 +9,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -18,6 +17,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -32,6 +33,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -147,13 +149,20 @@ public class FabFileIO implements I_FabFileIO {
   
   @Override
   public void downloadFile(String url, String file) throws IOException {
+    if (log_.isLogEnabled(FabFileIO.class)) {
+      I_FileMessages messages = constants_.getFileMessages();
+      log_.println(messages.getStartingDownloadFromX().replaceAll("<X/>", url) + sys_.lineSeperator());
+    }
+    
     CloseableHttpClient httpClient = sys_.newHttpClient();
     HttpEntity entity = null;
     CloseableHttpResponse resp = null;
     boolean exiting = true;
+    long length = -1;
     try {
       resp = httpClient.execute(new HttpGet(url));
       entity = resp.getEntity();
+      length = entity.getContentLength();
       StatusLine status = resp.getStatusLine();
       int statusCode = status.getStatusCode();
       if (statusCode >= 300) {
@@ -175,12 +184,16 @@ public class FabFileIO implements I_FabFileIO {
     InputStream in = entity.getContent();
     
     try {
-      writeFile(in, newFileOutputStream(file));
+      writeFile(in, newFileOutputStream(file), length, url);
     } catch (FileNotFoundException x) {
       throw new IOException(x);
     } finally {
       close(resp);
       close(httpClient);
+    }
+    if (log_.isLogEnabled(FabFileIO.class)) {
+      I_FileMessages messages = constants_.getFileMessages();
+      log_.println(messages.getFinisedDownloadFromX().replaceAll("<X/>", url) + sys_.lineSeperator());
     }
   }
 
@@ -276,10 +289,23 @@ public class FabFileIO implements I_FabFileIO {
    * a default buffer size of 16Kb.
    * @param in
    * @param fos
+   * @param length the known length of the file;
    * @throws IOException
    */
   public void writeFile(InputStream in, FileOutputStream fos) throws IOException {
-    writeFile(in, fos, 16 * 1024);
+    writeFile(in, fos, 16 * 1024, -1, "");
+  }
+  /**
+   * This method writes a file out to disk from a input stream, using NIO 
+   * (ByteBuffer, ReadableByteChannel, FileChannel).  It uses
+   * a default buffer size of 16Kb.
+   * @param in
+   * @param fos
+   * @param length the known length of the file;
+   * @throws IOException
+   */
+  public void writeFile(InputStream in, FileOutputStream fos, long length, String whichFile) throws IOException {
+    writeFile(in, fos, 16 * 1024, length, whichFile);
   }
   /**
    * This method writes a file out to disk from a input stream, using NIO 
@@ -288,30 +314,73 @@ public class FabFileIO implements I_FabFileIO {
    * https://thomaswabner.wordpress.com/2007/10/09/fast-stream-copy-using-javanio-channels/
    * @param in
    * @param fos
+   * @param length the known length of the file
    * @throws IOException
    */
   public void writeFile(InputStream in, FileOutputStream fos, int bufferSize) throws IOException {
-    writeFileWithCloseTracker(in,fos, bufferSize, DefaultIOCloseTracker.INSTANCE);
+    writeFileWithCloseTracker(in,fos, bufferSize, DefaultIOCloseTracker.INSTANCE, -1, "");
+  }
+  /**
+   * This method writes a file out to disk from a input stream, using NIO 
+   * (ByteBuffer, ReadableByteChannel, FileChannel).
+   * Thanks for this;
+   * https://thomaswabner.wordpress.com/2007/10/09/fast-stream-copy-using-javanio-channels/
+   * @param in
+   * @param fos
+   * @param length the known length of the file
+   * @throws IOException
+   */
+  public void writeFile(InputStream in, FileOutputStream fos, int bufferSize, long length, String whichFile) throws IOException {
+    writeFileWithCloseTracker(in,fos, bufferSize, DefaultIOCloseTracker.INSTANCE, length, whichFile);
   }
 
   public void writeFileWithCloseTracker(InputStream in, FileOutputStream fos, int bufferSize,
-      I_IOCloseTracker tracker) throws IOException {
+      I_IOCloseTracker tracker, long length, String whichFile) throws IOException {
     try {
       ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
       ReadableByteChannel inputChannel = Channels.newChannel(in);
       WritableByteChannel outputChannel = fos.getChannel();
       
-      writeFileWithBuffers(buffer, inputChannel, outputChannel, tracker);
+      writeFileWithBuffers(buffer, inputChannel, outputChannel, tracker, length, whichFile);
     } catch (IOException x) {
       throw x;
     } finally {
       closeIOPair(in, fos,tracker);
     }
   }
-  
+
   public void writeFileWithBuffers(ByteBuffer buffer, 
       ReadableByteChannel inputChannel, WritableByteChannel outputChannel, 
       I_IOCloseTracker tracker) throws IOException {
+    writeFileWithBuffers(buffer, inputChannel, outputChannel, tracker, -1, "");
+  }
+  @SuppressWarnings("boxing")
+  public void writeFileWithBuffers(ByteBuffer buffer, 
+      ReadableByteChannel inputChannel, WritableByteChannel outputChannel, 
+      I_IOCloseTracker tracker, long length, String whichFile) throws IOException {
+    
+    
+    LinkedList<Double> pctsToLog = null;
+    if (length != -1) {
+      pctsToLog = new LinkedList<Double>();
+      if (length <= 100000000 && length >= 10000000) {
+        //10-100mb
+        pctsToLog.add(25.0);
+        pctsToLog.add(50.0);
+        pctsToLog.add(75.0);
+      } else if (length <= Integer.MAX_VALUE && length > 1000000000) {
+        for (int i = 1; i < 11; i++) {
+          pctsToLog.add(10.0 * i);
+        }
+      } else if (length > Integer.MAX_VALUE) {
+        for (int i = 1; i < 34; i++) {
+          pctsToLog.add(3.0 * i);
+        }
+      }
+    }
+    
+    BigDecimal lengthD = new BigDecimal(length);
+    long written = 0;
     try {
       while (inputChannel.read(buffer) != -1) {
         // prepare the buffer to be drained
@@ -321,6 +390,27 @@ public class FabFileIO implements I_FabFileIO {
         // If partial transfer, shift remainder down
         // If buffer is empty, same as doing clear()
         buffer.compact();
+        written = written + buffer.limit();
+        
+        if (length != -1) {
+          BigDecimal writtenD = new BigDecimal(written);
+          BigDecimal pct = writtenD.divide(lengthD, 2, RoundingMode.HALF_UP);
+          if (pctsToLog != null) {
+            Double d = pctsToLog.peek();
+            if (d != null) {
+              double pctP = pct.doubleValue() * 100.0;
+              
+              if (pctP >= d.doubleValue()) {
+                I_FileMessages messages = constants_.getFileMessages();
+                String message = messages.getTheFollowingDownloadIsXPercentComplete().replaceAll(
+                    "<X/>", "" + new Double(pctP).intValue());
+                log_.println(message + sys_.lineSeperator() + 
+                    whichFile + sys_.lineSeperator());
+                pctsToLog.pop();
+              }
+            }
+          }
+        }
       }
       // EOF will leave buffer in fill state
       buffer.flip();

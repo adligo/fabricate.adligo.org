@@ -82,7 +82,7 @@ public class FabSystemSetup {
   private static Set<String> getDefaultOns() {
     Set<String> toRet = new HashSet<String>();
     
-    toRet.add("org.adligo.fabricate.repository.DependencyManager");
+    toRet.add("org.adligo.fabricate.common.files.FabFileIO");
     toRet.add("org.adligo.fabricate.repository.RepositoryManager");
     return toRet;
   }

@@ -126,21 +126,25 @@ public class DependencyManager implements I_DependencyManager {
       logMd5Mismatch(messages, md5FromFile, md5);
       return false;
     }
-    log_.println(
-        messages.getTheFollowingArtifact() + sys_.lineSeperator() +
-        depOnDisk_ + sys_.lineSeperator() +
-        messages.getPassedTheMd5Check());
+    if (log_.isLogEnabled(DependencyManager.class)) {
+      log_.println(
+          messages.getTheFollowingArtifact() + sys_.lineSeperator() +
+          depOnDisk_ + sys_.lineSeperator() +
+          messages.getPassedTheMd5Check() + sys_.lineSeperator());
+    }
     return true;
   }
 
 
   public void logMd5Mismatch(I_SystemMessages messages, String fileMd5, String md5) {
-    log_.println(
-        messages.getTheFollowingArtifact() + sys_.lineSeperator() +
-        depOnDisk_ + sys_.lineSeperator() +
-        messages.getDidNotPassTheMd5Check() + sys_.lineSeperator() + 
-        fileMd5 + sys_.lineSeperator() + 
-        md5);
+    if (log_.isLogEnabled(DependencyManager.class)) {
+      log_.println(
+          messages.getTheFollowingArtifact() + sys_.lineSeperator() +
+          depOnDisk_ + sys_.lineSeperator() +
+          messages.getDidNotPassTheMd5Check() + sys_.lineSeperator() + 
+          fileMd5 + sys_.lineSeperator() + 
+          md5);
+    }
   }
 
 
@@ -175,34 +179,31 @@ public class DependencyManager implements I_DependencyManager {
     String from = remotePathBuilder.getArtifactUrl(dep);
     String to = pathBuilder_.getArtifactPath(dep);
     I_SystemMessages messages = constants_.getSystemMessages();
-    log_.println(
-        messages.getStartingDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
-        from + sys_.lineSeperator() +
-        messages.getToTheFollowingFolder() + sys_.lineSeperator() +
-        to);
+    
     try {
       files_.downloadFile(from, to);
     } catch (IOException x) {
-      log_.printTrace(x);
-      log_.println(
-          messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
-          from + sys_.lineSeperator() +
-          messages.getFailed());
+      if (log_.isLogEnabled(DependencyManager.class)) {
+        log_.println(
+            messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
+            from + sys_.lineSeperator() +
+            messages.getFailed() + sys_.lineSeperator());
+        log_.printTrace(x);
+      
+      }
       lastIOException_ = x;
       return false;
     }
     if (!files_.exists(to)) {
-      log_.println(
-          messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
-          from + sys_.lineSeperator() +
-          messages.getFailed());
+      if (log_.isLogEnabled(DependencyManager.class)) {
+        log_.println(
+            messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
+            from + sys_.lineSeperator() +
+            messages.getFailed() + sys_.lineSeperator());
+      }
       return false;
     }
     downloadedAnyArtifact_ = true;
-    log_.println(
-        messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
-        from + sys_.lineSeperator() +
-        messages.getFinished());
     return true;
   }
   
@@ -215,42 +216,39 @@ public class DependencyManager implements I_DependencyManager {
       if (!files_.mkdirs(folder)) {
         //it may be created by another thread :)_
         if (!files_.exists(folder)) {
-          I_FileMessages messages = constants_.getFileMessages();
-          log_.println(messages.getThereWasAProblemCreatingTheFollowingDirectory() + sys_.lineSeperator() +
-              folder);
-          log_.println(CommandLineArgs.END);
-          throw new RuntimeException();
+          if (log_.isLogEnabled(DependencyManager.class)) {
+            I_FileMessages messages = constants_.getFileMessages();
+            log_.println(CommandLineArgs.END);
+            throw new RuntimeException(messages.getThereWasAProblemCreatingTheFollowingDirectory() + sys_.lineSeperator() +
+                folder);
+          }
         }
       }
     }
     I_SystemMessages messages = constants_.getSystemMessages();
-    log_.println(
-        messages.getStartingDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
-        from + sys_.lineSeperator() +
-        messages.getToTheFollowingFolder() + sys_.lineSeperator() +
-        to);
+   
     try {
       files_.downloadFile(from, to);
     } catch (IOException x) {
-      log_.printTrace(x);
-      log_.println(
-          messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
-          from + sys_.lineSeperator() +
-          messages.getFailed());
+      if (log_.isLogEnabled(DependencyManager.class)) {
+        log_.printTrace(x);
+        log_.println(
+            messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
+            from + sys_.lineSeperator() +
+            messages.getFailed() + sys_.lineSeperator());
+      }
       lastIOException_ = x;
       return false;
     }
     if (!files_.exists(to)) {
-      log_.println(
-          messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
-          from + sys_.lineSeperator() +
-          messages.getFailed());
+      if (log_.isLogEnabled(DependencyManager.class)) {
+        log_.println(
+            messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
+            from + sys_.lineSeperator() +
+            messages.getFailed() + sys_.lineSeperator());
+      }
       return false;
     }
-    log_.println(
-        messages.getTheDownloadFromTheFollowingUrl() + sys_.lineSeperator() +
-        from + sys_.lineSeperator() +
-        messages.getFinished());
     return true;
   }
   
@@ -288,9 +286,11 @@ public class DependencyManager implements I_DependencyManager {
   private boolean extract(I_Dependency dep) {
     cleanExtract();
     I_SystemMessages messages = constants_.getSystemMessages();
-    log_.println(
-        messages.getExtractingTheFollowingArtifact() + sys_.lineSeperator() +
-        depOnDisk_);
+    if (log_.isLogEnabled(DependencyManager.class)) {
+      log_.println(
+          messages.getExtractingTheFollowingArtifact() + sys_.lineSeperator() +
+          depOnDisk_ + sys_.lineSeperator());
+    }
     try {
       files_.unzip(depOnDisk_, extractOnDisk_);
     } catch (IOException x) {
@@ -315,18 +315,22 @@ public class DependencyManager implements I_DependencyManager {
 
 
   public void logExtractVerificationSuccess(I_SystemMessages messages) {
-    log_.println(
-        messages.getTheFollowingArtifact() + sys_.lineSeperator() +
-        depOnDisk_ + sys_.lineSeperator() +
-        messages.getPassedTheExtractCheck());
+    if (log_.isLogEnabled(DependencyManager.class)) {
+      log_.println(
+          messages.getTheFollowingArtifact() + sys_.lineSeperator() +
+          depOnDisk_ + sys_.lineSeperator() +
+          messages.getPassedTheExtractCheck() + sys_.lineSeperator());
+    }
   }
 
 
   public void logExtractFailure(I_SystemMessages messages) {
-    log_.println(
-        messages.getExtractionOfTheFollowingArtifact() + sys_.lineSeperator() +
-        depOnDisk_ + sys_.lineSeperator() + 
-        messages.getFailed());
+    if (log_.isLogEnabled(DependencyManager.class)) {
+      log_.println(
+          messages.getExtractionOfTheFollowingArtifact() + sys_.lineSeperator() +
+          depOnDisk_ + sys_.lineSeperator() + 
+          messages.getFailed() + sys_.lineSeperator());
+    }
   }
   /**
    * identifies the variables

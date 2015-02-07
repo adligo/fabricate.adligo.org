@@ -8,11 +8,14 @@ import org.adligo.fabricate.common.i18n.I_FileMessages;
  *
  */
 public class FileEnMessages implements I_FileMessages {
-  
-  private static final String EXCLUDES = "Excludes: ";
- 
+
+  private static final String THE_FOLLOWING_DOWNLOAD_IS_X_PERCENT_COMPLETE = "The following download is <X/> percent complete;";
+  private static final String STARTING_DOWNLOAD_FROM_X = "Starting download from <X/>";
   private static final String DID_NOT_MATCH_THE_FOLLOWING_PATTERN = 
       "did NOT match the following pattern;";
+  private static final String EXCLUDES = "Excludes: ";
+  private static final String FINISHED_DOWNLOAD_OF_X = "Finished download of <X/>";
+
   private static final String MATCHED_THE_FOLLOWING_PATTERN = 
       "matched the following pattern;";
   private static final String FILE_MATCHING_PATTERNS_CAN_NOT_BE_EMPTY = 
@@ -44,13 +47,20 @@ public class FileEnMessages implements I_FileMessages {
     return DID_NOT_MATCH_THE_FOLLOWING_PATTERN;
   }
   
+  public String getExcludes() {
+    return EXCLUDES;
+  }
+  
+  public String getFinisedDownloadFromX() {
+    return FINISHED_DOWNLOAD_OF_X;
+  }  
+  
+  
   public String getIncludes() {
     return INCLUDES;
   }
   
-  public String getExcludes() {
-    return EXCLUDES;
-  }
+
   
   public String getTheWildCardCharacterIsNotAllowedInMiddleFileName() {
     return WILDCARD_IS_NOT_ALLOWED_IN_THE_MIDDLE_OF_A_FILE_PATTERN_FILE_NAME;
@@ -63,6 +73,10 @@ public class FileEnMessages implements I_FileMessages {
   public String getMatchedTheFollowingPattern() {
      return MATCHED_THE_FOLLOWING_PATTERN;
   }
+  
+  public String getTheFollowingDownloadIsXPercentComplete() {
+    return THE_FOLLOWING_DOWNLOAD_IS_X_PERCENT_COMPLETE;
+  }  
   
   public String getTheFollowingFile() {
     return THE_FOLLOWING_FILE;
@@ -86,6 +100,10 @@ public class FileEnMessages implements I_FileMessages {
   
   public String getSubmittingAHttpGetToTheFollowingUrlReturnedAnInvalidStatusCodeX() {
     return SUBMITTING_A_HTTP_GET_TO_THE_FOLLOWING_URL_RETURNED_A_INVALID_STATUS_CODE_X;
+  }
+  
+  public String getStartingDownloadFromX() {
+    return STARTING_DOWNLOAD_FROM_X;
   }
   
   
