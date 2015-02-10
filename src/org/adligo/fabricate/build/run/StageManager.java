@@ -65,6 +65,7 @@ public class StageManager {
   
   public StageManager(I_FabSystem sys) {
     sys_ = sys;
+    log_ = sys.getLog();
     files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
   }

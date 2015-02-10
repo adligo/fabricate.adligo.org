@@ -6,5 +6,9 @@ package org.adligo.fabricate.models.scm;
  *
  */
 public interface I_Scm {
-
+  /**
+   * The name of the scm (i.e. Git, Cvs, Svn)
+   * @return
+   */
+  public String getName();
 }

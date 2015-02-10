@@ -3,6 +3,7 @@ package org.adligo.fabricate.models.scm;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.GitServerType;
 
 public class GitScm implements I_GitScm {
+  private static final String GIT = "Git";
   private String host;
   private String path;
   private String user;
@@ -41,6 +42,10 @@ public class GitScm implements I_GitScm {
   @Override
   public String getProtocol() {
     return protocol;
+  }
+  @Override
+  public String getName() {
+    return GIT;
   }
 
 }

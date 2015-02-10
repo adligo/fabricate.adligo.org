@@ -8,10 +8,13 @@ import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
+import org.adligo.fabricate.presenters.ObtainProjectsPresenter;
 import org.adligo.fabricate.repository.DefaultRepositoryPathBuilder;
 import org.adligo.fabricate.repository.DependenciesManager;
+import org.adligo.fabricate.repository.DependenciesNormalizer;
 import org.adligo.fabricate.repository.DependencyManager;
 import org.adligo.fabricate.repository.I_DependenciesManager;
+import org.adligo.fabricate.repository.I_DependenciesNormalizer;
 import org.adligo.fabricate.repository.I_DependencyManager;
 import org.adligo.fabricate.repository.I_LibraryResolver;
 import org.adligo.fabricate.repository.I_RepositoryFactory;
@@ -39,22 +42,20 @@ public class FabricateFactory implements I_RepositoryFactory {
     //return new Fabricate(fm);
     Fabricate tf = new Fabricate(fm);
     FabricateDependencies deps = fab.getDependencies();
-    List<LibraryReferenceType> lrts = deps.getLibrary();
-    if (lrts.size() >= 1) {
-      LibraryResolver lr = new LibraryResolver(sys,tf);
-      List<I_Dependency> imutDeps = lr.getDependencies(lrts);
-      List<I_Dependency> fmDeps = fm.getDependencies();
-      List<I_Dependency> allDeps = new ArrayList<I_Dependency>();
-      allDeps.addAll(imutDeps);
-      allDeps.addAll(fmDeps);
-      fm.setDependencies(allDeps);
-      return new Fabricate(fm);
+    if (deps != null) {
+      List<LibraryReferenceType> lrts = deps.getLibrary();
+      if (lrts.size() >= 1) {
+        LibraryResolver lr = new LibraryResolver(sys,tf);
+        List<I_Dependency> imutDeps = lr.getDependencies(lrts);
+        List<I_Dependency> fmDeps = fm.getDependencies();
+        List<I_Dependency> allDeps = new ArrayList<I_Dependency>();
+        allDeps.addAll(imutDeps);
+        allDeps.addAll(fmDeps);
+        fm.setDependencies(allDeps);
+        return new Fabricate(fm);
+      }
     }
     return tf;
-  }
-  
-  public FabricateXmlDiscovery createDiscovery(I_FabSystem sys) {
-    return new FabricateXmlDiscovery(sys);
   }
   
   public I_DependenciesManager createDependenciesManager(I_FabSystem sys, 
@@ -62,9 +63,23 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new DependenciesManager(sys, deps, this);
   }
 
+  @Override
+  public I_DependenciesNormalizer createDependenciesNormalizer() {
+    return new DependenciesNormalizer();
+  }
+  
+  public FabricateXmlDiscovery createDiscovery(I_FabSystem sys) {
+    return new FabricateXmlDiscovery(sys);
+  }
+  
   public I_DependencyManager createDependencyManager(
       I_FabSystem sys, List<String> repos, I_RepositoryPathBuilder builder) {
     return new DependencyManager(sys, repos, builder);
+  }
+
+  @Override
+  public I_LibraryResolver createLibraryResolver(I_FabSystem sys, I_Fabricate fabricate) {
+    return new LibraryResolver(sys, fabricate);
   }
   
   public RepositoryManager createRepositoryManager(I_FabSystem sys, I_Fabricate fab) {
@@ -77,12 +92,11 @@ public class FabricateFactory implements I_RepositoryFactory {
   }
   
   @Override
-  public I_RepositoryPathBuilder createRepositoryPathBuilder(String remoteRepository, String separator) {
-    return new DefaultRepositoryPathBuilder(remoteRepository, separator);
+  public I_RepositoryPathBuilder createRepositoryPathBuilder(String localRepository, String separator) {
+    return new DefaultRepositoryPathBuilder(localRepository, separator);
   }
 
-  @Override
-  public I_LibraryResolver createLibraryResolver(I_FabSystem sys, I_Fabricate fabricate) {
-    return new LibraryResolver(sys, fabricate);
-  }
+
+
+
 }

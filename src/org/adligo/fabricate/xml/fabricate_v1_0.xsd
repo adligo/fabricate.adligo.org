@@ -191,7 +191,7 @@ in order for the task to be executed on the project.</documentation>
         </annotation>
         <sequence>
     		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
-    		<element name="task" type="fns:task_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="task" type="fns:optional_routine_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     	<attribute name="name" type="string"></attribute>
     	<attribute name="class" type="string">
@@ -286,9 +286,9 @@ fabricate will be able to delegate to other fabrications.</documentation>
     	</sequence>
     </complexType>
     
-    <complexType name="task_type">
+    <complexType name="optional_routine_type">
     	<complexContent>
-	    	<extension base="fns:command_task_type">
+	    	<extension base="fns:routine_type">
 	        <attribute name="optional" type="boolean" use="optional">
 	        	<annotation>
 	        		<documentation>
@@ -334,7 +334,7 @@ fabricate will be able to delegate to other fabrications.</documentation>
     		<element name="params" type="cns:params_type" minOccurs="0"
     			maxOccurs="1">
     		</element>
-    		<element name="task" type="fns:command_task_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="task" type="fns:routine_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     	<attribute name="name" type="string" use="required"></attribute>
     	<attribute name="class" type="string" use="required">
@@ -350,7 +350,7 @@ fabricate will be able to delegate to other fabrications.</documentation>
     	</attribute>
     </complexType>
 
-    <complexType name="command_task_type">
+    <complexType name="routine_type">
     	<sequence>
     		<element name="params" type="cns:params_type" minOccurs="0"
     			maxOccurs="1">

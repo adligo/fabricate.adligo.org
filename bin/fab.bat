@@ -16,7 +16,8 @@ IF "%FABRICATE_HOME%" ==  "" (
 	SET CLASSPATH=%FABRICATE_HOME%/lib/commons-logging-1.2.jar;
 	SET CLASSPATH=!CLASSPATH!%FABRICATE_HOME%/lib/httpcore-4.3.2.jar;
 	SET CLASSPATH=!CLASSPATH!%FABRICATE_HOME%/lib/httpclient-4.3.5.jar;
-	SET CLASSPATH=!CLASSPATH!%FABRICATE_HOME%/lib/fabricate_snapshot.jar
+	SET FABRICATE_JAR=%FABRICATE_HOME%/lib/fabricate_snapshot.jar
+	SET CLASSPATH=!CLASSPATH!;!FABRICATE_JAR!
 	
 	SET ARGS_FROM_SETUP="Empty"
 	
@@ -54,7 +55,7 @@ IF "%FABRICATE_HOME%" ==  "" (
 
 	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) run Fabricate.
-	java !OPTIONS_FROM_SETUP! org.adligo.fabricate.FabricateController !ARGS_FROM_SETUP! 
+	java !OPTIONS_FROM_SETUP!;!FABRICATE_JAR! org.adligo.fabricate.FabricateController !ARGS_FROM_SETUP! 
 )
 :END
 ENDLOCAL

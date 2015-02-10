@@ -1,5 +1,6 @@
 package org.adligo.fabricate.models.fabricate;
 
+import org.adligo.fabricate.common.system.FabricateDefaults;
 import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 
@@ -27,7 +28,12 @@ public class Fabricate implements I_Fabricate {
     fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
     fabricateRepository_ = other.getFabricateRepository();
     javaHome_ = other.getJavaHome();
-    javaSettings_ = new JavaSettings(other.getJavaSettings());
+    I_JavaSettings otherJs = other.getJavaSettings();
+    if (otherJs != null) {
+      javaSettings_ = new JavaSettings(otherJs);
+    } else {
+      javaSettings_ = null;
+    }
     fabricateDevXmlDir_ = other.getFabricateDevXmlDir();
     fabricateProjectRunDir_ = other.getFabricateProjectRunDir();
     
@@ -96,11 +102,26 @@ public class Fabricate implements I_Fabricate {
     return remoteRepositories_;
   }
   
-  @Override
   public int getThreads() {
+    if (javaSettings_ == null) {
+      return FabricateDefaults.JAVA_THREADS;
+    }
     return javaSettings_.getThreads();
   }
 
+  public String getXms() {
+    if (javaSettings_ == null) {
+      return FabricateDefaults.JAVA_XMS_DEFAULT;
+    }
+    return javaSettings_.getXms();
+  }
+
+  public String getXmx() {
+    if (javaSettings_ == null) {
+      return FabricateDefaults.JAVA_XMX_DEFAULT;
+    }
+    return javaSettings_.getXmx();
+  }
   public String getFabricateXmlRunDir() {
     return fabricateXmlRunDir_;
   }

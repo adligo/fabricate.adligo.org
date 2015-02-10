@@ -5,46 +5,55 @@ import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.JavaType;
 
 public class JavaSettingsMutant implements I_JavaSettings {
-  private String xms;
-  private String xmx;
-  private int threads;
+  private String xms_;
+  private String xmx_;
+  private int threads_;
 
   public JavaSettingsMutant() {}
   
   public JavaSettingsMutant(I_JavaSettings other) {
-    threads = other.getThreads();
-    xms = other.getXms();
-    xmx = other.getXmx();
+    threads_ = other.getThreads();
+    xms_ = other.getXms();
+    xmx_ = other.getXmx();
   }
   
   public JavaSettingsMutant(JavaType java) {
-    threads = getThreads(java);
-    xms = getXms(java);
-    xmx = getXmx(java);
+    threads_ = getThreads(java);
+    xms_ = getXms(java);
+    xmx_ = getXmx(java);
   }
 
   public String getXms() {
-    return xms;
+    if (xms_ == null) {
+      return FabricateDefaults.JAVA_XMS_DEFAULT;
+    }
+    return xms_;
   }
 
   public String getXmx() {
-    return xmx;
+    if (xmx_ == null) {
+      return FabricateDefaults.JAVA_XMX_DEFAULT;
+    }
+    return xmx_;
   }
 
   public int getThreads() {
-    return threads;
+    if (threads_ == 0) {
+      return FabricateDefaults.JAVA_THREADS;
+    }
+    return threads_;
   }
 
   public void setXms(String xms) {
-    this.xms = xms;
+    this.xms_ = xms;
   }
 
   public void setXmx(String xmx) {
-    this.xmx = xmx;
+    this.xmx_ = xmx;
   }
 
   public void setThreads(int threads) {
-    this.threads = threads;
+    this.threads_ = threads;
   }
   
   @SuppressWarnings("boxing")

@@ -1,5 +1,7 @@
 package org.adligo.fabricate.routines;
 
+import org.adligo.fabricate.models.common.I_FabricationRoutine;
+
 /**
  * This class provides a Queue of projects which can help implementers 
  * process projects concurrently in project dependency order which is
@@ -9,6 +11,6 @@ package org.adligo.fabricate.routines;
  * @author scott
  *
  */
-public abstract class DependenciesQueueRoutine implements I_FabricationRoutine {
+public abstract class DependenciesQueueRoutine implements I_FabricationRoutine, I_ProjectsAware {
 
 }

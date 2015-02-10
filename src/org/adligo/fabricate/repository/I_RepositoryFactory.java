@@ -16,4 +16,5 @@ public interface I_RepositoryFactory {
   public I_LibraryResolver createLibraryResolver(I_FabSystem sys, I_Fabricate fabricate);
   public I_RepositoryPathBuilder createRepositoryPathBuilder(String remoteRepository);
   public I_RepositoryPathBuilder createRepositoryPathBuilder(String remoteRepository, String separator);
+  public I_DependenciesNormalizer createDependenciesNormalizer();
 }

@@ -3,16 +3,24 @@ package org.adligo.fabricate.common.en;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
-  
- 
-  private static final String CHECKING_FABRICATE_RUNTIME_DEPENDENCIES = "Checking Fabricate runtime dependencies.";
-  private static final String THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS = "The following local repository is locked by another process;";
-  private static final String DID_NOT_PASS_THE_EXTRACT_CHECK = "did not pass the extract check.";
-  private static final String DID_NOT_PASS_THE_MD5_CHECK = "did not pass the md5 check.";
+
+  private static final String FABRICATING = "Fabricating...";
+  private static final String BUILDING_FABRICATE_RUNTIME_CLASS_PATH = 
+      "Building Fabricate runtime class path.";
+  private static final String CHECKING_FABRICATE_RUNTIME_DEPENDENCIES = 
+      "Checking Fabricate runtime dependencies.";
+  private static final String THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS = 
+      "The following local repository is locked by another process;";
+  private static final String DID_NOT_PASS_THE_EXTRACT_CHECK = 
+      "did not pass the extract check.";
+  private static final String DID_NOT_PASS_THE_MD5_CHECK = 
+      "did not pass the md5 check.";
   
   private static final String FAILED = "failed!";
   private static final String FINISHED = "finished.";
   
+  private static final String SENDING_OPTS_TO_SCRIPT = 
+      "Sending opts to script.";
   private static final String STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
       "Starting download from the following url;";
   public static final SystemEnMessages INSTANCE = new SystemEnMessages();
@@ -24,7 +32,10 @@ public class SystemEnMessages implements I_SystemMessages {
       "Exception: No $FABRICATE_HOME environment variable set.";
   private static final String EXCEPTION_NO_$JAVA_HOME_ENVIRONMENT_VARIABLE_SET = 
       "Exception: No $JAVA_HOME environment variable set.";
-
+  private static final String EXCEPTION_NO_FABRICATE_XML_OR_PROJECT_XML_FOUND = 
+      "Exception: No fabricate.xml or project.xml found.";
+  private static final String EXCEPTION_NO_START_TIME_ARGUMENT = 
+      "Exception: No start time argument.";
   
   private static final String EXCEPTION_EXECUTING_JAVA_WITH_THE_FOLLOWING_JAVA_HOME = 
       "Exception: There was a problem executing java with the following $JAVA_HOME;";
@@ -32,8 +43,7 @@ public class SystemEnMessages implements I_SystemMessages {
       "Exception: Fabricate requires Java 1.7 or greater.";
   private static final String EXCEPTION_JAVA_VERSION_PARAMETER_EXPECTED = 
       "Exception: Java version parameter expected.";
-  private static final String EXCEPTION_NO_FABRICATE_XML_OR_PROJECT_XML_FOUND = 
-      "Exception: No fabricate.xml or project.xml found.";
+
   private static final String EXTRACTION_OF_THE_FOLLOWING_ARTIFACT = 
       "Extraction of the following artifact;";
   private static final String EXTRACTING_THE_FOLLOWING_ARTIFACT = 
@@ -42,6 +52,10 @@ public class SystemEnMessages implements I_SystemMessages {
   
   private static final String FABRICATE_BY_ADLIGO = "Fabricate by Adligo.";
   
+  private static final String MANAGING_FABRICATE_RUNTIME_CLASS_PATH_DEPENDENCIES = 
+      "Managing Fabricate runtime class path dependencies.";
+  private static final String MANAGING_THE_FOLLOWING_LOCAL_REPOSITORY = 
+      "Managing the following local repository;";
   private static final String NO_REMOTE_REPOSITORIES_COULD_BE_REACHED = 
       "No remote repositories could be reached.";
   
@@ -66,12 +80,18 @@ public class SystemEnMessages implements I_SystemMessages {
   
   private static final String TO_THE_FOLLOWING_FOLDER = "to the following folder;";
   
-
+  private static final String USING_THE_FOLLOWING_REMOTE_REPOSITORIES = 
+      "Using the following remote repositories;";
   private static final String VERSION_X = "Version <X/>.";
   
   private SystemEnMessages() {
   }
 
+  @Override
+  public String getBuildingFabricateRuntimeClassPath() {
+    return BUILDING_FABRICATE_RUNTIME_CLASS_PATH;
+  }
+  
   @Override
   public String getCompiledOnX() {
     return COMPILED_ON_X;
@@ -85,6 +105,11 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getDidNotPassTheMd5Check() {
     return DID_NOT_PASS_THE_MD5_CHECK;
   }
+  
+  public String getFabricating() {
+    return FABRICATING;
+  }
+  
   public String getDidNotPassTheExtractCheck() {
     return DID_NOT_PASS_THE_EXTRACT_CHECK;
   }
@@ -112,6 +137,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getExceptionNoJavaHomeSet() {
     return EXCEPTION_NO_$JAVA_HOME_ENVIRONMENT_VARIABLE_SET;
+  }
+
+  @Override
+  public String getExceptionNoStartTimeArg() {
+    return EXCEPTION_NO_START_TIME_ARGUMENT;
   }
   
   @Override
@@ -173,6 +203,11 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getUsingTheFollowingRemoteRepositories() {
+    return USING_THE_FOLLOWING_REMOTE_REPOSITORIES;
+  }
+  
+  @Override
   public String getTheDownloadFromTheFollowingUrl() {
     return THE_DOWNLOAD_FROM_THE_FOLLOWING_URL;
   }
@@ -203,10 +238,27 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess() {
     return THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS;
   }
+
+  @Override
+  public String getManagingFabricateRuntimeClassPathDependencies() {
+    return MANAGING_FABRICATE_RUNTIME_CLASS_PATH_DEPENDENCIES;
+  }
+
+  @Override
+  public String getManagingTheFollowingLocalRepository() {
+    return MANAGING_THE_FOLLOWING_LOCAL_REPOSITORY;
+  }
+  
+
   
   @Override
   public String getNoRemoteRepositoriesCouldBeReached() {
     return NO_REMOTE_REPOSITORIES_COULD_BE_REACHED;
+  }
+
+  @Override
+  public String getSendingOptsToScript() {
+    return SENDING_OPTS_TO_SCRIPT;
   }
   
   @Override

@@ -10,10 +10,10 @@ import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.OptionalRoutineType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.TaskType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependencyType;
@@ -94,9 +94,9 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
         if (stageParams_ == null) {
           stageParams_ = Collections.EMPTY_MAP;
         }
-        List<TaskType> tasks =  stage.getTask();
+        List<OptionalRoutineType> tasks =  stage.getTask();
         if (tasks != null) {
-          for (TaskType task: tasks) {
+          for (OptionalRoutineType task: tasks) {
             String taskName = task.getName();
             ParamsType params = task.getParams();
             Map<String,String> paramMap = toMap(params.getParam());

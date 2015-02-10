@@ -13,6 +13,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Locale;
@@ -39,6 +40,11 @@ public class FabSystem implements I_FabSystem {
     return log_;
   }
 
+  @Override
+  public String getPathSeparator() {
+    return File.pathSeparator;
+  }
+  
   public void setLog(I_FabLog log) {
     log_.setDelegate(log);;
   }

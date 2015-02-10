@@ -1,9 +1,10 @@
 package org.adligo.fabricate.common.i18n;
 
 public interface I_FabricateConstants {
-  public String getLanguage();
+  
+  public I_CommandLineConstants getCommandLineConstants();
   public String getCountry();
-  public boolean isLeftToRight();
+  
   /**
    * This is the relative folder or directory name
    * of the folder where Fabricate extracted
@@ -20,8 +21,12 @@ public interface I_FabricateConstants {
    * @return
    */
   public String getExtractDirName();
-  public I_CommandLineConstants getCommandLineConstants();
+  
   public I_FileMessages getFileMessages();
+  public String getLanguage();
+  public boolean isLeftToRight();
+  
+  
   public I_GitMessages getGitMessages();
   /**
    * Try to use I_FabSystem.lineSeperator

@@ -37,6 +37,13 @@ public interface I_FabSystem extends I_FabFilesSystem {
    */
   public I_Executor getExecutor();
   
+  /**
+   * This returns the system dependent separator for class path entries.
+   * an alias to File.pathSeparator(), for stubbing.
+   * @return
+   */
+  public String getPathSeparator();
+  
   public I_FabFileIO getFileIO();
   public I_FabXmlFileIO getXmlFileIO();
   /**

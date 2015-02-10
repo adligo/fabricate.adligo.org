@@ -11,7 +11,8 @@ fi
 CLASSPATH=$FABRICATE_HOME/lib/commons-logging-1.2.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpcore-4.3.2.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpclient-4.3.5.jar
-CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/@FABRICATE_NAME@.jar 
+FABRICATE_JAR=$FABRICATE_HOME/lib/@FABRICATE_NAME@.jar 
+CLASSPATH=$CLASSPATH:$FABRICATE_JAR
 ARGS="$@"
 
 
@@ -50,11 +51,12 @@ else
 	
 	if [ "END" == "$OPTIONS_FROM_SETUP" ]; then
 		exit 0
-	else
-		
+	else 
+		OPTS=$OPTIONS_FROM_SETUP:$FABRICATE_JAR
 		# @diagram_sync on 1/26/2014 with Overview.seq
 		# main(String [] args) run Fabricate.
-		java  $OPTIONS_FROM_SETUP org.adligo.fabricate.FabricateController $ARGS_FROM_SETUP 
+		java  $OPTS org.adligo.fabricate.FabricateController $ARGS_FROM_SETUP
 	fi
 fi
+
 

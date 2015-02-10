@@ -4,7 +4,7 @@ import org.adligo.fabricate.models.dependencies.I_Dependency;
 
 import java.util.List;
 
-public interface I_Fabricate {
+public interface I_Fabricate extends I_JavaSettings {
 
   public List<I_Dependency> getDependencies();
   
@@ -24,6 +24,5 @@ public interface I_Fabricate {
   
   public List<String> getRemoteRepositories();
   
-  public int getThreads();
 
 }

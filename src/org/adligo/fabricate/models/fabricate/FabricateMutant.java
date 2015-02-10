@@ -1,6 +1,8 @@
 package org.adligo.fabricate.models.fabricate;
 
 import org.adligo.fabricate.common.system.FabricateDefaults;
+import org.adligo.fabricate.models.common.I_FabricationRoutine;
+import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.dependencies.DependencyMutant;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
@@ -10,7 +12,9 @@ import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FabricateMutant implements I_Fabricate {
   private String fabricateHome_;
@@ -22,10 +26,20 @@ public class FabricateMutant implements I_Fabricate {
   private JavaSettingsMutant javaSettings_;
   private List<I_Dependency> dependencies_ = new ArrayList<I_Dependency>();
   private List<String> remoteRepositories_ = new ArrayList<String>();
+  private Map<String,RoutineBriefMutant> commands = new HashMap<String,RoutineBriefMutant>();
+  private Map<String,RoutineBriefMutant> stages = new HashMap<String,RoutineBriefMutant>();
   
   public FabricateMutant() {
   }
   
+  /**
+   * Note this constructor does NOT create commands, stages and tasks 
+   * in order to save on script processing time.  The methods addCommands 
+   * and addStagesAndTasks may be used to add the commands, stages and tasks.
+   * 
+   * @param fab
+   * @param xmlDisc
+   */
   public FabricateMutant(FabricateType fab, I_FabricateXmlDiscovery xmlDisc) {
     javaSettings_ = new JavaSettingsMutant(fab.getJava());
     FabricateDependencies deps =  fab.getDependencies();
@@ -65,6 +79,10 @@ public class FabricateMutant implements I_Fabricate {
     List<I_Dependency> deps = other.getDependencies();
     setDependencies(deps);
   }
+  
+  public void addCommands(FabricateType type) {
+    
+  }
 
   public void addDependency(DependencyType dep) {
     dependencies_.add(new DependencyMutant(dep));
@@ -82,6 +100,10 @@ public class FabricateMutant implements I_Fabricate {
     if (repo != null) {
       remoteRepositories_.add(repo);
     }
+  }
+  
+  public void addStagesAndTasks(FabricateType type) {
+    
   }
   
   public List<I_Dependency> getDependencies() {
@@ -136,6 +158,20 @@ public class FabricateMutant implements I_Fabricate {
     return javaSettings_.getThreads();
   }
 
+  public String getXms() {
+    if (javaSettings_ == null) {
+      return FabricateDefaults.JAVA_XMS_DEFAULT;
+    }
+    return javaSettings_.getXms();
+  }
+
+  public String getXmx() {
+    if (javaSettings_ == null) {
+      return FabricateDefaults.JAVA_XMX_DEFAULT;
+    }
+    return javaSettings_.getXmx();
+  }
+  
   public void setDependencies(Collection<? extends I_Dependency> deps) {
     dependencies_.clear();
     if (deps != null) {
@@ -197,5 +233,7 @@ public class FabricateMutant implements I_Fabricate {
   public void setFabricateDevXmlDir(String fabricateDevXmlDir) {
     this.fabricateDevXmlDir_ = fabricateDevXmlDir;
   }
+
+
   
 }

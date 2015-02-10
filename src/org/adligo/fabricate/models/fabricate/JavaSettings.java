@@ -1,5 +1,6 @@
 package org.adligo.fabricate.models.fabricate;
 
+import org.adligo.fabricate.common.system.FabricateDefaults;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.JavaType;
 
 public class JavaSettings implements I_JavaSettings {
@@ -22,6 +23,9 @@ public class JavaSettings implements I_JavaSettings {
    */
   @Override
   public int getThreads() {
+    if (threads_ == 0) {
+      return FabricateDefaults.JAVA_THREADS;
+    }
     return threads_;
   }
   
@@ -29,16 +33,18 @@ public class JavaSettings implements I_JavaSettings {
    * @see org.adligo.fabricate.models.fabricate.I_JavaSettings#getXmx()
    */
   @Override
-  public String getXmx() {
-    return xmx_;
-  }
-  
-  /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.fabricate.I_JavaSettings#getXms()
-   */
-  @Override
   public String getXms() {
+    if (xms_ == null) {
+      return FabricateDefaults.JAVA_XMS_DEFAULT;
+    }
     return xms_;
+  }
+
+  public String getXmx() {
+    if (xmx_ == null) {
+      return FabricateDefaults.JAVA_XMX_DEFAULT;
+    }
+    return xmx_;
   }
 
 }

@@ -1,7 +1,6 @@
 package org.adligo.fabricate.repository;
 
 import org.adligo.fabricate.common.files.I_FabFileIO;
-import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Semaphore;
 
 /**
  * This class should concurrently obtain (download + md5 check) 
@@ -21,7 +19,6 @@ import java.util.concurrent.Semaphore;
  */
 public class DependenciesManager implements I_DependenciesManager {
   private final I_FabSystem sys_;
-  private final I_FabLog log_;
   private final I_FabFileIO files_;
   
   private final ConcurrentLinkedQueue<I_Dependency> dependencyQueue_;
@@ -37,7 +34,6 @@ public class DependenciesManager implements I_DependenciesManager {
       ConcurrentLinkedQueue<I_Dependency> deps, I_RepositoryFactory factory) {
     
     sys_ = sys;
-    log_ = sys.getLog();
     files_ = sys.getFileIO();
     dependencyQueue_ = deps;
     factory_ = factory;
@@ -112,6 +108,9 @@ public class DependenciesManager implements I_DependenciesManager {
   
   public synchronized boolean isFinished() {
     return finished;
+  }
+  public ConcurrentLinkedQueue<I_Dependency> getDependencyQueue() {
+    return dependencyQueue_;
   }
 
 }

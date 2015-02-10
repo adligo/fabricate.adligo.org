@@ -14,7 +14,7 @@ import java.util.List;
  * @author scott
  *
  */
-public interface I_ProjectBriefAware {
+public interface I_ProjectBriefsAware {
   public List<I_ProjectBrief> getProjectBriefs();
   public void setProjectBriefs(Collection<I_ProjectBrief> briefs);
 }

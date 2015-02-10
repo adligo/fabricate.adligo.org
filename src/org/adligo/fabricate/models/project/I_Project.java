@@ -1,5 +1,11 @@
 package org.adligo.fabricate.models.project;
 
+import org.adligo.fabricate.models.dependencies.I_Dependency;
+import org.adligo.fabricate.models.dependencies.I_ProjectDependency;
+import org.adligo.fabricate.models.scm.I_Scm;
+
+import java.util.List;
+
 
 
 /**
@@ -20,6 +26,9 @@ public interface I_Project extends I_ProjectBrief {
    * @return
    */
   public String getDir();
-  public String getShortName();
-  public String getDomainName();
+
+  public List<I_Dependency> getDependencies();
+  public List<I_ProjectDependency> getProjectDependencies();
+  
+  public I_Scm getScm();
 }

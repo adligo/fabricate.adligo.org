@@ -238,11 +238,10 @@ public class FabricateArgsSetup {
     return ENV;
   }
 
-  
   /**
    * This method is for injecting a mock 
    * for testing only.
-   * @param jAVA_CALLS
+   * @param jc
    */
   public static void setJAVA_CALLS(JavaCalls jc) {
     JAVA_CALLS = jc;

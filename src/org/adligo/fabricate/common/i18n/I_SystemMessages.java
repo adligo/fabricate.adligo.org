@@ -1,6 +1,8 @@
 package org.adligo.fabricate.common.i18n;
 
 public interface I_SystemMessages {
+  public String getBuildingFabricateRuntimeClassPath();
+  
   public String getCheckingFabricateRuntimeDependencies();
   public String getCompiledOnX();
   
@@ -15,12 +17,15 @@ public interface I_SystemMessages {
   public String getExceptionNoFabricateXmlOrProjectXmlFound();
   public String getExceptionNoFabricateHomeSet();
   public String getExceptionNoFabricateJarInFabricateHomeLib();
+  public String getExceptionNoStartTimeArg();
   public String getExceptionNoJavaHomeSet();
   
   public String getExtractingTheFollowingArtifact();
   public String getExtractionOfTheFollowingArtifact();
   
   public String getFabricateByAdligo();
+  public String getFabricating();
+  
   /**
    * For other languages this may be translated better as
    * Fabricate (failed). Where Fabricate (the name of the 
@@ -32,10 +37,13 @@ public interface I_SystemMessages {
   public String getFailed();
   public String getFinished();
   
+  public String getManagingTheFollowingLocalRepository();
+  public String getManagingFabricateRuntimeClassPathDependencies();
   public String getNoRemoteRepositoriesCouldBeReached();
   public String getPassedTheMd5Check();
   public String getPassedTheExtractCheck();
   
+  public String getSendingOptsToScript();
   public String getStartingDownloadFromTheFollowingUrl();
   
   public String getToTheFollowingFolder();
@@ -58,6 +66,6 @@ public interface I_SystemMessages {
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   
   public String getTheFollowingArtifact();
-  
+  public String getUsingTheFollowingRemoteRepositories();
   public String getVersionX();
 }

@@ -4,7 +4,10 @@ import org.adligo.fabricate.common.FabConstantsDiscovery;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.FabLog;
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.LogSettingsType;
@@ -20,20 +23,25 @@ import java.util.StringTokenizer;
 
 public class FabSystemSetup {
 
+  @SuppressWarnings("boxing")
   public static Map<String, Boolean> getSettings(FabricateType fabricate, Set<String> defaultOns) {
     Map<String,Boolean> logSets = new HashMap<String,Boolean>();
-    LogSettingsType logs = fabricate.getLogs();
-    List<LogSettingType> settings = logs.getLog();
     for (String clazz: defaultOns) {
       logSets.put(clazz, true);
     }
-    for (LogSettingType set: settings) {
-      String clazz = set.getClazz();
-      Boolean value = set.isSetting();
-      if (value != null) {
-        logSets.put(clazz, value);
+    LogSettingsType logs = fabricate.getLogs();
+    if (logs != null) {
+      List<LogSettingType> settings = logs.getLog();
+      
+      for (LogSettingType set: settings) {
+        String clazz = set.getClazz();
+        Boolean value = set.isSetting();
+        if (value != null) {
+          logSets.put(clazz, value);
+        }
       }
     }
+    
     return logSets;
   }
   
@@ -67,6 +75,25 @@ public class FabSystemSetup {
     sys.setArgs(argMap);
   }
   
+  public static void checkManditoryOptsAndAfterArgs(I_FabSystem sys) {
+    String version = sys.getArgValue("java");
+    if (StringUtils.isEmpty(version)) {
+      I_FabricateConstants constants = sys.getConstants();
+      I_FabLog log = sys.getLog();
+      I_SystemMessages sysMessages = constants.getSystemMessages();
+      log.println(CommandLineArgs.END);
+      throw new IllegalStateException(sysMessages.getExceptionJavaVersionParameterExpected());
+    }
+    
+    String start = sys.getArgValue("start");
+    if (StringUtils.isEmpty(start)) {
+      I_FabricateConstants constants = sys.getConstants();
+      I_FabLog log = sys.getLog();
+      I_SystemMessages sysMessages = constants.getSystemMessages();
+      log.println(CommandLineArgs.END);
+      throw new IllegalStateException(sysMessages.getExceptionNoStartTimeArg());
+    }
+  }
   public static void setup(FabSystem sys, FabricateType fabricate) {
     I_FabricateConstants constants = sys.getConstants();
     I_CommandLineConstants clConstants = constants.getCommandLineConstants();
