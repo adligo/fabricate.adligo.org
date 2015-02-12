@@ -8,6 +8,9 @@ import java.util.Map;
 
 public class CommandLineEnConstants implements I_CommandLineConstants {
   public static final CommandLineEnConstants INSTANCE = new CommandLineEnConstants();
+  /**
+   * key to a comma delimited String which turns into a List<String>
+   */
   private static final String COMMAND = "cmd";
   private static final String C = "-c";
   private static final String CONFIRM = "--confirm-repository-integrity";
@@ -17,6 +20,10 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   private static final String LOG = "--log-verbosely";
   private static final String R = "-r";
   private static final String REBUILD = "--rebuild-dependents";
+  /**
+   * key to a comma delimited String which turns into a  key to a List<String>
+   */
+  private static final String STAGES = "stages";
   private static final String U = "-u";
   private static final String UPDATE = "--update";
   private static final String V = "-v";
@@ -66,6 +73,11 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
       return L;
     }
     return LOG;
+  }
+  
+  @Override
+  public String getStages() {
+    return STAGES;
   }
   
   @Override

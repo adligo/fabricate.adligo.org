@@ -6,6 +6,7 @@ import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.List;
 
 
 public interface I_FabSystem extends I_FabFilesSystem {
@@ -22,7 +23,13 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public String getArgValue(String key);
-  
+  /**
+   * parses and keeps a cache of comma delimited 
+   * arguments from the command line.
+   * @param key
+   * @return
+   */
+  public List<String> getArgValues(String key);
   /**
    * the command line arguments that came
    * in as a normalized string

@@ -15,15 +15,5 @@ package org.adligo.fabricate.models.common;
  *
  */
 public interface I_FabricationRoutine extends Runnable {
-  /**
-   * If this routine is concurrent, which is usually
-   * true since Fabricate favors concurrency for 
-   * most building.   This may be set to false
-   * for simple routines which only deal with one thing.
-   * A good example of this is the SimpleCryptCommand which 
-   * simply encrypts a password and prints the result 
-   * to the console.
-   * @return
-   */
-  public boolean isConcurrent();
+  
 }

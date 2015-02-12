@@ -1,15 +1,21 @@
 package org.adligo.fabricate.models.fabricate;
 
 import org.adligo.fabricate.common.system.FabricateDefaults;
-import org.adligo.fabricate.models.common.I_FabricationRoutine;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
+import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.dependencies.DependencyMutant;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.JavaType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,16 +32,17 @@ public class FabricateMutant implements I_Fabricate {
   private JavaSettingsMutant javaSettings_;
   private List<I_Dependency> dependencies_ = new ArrayList<I_Dependency>();
   private List<String> remoteRepositories_ = new ArrayList<String>();
-  private Map<String,RoutineBriefMutant> commands = new HashMap<String,RoutineBriefMutant>();
-  private Map<String,RoutineBriefMutant> stages = new HashMap<String,RoutineBriefMutant>();
+  private Map<String,RoutineBriefMutant> traits_ = new HashMap<String,RoutineBriefMutant>();
+  private Map<String,RoutineBriefMutant> commands_ = new HashMap<String,RoutineBriefMutant>();
+  private Map<String,RoutineBriefMutant> stages_ = new HashMap<String,RoutineBriefMutant>();
   
   public FabricateMutant() {
   }
   
   /**
-   * Note this constructor does NOT create commands, stages and tasks 
-   * in order to save on script processing time.  The methods addCommands 
-   * and addStagesAndTasks may be used to add the commands, stages and tasks.
+   * Note this constructor does NOT create commands, stages, tasks  and traits
+   * in order to save on script processing time.  The methods addCommands,
+   * addStages and addTraits may be used to add the commands, stages and tasks.
    * 
    * @param fab
    * @param xmlDisc
@@ -80,8 +87,10 @@ public class FabricateMutant implements I_Fabricate {
     setDependencies(deps);
   }
   
-  public void addCommands(FabricateType type) {
-    
+  public void addCommands(FabricateType type) 
+      throws IllegalArgumentException, ClassNotFoundException {
+    List<RoutineParentType> routines =  type.getCommand();
+    addRoutineParents(routines, traits_, RoutineBriefOrigin.COMMAND);
   }
 
   public void addDependency(DependencyType dep) {
@@ -102,8 +111,26 @@ public class FabricateMutant implements I_Fabricate {
     }
   }
   
-  public void addStagesAndTasks(FabricateType type) {
-    
+  public void addStages(FabricateType type) throws IllegalArgumentException, ClassNotFoundException {
+    StagesAndProjectsType spt =  type.getProjectGroup();
+    if (spt != null) {
+      StagesType stages = spt.getStages();
+      if (stages != null) {
+        List<StageType> stageTypes = stages.getStage();
+        
+        if (stageTypes != null) {
+          for (StageType routine: stageTypes) {
+            RoutineBriefMutant mut = new RoutineBriefMutant(routine);
+            stages_.put(mut.getName(), mut);
+          }
+        }
+      }
+    }
+  }
+  
+  public void addTraits(Collection<RoutineParentType> routines) 
+      throws IllegalArgumentException, ClassNotFoundException {
+    addRoutineParents(routines, traits_, RoutineBriefOrigin.TRAIT);
   }
   
   public List<I_Dependency> getDependencies() {
@@ -235,5 +262,14 @@ public class FabricateMutant implements I_Fabricate {
   }
 
 
-  
+  private void addRoutineParents(Collection<RoutineParentType> routines, 
+      Map<String,RoutineBriefMutant> map, RoutineBriefOrigin origin) 
+          throws IllegalArgumentException, ClassNotFoundException {
+    if (routines != null) {
+      for (RoutineType routine: routines) {
+        RoutineBriefMutant mut = new RoutineBriefMutant(routine, origin);
+        map.put(mut.getName(), mut);
+      }
+    }
+  }
 }

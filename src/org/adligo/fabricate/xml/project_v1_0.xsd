@@ -26,13 +26,22 @@ srcDirs, so that classpath2Eclipse and compile
 could share multiple source directories. Each task
 must document which attributes it pays attention to.</documentation>
             	</annotation></element>
-            <element name="command" type="pns:project_command_type"
+            <element name="command" type="cns:routine_params_parent_type"
     			minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                	<documentation>
+This command xml node allows the project
+to override parameters and provide additional 
+parameters for command execution. 
+If the I_FabricationRoutine implements I_ParticipationAware it should check
+if the corresponding stage is present here in the project.xml,
+if it is it should execute.
+					</documentation>
+                </annotation>
+            </element>
+            <element name="stages" type="pns:project_stages_type" minOccurs="1" maxOccurs="1">
     		</element>
-    		<element name="stages" type="pns:project_stages_type"
-    			minOccurs="1" maxOccurs="1">
-    		</element>
-    		<element name="dependencies" type="pns:project_dependencies_type"
+            <element name="dependencies" type="pns:project_dependencies_type"
     			minOccurs="0" maxOccurs="1">
     		</element>
     	</sequence>
@@ -42,11 +51,11 @@ must document which attributes it pays attention to.</documentation>
 
     <complexType name="project_stages_type">
     	<sequence minOccurs="1" maxOccurs="unbounded">
-    		<element name="stage" type="pns:project_stage_type" minOccurs="1" maxOccurs="unbounded">
+    		<element name="stage" type="cns:routine_params_parent_type" minOccurs="1" maxOccurs="unbounded">
 	    		<annotation>
 					<documentation>
 						Each stage is called by main fabricate run (fabricate.xml), 
-						if the I_FabStage is aware of participation it should check
+						if the I_FabricationRoutine implements I_ParticipationAware it should check
 						if the corresponding stage is present here in the project.xml,
 						if it is it should execute.
 					</documentation>
@@ -55,27 +64,7 @@ must document which attributes it pays attention to.</documentation>
     	</sequence>
     </complexType>
 
-    <complexType name="project_stage_type">
-    	<sequence>
-    		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
-    		<element name="task" type="pns:project_task_type" minOccurs="0" maxOccurs="unbounded"></element>
-    	</sequence>
-    	<attribute name="name" type="string"></attribute>
-    </complexType>
 
-    <complexType name="project_command_type">
-    	<sequence>
-    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
-    	</sequence>
-    	<attribute name="name" type="string"></attribute>
-    </complexType>
-
-    <complexType name="project_task_type">
-    	<sequence>
-    		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
-    	</sequence>
-    	<attribute name="name" type="string" use="required"></attribute>
-    </complexType>
 
 	<complexType name="project_dependency_type">
     	<annotation>

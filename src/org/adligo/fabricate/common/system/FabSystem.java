@@ -9,22 +9,28 @@ import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.util.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FabSystem implements I_FabSystem {
   
   private final DeferredLog log_ = new DeferredLog();
   private final I_FabFileIO fileIO_;
   private final I_FabXmlFileIO xmlFileIO_ = new FabXmlFileIO();
+  private final ConcurrentHashMap<String, List<String>> argListVals_ = new ConcurrentHashMap<String, List<String>>();
   private final Map<String,String> argMap = new TreeMap<String,String>();
   private I_FabricateConstants constants_ = FabricateEnConstants.INSTANCE;
   private Executor executor_;
@@ -156,5 +162,34 @@ public class FabSystem implements I_FabSystem {
   @Override
   public CloseableHttpClient newHttpClient() {
     return HttpClients.createDefault();
+  }
+
+  @Override
+  public List<String> getArgValues(String key) {
+    List<String> toRet = argListVals_.get(key);
+    if (toRet == null) {
+      String valsDelimited  = argMap.get(key);
+      if ( !StringUtils.isEmpty(valsDelimited)) {
+        List<String> newVals = new ArrayList<String>();
+        StringTokenizer st = new StringTokenizer(valsDelimited,",");
+        boolean hadVals = false;
+        while (st.hasMoreTokens()) {
+          String token = st.nextToken();
+          newVals.add(token);
+          hadVals = true;
+        }
+        if (!hadVals) {
+          if (valsDelimited.length() >= 1) {
+            newVals.add(valsDelimited);
+            hadVals = true;
+          }
+        }
+        if (hadVals ) {
+          toRet = Collections.unmodifiableList(newVals);
+          argListVals_.putIfAbsent(key, toRet);
+        }
+      }
+    }
+    return toRet;
   }
 }

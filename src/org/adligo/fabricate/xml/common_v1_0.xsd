@@ -2,11 +2,11 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
 	targetNamespace="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd" 
 	elementFormDefault="qualified"
-	xmlns:tns="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd" >
+	xmlns:cns="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd" >
 	
     <complexType name="param_type">
     	<sequence>
-    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     	<attribute name="key" type="string" use="required"></attribute>
     	<attribute name="value" type="string" use="optional"></attribute>
@@ -14,7 +14,75 @@
 
     <complexType name="params_type">
     	<sequence>
-    		<element name="param" type="tns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
+    
+    <complexType name="routine_params_type">
+    	<sequence>
+    		<element name="params" type="cns:params_type" minOccurs="0"
+    			maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Each task is called by main fabricate run
+    					(fabricate.xml) there may be many tasks to one
+    					stage or command. Each task gets params which are formed by
+    					the project.xml's task params overriding the
+    					fabricate.xml's task params.
+    				</documentation>
+    			</annotation>
+    		</element>
+    	</sequence>
+    	<attribute name="name" use="required">
+    		<simpleType>
+    			<restriction base="normalizedString">
+    				<whiteSpace value="collapse"></whiteSpace>
+    				<minLength value="3"></minLength>
+    			</restriction>
+	    	</simpleType>
+    	</attribute>
+    </complexType>
+    
+    <complexType name="routine_params_parent_type">
+    	<complexContent>
+    		<extension base="cns:routine_params_type">
+    			<sequence>
+    				<element name="task" type="cns:routine_params_type" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="routine_type">
+    	<complexContent>
+	    	<extension base="cns:routine_params_type">
+	    	<attribute name="class" use="required">
+	    		<annotation>
+	    			<documentation>
+	    				This must be the name of a
+	    				org.adligo.fabricate.models.common.I_FabricationRoutine
+	    				implementation.
+	    			</documentation>
+	    		</annotation>
+	    		<simpleType>
+	    			<restriction base="normalizedString">
+	    				<whiteSpace value="collapse"></whiteSpace>
+	    				<minLength value="3"></minLength>
+	    			</restriction>
+	    		</simpleType>
+	    	</attribute>
+	    	</extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="routine_parent_type">
+    	<complexContent>
+    		<extension base="cns:routine_type">
+    			<sequence>
+    				<element name="task" type="cns:routine_type" minOccurs="0" maxOccurs="unbounded"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
 </schema>

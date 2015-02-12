@@ -82,6 +82,8 @@ public class SystemEnMessages implements I_SystemMessages {
   
   private static final String USING_THE_FOLLOWING_REMOTE_REPOSITORIES = 
       "Using the following remote repositories;";
+  private static final String UNABLE_TO_LOAD_THE_FOLLOWING_CLASS = 
+      "Unable to load the following class;";
   private static final String VERSION_X = "Version <X/>.";
   
   private SystemEnMessages() {
@@ -168,7 +170,7 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getFabricateByAdligo() {
     return FABRICATE_BY_ADLIGO;
   }
-  
+
   @Override
   public String getFabricationFailed() {
     return FABRICATION_FAILED;
@@ -190,7 +192,6 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getPassedTheExtractCheck() {
     return PASSED_THE_EXTRACT_CHECK;
   }
-  
   
   @Override
   public String getStartingDownloadFromTheFollowingUrl() {
@@ -259,6 +260,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getSendingOptsToScript() {
     return SENDING_OPTS_TO_SCRIPT;
+  }
+
+  @Override
+  public String getUnableToLoadTheFollowingClass() {
+    return UNABLE_TO_LOAD_THE_FOLLOWING_CLASS;
   }
   
   @Override

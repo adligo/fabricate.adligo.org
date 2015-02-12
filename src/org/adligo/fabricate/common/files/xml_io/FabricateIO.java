@@ -21,6 +21,7 @@ public class FabricateIO {
       
       jaxbUnmarshaller.setSchema(schema);
       JAXBElement<FabricateType> devType = (JAXBElement<FabricateType>) jaxbUnmarshaller.unmarshal(file);
+      
       return devType.getValue();
     } catch (JAXBException e) {
       throw new IOException(e);

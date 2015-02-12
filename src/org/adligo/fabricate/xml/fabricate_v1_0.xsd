@@ -46,6 +46,7 @@
 		namespace="http://www.adligo.org/fabricate/xml/io_v1/common_v1_0.xsd">
 	</import>
 	
+    
     <complexType name="fabricate_type">
     	<sequence>
     		<element name="java" type="fns:java_type" minOccurs="0"
@@ -57,8 +58,15 @@
     		<element name="dependencies"
     			type="fns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
     		</element>
-            <element name="trait" type="fns:trait_type" minOccurs="0" maxOccurs="unbounded"></element>
-            <element name="command" type="fns:command_type"
+            <element name="trait" type="cns:routine_parent_type" minOccurs="0" maxOccurs="unbounded">
+            	<annotation>
+            		<documentation>Traits provide reusable code between commands and stages,
+they were originally added as a way to encrypt and decrypt
+keystore passwords for git.  Fabricate includes these 
+default traits (encrypt and decrypt), but they may be replaced 
+by specifying a trait node with a identical name.</documentation>
+            	</annotation></element>
+            <element name="command" type="cns:routine_parent_type"
     			minOccurs="0" maxOccurs="unbounded">
     		</element>
     		<choice>
@@ -111,15 +119,7 @@
     	
     </complexType>
 
-	<complexType name="scm_type">
-    
-    	<choice>
-    		<element name="git" type="fns:git_server_type" minOccurs="1"
-    			maxOccurs="1">
-    		</element>
-    	</choice>
-    	
-    </complexType>
+
     
     <complexType name="project_type">
     	<attribute name="name" type="string" use="required">
@@ -179,55 +179,7 @@
     </complexType>
 
     
-    <complexType name="stage_type">
-        <annotation>
-        	<documentation>
-Fabricate stages are templates that may be applied to projects
-if the project has a stage with a matching stage name.   By default
-all tasks for a stage are executed on the project, however 
-if a task is optional, then the project must have the task node
-under the stage with matching respective names
-in order for the task to be executed on the project.</documentation>
-        </annotation>
-        <sequence>
-    		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
-    		<element name="task" type="fns:optional_routine_type" minOccurs="0" maxOccurs="unbounded"></element>
-    	</sequence>
-    	<attribute name="name" type="string"></attribute>
-    	<attribute name="class" type="string">
-    		<annotation>
-    			<documentation>
-    				This is a class in the fabricate classpath which
-    				must implement one of;
-    				org.adligo.fabricate.common.I_ScmTask
-    				org.adligo.fabricate.common.I_ProjectTask
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute name="optional" type="boolean">
-    		<annotation>
-    			<documentation>
-    				When this is set to true, the task/stage name must
-    				be set to true on the command line for the stage to execute. 
-				This was originally done so that external users of the build do not need
-    				to push to a intelligence4j server.
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    </complexType>
-
-    <complexType name="stages_type">
-    	<sequence>
-    		<element name="stage" type="fns:stage_type" minOccurs="1" maxOccurs="unbounded"></element>
-    	</sequence>
-    </complexType>
-
-    <complexType name="stages_and_projects_type">
-    	<sequence>
-    		<element name="stages" type="fns:stages_type" minOccurs="1" maxOccurs="1"></element>
-    		<element name="projects" type="fns:projects_type" minOccurs="1" maxOccurs="1"></element>
-    	</sequence>
-    </complexType>
+    
 
     <complexType name="java_type">
     	<annotation>
@@ -285,90 +237,85 @@ fabricate will be able to delegate to other fabrications.</documentation>
     		<element name="project" type="fns:project_type" minOccurs="1" maxOccurs="1"></element>
     	</sequence>
     </complexType>
+
     
-    <complexType name="optional_routine_type">
-    	<complexContent>
-	    	<extension base="fns:routine_type">
-	        <attribute name="optional" type="boolean" use="optional">
-	        	<annotation>
-	        		<documentation>
-	        			When this is set to true, the project
-	        			must have a corresponding stage/task
-	        			in order for the project to have this task
-	        			executed on it.
-	        		</documentation>
-	        	</annotation></attribute>
-	        </extension>
-        </complexContent>
+  
+
+	<complexType name="scm_type">
+    
+    	<choice>
+    		<element name="git" type="fns:git_server_type" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    	</choice>
+    	
     </complexType>
 
-    <complexType name="trait_type">
+    
+	<complexType name="stage_type">
         <annotation>
         	<documentation>
-        		A trait is simply a java class with a zero argument constructor
-				that is placed in the fabricate context.  Any command,
-				stage or task may require a trait to be a specific java 
-				interface.  Trait classes should always be immutable
-				and any methods should be thread safe.</documentation>
+Fabricate stages are templates that may be applied to projects
+if the project has a stage with a matching stage name.   By default
+all tasks for a stage are executed on the project, however 
+if a task is optional, then the project must have the task node
+under the stage with matching respective names
+in order for the task to be executed on the project.</documentation>
         </annotation>
         <sequence>
     		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
+    		<element name="task" type="cns:routine_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
-    	<attribute name="name" type="string" use="required"></attribute>
-    	<attribute name="class" type="string" use="required"></attribute>
-    </complexType>
-    
-    <complexType name="command_type">
-    	<annotation>
-    		<documentation>
-    			Note commands are not part of the general build process,
-    			but are executed on each project in concurrent project
-    			dependency order (although the command implementation
-    			could contain any kind of project filter/selection
-    			process). They were originally added for creating
-    			eclipse .classpath files from fabricates project.xml
-    			files, however they could be used for any purpose.
-    		</documentation>
-    	</annotation>
-    	<sequence>
-    		<element name="params" type="cns:params_type" minOccurs="0"
-    			maxOccurs="1">
-    		</element>
-    		<element name="task" type="fns:routine_type" minOccurs="0" maxOccurs="unbounded"></element>
-    	</sequence>
-    	<attribute name="name" type="string" use="required"></attribute>
-    	<attribute name="class" type="string" use="required">
+    	<attribute name="name" use="required">
+    		<simpleType>
+    			<restriction base="normalizedString">
+    				<whiteSpace value="collapse"></whiteSpace>
+    				<minLength value="3"></minLength>
+    			</restriction>
+    		</simpleType>
+	   </attribute>
+    	<attribute name="class" use="required">
     		<annotation>
     			<documentation>
-    				This class must be available in the fabricate
-    				dependencies in this file, also any dependent
-    				classes must be available in the fabricate
-    				dependencies.  Also this class must implement
-    				org.adligo.fabricate.common.I_FabTask.
+    				This is a class in the fabricate classpath which
+    				must implement one of;
+    				org.adligo.fabricate.common.I_ScmTask
+    				org.adligo.fabricate.common.I_ProjectTask
+    			</documentation>
+    		</annotation>
+    		<simpleType>
+    			<restriction base="normalizedString">
+    				<whiteSpace value="collapse"></whiteSpace>
+    				<minLength value="3"></minLength>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
+    	<attribute name="optional" type="boolean">
+    		<annotation>
+    			<documentation>
+    				When this is set to true, the task/stage name must
+    				be included on the command line for the stage to execute. 
+    				In Example;
+    				stages=foo,bar
+					This was originally done so that external users of the build do not need
+    				to push to a intelligence4j server.
     			</documentation>
     		</annotation>
     	</attribute>
     </complexType>
-
-    <complexType name="routine_type">
+    
+    <complexType name="stages_and_projects_type">
     	<sequence>
-    		<element name="params" type="cns:params_type" minOccurs="0"
-    			maxOccurs="1">
-    			<annotation>
-    				<documentation>
-    					Each task is called by main fabricate run
-    					(fabricate.xml) there may be many tasks to one
-    					stage. Each task gets params which are formed by
-    					the project.xml's task params overriding the
-    					fabricate.xml's task params.
-    				</documentation>
-    			</annotation>
-    		</element>
+    		<element name="stages" type="fns:stages_type" minOccurs="1" maxOccurs="1"></element>
+    		<element name="projects" type="fns:projects_type" minOccurs="1" maxOccurs="1"></element>
     	</sequence>
-    	<attribute name="name" type="string"></attribute>
-    	<attribute name="class" type="string" use="required">
-    		<annotation>
-    			<documentation>This must be the name of a org.adligo.fabricate.common.I_FabTask implementation.</documentation>
-    		</annotation></attribute>
     </complexType>
+    
+    <complexType name="stages_type">
+    	<sequence>
+    		<element name="stage" type="fns:stage_type" minOccurs="1" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+
 </schema>

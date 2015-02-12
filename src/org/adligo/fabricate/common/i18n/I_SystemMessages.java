@@ -66,6 +66,8 @@ public interface I_SystemMessages {
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   
   public String getTheFollowingArtifact();
+  public String getUnableToLoadTheFollowingClass();
   public String getUsingTheFollowingRemoteRepositories();
+  
   public String getVersionX();
 }

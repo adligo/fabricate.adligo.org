@@ -1,12 +1,11 @@
 package org.adligo.fabricate.models.common;
 
-import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.CommandType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.OptionalRoutineType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.RoutineType;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,29 +30,41 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   
   public RoutineBriefMutant() {}
   
+  /**
+   * 
+   * @param name
+   * @param className
+   * @param origin
+   * @throws IllegalArgumentException
+   *   Note these are internal exceptions and should never show to the user.
+   * @throws IOException with the message the name 
+   * of the class that couldn't be loaded.
+   */
   @SuppressWarnings("unchecked")
-  public RoutineBriefMutant(String name, String className, RoutineBriefOrigin origin) throws IllegalArgumentException {
-
-    if (StringUtils.isEmpty(name)) {
+  public RoutineBriefMutant(String name, String className, 
+      RoutineBriefOrigin origin) throws IllegalArgumentException, ClassNotFoundException {
+    if (name == null) {
       throw new IllegalArgumentException("name");
     }
     name_ = name;
-    try {
-      if (StringUtils.isEmpty(className)) {
-        throw new IllegalArgumentException("className");
-      }
-      //This uses the system class loader so that
-      // it doesn't collide with the instrumented class
-      // loader for tests4j_4jacoco.
-      ClassLoader cl = ClassLoader.getSystemClassLoader();
-      clazz_ = (Class<? extends I_FabricationRoutine>) Class.forName(className, true, cl);
-    } catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException(e.getMessage());
-    }
     if (origin == null) {
       throw new IllegalArgumentException("origin");
     }
     origin_ = origin;
+    switch (origin_) {
+      case PROJECT_COMMAND:
+      case PROJECT_COMMAND_TASK:
+      case PROJECT_STAGE:
+      case PROJECT_STAGE_TASK:
+        //for projects the class will be null
+        break;
+      default:
+        //This uses the system class loader so that
+        // it doesn't collide with the instrumented class
+        // loader for tests4j_4jacoco.
+        ClassLoader cl = ClassLoader.getSystemClassLoader();
+        clazz_ = (Class<? extends I_FabricationRoutine>) Class.forName(className, true, cl);
+    }
   }
   /**
    * 
@@ -75,9 +86,10 @@ public class RoutineBriefMutant implements I_RoutineBrief {
       setParameters(parameters);
     }
   }
-  public RoutineBriefMutant(CommandType command)  throws IllegalArgumentException {
-    this(command.getName(), command.getClazz(), RoutineBriefOrigin.COMMAND);
-    ParamsType params = command.getParams();
+  public RoutineBriefMutant(RoutineParentType routine, RoutineBriefOrigin origin)
+      throws IllegalArgumentException, ClassNotFoundException {
+    this(routine.getName(), routine.getClazz(), origin);
+    ParamsType params = routine.getParams();
     if (params != null) {
       List<I_Parameter> ps = ParameterMutant.convert(params);
       if (ps.size() >= 1) {
@@ -85,28 +97,27 @@ public class RoutineBriefMutant implements I_RoutineBrief {
       }
     }
     
-    List<RoutineType> nested = command.getTask();
+    List<RoutineType> nested = routine.getTask();
     if (nested != null) {
       if (nested.size() >= 1) {
-        addNested(nested, RoutineBriefOrigin.COMMAND_TASK);
+        switch (origin) {
+          case COMMAND:
+            addNested(nested, RoutineBriefOrigin.COMMAND_TASK);
+            break;
+          case PROJECT_COMMAND:
+            addNested(nested, RoutineBriefOrigin.PROJECT_COMMAND_TASK);
+            break;
+          case PROJECT_STAGE:
+            addNested(nested, RoutineBriefOrigin.PROJECT_STAGE_TASK);
+            break;
+          default:
+            addNested(nested, RoutineBriefOrigin.TRAIT_TASK);
+        }
+        
       }
     }
   }
 
-  public void addNested(List<? extends RoutineType> nested, RoutineBriefOrigin origin) {
-    if (nested != null) {
-      List<RoutineBriefMutant> nestedMuts = new ArrayList<RoutineBriefMutant>();
-      
-      for (RoutineType type: nested) {
-        RoutineBriefMutant mut = new RoutineBriefMutant(type, origin);
-        nestedMuts.add(mut);
-        if (type instanceof OptionalRoutineType) {
-          mut.setOptional(((OptionalRoutineType) type).isOptional());
-        }
-      }
-      nestedRoutines_ = nestedMuts;
-    }
-  }
   /**
    * 
    * @param routine
@@ -115,13 +126,16 @@ public class RoutineBriefMutant implements I_RoutineBrief {
    * @throws a exception when the class couldn't be located,
    *      or there was some other problem paramter.
    */
-  public RoutineBriefMutant(RoutineType routine, RoutineBriefOrigin origin)  throws IllegalArgumentException {
+  public RoutineBriefMutant(RoutineType routine, RoutineBriefOrigin origin) 
+      throws IllegalArgumentException, ClassNotFoundException {
     this(routine.getName(), routine.getClazz(), origin);
     ParamsType params = routine.getParams();
     List<I_Parameter> ps = ParameterMutant.convert(params);
     setParameters(ps);
   }
-  public RoutineBriefMutant(StageType stage)  throws IllegalArgumentException {
+  
+  public RoutineBriefMutant(StageType stage)  
+      throws IllegalArgumentException, ClassNotFoundException {
     this(stage.getName(), stage.getClazz(), RoutineBriefOrigin.STAGE);
     ParamsType params = stage.getParams();
     if (params != null) {
@@ -139,6 +153,8 @@ public class RoutineBriefMutant implements I_RoutineBrief {
       }
     }
   }
+ 
+
 
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getClazz()
@@ -233,6 +249,19 @@ public class RoutineBriefMutant implements I_RoutineBrief {
           parameters_.add(new ParameterMutant(param));
         }
       }
+    }
+  }
+  
+  private void addNested(List<? extends RoutineType> nested, RoutineBriefOrigin origin) 
+    throws IllegalArgumentException, ClassNotFoundException {
+    if (nested != null) {
+      List<RoutineBriefMutant> nestedMuts = new ArrayList<RoutineBriefMutant>();
+      
+      for (RoutineType type: nested) {
+        RoutineBriefMutant mut = new RoutineBriefMutant(type, origin);
+        nestedMuts.add(mut);
+      }
+      nestedRoutines_ = nestedMuts;
     }
   }
 }

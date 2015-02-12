@@ -1,5 +1,11 @@
 This is the new adligo build/make system.
 
+The shell is expected to be using UTF-8 Character Encoding;
+http://perlgeek.de/en/article/set-up-a-clean-utf8-environment
+http://stackoverflow.com/questions/7165108/in-osx-lion-lang-is-not-set-to-utf8-how-fix
+http://stackoverflow.com/questions/379240/is-there-a-windows-command-shell-that-will-display-unicode-characters
+
+
 to regenerate the xml .java io files in
 org.adligo.fabricate.xml.io and it's child packages
 you may need to delete the directories with the auto generated code

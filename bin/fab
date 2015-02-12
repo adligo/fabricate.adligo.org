@@ -3,6 +3,7 @@
 # This is the fabricate shell script, to execute fabricate.
 # Licensed by Adligo Inc. 
 # http://www.apache.org/licenses/LICENSE-2.0
+# Note Fabricate uses the UTF-8 char set by default.
 
 if [ -z "$FABRICATE_HOME" ]; then
     echo "Fabricate requires the FABRICATE_HOME environment variable to be set."

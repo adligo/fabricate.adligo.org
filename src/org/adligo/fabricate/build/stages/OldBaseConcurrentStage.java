@@ -7,19 +7,20 @@ import org.adligo.fabricate.common.ProjectBlock;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.routines.I_ParticipationAware;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParamsParentType;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParamsType;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.OptionalRoutineType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependencyType;
-import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectStageType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectStagesType;
-import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectTaskType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,9 +95,9 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
         if (stageParams_ == null) {
           stageParams_ = Collections.EMPTY_MAP;
         }
-        List<OptionalRoutineType> tasks =  stage.getTask();
+        List<RoutineType> tasks =  stage.getTask();
         if (tasks != null) {
-          for (OptionalRoutineType task: tasks) {
+          for (RoutineType task: tasks) {
             String taskName = task.getName();
             ParamsType params = task.getParams();
             Map<String,String> paramMap = toMap(params.getParam());
@@ -202,8 +203,8 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
     
     ProjectStagesType st = project.getStages();
     if (st != null) {
-      List<ProjectStageType> stages = st.getStage();
-      for (ProjectStageType stage: stages) {
+      List<RoutineParamsParentType> stages = st.getStage();
+      for (RoutineParamsParentType stage: stages) {
         String projectStage = stage.getName();
         if (stageName_.equals(projectStage)) {
           ParamsType paramsType = stage.getParams();
@@ -237,8 +238,8 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
     }
     ProjectStagesType st = project.getStages();
     if (st != null) {
-      List<ProjectStageType> stages = st.getStage();
-      for (ProjectStageType stage: stages) {
+      List<RoutineParamsParentType> stages = st.getStage();
+      for (RoutineParamsParentType stage: stages) {
         String projectStage = stage.getName();
         if (stageName_.equals(projectStage)) {
           ParamsType paramsType = stage.getParams();
@@ -247,9 +248,9 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
             Map<String,String> toAdd = toMap(params);
             toRet.putAll(toAdd);
             
-            List<ProjectTaskType> tasks = stage.getTask();
+            List<RoutineParamsType> tasks = stage.getTask();
             if (tasks != null) {
-              for (ProjectTaskType taskType: tasks) {
+              for (RoutineParamsType taskType: tasks) {
                 String projTaskName = taskType.getName();
                 if (task.equals(projTaskName)) {
                   ParamsType taskParams = taskType.getParams();
@@ -274,15 +275,15 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
    * is participating in this stage, for I_FabTask
    * implementations that require participation ie
    * CompileAndJar.
-   * 
+   * @deprecated @see {@link I_ParticipationAware}
    * @param project
    * @return
    */
   public boolean isParticipant(FabricateProjectType project) {
     ProjectStagesType st = project.getStages();
     if (st != null) {
-      List<ProjectStageType> stages = st.getStage();
-      for (ProjectStageType stage: stages) {
+      List<RoutineParamsParentType> stages = st.getStage();
+      for (RoutineParamsParentType stage: stages) {
         String projectStage = stage.getName();
         if (stageName_.equals(projectStage)) {
           return true;

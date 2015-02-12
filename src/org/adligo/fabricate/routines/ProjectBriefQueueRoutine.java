@@ -10,10 +10,7 @@ import org.adligo.fabricate.models.common.I_FabricationRoutine;
  * @author scott
  *
  */
-public abstract class ProjectBriefQueueRoutine implements I_FabricationRoutine, I_ProjectsAware {
+public abstract class ProjectBriefQueueRoutine 
+  implements I_ConcurrencyAware, I_FabricationRoutine, I_ProjectsAware {
  
-  @Override
-  public boolean isConcurrent() {
-    return true;
-  }
 }

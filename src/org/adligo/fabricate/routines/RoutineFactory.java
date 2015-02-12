@@ -1,11 +1,5 @@
 package org.adligo.fabricate.routines;
 
-import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.CommandType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class RoutineFactory {
   

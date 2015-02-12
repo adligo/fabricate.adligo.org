@@ -118,6 +118,16 @@ public interface I_CommandLineConstants {
    *    "--rebuild-dependents"
    */
   public String getRebuildDependents(boolean alias);
+  
+  /**
+   * This argument turns on optional stages which are set as optional
+   * in the fabricate.xml file.  In English this is 'stages' for command
+   * line arguments like;<br/>
+   * stages=submit2intelligence4j
+   * stages= 
+   * @return
+   */
+  public String getStages();
   /**
    * This argument instructs Fabricate to update all projects from their various
    * source control management systems (git) before executing commands

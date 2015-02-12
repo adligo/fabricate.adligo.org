@@ -1,6 +1,7 @@
 package org.adligo.fabricate.common.log;
 
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 
 /**
  * This class should be used for all
@@ -21,7 +22,7 @@ public class ThreadLocalPrintStream {
    */
   protected static final void println(String p) {
     PrintStream out = getProtected();
-    out.println(p);
+    out.println(new String(p.getBytes(), Charset.forName("UTF-8")));
   }
   /**
    * This method should only be used if there 
