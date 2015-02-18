@@ -11,6 +11,7 @@ import org.adligo.fabricate.models.common.I_FabricationRoutine;
  * @author scott
  *
  */
-public abstract class DependenciesQueueRoutine implements I_FabricationRoutine, I_ProjectsAware {
+public abstract class DependenciesQueueRoutine implements 
+  I_ConcurrencyAware, I_FabricationRoutine, I_ProjectsAware {
 
 }

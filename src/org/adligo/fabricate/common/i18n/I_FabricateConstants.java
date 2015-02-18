@@ -25,9 +25,8 @@ public interface I_FabricateConstants {
   public I_FileMessages getFileMessages();
   public String getLanguage();
   public boolean isLeftToRight();
-  
-  
   public I_GitMessages getGitMessages();
+  public I_ImplicitTraitMessages getImplicitTraitMessages();
   /**
    * Try to use I_FabSystem.lineSeperator
    * instead of this method if possible.

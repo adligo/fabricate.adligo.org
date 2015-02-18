@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.i18n.I_GitMessages;
+import org.adligo.fabricate.common.i18n.I_ImplicitTraitMessages;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
@@ -88,6 +89,12 @@ public class FabConstantsDiscovery implements I_FabricateConstants {
 
   @Override
   public String getExtractDirName() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public I_ImplicitTraitMessages getImplicitTraitMessages() {
     // TODO Auto-generated method stub
     return null;
   }

@@ -35,8 +35,7 @@
     	</sequence>
     	<attribute name="name" use="required">
     		<simpleType>
-    			<restriction base="normalizedString">
-    				<whiteSpace value="collapse"></whiteSpace>
+    			<restriction base="token">
     				<minLength value="3"></minLength>
     			</restriction>
 	    	</simpleType>
@@ -56,7 +55,7 @@
     <complexType name="routine_type">
     	<complexContent>
 	    	<extension base="cns:routine_params_type">
-	    	<attribute name="class" use="required">
+	    	<attribute name="class" use="optional">
 	    		<annotation>
 	    			<documentation>
 	    				This must be the name of a

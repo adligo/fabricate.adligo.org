@@ -1,6 +1,7 @@
 package org.adligo.fabricate.models.fabricate;
 
 import org.adligo.fabricate.common.system.FabricateDefaults;
+import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.dependencies.DependencyMutant;
@@ -15,12 +16,13 @@ import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class FabricateMutant implements I_Fabricate {
   private String fabricateHome_;
@@ -47,7 +49,7 @@ public class FabricateMutant implements I_Fabricate {
    * @param fab
    * @param xmlDisc
    */
-  public FabricateMutant(FabricateType fab, I_FabricateXmlDiscovery xmlDisc) {
+  public FabricateMutant(FabricateType fab, I_FabricateXmlDiscovery xmlDisc) throws ClassNotFoundException {
     javaSettings_ = new JavaSettingsMutant(fab.getJava());
     FabricateDependencies deps =  fab.getDependencies();
     if (deps != null) {
@@ -63,6 +65,7 @@ public class FabricateMutant implements I_Fabricate {
     fabricateXmlRunDir_ = xmlDisc.getFabricateXmlDir();
     fabricateDevXmlDir_ = xmlDisc.getDevXmlDir();
     fabricateProjectRunDir_ = xmlDisc.getProjectXmlDir();
+    
   }
 
   public FabricateMutant(I_Fabricate other) {
@@ -73,7 +76,6 @@ public class FabricateMutant implements I_Fabricate {
     fabricateDevXmlDir_ = other.getFabricateDevXmlDir();
     fabricateProjectRunDir_ = other.getFabricateProjectRunDir();
     
-    
     I_JavaSettings otherJava = other.getJavaSettings();
     if (otherJava == null) {
       javaSettings_ = new JavaSettingsMutant((JavaType) null);
@@ -83,14 +85,18 @@ public class FabricateMutant implements I_Fabricate {
     List<String> remoteRepos = other.getRemoteRepositories();
     setRemoteRepositories(remoteRepos);
     
+    setCommands(other.getCommands());
     List<I_Dependency> deps = other.getDependencies();
     setDependencies(deps);
+    
+    setStages(other.getStages());
+    setTraits(other.getTraits());
   }
   
   public void addCommands(FabricateType type) 
       throws IllegalArgumentException, ClassNotFoundException {
     List<RoutineParentType> routines =  type.getCommand();
-    addRoutineParents(routines, traits_, RoutineBriefOrigin.COMMAND);
+    addRoutineParents(routines, commands_, RoutineBriefOrigin.COMMAND);
   }
 
   public void addDependency(DependencyType dep) {
@@ -133,6 +139,11 @@ public class FabricateMutant implements I_Fabricate {
     addRoutineParents(routines, traits_, RoutineBriefOrigin.TRAIT);
   }
   
+  public Map<String, I_RoutineBrief> getCommands() {
+    return new HashMap<String,I_RoutineBrief>(commands_);
+  }
+
+  
   public List<I_Dependency> getDependencies() {
     return dependencies_;
   }
@@ -150,6 +161,9 @@ public class FabricateMutant implements I_Fabricate {
     return fabricateHome_;
   }
 
+  public String getFabricateProjectRunDir() {
+    return fabricateProjectRunDir_;
+  }
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getFabricateRepository()
    */
@@ -158,6 +172,10 @@ public class FabricateMutant implements I_Fabricate {
     return fabricateRepository_;
   }
   
+  public String getFabricateXmlRunDir() {
+    return fabricateXmlRunDir_;
+  }
+
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getJavaHome()
    */
@@ -176,6 +194,15 @@ public class FabricateMutant implements I_Fabricate {
   
   public List<String> getRemoteRepositories() {
     return remoteRepositories_;
+  }
+  
+
+  public Map<String, I_RoutineBrief> getStages() {
+    return new HashMap<String,I_RoutineBrief>(stages_);
+  }
+  
+  public Map<String, I_RoutineBrief> getTraits() {
+    return new HashMap<String,I_RoutineBrief>(traits_);
   }
   
   public int getThreads() {
@@ -197,6 +224,21 @@ public class FabricateMutant implements I_Fabricate {
       return FabricateDefaults.JAVA_XMX_DEFAULT;
     }
     return javaSettings_.getXmx();
+  }
+  
+  public void setCommands(Map<String, I_RoutineBrief> commands) {
+    commands_.clear();
+    if (commands != null && commands.size() >= 1) {
+      Set<Entry<String, I_RoutineBrief>> entries = commands.entrySet();
+      for (Entry<String,I_RoutineBrief> e: entries) {
+        I_RoutineBrief v = e.getValue();
+        if (v instanceof RoutineBriefMutant) {
+          commands_.put(e.getKey(), (RoutineBriefMutant) v);
+        } else {
+          commands_.put(e.getKey(), new RoutineBriefMutant(v));
+        }
+      }
+    }
   }
   
   public void setDependencies(Collection<? extends I_Dependency> deps) {
@@ -242,16 +284,6 @@ public class FabricateMutant implements I_Fabricate {
     }
   }
 
-  public String getFabricateXmlRunDir() {
-    return fabricateXmlRunDir_;
-  }
-
-
-
-  public String getFabricateProjectRunDir() {
-    return fabricateProjectRunDir_;
-  }
-
 
   public void setFabricateProjectRunDir(String fabricateProjectRunDir) {
     this.fabricateProjectRunDir_ = fabricateProjectRunDir;
@@ -261,6 +293,37 @@ public class FabricateMutant implements I_Fabricate {
     this.fabricateDevXmlDir_ = fabricateDevXmlDir;
   }
 
+  public void setStages(Map<String, I_RoutineBrief> stages) {
+    stages_.clear();
+    if (stages != null && stages.size() >= 1) {
+      Set<Entry<String, I_RoutineBrief>> entries = stages.entrySet();
+      for (Entry<String,I_RoutineBrief> e: entries) {
+        I_RoutineBrief v = e.getValue();
+        if (v instanceof RoutineBriefMutant) {
+          stages_.put(e.getKey(), (RoutineBriefMutant) v);
+        } else {
+          //should throw a npe for null v
+          stages_.put(e.getKey(), new RoutineBriefMutant(v));
+        }
+      }
+    }
+  }
+  
+  public void setTraits(Map<String, I_RoutineBrief> traits) {
+    traits_.clear();
+    if (traits != null && traits.size() >= 1) {
+      Set<Entry<String, I_RoutineBrief>> entries = traits.entrySet();
+      for (Entry<String,I_RoutineBrief> e: entries) {
+        I_RoutineBrief v = e.getValue();
+        if (v instanceof RoutineBriefMutant) {
+          traits_.put(e.getKey(), (RoutineBriefMutant) v);
+        } else {
+          //should throw a npe for null v
+          traits_.put(e.getKey(), new RoutineBriefMutant(v));
+        }
+      }
+    }
+  }
 
   private void addRoutineParents(Collection<RoutineParentType> routines, 
       Map<String,RoutineBriefMutant> map, RoutineBriefOrigin origin) 
@@ -272,4 +335,8 @@ public class FabricateMutant implements I_Fabricate {
       }
     }
   }
+
+
+ 
+  
 }

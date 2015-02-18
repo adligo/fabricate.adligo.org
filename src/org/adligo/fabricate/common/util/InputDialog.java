@@ -2,6 +2,12 @@ package org.adligo.fabricate.common.util;
 
 import java.io.Console;
 
+/**
+ * @deprecated
+ *  use I_FabSystem dialog methods.
+ * @author scott
+ *
+ */
 public class InputDialog {
   private static final Console CONSOLE = System.console();
   

@@ -12,7 +12,8 @@ public interface I_RoutineBrief {
   public RoutineBriefOrigin getOrigin();
 
   public List<I_Parameter> getParameters();
+  public String getParameter(String key);
   
   public List<I_RoutineBrief> getNestedRoutines();
-
+  public I_RoutineBrief getNestedRoutine(String name);
 }

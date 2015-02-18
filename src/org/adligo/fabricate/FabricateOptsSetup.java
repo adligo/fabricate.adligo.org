@@ -93,7 +93,7 @@ public class FabricateOptsSetup {
      
       //@diagram_sync on 1/26/2014 with Overview.seq
       sendOptsToScript(classpath);
-    } catch (IOException e) {
+    } catch (IOException | ClassNotFoundException e) {
       log_.printTrace(e);
       log_.println(CommandLineArgs.END);
       return;

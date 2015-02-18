@@ -1,16 +1,22 @@
 package org.adligo.fabricate.models.fabricate;
 
 import org.adligo.fabricate.common.system.FabricateDefaults;
+import org.adligo.fabricate.models.common.I_RoutineBrief;
+import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class Fabricate implements I_Fabricate {
   private final List<I_Dependency> dependencies_;
-  
+  private final Map<String, I_RoutineBrief> commands_; 
   private final String fabricateHome_;
   private final String fabricateDevXmlDir_;
   
@@ -23,7 +29,11 @@ public class Fabricate implements I_Fabricate {
   
   private final List<String> remoteRepositories_;
   
+  private final Map<String, I_RoutineBrief> stages_; 
+  private final Map<String, I_RoutineBrief> traits_; 
+  
   public Fabricate(I_Fabricate other) {
+    commands_ = createImmutableMap(other.getCommands());
     fabricateHome_ = other.getFabricateHome();
     fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
     fabricateRepository_ = other.getFabricateRepository();
@@ -66,8 +76,16 @@ public class Fabricate implements I_Fabricate {
     } else {
       dependencies_ = Collections.emptyList();
     }
+    
+    stages_ = createImmutableMap(other.getStages());
+    traits_ = createImmutableMap(other.getTraits());
   }
 
+  @Override
+  public Map<String, I_RoutineBrief> getCommands() {
+    return commands_;
+  }
+  
   @Override
   public List<I_Dependency> getDependencies() {
     return dependencies_;
@@ -102,6 +120,17 @@ public class Fabricate implements I_Fabricate {
     return remoteRepositories_;
   }
   
+
+  @Override
+  public Map<String, I_RoutineBrief> getStages() {
+    return stages_;
+  }
+
+  @Override
+  public Map<String, I_RoutineBrief> getTraits() {
+    return traits_;
+  }
+  
   public int getThreads() {
     if (javaSettings_ == null) {
       return FabricateDefaults.JAVA_THREADS;
@@ -125,7 +154,22 @@ public class Fabricate implements I_Fabricate {
   public String getFabricateXmlRunDir() {
     return fabricateXmlRunDir_;
   }
-
   
-
+  private Map<String,I_RoutineBrief> createImmutableMap(Map<String,I_RoutineBrief> in) {
+    if (in == null || in.size() == 0) {
+      return Collections.emptyMap();
+    }
+    Map<String,I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
+    Set<Entry<String, I_RoutineBrief>> entries = in.entrySet();
+    for (Entry<String, I_RoutineBrief> e: entries) {
+      I_RoutineBrief v = e.getValue();
+      if (v instanceof RoutineBrief) {
+        toRet.put(e.getKey(), v);
+      } else {
+        //this will throw a npe for v == null
+        toRet.put(e.getKey(), new RoutineBrief(v));
+      }
+    }
+    return Collections.unmodifiableMap(toRet);
+  }
 }

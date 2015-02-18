@@ -10,6 +10,16 @@ import java.util.List;
 
 
 public interface I_FabSystem extends I_FabFilesSystem {
+  
+  /**
+   * This dialogs the user on the command line, 
+   * it should only be used inside the method 'doDialogs'
+   * as a implementation of I_PresentationAware.
+   * 
+   * @param question
+   * @return
+   */
+  public String doDialog(String question, boolean readPassword);
   /**
    * Stub for System.getenv(String key);
    * @param key

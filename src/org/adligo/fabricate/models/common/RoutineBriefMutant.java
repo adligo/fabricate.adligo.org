@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is the description of a routine class,
@@ -18,6 +21,31 @@ import java.util.List;
  *
  */
 public class RoutineBriefMutant implements I_RoutineBrief {
+  public static Map<String, I_RoutineBrief> convert(List<RoutineParentType> types, 
+      RoutineBriefOrigin origin) throws ClassNotFoundException {
+    Map<String, I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
+    if (types != null) {
+      for (RoutineParentType type: types) {
+        if (type != null) {
+          toRet.put( type.getName(), new RoutineBriefMutant(type, origin));
+        }
+      }
+    }
+    return toRet;
+  }
+
+  public static Map<String, I_RoutineBrief> convert(List<StageType> types) throws ClassNotFoundException {
+    Map<String, I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
+    if (types != null) {
+      for (StageType type: types) {
+        if (type != null) {
+          toRet.put(type.getName(), new RoutineBriefMutant(type));
+        }
+      }
+    }
+    return toRet;
+  }
+  
   private String name_;
   private Class<? extends I_FabricationRoutine> clazz_;
   private RoutineBriefOrigin origin_;
@@ -29,7 +57,7 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   private Boolean optional_;
   
   public RoutineBriefMutant() {}
-  
+
   /**
    * 
    * @param name
@@ -51,19 +79,12 @@ public class RoutineBriefMutant implements I_RoutineBrief {
       throw new IllegalArgumentException("origin");
     }
     origin_ = origin;
-    switch (origin_) {
-      case PROJECT_COMMAND:
-      case PROJECT_COMMAND_TASK:
-      case PROJECT_STAGE:
-      case PROJECT_STAGE_TASK:
-        //for projects the class will be null
-        break;
-      default:
-        //This uses the system class loader so that
-        // it doesn't collide with the instrumented class
-        // loader for tests4j_4jacoco.
-        ClassLoader cl = ClassLoader.getSystemClassLoader();
-        clazz_ = (Class<? extends I_FabricationRoutine>) Class.forName(className, true, cl);
+    if (className != null) {
+      //This uses the system class loader so that
+      // it doesn't collide with the instrumented class
+      // loader for tests4j_4jacoco.
+      ClassLoader cl = ClassLoader.getSystemClassLoader();
+      clazz_ = (Class<? extends I_FabricationRoutine>) Class.forName(className, true, cl);
     }
   }
   /**
@@ -154,6 +175,29 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
   }
  
+  public void addNestedRoutine(I_RoutineBrief nested) {
+    if (nestedRoutines_ == null) {
+      nestedRoutines_ = new ArrayList<RoutineBriefMutant>();
+    }
+    if (nested instanceof RoutineBriefMutant) {
+      nestedRoutines_.add((RoutineBriefMutant) nested);
+    } else {
+      //should throw a npe for null input
+      nestedRoutines_.add(new RoutineBriefMutant(nested));
+    }
+  }
+  
+  public void addParameter(I_Parameter param) {
+    if (parameters_ == null) {
+      parameters_ = new ArrayList<ParameterMutant>();
+    }
+    if (param instanceof ParameterMutant) {
+      parameters_.add((ParameterMutant) param);
+    } else {
+      //should throw a npe for null input
+      parameters_.add(new ParameterMutant(param));
+    }
+  }
 
 
   /* (non-Javadoc)
@@ -207,12 +251,30 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
     return new ArrayList<I_RoutineBrief>(nestedRoutines_);
   }
-  public void setName(String name) {
-    this.name_ = name;
+
+  public boolean removeNestedRoutine(String name) {
+    if (nestedRoutines_ == null) {
+      return false;
+    }
+    Iterator<RoutineBriefMutant> nestedIt = nestedRoutines_.iterator();
+    while(nestedIt.hasNext()) {
+      RoutineBriefMutant next = nestedIt.next();
+      if (name.equals(next.getName())) {
+        nestedIt.remove();
+        return true;
+      }
+    }
+    return false;
   }
+  
   public void setClazz(Class<? extends I_FabricationRoutine> clazz) {
     this.clazz_ = clazz;
   }
+  
+  public void setName(String name) {
+    this.name_ = name;
+  }
+  
   public void setOptional(Boolean optional) {
     this.optional_ = optional;
   }
@@ -220,34 +282,21 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     this.origin_ = origin;
   }
   public void setNestedRoutines(List<I_RoutineBrief> nestedRoutines) {
-    if (nestedRoutines_ == null) {
-      nestedRoutines_ = new ArrayList<RoutineBriefMutant>();
-    } else {
+    if (nestedRoutines_ != null) {
       nestedRoutines_.clear();
     }
     if (nestedRoutines != null) {
       for (I_RoutineBrief brief: nestedRoutines) {
-        if (brief instanceof RoutineBriefMutant) {
-          nestedRoutines_.add((RoutineBriefMutant) brief);
-        } else {
-          nestedRoutines_.add(new RoutineBriefMutant(brief));
-        }
+        addNestedRoutine(brief);
       }
     }
   }
   public void setParameters(Collection<I_Parameter> parameters) {
-    if (parameters_ == null) {
-      parameters_ = new ArrayList<ParameterMutant>();
-    } else {
-      parameters_.clear();
+    if (parameters_ != null) {parameters_.clear();
     }
     if (parameters != null) {
       for (I_Parameter param: parameters) {
-        if (param instanceof ParameterMutant) {
-          parameters_.add((ParameterMutant) param);
-        } else {
-          parameters_.add(new ParameterMutant(param));
-        }
+        addParameter(param);
       }
     }
   }
@@ -263,5 +312,49 @@ public class RoutineBriefMutant implements I_RoutineBrief {
       }
       nestedRoutines_ = nestedMuts;
     }
+  }
+
+  @Override
+  public I_RoutineBrief getNestedRoutine(String name) {
+    if (nestedRoutines_ == null) {
+      return null;
+    }
+    for (RoutineBriefMutant rbm: nestedRoutines_) {
+      if (rbm != null) {
+        if (name.equals(rbm.getName())) {
+          return rbm;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public String getParameter(String key) {
+    if (parameters_ == null) {
+      return null;
+    }
+    for (I_Parameter rbm: parameters_) {
+      if (rbm != null) {
+        if (key.equals(rbm.getKey())) {
+          return rbm.getValue();
+        }
+      }
+    }
+    return null;
+  }
+  
+  public ParameterMutant getParameterMutant(String key) {
+    if (parameters_ == null) {
+      return null;
+    }
+    for (ParameterMutant rbm: parameters_) {
+      if (rbm != null) {
+        if (key.equals(rbm.getKey())) {
+          return rbm;
+        }
+      }
+    }
+    return null;
   }
 }

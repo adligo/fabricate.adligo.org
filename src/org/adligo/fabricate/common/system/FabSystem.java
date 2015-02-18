@@ -14,8 +14,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.File;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -191,5 +193,16 @@ public class FabSystem implements I_FabSystem {
       }
     }
     return toRet;
+  }
+
+  @Override
+  public String doDialog(String question, boolean readPassword) {
+    Console console = System.console();
+    question = question + lineSeperator();
+    if (readPassword) {
+      return new String(console.readPassword(question, new Object[]{}));
+    } else {
+      return console.readLine(question, new Object[]{});
+    }
   }
 }

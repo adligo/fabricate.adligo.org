@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FabricateFactory implements I_RepositoryFactory {
 
-  public Fabricate create(I_FabSystem sys, FabricateType fab, I_FabricateXmlDiscovery xmlDisc) {
+  public Fabricate create(I_FabSystem sys, FabricateType fab, I_FabricateXmlDiscovery xmlDisc) throws ClassNotFoundException {
     FabricateMutant fm = new FabricateMutant(fab, xmlDisc);
     String fabHome = FabricateEnvironment.INSTANCE.getFabricateHome(sys);
     fm.setFabricateHome(fabHome);

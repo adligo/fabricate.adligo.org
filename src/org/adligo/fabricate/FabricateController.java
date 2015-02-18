@@ -11,6 +11,11 @@ import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
+import org.adligo.fabricate.presenters.CommandPhasePresenter;
+import org.adligo.fabricate.routines.FabricationRoutineCreationException;
+import org.adligo.fabricate.routines.I_ProjectAware;
+import org.adligo.fabricate.routines.RoutineFabricateFactory;
+import org.adligo.fabricate.routines.RoutineFactory;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 
@@ -31,13 +36,15 @@ public class FabricateController {
   private final I_FabLog log_;
   //private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
+  private RoutineFabricateFactory factory_;
   
   @SuppressWarnings("unused")
   public static final void main(String [] args) throws Exception {
     new FabricateController(new FabSystem(), args, new FabricateFactory());
   }
   
-  public FabricateController(FabSystem sys, String [] args, FabricateFactory factory) throws IOException {
+  public FabricateController(FabSystem sys, String [] args, FabricateFactory factory) 
+      throws ClassNotFoundException, FabricationRoutineCreationException, IOException {
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
     sys_ = sys;
     //files_ = sys.getFileIO();
@@ -101,18 +108,23 @@ public class FabricateController {
     Fabricate fab = factory.create(sys_, fabX, discovery);
     FabricateMutant fm = new FabricateMutant(fab);
     List<RoutineParentType> traits =  fabX.getTrait();
-    
+    List<String> argCommands;
+    boolean commands = true;
     try {
       if (traits != null) {
         fm.addTraits(traits);
       }
-      List<String> argCommands = sys_.getArgValues(cmdMessages_.getCommand());
+      argCommands = sys_.getArgValues(cmdMessages_.getCommand());
       
       if (argCommands != null) {
         fm.addCommands(fabX);
       } else {
         fm.addStages(fabX);
+        commands = false;
       }
+       
+      fab = new Fabricate(fm);
+      factory_ = new RoutineFabricateFactory(fab, commands);
     } catch (ClassNotFoundException x) {
       String message = sysMessages_.getUnableToLoadTheFollowingClass() + 
         sys_.lineSeperator() + x.getMessage();
@@ -120,11 +132,19 @@ public class FabricateController {
       log_.printTrace(x);
       return;
     }
-    log_.println("failed todo: ");
-    log_.println("add read of command arguments cmd,stages into Fabricate");
-    log_.println("add control logic of what to do");
-    log_.println("with read of Fabricate.xml commands or stages accordingly");
-    log_.println("add command phase presenter");
+    
+    if (requiresProjects()) {
+      
+    }
+    
+    if (commands) {
+      log_.println("commands");
+      CommandPhasePresenter presenter = new CommandPhasePresenter(argCommands, sys_, factory_);
+      presenter.processCommands();
+    } else {
+      
+    }
+    log_.println("not yet working todo: ");
     log_.println("add default commands encrypt, decrypt");
     log_.println("add obtain projects presenter");
     log_.println("add stage phase presenter");
@@ -135,4 +155,10 @@ public class FabricateController {
     
   }
   
+  private boolean requiresProjects() throws FabricationRoutineCreationException {
+    if (factory_.anyAssignableTo(I_ProjectAware.class)) {
+      return true;
+    }
+    return false;
+  }
 }

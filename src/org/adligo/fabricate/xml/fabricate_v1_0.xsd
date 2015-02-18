@@ -56,7 +56,7 @@
     			minOccurs="0" maxOccurs="1">
     		</element>
     		<element name="dependencies"
-    			type="fns:fabricate_dependencies" minOccurs="0" maxOccurs="1">
+    			type="fns:fabricate_dependencies" minOccurs="1" maxOccurs="1">
     		</element>
             <element name="trait" type="cns:routine_parent_type" minOccurs="0" maxOccurs="unbounded">
             	<annotation>
@@ -149,8 +149,8 @@ by specifying a trait node with a identical name.</documentation>
     		</documentation>
     	</annotation>
     	<sequence>
-    		<element name="remote_repository" type="string"
-    			minOccurs="1" maxOccurs="unbounded">
+    		<element name="remote_repository" minOccurs="1"
+    			maxOccurs="unbounded">
     			<annotation>
     				<documentation>
     					The repositories listed with these elements are
@@ -167,8 +167,13 @@ by specifying a trait node with a identical name.</documentation>
     					available.
     				</documentation>
     			</annotation>
+    			<simpleType>
+    				<restriction base="token">
+    					<minLength value="3"></minLength>
+    				</restriction>
+    			</simpleType>
     		</element>
-            <element name="library" type="lns:library_reference_type" minOccurs="0" maxOccurs="unbounded">
+    		<element name="library" type="lns:library_reference_type" minOccurs="0" maxOccurs="unbounded">
             	<annotation>
             		<documentation>Note the platform_type is always ignored in this context.</documentation>
             	</annotation></element>
@@ -274,7 +279,7 @@ in order for the task to be executed on the project.</documentation>
     			</restriction>
     		</simpleType>
 	   </attribute>
-    	<attribute name="class" use="required">
+    	<attribute name="class" use="optional">
     		<annotation>
     			<documentation>
     				This is a class in the fabricate classpath which

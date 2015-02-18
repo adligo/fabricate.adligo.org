@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.i18n.I_GitMessages;
+import org.adligo.fabricate.common.i18n.I_ImplicitTraitMessages;
 import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
@@ -29,6 +30,11 @@ public class FabricateEnConstants  implements I_FabricateConstants {
   @Override
   public I_GitMessages getGitMessages() {
     return GitEnMessages.INSTANCE;
+  }
+  
+  @Override
+  public  I_ImplicitTraitMessages getImplicitTraitMessages() {
+    return ImplicitTraitEnMessages.INSTANCE;
   }
   
   @Override
