@@ -51,6 +51,17 @@ public interface I_CommandLineConstants {
   public String getAlias(String arg);
   
   /**
+   * This argument indicates that archival stages
+   * should be executed.
+   * @param alias
+   * @return for English this will be;
+   * alias == true
+   *     "-a"
+   * alias == false
+   *    "--archive"
+   */
+  public String getArchive(boolean alias);
+  /**
    * This argument key instructs Fabricate to execute 
    * a command, the command itself 
    * @return The command line key for 
@@ -163,6 +174,18 @@ public interface I_CommandLineConstants {
    */
   public String getStages();
   /**
+   * This argument should be checked for by any sort of
+   * testing stage, so that the stage should be skipped
+   * if it isn't set.
+   * @param alias
+   * @return for English this will be;
+   * alias == true
+   *     "-t"
+   * alias == false
+   *    "--test"
+   */
+  public String getTest(boolean alias);
+  /**
    * This argument instructs Fabricate to tag all projects using the
    * version setting in fabricate.xml.  Versions are considered
    * a tag when they do NOT contain the branch prefix. By 
@@ -175,11 +198,11 @@ public interface I_CommandLineConstants {
    * @param alias
    * @return for English this will be;
    * alias == true
-   *     "-t"
+   *     "-m"
    * alias == false
-   *    "--tag-versions"
+   *    "--mark-versions"
    */
-  public String getTagVersions(boolean alias);
+  public String getMarkVersions(boolean alias);
   /**
    * This argument instructs Fabricate to update all projects from their various
    * source control management systems (git) before executing commands

@@ -98,8 +98,8 @@ public class AbstractRoutine implements I_FabricationRoutine {
    * Do nothing, allow extension classes to override.
    */
   @Override
-  public void setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException {
-    
+  public boolean setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException {
+    return true;
   }
 
   /**

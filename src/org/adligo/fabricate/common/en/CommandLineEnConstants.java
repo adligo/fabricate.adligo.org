@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class CommandLineEnConstants implements I_CommandLineConstants {
   public static final CommandLineEnConstants INSTANCE = new CommandLineEnConstants();
+  private static final String A = "-a";
+  private static final String ARCHIVE = "--archive";
   /**
    * key to a comma delimited String which turns into a List<String>
    */
@@ -20,6 +22,8 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   private static final String GROW_BRANCHES = "--grow-branches";
   private static final String L = "-l";
   private static final String LOG = "--log-verbosely";
+  private static final String M = "-m";
+  private static final String MARK_VERSIONS = "--mark-versions";
   private static final String R = "-r";
   private static final String REBUILD = "--rebuild-dependents";
   
@@ -30,7 +34,7 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
    */
   private static final String STAGES = "stages";
   private static final String T = "-t";
-  private static final String TAG_VERSIONS = "--tag-versions";
+  private static final String TEST = "--test";
   
   private static final String U = "-u";
   private static final String UPDATE = "--update";
@@ -40,13 +44,15 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   
   private CommandLineEnConstants() {
     map_ = new HashMap<String, String>();
+    map_.put(ARCHIVE, A);
     map_.put(CONFIRM, C);
     map_.put(DEVELOPMENT, D);
     map_.put(GROW_BRANCHES, G);
     map_.put(LOG, L);
+    map_.put(MARK_VERSIONS, M);
     map_.put(REBUILD, R);
     map_.put(SHARE, S);
-    map_.put(TAG_VERSIONS, T);
+    map_.put(TEST, T);
     map_.put(UPDATE, U);
     map_.put(VERSION, V);
     map_ = Collections.unmodifiableMap(map_);
@@ -56,7 +62,15 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   public String getAlias(String arg) {
     return map_.get(arg);
   }
-
+  
+  @Override
+  public String getArchive(boolean alias) {
+    if (alias) {
+      return A;
+    }
+    return ARCHIVE;
+  }
+  
   @Override
   public String getCommand() {
     return COMMAND;
@@ -79,6 +93,14 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   }
 
   @Override
+  public String getGrowBranches(boolean alias) {
+    if (alias) {
+      return G;
+    }
+    return GROW_BRANCHES;
+  }
+  
+  @Override
   public String getLog(boolean alias) {
     if (alias) {
       return L;
@@ -87,8 +109,32 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   }
   
   @Override
+  public String getShare(boolean alias) {
+    if (alias) {
+      return S;
+    }
+    return SHARE;
+  }
+  
+  @Override
   public String getStages() {
     return STAGES;
+  }
+  
+  @Override
+  public String getTest(boolean alias) {
+    if (alias) {
+      return T;
+    }
+    return TEST;
+  }
+  
+  @Override
+  public String getMarkVersions(boolean alias) {
+    if (alias) {
+      return M;
+    }
+    return MARK_VERSIONS;
   }
   
   @Override
@@ -113,29 +159,5 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
       return V;
     }
     return VERSION;
-  }
-
-  @Override
-  public String getGrowBranches(boolean alias) {
-    if (alias) {
-      return G;
-    }
-    return GROW_BRANCHES;
-  }
-
-  @Override
-  public String getShare(boolean alias) {
-    if (alias) {
-      return S;
-    }
-    return SHARE;
-  }
-
-  @Override
-  public String getTagVersions(boolean alias) {
-    if (alias) {
-      return T;
-    }
-    return TAG_VERSIONS;
   }
 }

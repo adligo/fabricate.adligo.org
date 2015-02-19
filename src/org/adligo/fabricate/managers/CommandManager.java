@@ -1,4 +1,4 @@
-package org.adligo.fabricate.presenters;
+package org.adligo.fabricate.managers;
 
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandPhasePresenter {
+public class CommandManager {
   private final List<String> commands_ = new ArrayList<String>();
   private final I_FabSystem system_;
   private final I_FabLog log_;
@@ -34,7 +34,9 @@ public class CommandPhasePresenter {
     public I_FabricationRoutine create(I_FabricationMemoryMutant memory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();
-      toRet.setup(memory);
+      if (!toRet.setup(memory)) {
+        return null;
+      }
       return toRet;
     }
 
@@ -47,7 +49,7 @@ public class CommandPhasePresenter {
     }
   };
   
-  public CommandPhasePresenter(Collection<String> commands, I_FabSystem system, 
+  public CommandManager(Collection<String> commands, I_FabSystem system, 
       RoutineFabricateFactory factory) {
     commands_.addAll(commands);
     system_ = system;

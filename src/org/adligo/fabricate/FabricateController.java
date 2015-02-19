@@ -9,9 +9,9 @@ import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
+import org.adligo.fabricate.managers.CommandManager;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
-import org.adligo.fabricate.presenters.CommandPhasePresenter;
 import org.adligo.fabricate.routines.FabricationRoutineCreationException;
 import org.adligo.fabricate.routines.I_ProjectProcessor;
 import org.adligo.fabricate.routines.RoutineFabricateFactory;
@@ -138,15 +138,14 @@ public class FabricateController {
     }
     
     if (commands) {
-      CommandPhasePresenter presenter = new CommandPhasePresenter(argCommands, sys_, factory_);
+      CommandManager presenter = new CommandManager(argCommands, sys_, factory_);
       presenter.processCommands();
     } else {
       
     }
     log_.println("not yet working todo: ");
-    log_.println("add obtain projects presenter");
-    log_.println("add stage phase presenter");
-    log_.println("add compiles presenter");
+    log_.println("add projects manager code");
+    log_.println("add fabrication manager code");
     log_.println("add classpath to eclipse");
     log_.println("add fabricate4tests4j");
     log_.println("add fabricate4junit");

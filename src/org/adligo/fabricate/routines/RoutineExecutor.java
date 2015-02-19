@@ -29,6 +29,9 @@ public class RoutineExecutor {
     
     FabricationMemoryMutant memoryMut = new FabricationMemoryMutant();
     I_FabricationRoutine routine = factory_.create(memoryMut);
+    if (routine == null) {
+      return;
+    }
     FabricationMemory memory = new FabricationMemory(memoryMut);
     
     if (I_ConcurrencyAware.class.isAssignableFrom(routine.getClass())) {

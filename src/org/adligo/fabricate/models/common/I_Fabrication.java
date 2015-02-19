@@ -43,6 +43,9 @@ public interface I_Fabrication {
    * This method is always the last method called on the 
    * first instance of the class with this implementation
    * before it is run.
+   * @return a boolean if this fabrication should run, this allows the 
+   * stages to check for command line parameters or other indicators
+   * to see if they should run.
    */
-  public void setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException;
+  public boolean setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException;
 }

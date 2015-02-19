@@ -30,7 +30,7 @@ public class EncryptCommand extends AbstractRoutine implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public void setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException {
+  public boolean setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException {
     encryptTrait_ = traitFactory_.createRoutine(EncryptTrait.NAME, EncryptTrait.IMPLEMENTED_INTERFACES);
     
     String data =  system_.getArgValue(INPUT_CLA);
@@ -42,6 +42,7 @@ public class EncryptCommand extends AbstractRoutine implements
     String output = ((I_ResultFactory<String>) encryptTrait_).getResult();
     log_.println(implicit_.getTheFollowingLineContainsTheEncryptedResult());
     log_.println(output);
+    return true;
   }
 
 
