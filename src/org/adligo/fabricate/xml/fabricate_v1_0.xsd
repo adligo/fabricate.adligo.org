@@ -92,28 +92,20 @@ by specifying a trait node with a identical name.</documentation>
     	</sequence>
     </complexType>
 
-    <complexType name="git_server_type">
-    	<attribute name="user" type="string" use="optional"></attribute>
-    	<attribute name="hostname" type="string" use="required"></attribute>
-    	<attribute name="path" type="string" use="required">
-    		<annotation>
-    			<documentation>
-    				This is the remote path, and must contain a final
-    				slash in the remote servers file syntax which I
-    				think is always /.
-    			</documentation>
-    		</annotation>
-    	</attribute>
-    	<attribute name="protocol" type="string" use="optional">
-    		<annotation>
-    			<documentation>This defaults to ssh, but could be https.
-</documentation>
-    		</annotation></attribute>
-    </complexType>
 
     <complexType name="projects_type">
     		<sequence>
-    			<element name="scm" type="fns:scm_type" minOccurs="1" maxOccurs="1"></element>
+    			<element name="scm" type="cns:routine_type" minOccurs="1" maxOccurs="1">
+    				<annotation>
+    					<documentation>The scm node represents a special I_ScmFactories implementation
+class.  When the nodes class is null the name is used to locate
+a default I_ScmFactories implementation 
+(i.e. org.adligo.fabricate.routines.implicit.GitFactories).
+When a class is present then reflection is used to create the
+class of the custom I_ScmFactories implementation
+allowing Fabricate to work with other source control
+management systems.</documentation>
+    				</annotation></element>
     			<element name="project" type="fns:project_type" minOccurs="1" maxOccurs="unbounded"></element>
     		</sequence>
     	
@@ -236,8 +228,11 @@ Project groups are projects with fabricate.xml files,
 fabricate will be able to delegate to other fabrications.</documentation>
         </annotation>
         <sequence>
-    		<element name="scm" type="fns:scm_type" minOccurs="1"
+    		<element name="scm" type="cns:routine_type" minOccurs="1"
     			maxOccurs="1">
+                <annotation>
+                	<documentation>See comments under projects_type/scm.</documentation>
+                </annotation>
     		</element>
     		<element name="project" type="fns:project_type" minOccurs="1" maxOccurs="1"></element>
     	</sequence>
@@ -246,15 +241,6 @@ fabricate will be able to delegate to other fabrications.</documentation>
     
   
 
-	<complexType name="scm_type">
-    
-    	<choice>
-    		<element name="git" type="fns:git_server_type" minOccurs="1"
-    			maxOccurs="1">
-    		</element>
-    	</choice>
-    	
-    </complexType>
 
     
 	<complexType name="stage_type">

@@ -8,10 +8,8 @@ import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.git.GitCalls;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.GitServerType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectsType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ScmType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
 
 import java.io.File;
@@ -59,12 +57,13 @@ public class GitStage extends OldBaseConcurrentStage implements I_FabStage {
     FabricateType fab = ctx.getFabricate();
     StagesAndProjectsType stageAndProj = fab.getProjectGroup();
     ProjectsType projects = stageAndProj.getProjects();
+    /*
     ScmType scm = projects.getScm();
     GitServerType git =  scm.getGit();
     gitUser_ = git.getUser();
     gitHost_ = git.getHostname();
     gitPath_ = git.getPath();
-    
+    */
     List<ProjectType> projTypes =  projects.getProject();
     projects_.clear();
     if (log_.isLogEnabled(GitStage.class)) {

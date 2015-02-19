@@ -93,6 +93,25 @@ public interface I_CommandLineConstants {
   public String getDevelopment(boolean alias);
   
   /**
+   * This argument instructs Fabricate to create branches on all projects using the
+   * version setting in fabricate.xml.  Versions are considered
+   * a branch when they do contain the branch prefix. By 
+   * default the branch prefix is 'b', but it may 
+   * be changed using the xml key value with 'branchPrefix' as the key
+   * on the scm node. This command line argument
+   * is executed by the ObtainProjectsPresenter and 
+   * ends Fabrication after it's execution. <br/>
+   * <br/>
+   * @param alias
+   * @return for English this will be;
+   * alias == true
+   *     "-g"
+   * alias == false
+   *    "--grow-branches"
+   */
+  public String getGrowBranches(boolean alias);
+  
+  /**
    * This argument instructs Fabricate to turn on ALL LOGGING,
    * in the scripts and I_FabLog interface.
    * @param alias
@@ -120,6 +139,21 @@ public interface I_CommandLineConstants {
   public String getRebuildDependents(boolean alias);
   
   /**
+   * This argument instructs Fabricate to share all projects
+   * using the source control management system<br/>
+   * This command line argument
+   * is executed by the ObtainProjectsPresenter and 
+   * ends Fabrication after it's execution. 
+   * @param alias
+   * @return for English this will be;
+   * alias == true
+   *     "-s"
+   * alias == false
+   *    "--share"
+   */
+  public String getShare(boolean alias);
+  
+  /**
    * This argument turns on optional stages which are set as optional
    * in the fabricate.xml file.  In English this is 'stages' for command
    * line arguments like;<br/>
@@ -129,9 +163,29 @@ public interface I_CommandLineConstants {
    */
   public String getStages();
   /**
+   * This argument instructs Fabricate to tag all projects using the
+   * version setting in fabricate.xml.  Versions are considered
+   * a tag when they do NOT contain the branch prefix. By 
+   * default the branch prefix is 'b', but it may 
+   * be changed using the xml key value with 'branchPrefix' as the key
+   * on the scm node.  This command line argument
+   * is executed by the ObtainProjectsPresenter and 
+   * ends Fabrication after it's execution. <br/>
+   * <br/>
+   * @param alias
+   * @return for English this will be;
+   * alias == true
+   *     "-t"
+   * alias == false
+   *    "--tag-versions"
+   */
+  public String getTagVersions(boolean alias);
+  /**
    * This argument instructs Fabricate to update all projects from their various
    * source control management systems (git) before executing commands
-   * or build stages. <br/>
+   * or build stages. <This command line argument
+   * is executed by the ObtainProjectsPresenter and 
+   * does NOT end Fabrication. br/>
    * <br/>
    * @param alias
    * @return for English this will be;

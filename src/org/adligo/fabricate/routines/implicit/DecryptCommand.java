@@ -1,5 +1,6 @@
 package org.adligo.fabricate.routines.implicit;
 
+import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
 import org.adligo.fabricate.routines.FabricationRoutineCreationException;
 import org.adligo.fabricate.routines.I_InputAware;
@@ -29,7 +30,7 @@ public class DecryptCommand extends AbstractRoutine implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public void setup() throws FabricationRoutineCreationException {
+  public void setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException {
     decryptTrait_ = traitFactory_.createRoutine(DecryptTrait.NAME, EncryptTrait.IMPLEMENTED_INTERFACES);
     
     String data =  system_.getArgValue(INPUT_CLA);

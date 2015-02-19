@@ -13,7 +13,7 @@ import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
 import org.adligo.fabricate.presenters.CommandPhasePresenter;
 import org.adligo.fabricate.routines.FabricationRoutineCreationException;
-import org.adligo.fabricate.routines.I_ProjectAware;
+import org.adligo.fabricate.routines.I_ProjectProcessor;
 import org.adligo.fabricate.routines.RoutineFabricateFactory;
 import org.adligo.fabricate.routines.RoutineFactory;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
@@ -138,14 +138,12 @@ public class FabricateController {
     }
     
     if (commands) {
-      log_.println("commands");
       CommandPhasePresenter presenter = new CommandPhasePresenter(argCommands, sys_, factory_);
       presenter.processCommands();
     } else {
       
     }
     log_.println("not yet working todo: ");
-    log_.println("add default commands encrypt, decrypt");
     log_.println("add obtain projects presenter");
     log_.println("add stage phase presenter");
     log_.println("add compiles presenter");
@@ -156,7 +154,7 @@ public class FabricateController {
   }
   
   private boolean requiresProjects() throws FabricationRoutineCreationException {
-    if (factory_.anyAssignableTo(I_ProjectAware.class)) {
+    if (factory_.anyAssignableTo(I_ProjectProcessor.class)) {
       return true;
     }
     return false;

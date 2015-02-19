@@ -7,6 +7,6 @@ package org.adligo.fabricate.routines;
  * @author scott
  *
  */
-public interface I_ProjectAware {
-
+public interface I_ProjectProcessor {
+  public String getCurrentProject();
 }

@@ -1,7 +1,7 @@
 package org.adligo.fabricate.models.common;
 
-import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.routines.FabricationRoutineCreationException;
+
 
 /**
  * This is the base interface of all things that
@@ -17,23 +17,22 @@ import org.adligo.fabricate.routines.FabricationRoutineCreationException;
  * @author scott
  *
  */
-public interface I_FabricationRoutine extends Runnable {
-  public I_RoutineBrief getBrief();
-  public I_RoutineFactory getTraitFactory();
+public interface I_FabricationRoutine extends I_Fabrication, Runnable {
   public I_RoutineFactory getTaskFactory();
-  public I_FabSystem getSystem();
   
-  public void setBrief(I_RoutineBrief brief);
-  public void setTraitFactory(I_RoutineFactory factory);
   public void setTaskFactory(I_RoutineFactory factory);
-  public void setSystem(I_FabSystem system);
+  
   
   /**
    * This method should be used to setup up this routine
    * finding (and casting) all traits, before the routine
-   * may be run on another thread.  It is always the 
-   * last method to call on the main thread before
-   * run is called on the main thread or on another thread.
+   * may is run.  <br/>
+   * This method may NOT dialog the user for passwords or other settings.
+   * <br/>
+   * This method is always the last method called before
+   * run is called on all instances which didn't have
+   * it's sibling setup(I_FabricationMemoryMutant memory) method
+   * called.
    */
-  public void setup() throws FabricationRoutineCreationException;
+  public void setup(I_FabricationMemory memory) throws FabricationRoutineCreationException;
 }
