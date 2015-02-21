@@ -43,7 +43,9 @@ public class ExpectedRoutineInterfaceMutant implements I_ExpectedRoutineInterfac
       if (otherInterfaceClass != null) {
         return false;
       }
-    } else if (interfaceClass.equals(otherInterfaceClass)) {
+    } else if (otherInterfaceClass == null) {
+      return false;
+    } else if ( !interfaceClass.getName().equals(otherInterfaceClass.getName())) {
       return false;
     }
     

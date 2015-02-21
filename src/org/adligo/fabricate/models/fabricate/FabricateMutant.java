@@ -96,7 +96,7 @@ public class FabricateMutant implements I_Fabricate {
   public void addCommands(FabricateType type) 
       throws IllegalArgumentException, ClassNotFoundException {
     List<RoutineParentType> routines =  type.getCommand();
-    addRoutineParents(routines, commands_, RoutineBriefOrigin.COMMAND);
+    addRoutineParents(routines, commands_, RoutineBriefOrigin.FABRICATE_COMMAND);
   }
 
   public void addDependency(DependencyType dep) {
@@ -126,7 +126,16 @@ public class FabricateMutant implements I_Fabricate {
         
         if (stageTypes != null) {
           for (StageType routine: stageTypes) {
-            RoutineBriefMutant mut = new RoutineBriefMutant(routine);
+            RoutineBriefMutant mut = new RoutineBriefMutant(routine, RoutineBriefOrigin.FABRICATE_STAGE);
+            stages_.put(mut.getName(), mut);
+          }
+        }
+        
+        List<StageType> archiveTypes = stages.getArchiveStage();
+        
+        if (archiveTypes != null) {
+          for (StageType routine: archiveTypes) {
+            RoutineBriefMutant mut = new RoutineBriefMutant(routine, RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE);
             stages_.put(mut.getName(), mut);
           }
         }
@@ -136,7 +145,7 @@ public class FabricateMutant implements I_Fabricate {
   
   public void addTraits(Collection<RoutineParentType> routines) 
       throws IllegalArgumentException, ClassNotFoundException {
-    addRoutineParents(routines, traits_, RoutineBriefOrigin.TRAIT);
+    addRoutineParents(routines, traits_, RoutineBriefOrigin.FABRICATE_TRAIT);
   }
   
   public Map<String, I_RoutineBrief> getCommands() {

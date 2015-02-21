@@ -27,13 +27,13 @@ public class RoutineBrief implements I_RoutineBrief {
     return Collections.unmodifiableMap(toRet);
   }
   
-  public static Map<String, I_RoutineBrief> convert(List<StageType> types) throws ClassNotFoundException {
+  public static Map<String, I_RoutineBrief> convertStages(List<StageType> types, RoutineBriefOrigin origin) throws ClassNotFoundException {
     Map<String, I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
     
     if (types != null) {
       for (StageType type: types) {
         if (type != null) {
-          toRet.put(type.getName(), new RoutineBrief(new RoutineBriefMutant(type)));
+          toRet.put(type.getName(), new RoutineBrief(new RoutineBriefMutant(type, origin)));
         }
       }
     }

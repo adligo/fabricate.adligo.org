@@ -1,9 +1,15 @@
-package org.adligo.fabricate.routines;
+package org.adligo.fabricate.models.common;
 
+/**
+ * This exception helps export data
+ * to the layer which has i18n constants available
+ * for logging.
+ * 
+ * @author scott
+ *
+ */
 public class FabricationRoutineCreationException extends InstantiationException {
-  /**
-   * 
-   */
+
   private static final long serialVersionUID = 1L;
   private Class<?> actualGenericType;
   private Class<?> routine;

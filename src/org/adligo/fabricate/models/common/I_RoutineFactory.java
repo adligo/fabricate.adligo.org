@@ -1,7 +1,5 @@
 package org.adligo.fabricate.models.common;
 
-import org.adligo.fabricate.routines.FabricationRoutineCreationException;
-
 import java.util.Set;
 
 /**

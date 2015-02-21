@@ -4,13 +4,13 @@ import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_ImplicitTraitMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.I_RoutineFactory;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
-import org.adligo.fabricate.routines.FabricationRoutineCreationException;
 
 public class AbstractRoutine implements I_FabricationRoutine {
   protected I_RoutineBrief brief_;

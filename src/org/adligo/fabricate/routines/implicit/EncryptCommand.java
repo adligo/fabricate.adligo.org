@@ -1,8 +1,8 @@
 package org.adligo.fabricate.routines.implicit;
 
+import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
-import org.adligo.fabricate.routines.FabricationRoutineCreationException;
 import org.adligo.fabricate.routines.I_InputAware;
 import org.adligo.fabricate.routines.I_PresentationAware;
 import org.adligo.fabricate.routines.I_ResultFactory;

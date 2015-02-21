@@ -2,15 +2,15 @@ package org.adligo.fabricate.managers;
 
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.I_RoutineFactory;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
-import org.adligo.fabricate.routines.FabricationRoutineCreationException;
 import org.adligo.fabricate.routines.I_CommandAware;
-import org.adligo.fabricate.routines.I_RoutineExecutorFactory;
+import org.adligo.fabricate.routines.I_RoutineBuilder;
 import org.adligo.fabricate.routines.RoutineExecutor;
 import org.adligo.fabricate.routines.RoutineFabricateFactory;
 import org.adligo.fabricate.routines.RoutineFactory;
@@ -27,11 +27,11 @@ public class CommandManager {
   private final I_Fabricate fabricate_;
   private final RoutineFabricateFactory factory_;
   private String command_;
-  private final I_RoutineExecutorFactory executorFactory_ = new I_RoutineExecutorFactory() {
+  private final I_RoutineBuilder executorFactory_ = new I_RoutineBuilder() {
     
 
     @Override
-    public I_FabricationRoutine create(I_FabricationMemoryMutant memory)
+    public I_FabricationRoutine build(I_FabricationMemoryMutant memory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();
       if (!toRet.setup(memory)) {
@@ -41,7 +41,7 @@ public class CommandManager {
     }
 
     @Override
-    public I_FabricationRoutine create(I_FabricationMemory memory)
+    public I_FabricationRoutine build(I_FabricationMemory memory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();
       toRet.setup(memory);
@@ -62,7 +62,7 @@ public class CommandManager {
     for (String command: commands_) {
       command_ = command;
       RoutineExecutor exe = new RoutineExecutor(system_, executorFactory_, fabricate_.getThreads());
-      exe.run();
+      exe.runRoutines();
     }
   }
 

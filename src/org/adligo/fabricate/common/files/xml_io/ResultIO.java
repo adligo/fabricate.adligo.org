@@ -9,11 +9,28 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.validation.Schema;
 
 public class ResultIO {
 
-  public static void write(ResultType result, String filePath) throws IOException {
+  @SuppressWarnings("unchecked")
+  protected static ResultType parse_v1_0(Schema schema, File file) throws IOException {
+    try {
+      JAXBContext jaxbContext = JAXBContext.newInstance(SchemaLoader.JAVA_PROJECT_NS_V1_0);
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+      
+      jaxbUnmarshaller.setSchema(schema);
+      JAXBElement<ResultType> devType = (JAXBElement<ResultType>) jaxbUnmarshaller.unmarshal(file);
+      ResultType toRet = devType.getValue();
+      return toRet;
+    } catch (JAXBException e) {
+      throw new IOException(file.getAbsolutePath(), e);
+    } 
+  }
+  
+  protected static void write_v1_0(String filePath, ResultType result) throws IOException {
     try {
       JAXBContext jaxbContext = JAXBContext.newInstance(SchemaLoader.JAVA_RESULT_NS_V1_0);
       Marshaller marshaller = jaxbContext.createMarshaller();

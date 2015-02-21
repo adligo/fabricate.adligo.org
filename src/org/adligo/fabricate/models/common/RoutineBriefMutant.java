@@ -34,12 +34,12 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     return toRet;
   }
 
-  public static Map<String, I_RoutineBrief> convert(List<StageType> types) throws ClassNotFoundException {
+  public static Map<String, I_RoutineBrief> convertStages(List<StageType> types, RoutineBriefOrigin origin) throws ClassNotFoundException {
     Map<String, I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
     if (types != null) {
       for (StageType type: types) {
         if (type != null) {
-          toRet.put(type.getName(), new RoutineBriefMutant(type));
+          toRet.put(type.getName(), new RoutineBriefMutant(type, origin));
         }
       }
     }
@@ -155,9 +155,9 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     setParameters(ps);
   }
   
-  public RoutineBriefMutant(StageType stage)  
+  public RoutineBriefMutant(StageType stage, RoutineBriefOrigin origin)  
       throws IllegalArgumentException, ClassNotFoundException {
-    this(stage.getName(), stage.getClazz(), RoutineBriefOrigin.STAGE);
+    this(stage.getName(), stage.getClazz(), origin);
     ParamsType params = stage.getParams();
     if (params != null) {
       List<I_Parameter> ps = ParameterMutant.convert(params);
@@ -170,7 +170,11 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     List<? extends RoutineType> nested = stage.getTask();
     if (nested != null) {
       if (nested.size() >= 1) {
-        addNested(nested, RoutineBriefOrigin.STAGE_TASK);
+        if (RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE == origin) {
+          addNested(nested, RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE_TASK);
+        } else {
+          addNested(nested, RoutineBriefOrigin.FABRICATE_STAGE_TASK);
+        }
       }
     }
   }

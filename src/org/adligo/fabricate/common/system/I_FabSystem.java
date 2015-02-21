@@ -7,6 +7,7 @@ import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 
 
 public interface I_FabSystem extends I_FabFilesSystem {
@@ -40,12 +41,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public List<String> getArgValues(String key);
-  /**
-   * the command line arguments that came
-   * in as a normalized string
-   * @return
-   */
-  public String toScriptArgs();
+
   
   /**
    * @see I_Executor, this method also provides a
@@ -86,12 +82,37 @@ public interface I_FabSystem extends I_FabFilesSystem {
   public void join();
   
   /**
+   * the command line arguments that came
+   * in as a normalized string
+   * @return
+   */
+  public String toScriptArgs();
+  
+  /**
+   * creates a new ArrayBlockingQueue for stubbing.
+   * @param type
+   * @param size
+   * @return
+   */
+  public <E> ArrayBlockingQueue<E> newArrayBlockingQueue(Class<E> type, int size);
+  
+  /**
    * This method provides a
    * way to pass in a mock for testing.
    * @param args
    * @return
    */
   public ProcessBuilderWrapper newProcessBuilder(String []  args);
+  
+  /**
+   * Create a new run monitor to wrap a Runnable,
+   * in a way that can be monitored.
+   * 
+   * @param delegate
+   * @param counter
+   * @return
+   */
+  public I_RunMonitor newRunMonitor(Runnable delegate, int counter);
   
   /**
    * This method provides the Thread.currentThread(),

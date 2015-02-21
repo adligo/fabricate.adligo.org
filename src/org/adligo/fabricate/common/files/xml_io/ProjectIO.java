@@ -21,8 +21,6 @@ import javax.xml.validation.Schema;
  */
 public class ProjectIO {
   
-  public static final String THERE_WAS_AN_ERROR_PARSING_THE_FOLLOWING_FILE = "There was an error parsing the following file;";
-
   @SuppressWarnings("unchecked")
   protected static FabricateProjectType parse_v1_0(Schema schema, File file) throws IOException {
     try {
@@ -34,8 +32,7 @@ public class ProjectIO {
       FabricateProjectType toRet = devType.getValue();
       return toRet;
     } catch (JAXBException e) {
-      throw new IOException(THERE_WAS_AN_ERROR_PARSING_THE_FOLLOWING_FILE +
-          file.getAbsolutePath(), e);
+      throw new IOException(file.getAbsolutePath(), e);
     } 
   }
   

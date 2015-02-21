@@ -2,7 +2,6 @@ package org.adligo.fabricate.models.common;
 
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
-import org.adligo.fabricate.routines.FabricationRoutineCreationException;
 
 public interface I_Fabrication {
   public I_RoutineBrief getBrief();

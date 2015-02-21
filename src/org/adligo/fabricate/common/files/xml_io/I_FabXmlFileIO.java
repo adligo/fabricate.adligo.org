@@ -5,6 +5,7 @@ import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io_v1.result_v1_0.ResultType;
 
 import java.io.IOException;
 
@@ -13,8 +14,10 @@ public interface I_FabXmlFileIO {
   public FabricateDevType parseDev_v1_0(String xmlFilePath) throws IOException;
   public FabricateType parseFabricate_v1_0(String xmlFilePath) throws IOException;
   public FabricateProjectType parseProject_v1_0(String xmlFilePath) throws IOException;
+  public ResultType parseResult_v1_0(String xmlFilePath) throws IOException;
   public LibraryType parseLibrary_v1_0(String xmlFilePath) throws IOException;
   
   public void writeDepot_v1_0(String filePath, DepotType depot) throws IOException;
   public void writeDev_v1_0(String filePath, FabricateDevType dev) throws IOException;
+  public void writeResult_v1_0(String filePath, ResultType dev) throws IOException;
 }

@@ -23,7 +23,7 @@ public class LibraryIO {
       JAXBElement<LibraryType> devType = (JAXBElement<LibraryType>) jaxbUnmarshaller.unmarshal(file);
       return devType.getValue();
     } catch (JAXBException e) {
-      throw new IOException(e);
+      throw new IOException(file.getAbsolutePath(), e);
     } 
   }
 }

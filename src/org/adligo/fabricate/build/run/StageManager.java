@@ -307,7 +307,7 @@ public class StageManager {
     }
       
     try { 
-      ResultIO.write(result, resultFile.getAbsolutePath());
+      xmlFiles_.writeResult_v1_0(resultFile.getAbsolutePath(), result);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

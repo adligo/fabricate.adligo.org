@@ -1,7 +1,5 @@
 package org.adligo.fabricate.common.log;
 
-import org.adligo.fabricate.common.i18n.I_FabricateConstants;
-
 import java.util.HashMap;
 import java.util.Map;
 

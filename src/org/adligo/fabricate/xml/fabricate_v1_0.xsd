@@ -297,14 +297,21 @@ in order for the task to be executed on the project.</documentation>
     
     <complexType name="stages_and_projects_type">
     	<sequence>
-    		<element name="stages" type="fns:stages_type" minOccurs="1" maxOccurs="1"></element>
-    		<element name="projects" type="fns:projects_type" minOccurs="1" maxOccurs="1"></element>
+    		<element name="stages" type="fns:stages_type" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="projects" type="fns:projects_type"
+    			minOccurs="1" maxOccurs="1">
+    		</element>
     	</sequence>
     </complexType>
     
     <complexType name="stages_type">
     	<sequence>
-    		<element name="stage" type="fns:stage_type" minOccurs="1" maxOccurs="unbounded"></element>
+    		<element name="stage" type="fns:stage_type" minOccurs="1"
+    			maxOccurs="unbounded">
+    		</element>
+    		<element name="archiveStage" type="fns:stage_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 

@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FabSystem implements I_FabSystem {
@@ -44,6 +45,56 @@ public class FabSystem implements I_FabSystem {
   }
   
   @Override
+  public Thread currentThread() {
+    return Thread.currentThread();
+  }
+  
+  @Override
+  public String doDialog(String question, boolean readPassword) {
+    Console console = System.console();
+    question = question + lineSeperator();
+    if (readPassword) {
+      return new String(console.readPassword(question, new Object[]{}));
+    } else {
+      return console.readLine(question, new Object[]{});
+    }
+  }
+  
+  @Override
+  public String getArgValue(String key) {
+    return argMap.get(key);
+  }
+  
+  @Override
+  public List<String> getArgValues(String key) {
+    List<String> toRet = argListVals_.get(key);
+    if (toRet == null) {
+      String valsDelimited  = argMap.get(key);
+      if ( !StringUtils.isEmpty(valsDelimited)) {
+        List<String> newVals = new ArrayList<String>();
+        StringTokenizer st = new StringTokenizer(valsDelimited,",");
+        boolean hadVals = false;
+        while (st.hasMoreTokens()) {
+          String token = st.nextToken();
+          newVals.add(token);
+          hadVals = true;
+        }
+        if (!hadVals) {
+          if (valsDelimited.length() >= 1) {
+            newVals.add(valsDelimited);
+            hadVals = true;
+          }
+        }
+        if (hadVals ) {
+          toRet = Collections.unmodifiableList(newVals);
+          argListVals_.putIfAbsent(key, toRet);
+        }
+      }
+    }
+    return toRet;
+  }
+  
+  @Override
   public I_FabLog getLog() {
     return log_;
   }
@@ -51,10 +102,6 @@ public class FabSystem implements I_FabSystem {
   @Override
   public String getPathSeparator() {
     return File.pathSeparator;
-  }
-  
-  public void setLog(I_FabLog log) {
-    log_.setDelegate(log);;
   }
 
   @Override
@@ -113,18 +160,6 @@ public class FabSystem implements I_FabSystem {
        Thread.currentThread().interrupt();
      }
    }
-    
-  @Override
-  public String getArgValue(String key) {
-    return argMap.get(key);
-  }
-
-  @Override
-  public String toScriptArgs() {
-    StringBuilder sb = new StringBuilder();
-    CommandLineArgs.appendArgs(sb, argMap);
-    return sb.toString();
-  }
   
   public void setArgs(Map<String,String> argsIn) {
     argMap.clear();
@@ -139,16 +174,6 @@ public class FabSystem implements I_FabSystem {
       executor_ = new Executor(this);
     }
     return executor_;
-  }
-
-  @Override
-  public ProcessBuilderWrapper newProcessBuilder(String[] args) {
-    return new ProcessBuilderWrapper(new ProcessBuilder(args));
-  }
-
-  @Override
-  public Thread currentThread() {
-    return Thread.currentThread();
   }
 
   @Override
@@ -167,42 +192,29 @@ public class FabSystem implements I_FabSystem {
   }
 
   @Override
-  public List<String> getArgValues(String key) {
-    List<String> toRet = argListVals_.get(key);
-    if (toRet == null) {
-      String valsDelimited  = argMap.get(key);
-      if ( !StringUtils.isEmpty(valsDelimited)) {
-        List<String> newVals = new ArrayList<String>();
-        StringTokenizer st = new StringTokenizer(valsDelimited,",");
-        boolean hadVals = false;
-        while (st.hasMoreTokens()) {
-          String token = st.nextToken();
-          newVals.add(token);
-          hadVals = true;
-        }
-        if (!hadVals) {
-          if (valsDelimited.length() >= 1) {
-            newVals.add(valsDelimited);
-            hadVals = true;
-          }
-        }
-        if (hadVals ) {
-          toRet = Collections.unmodifiableList(newVals);
-          argListVals_.putIfAbsent(key, toRet);
-        }
-      }
-    }
-    return toRet;
+  public ProcessBuilderWrapper newProcessBuilder(String[] args) {
+    return new ProcessBuilderWrapper(new ProcessBuilder(args));
+  }
+  
+  @Override
+  public I_RunMonitor newRunMonitor(Runnable delegate, int counter) {
+    return new RunMonitor(this, delegate, counter);
+  }
+
+  public void setLog(I_FabLog log) {
+    log_.setDelegate(log);
+  }
+  
+  @Override
+  public String toScriptArgs() {
+    StringBuilder sb = new StringBuilder();
+    CommandLineArgs.appendArgs(sb, argMap);
+    return sb.toString();
   }
 
   @Override
-  public String doDialog(String question, boolean readPassword) {
-    Console console = System.console();
-    question = question + lineSeperator();
-    if (readPassword) {
-      return new String(console.readPassword(question, new Object[]{}));
-    } else {
-      return console.readLine(question, new Object[]{});
-    }
-  }
+  public <E> ArrayBlockingQueue<E> newArrayBlockingQueue(Class<E> type, int size) {
+    return new ArrayBlockingQueue<E>(size);
+  }  
+
 }
