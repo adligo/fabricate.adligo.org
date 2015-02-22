@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common.system;
 
+
 import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 
 import java.util.Collections;
@@ -10,6 +11,13 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public class CommandLineArgs {
+  /**
+   * A special key for passing the original fab command
+   * from the command line to the FabricateController
+   */
+  public static final String PASSABLE_ARGS_ = "passableArgs";
+  
+  private static final String PASSABLE_ARGS_START = "\"[";
   /**
    * This is printed out to the console 
    * so that the script knows that the last
@@ -44,6 +52,61 @@ public class CommandLineArgs {
    */
   public static final String LOCALE = "--";
   
+  public static String toPassableString(String [] args) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(PASSABLE_ARGS_START);
+    int len = args.length;
+    sb.append(len);
+    sb.append(",");
+    
+    for (int i = 0; i < args.length; i++) {
+      String arg = args[i];
+      int tokenLen = arg.length();
+      sb.append("[");
+      sb.append(tokenLen);
+      sb.append(",");
+      sb.append(arg);
+      sb.append("]");
+    }
+    sb.append("]\"");
+    return sb.toString();
+  }
+  
+  @SuppressWarnings("boxing")
+  public static String[] fromPassableString(String in) {
+    if (in.length() < PASSABLE_ARGS_START.length() + 3) {
+      return new String[] {};
+    }
+    
+    int firstNumEnd = in.indexOf(",");
+    String firstNum =  in.substring(PASSABLE_ARGS_START.length(), firstNumEnd);
+    Integer tokens = new Integer(firstNum);
+    
+    String []  result = new String[tokens];
+    if (tokens == 0) {
+      return result;
+    }
+    
+    int last = firstNumEnd + firstNum.length();
+    String remaining = in.substring(last,  in.length());
+    
+    for (int i = 0; i < tokens; i++) {
+      int nextComma = remaining.indexOf(",");
+      if (nextComma == -1) {
+        break;
+      }
+      String nextNum =  remaining.substring(1, nextComma);
+      
+      int afterComma = nextComma + 1;
+      Integer num = new Integer(nextNum);
+      last = afterComma + num;
+      String next =  remaining.substring(afterComma, last);
+      result[i] = next;
+      remaining = remaining.substring(last + 1, remaining.length());
+    }
+    return result;
+  }
+  
   public static Map<String,String> parseArgs(String [] args) {
     Map<String,String> toRet = new TreeMap<String,String>();
     for (int i = 0; i < args.length; i++) {
@@ -55,15 +118,14 @@ public class CommandLineArgs {
         if (arg.length() > eq + 1) {
           value = arg.substring(eq + 1, arg.length());
         } 
-        toRet.put(key.toLowerCase(), value);
+        toRet.put(key, value);
       } else {
-        String argCased = arg.toLowerCase();
         boolean added = false;
-        if (argCased.indexOf("--") == 0) {
-          toRet.put(argCased, null);
+        if (arg.indexOf("--") == 0) {
+          toRet.put(arg, null);
           added = true;
-        } else if (argCased.indexOf("-") == 0) {
-          char [] chars = argCased.toCharArray();
+        } else if (arg.indexOf("-") == 0) {
+          char [] chars = arg.toCharArray();
           for (int j = 0; j < chars.length; j++) {
             char c = chars[j];
             if (c != '-') {
@@ -73,7 +135,7 @@ public class CommandLineArgs {
           }
         }
         if (!added) {
-          toRet.put(arg.toLowerCase(),null);
+          toRet.put(arg,null);
         }
       }
     }

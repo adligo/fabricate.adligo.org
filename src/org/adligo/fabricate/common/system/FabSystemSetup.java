@@ -65,6 +65,10 @@ public class FabSystemSetup {
     } catch (IOException x) {
       constants = FabricateEnConstants.INSTANCE;
     }
+    if (!argMap.containsKey(CommandLineArgs.PASSABLE_ARGS_)) {
+      String passableArgs = CommandLineArgs.toPassableString(args);
+      argMap.put(CommandLineArgs.PASSABLE_ARGS_, passableArgs);
+    }
     I_CommandLineConstants clConstants = constants.getCommandLineConstants();
     argMap = CommandLineArgs.normalizeArgs(argMap, clConstants);
     String logAlias = clConstants.getLog(true);

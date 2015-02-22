@@ -40,6 +40,9 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   private static final String UPDATE = "--update";
   private static final String V = "-v";
   private static final String VERSION = "--version";
+  private static final String W = "-w";
+  private static final String WRITE_LOG = "--write-log";
+  
   private Map<String,String> map_;
   
   private CommandLineEnConstants() {
@@ -55,6 +58,7 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
     map_.put(TEST, T);
     map_.put(UPDATE, U);
     map_.put(VERSION, V);
+    map_.put(WRITE_LOG, W);
     map_ = Collections.unmodifiableMap(map_);
   }
   
@@ -159,5 +163,13 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
       return V;
     }
     return VERSION;
+  }
+  
+  @Override
+  public String getWriteLog(boolean alias) {
+    if (alias) {
+      return W;
+    }
+    return WRITE_LOG;
   }
 }

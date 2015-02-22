@@ -1,9 +1,11 @@
 package org.adligo.fabricate.common.files;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.ZipFile;
 
@@ -129,6 +131,14 @@ public interface I_FabFileIO {
    */
   public boolean mkdirs(String dirsPath);
   
+  /**
+   * 
+   * @param file
+   * @return
+   * @throws IOException
+   * @throws FileNotFoundException
+   */
+  public OutputStream newFileOutputStream(String file) throws IOException, FileNotFoundException;
   /**
    * simply creates a new ZipFile instance.
    * @param file

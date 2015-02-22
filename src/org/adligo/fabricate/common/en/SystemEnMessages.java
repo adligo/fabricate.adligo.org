@@ -3,12 +3,14 @@ package org.adligo.fabricate.common.en;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
+  
 
-  private static final String FABRICATING = "Fabricating...";
+ 
   private static final String BUILDING_FABRICATE_RUNTIME_CLASS_PATH = 
       "Building Fabricate runtime class path.";
   private static final String CHECKING_FABRICATE_RUNTIME_DEPENDENCIES = 
       "Checking Fabricate runtime dependencies.";
+  private static final String COMPILED_ON_X = "Compiled on <X/>.";
   private static final String THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS = 
       "The following local repository is locked by another process;";
   private static final String DID_NOT_PASS_THE_EXTRACT_CHECK = 
@@ -16,16 +18,11 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String DID_NOT_PASS_THE_MD5_CHECK = 
       "did not pass the md5 check.";
   
-  private static final String FAILED = "failed!";
-  private static final String FINISHED = "finished.";
+  private static final String DURATION_WAS_X_MILLISECONDS = "Duration was <X/> milliseconds.";
+  private static final String DURATION_WAS_X_MINUTES = "Duration was <X/> minutes.";
+  private static final String DURATION_WAS_X_SECONDS = "Duration was <X/> seconds.";
   
-  private static final String SENDING_OPTS_TO_SCRIPT = 
-      "Sending opts to script.";
-  private static final String STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
-      "Starting download from the following url;";
-  public static final SystemEnMessages INSTANCE = new SystemEnMessages();
-  private static final String COMPILED_ON_X = "Compiled on <X/>.";
-  private static final String FABRICATION_FAILED = "Fabrication failed!";
+  
   private static final String EXCEPTION_NO_FABRICATE_JAR_IN_$FABRICATE_HOME_LIB_FOR_THE_FOLLOWING_$FABRICATE_HOME =
       "Exception: No fabricate_*.jar in $FABRICATE_HOME/lib for the following $FABRICATE_HOME;";
   private static final String EXCEPTION_NO_$FABRICATE_HOME_ENVIRONMENT_VARIABLE_SET = 
@@ -48,9 +45,24 @@ public class SystemEnMessages implements I_SystemMessages {
       "Extraction of the following artifact;";
   private static final String EXTRACTING_THE_FOLLOWING_ARTIFACT = 
       "Extracting the following artifact;";
-
   
+  private static final String FABRICATING = "Fabricating...";
+  private static final String FABRICATE_ALREADY_RUNNING = 
+      "Fabricate appears to already be running ";
+  private static final String FABRICATE_ALREADY_RUNNING_2 = 
+      "(run.marker is in the same directory as fabricate.xml).";
   private static final String FABRICATE_BY_ADLIGO = "Fabricate by Adligo.";
+  private static final String FABRICATION_FAILED = "Fabrication failed!";
+  private static final String FABRICATION_SUCCESSFUL = "Fabrication successful!";
+  
+  private static final String FAILED = "failed!";
+  private static final String FINISHED = "finished.";
+  
+  private static final String SENDING_OPTS_TO_SCRIPT = 
+      "Sending opts to script.";
+  private static final String STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
+      "Starting download from the following url;";
+  public static final SystemEnMessages INSTANCE = new SystemEnMessages();
   
   private static final String MANAGING_FABRICATE_RUNTIME_CLASS_PATH_DEPENDENCIES = 
       "Managing Fabricate runtime class path dependencies.";
@@ -77,6 +89,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "The following list of Fabricate libraries contains a circular reference;";
   private static final String THE_FOLLOWING_REMOTE_REPOSITORY_APPEARS_TO_BE_DOWN = 
       "The following remote repository appears to be down;";
+  private static final String THERE_WAS_A_PROBLEM_CREATING_RUN_MARKER_IN_THE_FOLLOWING_DIRECTORY =
+      "There was a problem creating run.marker in the following directory;";
   
   private static final String TO_THE_FOLLOWING_FOLDER = "to the following folder;";
   
@@ -89,6 +103,21 @@ public class SystemEnMessages implements I_SystemMessages {
   private SystemEnMessages() {
   }
 
+  @Override
+  public String getDurationWasXMilliseconds() {
+    return DURATION_WAS_X_MILLISECONDS;
+  }
+
+  @Override
+  public String getDurationWasXMinutes() {
+    return DURATION_WAS_X_MINUTES;
+  }
+
+  @Override
+  public String getDurationWasXSeconds() {
+    return DURATION_WAS_X_SECONDS;
+  }
+  
   @Override
   public String getBuildingFabricateRuntimeClassPath() {
     return BUILDING_FABRICATE_RUNTIME_CLASS_PATH;
@@ -110,6 +139,14 @@ public class SystemEnMessages implements I_SystemMessages {
   
   public String getFabricating() {
     return FABRICATING;
+  }
+
+  public String getFabricateAppearsToBeAlreadyRunning() {
+    return FABRICATE_ALREADY_RUNNING;
+  }
+  
+  public String getFabricateAppearsToBeAlreadyRunningPartTwo() {
+    return FABRICATE_ALREADY_RUNNING_2;
   }
   
   public String getDidNotPassTheExtractCheck() {
@@ -175,7 +212,10 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getFabricationFailed() {
     return FABRICATION_FAILED;
   }
-  
+  @Override
+  public String getFabricationSuccessful() {
+    return FABRICATION_SUCCESSFUL;
+  }
   @Override
   public String getFailed() {
     return FAILED;
@@ -208,6 +248,7 @@ public class SystemEnMessages implements I_SystemMessages {
     return USING_THE_FOLLOWING_REMOTE_REPOSITORIES;
   }
   
+
   @Override
   public String getTheDownloadFromTheFollowingUrl() {
     return THE_DOWNLOAD_FROM_THE_FOLLOWING_URL;
@@ -238,6 +279,10 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess() {
     return THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS;
+  }
+
+  public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory() {
+    return THERE_WAS_A_PROBLEM_CREATING_RUN_MARKER_IN_THE_FOLLOWING_DIRECTORY;
   }
 
   @Override

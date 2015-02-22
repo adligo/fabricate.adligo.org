@@ -233,4 +233,16 @@ public interface I_CommandLineConstants {
    *    "--version"
    */
   public String getVersion(boolean alias);
+  /**
+   * This argument instructs Fabricate to write out 
+   * out a log file to output/fab.log. <br/>
+   * <br/>
+   * @param alias
+   * @return for English this will be;
+   * alias == true
+   *     "-w"
+   * alias == false
+   *    "--write-log"
+   */  
+  public String getWriteLog(boolean alias);
 }

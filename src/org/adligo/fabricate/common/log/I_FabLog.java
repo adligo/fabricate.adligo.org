@@ -8,9 +8,7 @@ package org.adligo.fabricate.common.log;
  * @author scott
  *
  */
-public interface I_FabLog {
+public interface I_FabLog extends I_Print {
   public boolean hasAllLogsEnabled();
   public boolean isLogEnabled(Class<?> clazz);
-  public void println(String p);
-  public void printTrace(Throwable t);
 }

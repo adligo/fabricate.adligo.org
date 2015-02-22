@@ -7,54 +7,66 @@
 
     <complexType name="result_type">
     	<sequence>
-    		<element name="machine" type="tns:machine_info_type" minOccurs="1" maxOccurs="1"></element>
-    		<element name="failure" type="tns:failure_type" minOccurs="0" maxOccurs="1">
-	    		<annotation>
-					<documentation>
-						Note CDATA text inside of the failure can contain
-						stack traces, and any other failure information.
-					</documentation>
-				</annotation>
+    		<element name="machine" type="tns:machine_info_type"
+    			minOccurs="1" maxOccurs="1">
+    		</element>
+    		<element name="failure" type="tns:failure_type"
+    			minOccurs="0" maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Note CDATA text inside of the failure can
+    					contain stack traces, and any other failure
+    					information.
+    				</documentation>
+    			</annotation>
     		</element>
     	</sequence>
     	<attribute name="name" type="string">
     		<annotation>
-				<documentation>
-					This the name of the project_group.
-				</documentation>
-			</annotation>
+    			<documentation>
+    				This the name of the project_group.
+    			</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="successful" type="boolean">
     		<annotation>
-				<documentation>
-					True when the fabrication was successful with no issues.
-				</documentation>
-			</annotation>
+    			<documentation>
+    				True when the fabrication was successful with no
+    				issues.
+    			</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="duration" type="duration">
     		<annotation>
-				<documentation>
-					The length of time fabricate ran.
-				</documentation>
-			</annotation>
+    			<documentation>
+    				The length of time fabricate ran.
+    			</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="os" type="string">
     		<annotation>
-				<documentation>
-					The operating system where fabricate ran, 
-					it should be a simple name like;
-					mac, linux, windows exc
-				</documentation>
-			</annotation>
+    			<documentation>
+    				The operating system where fabricate ran, it should
+    				be a simple name like; mac, linux, windows exc
+    			</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="os_version" type="string">
     		<annotation>
-				<documentation>
-					The version of the operating system/kernel ie
-					10.10, 8, 3.4 exc
-				</documentation>
-			</annotation>
+    			<documentation>
+    				The version of the operating system/kernel ie 10.10,
+    				8, 3.4 exc
+    			</documentation>
+    		</annotation>
     	</attribute>
+    	<attribute name="command_line" type="string">
+    		<annotation>
+    			<documentation>
+This should contain the original command line command used to start Fabricate.
+In Example;
+fab cmd=encrypt
+</documentation>
+    		</annotation></attribute>
     </complexType>
 
     <complexType name="machine_info_type">

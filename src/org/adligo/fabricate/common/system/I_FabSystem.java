@@ -3,6 +3,7 @@ package org.adligo.fabricate.common.system;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.I_FabFilesSystem;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.log.I_Print;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -129,4 +130,6 @@ public interface I_FabSystem extends I_FabFilesSystem {
   public ByteArrayOutputStream newByteArrayOutputStream();
   
   public BufferedInputStream newBufferedInputStream(InputStream in);
+  
+  public void setLogFileOutputStream(I_Print ps);
 }

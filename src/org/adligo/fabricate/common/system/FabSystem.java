@@ -9,6 +9,8 @@ import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.log.I_Print;
+import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -17,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.Console;
 import java.io.File;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,7 @@ public class FabSystem implements I_FabSystem {
   private final Map<String,String> argMap = new TreeMap<String,String>();
   private I_FabricateConstants constants_ = FabricateEnConstants.INSTANCE;
   private Executor executor_;
+  private I_Print fileLog_;
   
   public FabSystem() {
     fileIO_ = new FabFileIO(this);
@@ -52,7 +54,11 @@ public class FabSystem implements I_FabSystem {
   @Override
   public String doDialog(String question, boolean readPassword) {
     Console console = System.console();
+    
     question = question + lineSeperator();
+    if (fileLog_ != null) {
+      fileLog_.println(question);
+    }
     if (readPassword) {
       return new String(console.readPassword(question, new Object[]{}));
     } else {
@@ -215,6 +221,12 @@ public class FabSystem implements I_FabSystem {
   @Override
   public <E> ArrayBlockingQueue<E> newArrayBlockingQueue(Class<E> type, int size) {
     return new ArrayBlockingQueue<E>(size);
+  }
+
+  @Override
+  public void setLogFileOutputStream(I_Print ps) {
+    fileLog_ = ps;
+    ThreadLocalPrintStream.setLOG_FILE_OUTPUT(ps);
   }  
 
 }

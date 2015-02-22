@@ -8,70 +8,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class discovers information about
+ * the computer where it is running.
+ * 
+ * @author scott
+ *
+ */
 public class ComputerInfoDiscovery {
   private static final Set<String> OS_WITH_SYSCTL = getOsWithSysCtl();
-  
-  public static Set<String> getOsWithSysCtl() {
-    Set<String> toRet = new HashSet<String>();
-    toRet.add("mac");
-    toRet.add("linux");
-    return Collections.unmodifiableSet(toRet);
-  }
-  
-  public static String getOperatingSystem() {
-    String os = System.getProperty("os.name", "unknown");
-    os = os.toLowerCase();
-    if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
-        return "mac";
-      } else if (os.indexOf("win") >= 0) {
-        return "windows";
-      } else if (os.indexOf("linux") >= 0) {
-        return "linux";
-      } else if (os.indexOf("nux") >= 0) {
-        return "unux";
-      } else {
-        return os;
-      }
-  }
-  
-  public static String getJavaVersion() {
-    return System.getProperty("java.version", "unknown");
-  }
-  
-  public static String getOperatingSystemVersion(I_FabSystem sys, String os) {
-    if ("mac".equals(os)) {
-      try {
-        I_Executor exe = sys.getExecutor();
-        I_ExecutionResult er = exe.executeProcess(".", "sw_vers", "-productVersion");
-        String ver = er.getOutput();
-        if (ver != null) {
-          return ver;
-        }
-      } catch (Exception x) {
-        //do nothing
-      }
-    }
-    return "unknown";
-  }
-  
-  public static String getHostname() {
-    try {
-      String result = InetAddress.getLocalHost().getHostName();
-      if (!StringUtils.isEmpty( result))
-          return result;
-    } catch (UnknownHostException e) {
-        // failed;  try alternate means.
-    }
-
-    // try environment properties.
-  //        
-    String host = System.getenv("COMPUTERNAME");
-    if (host != null) {
-        return host;
-    }
-    host = System.getenv("HOSTNAME");
-    return host;
-  }
   
   public static String[] getCpuInfo(I_FabSystem sys, String os) {
     try {
@@ -114,6 +59,7 @@ public class ComputerInfoDiscovery {
     return new String[] {"unknown","unknown"};
   }
   
+
   public static String getCpuSpeed() {
     String cpu = System.getProperty("cpu.brand_string");
     int atIdx = cpu.indexOf("@");
@@ -123,6 +69,77 @@ public class ComputerInfoDiscovery {
       }
     }
     return cpu;
+  }
+  
+  public static Set<String> getOsWithSysCtl() {
+    Set<String> toRet = new HashSet<String>();
+    toRet.add("mac");
+    toRet.add("linux");
+    return Collections.unmodifiableSet(toRet);
+  }
+  
+  public static String getOperatingSystem() {
+    String os = System.getProperty("os.name", "unknown");
+    os = os.toLowerCase();
+    if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
+        return "mac";
+      } else if (os.indexOf("win") >= 0) {
+        return "windows";
+      } else if (os.indexOf("linux") >= 0) {
+        return "linux";
+      } else if (os.indexOf("nux") >= 0) {
+        return "unux";
+      } else {
+        return os;
+      }
+  }
+  
+  public static String getJavaVersion() {
+    return System.getProperty("java.version", "unknown");
+  }
+  
+  public static String getOperatingSystemVersion(I_FabSystem sys, String os) {
+    if ("mac".equals(os)) {
+      try {
+        I_Executor exe = sys.getExecutor();
+        I_ExecutionResult er = exe.executeProcess(".", "sw_vers", "-productVersion");
+        String ver = er.getOutput();
+        if (ver != null) {
+          StringBuilder sb = new StringBuilder();
+          char [] chars = ver.toCharArray();
+          for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            if (Character.isDigit(c) || '.' == c) {
+              sb.append(c);
+            }
+          }
+          ver = sb.toString();
+          return ver;
+        }
+      } catch (Exception x) {
+        //do nothing
+      }
+    }
+    return "unknown";
+  }
+  
+  public static String getHostname() {
+    try {
+      String result = InetAddress.getLocalHost().getHostName();
+      if (!StringUtils.isEmpty( result))
+          return result;
+    } catch (UnknownHostException e) {
+        // failed;  try alternate means.
+    }
+
+    // try environment properties.
+  //        
+    String host = System.getenv("COMPUTERNAME");
+    if (host != null) {
+        return host;
+    }
+    host = System.getenv("HOSTNAME");
+    return host;
   }
   
 }

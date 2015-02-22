@@ -10,6 +10,10 @@ public interface I_SystemMessages {
   public String getDidNotPassTheMd5Check();
   public String getDidNotPassTheExtractCheck();
   
+  public String getDurationWasXMilliseconds();
+  public String getDurationWasXMinutes();
+  public String getDurationWasXSeconds();
+  
   public String getExceptionExecutingJavaWithTheFollowingJavaHome();
   public String getExceptionFabricateRequiresJava1_7OrGreater();
   public String getExceptionJavaVersionParameterExpected();
@@ -25,6 +29,8 @@ public interface I_SystemMessages {
   
   public String getFabricateByAdligo();
   public String getFabricating();
+  public String getFabricateAppearsToBeAlreadyRunning();
+  public String getFabricateAppearsToBeAlreadyRunningPartTwo();
   
   /**
    * For other languages this may be translated better as
@@ -34,6 +40,7 @@ public interface I_SystemMessages {
    * @return
    */
   public String getFabricationFailed();
+  public String getFabricationSuccessful();
   public String getFailed();
   public String getFinished();
   
@@ -66,6 +73,9 @@ public interface I_SystemMessages {
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   
   public String getTheFollowingArtifact();
+  
+  public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory();
+  
   public String getUnableToLoadTheFollowingClass();
   public String getUsingTheFollowingRemoteRepositories();
   
