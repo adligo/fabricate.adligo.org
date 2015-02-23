@@ -7,6 +7,7 @@ import org.adligo.fabricate.common.log.I_Print;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -43,7 +44,18 @@ public interface I_FabSystem extends I_FabFilesSystem {
    */
   public List<String> getArgValues(String key);
 
-  
+  /**
+   * Runtime.getRuntime().getAvailableProcessors();
+   * @return
+   */
+  public int getAvailableProcessors();
+  /**
+   * @param os
+   * @return  a array of two strings;
+   * 1) the cpu name
+   * 2) the cpu speed
+   */
+  public String[] getCpuInfo(String os);
   /**
    * @see I_Executor, this method also provides a
    * way to pass in a mock for testing.
@@ -51,6 +63,8 @@ public interface I_FabSystem extends I_FabFilesSystem {
    */
   public I_Executor getExecutor();
   
+  public String getOperatingSystem();
+  public String getOperatingSystemVersion(String os);
   /**
    * This returns the system dependent separator for class path entries.
    * an alias to File.pathSeparator(), for stubbing.
@@ -58,7 +72,18 @@ public interface I_FabSystem extends I_FabFilesSystem {
    */
   public String getPathSeparator();
   
+  /**
+   * An alias to System.getProperty for stubbing.
+   * @param key
+   * @param defaultValue
+   * @return
+   */
+  public String getProperty(String key, String defaultValue);
+  
   public I_FabFileIO getFileIO();
+  public String getHostname();
+  public String getInetAddressHostname() throws UnknownHostException;
+  public String getJavaVersion();
   public I_FabXmlFileIO getXmlFileIO();
   /**
    * backed by the CommandLineArgs map.

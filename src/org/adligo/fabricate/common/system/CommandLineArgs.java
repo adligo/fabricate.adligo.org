@@ -79,7 +79,8 @@ public class CommandLineArgs {
     }
     
     int firstNumEnd = in.indexOf(",");
-    String firstNum =  in.substring(PASSABLE_ARGS_START.length(), firstNumEnd);
+    int firstBlock = in.indexOf("[");
+    String firstNum =  in.substring(firstBlock + 1, firstNumEnd);
     Integer tokens = new Integer(firstNum);
     
     String []  result = new String[tokens];

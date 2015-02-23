@@ -3,6 +3,7 @@ package org.adligo.fabricate.managers;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
+import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class CommandManager {
   private final List<String> commands_ = new ArrayList<String>();
@@ -67,7 +69,8 @@ public class CommandManager {
   }
 
   private I_FabricationRoutine processCommandSetup() throws FabricationRoutineCreationException{
-    I_FabricationRoutine routine = factory_.createCommand(command_, Collections.emptySet());
+    Set<I_ExpectedRoutineInterface> es = Collections.emptySet();
+    I_FabricationRoutine routine = factory_.createCommand(command_,es);
     I_RoutineBrief brief = fabricate_.getCommands().get(command_);
     routine.setSystem(system_);
     RoutineFactory cmdFactory = factory_.getCommands();

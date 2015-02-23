@@ -73,7 +73,8 @@ public class FabSystemSetup {
     argMap = CommandLineArgs.normalizeArgs(argMap, clConstants);
     String logAlias = clConstants.getLog(true);
     boolean debug = argMap.containsKey(logAlias);
-    FabLog log = new FabLog(Collections.emptyMap(), debug);
+    Map<String, Boolean> em = Collections.emptyMap();
+    FabLog log = new FabLog(em, debug);
     sys.setLog(log);
     sys.setConstants(constants);
     sys.setArgs(argMap);

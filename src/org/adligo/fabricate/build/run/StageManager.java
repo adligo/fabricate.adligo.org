@@ -244,7 +244,7 @@ public class StageManager {
     
     
     result.setName(fabricatePath.getName());
-    String os = ComputerInfoDiscovery.getOperatingSystem();
+    String os = ComputerInfoDiscovery.getOperatingSystem(sys_);
     result.setOs(os);
     String osVersion = ComputerInfoDiscovery.getOperatingSystemVersion(sys_, os);
     result.setOsVersion(osVersion);
@@ -268,7 +268,7 @@ public class StageManager {
       result.setFailure(failure);
       
     }
-    String hostName = ComputerInfoDiscovery.getHostname();
+    String hostName = ComputerInfoDiscovery.getHostname(sys_);
     
     MachineInfoType machine = new MachineInfoType();
     machine.setHostname(hostName);
@@ -278,7 +278,7 @@ public class StageManager {
     String[] cpu = ComputerInfoDiscovery.getCpuInfo(sys_, os);
     machine.setCpuName(cpu[0]);
     machine.setCpuSpeed(cpu[1]);
-    String jv = ComputerInfoDiscovery.getJavaVersion();
+    String jv = ComputerInfoDiscovery.getJavaVersion(sys_);
     machine.setJavaVersion(jv);
     result.setMachine(machine);
     

@@ -19,6 +19,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.Console;
 import java.io.File;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +44,8 @@ public class FabSystem implements I_FabSystem {
   
   public FabSystem() {
     fileIO_ = new FabFileIO(this);
-    FabLog log = new FabLog(Collections.emptyMap(), true);
+    Map<String, Boolean> em = Collections.emptyMap();
+    FabLog log = new FabLog( em, true);
     log_.setDelegate(log);
   }
   
@@ -101,19 +104,49 @@ public class FabSystem implements I_FabSystem {
   }
   
   @Override
+  public int getAvailableProcessors() {
+    return Runtime.getRuntime().availableProcessors();
+  }
+  
+  public I_FabricateConstants getConstants() {
+    return constants_;
+  }
+
+  @Override
+  public String[] getCpuInfo(String os) {
+    return ComputerInfoDiscovery.getCpuInfo(this, os);
+  }
+  
+  @Override
+  public long getCurrentTime() {
+    return System.currentTimeMillis();
+  }
+  
+  @Override
   public I_FabLog getLog() {
     return log_;
   }
 
+  public String getOperatingSystem() {
+    return ComputerInfoDiscovery.getOperatingSystem(this);
+  }
+  
+  @Override
+  public String getOperatingSystemVersion(String os) {
+    return ComputerInfoDiscovery.getOperatingSystemVersion(this, os);
+  }
+  
+  @Override
+  public String getProperty(String key, String defaultValue) {
+    return System.getProperty(key, defaultValue);
+  }  
+  
   @Override
   public String getPathSeparator() {
     return File.pathSeparator;
   }
 
-  @Override
-  public long getCurrentTime() {
-    return System.currentTimeMillis();
-  }
+
 
   @Override
   public String getDefaultLanguage() {
@@ -125,9 +158,6 @@ public class FabSystem implements I_FabSystem {
     return Locale.getDefault().getCountry();
   }
 
-  public I_FabricateConstants getConstants() {
-    return constants_;
-  }
 
   public void setConstants(I_FabricateConstants constants) {
     this.constants_ = constants;
@@ -227,6 +257,23 @@ public class FabSystem implements I_FabSystem {
   public void setLogFileOutputStream(I_Print ps) {
     fileLog_ = ps;
     ThreadLocalPrintStream.setLOG_FILE_OUTPUT(ps);
-  }  
+  }
+
+  @Override
+  public String getHostname() {
+    return ComputerInfoDiscovery.getHostname(this);
+  }
+
+  @Override
+  public String getInetAddressHostname() throws UnknownHostException {
+    return InetAddress.getLocalHost().getHostName();
+  }
+
+  @Override
+  public String getJavaVersion() {
+    return ComputerInfoDiscovery.getJavaVersion(this);
+  }
+
+
 
 }

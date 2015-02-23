@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -492,7 +493,7 @@ public class FabFileIO implements I_FabFileIO {
   }
   @Override
   public String readFile(String path) throws IOException {
-    return readFile(newBufferedReader(path));
+    return readFile(newBufferedReader(path, Charset.forName("UTF-8")));
   }
   
   public String readFile(BufferedReader reader) throws IOException {
@@ -522,8 +523,8 @@ public class FabFileIO implements I_FabFileIO {
     return sb.toString();
   }
 
-  public BufferedReader newBufferedReader(String path) throws IOException {
-    BufferedReader rdr = Files.newBufferedReader(Paths.get(path));
+  public BufferedReader newBufferedReader(String path, Charset charSet) throws IOException {
+    BufferedReader rdr = Files.newBufferedReader(Paths.get(path), charSet);
     return rdr;
   }
   /**

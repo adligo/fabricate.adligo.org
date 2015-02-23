@@ -125,7 +125,7 @@ public class Dependency implements I_Dependency {
   }
   
   private void setChildren(List<I_Ide> children) {
-    List<Ide> toAdd = new ArrayList<Ide>();
+    List<I_Ide> toAdd = new ArrayList<I_Ide>();
     if (children != null) {
       for(I_Ide child: children) {
         if (child instanceof Ide) {

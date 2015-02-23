@@ -55,6 +55,10 @@ public class FabricateController {
   private final I_FabXmlFileIO xmlFiles_;
   private final FabricateXmlDiscovery discovery_;
   private RoutineFabricateFactory factory_;
+  /**
+   * The first throwable thrown by either
+   * processing of a command or a build or share stage.
+   */
   private Throwable failureThrowable_;
   private Fabricate fab_;
   
@@ -213,9 +217,9 @@ public class FabricateController {
     result.setCommandLine(sb.toString());
     
     result.setName(fabricatePath.getName());
-    String os = ComputerInfoDiscovery.getOperatingSystem();
+    String os = sys_.getOperatingSystem();
     result.setOs(os);
-    String osVersion = ComputerInfoDiscovery.getOperatingSystemVersion(sys_, os);
+    String osVersion = sys_.getOperatingSystemVersion(os);
     result.setOsVersion(osVersion);
     if (failureThrowable_ == null) {
       result.setSuccessful(true);
@@ -237,23 +241,23 @@ public class FabricateController {
       result.setFailure(failure);
       
     }
-    String hostName = ComputerInfoDiscovery.getHostname();
+    String hostName = sys_.getHostname();
     
     MachineInfoType machine = new MachineInfoType();
     machine.setHostname(hostName);
-    machine.setProcessors("" + Runtime.getRuntime().availableProcessors());
+    machine.setProcessors("" + sys_.getAvailableProcessors());
     
     machine.setRam(fab_.getXms());
-    String[] cpu = ComputerInfoDiscovery.getCpuInfo(sys_, os);
+    String[] cpu = sys_.getCpuInfo(os);
     machine.setCpuName(cpu[0]);
     machine.setCpuSpeed(cpu[1]);
-    String jv = ComputerInfoDiscovery.getJavaVersion();
+    String jv = sys_.getJavaVersion();
     machine.setJavaVersion(jv);
     result.setMachine(machine);
     
     
     
-    long end = System.currentTimeMillis();
+    long end = sys_.getCurrentTime();
     String startString = sys_.getArgValue("start");
     long start = new Long(startString);
     long dur = end - start;

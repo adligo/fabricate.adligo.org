@@ -18,8 +18,7 @@
 	    <javac srcdir="src"
 	         destdir="build/classes"
 	         debug="on"
-	         source="1.8"
-	         target="1.8"
+	         source="1.7"
 	         classpathref="lib.path.ref"
 	  	/>
 	    <echo> compile complete </echo>
@@ -80,6 +79,8 @@
 		</copy>
 		<mkdir dir="build/${fabricate_name}/${fabricate_name}/bin" />
 		<copy file="bin/fab" todir="build/${fabricate_name}/${fabricate_name}/bin" />
+		<copy file="bin/fab.bat" todir="build/${fabricate_name}/${fabricate_name}/bin" />
+		
 		<replace file="build/${fabricate_name}/${fabricate_name}/bin/fab" 
   	  		        token="@FABRICATE_NAME@" value="${fabricate_name}"/>
   	  	<chmod dir="build/${fabricate_name}/${fabricate_name}/bin" perm="ugo+rx" 
@@ -88,7 +89,7 @@
 		<tar destfile="build/${fabricate_name}.tar.gz" basedir="build/${fabricate_name}" 
 		    compression="gzip" />
 		<zip destfile="build/${fabricate_name}.zip">
-			<zipfileset dir="build/${fabricate_name}" prefix="${fabricate_name}"/>
+			<zipfileset dir="build/${fabricate_name}" />
 		</zip>	
 		<echo>packaged sucessfully</echo>
 	</target>

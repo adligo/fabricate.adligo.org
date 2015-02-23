@@ -25,9 +25,9 @@ IF "%FABRICATE_HOME%" ==  "" (
 	REM main(String [] args) setup Fabricate args.
 	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateArgsSetup !ARGS!') do (
 		SET LINE=%%i
-		SET END=%LINE:~0,2%
-		if "!END!" == "END" (
-			SET ARGS_FROM_SETUP=!LINE!
+		SET END=!LINE:~0,9!
+		if "!END!" == "LASTLINE " (
+			SET ARGS_FROM_SETUP=!LINE:~9!
 		) else (
 			@ECHO !LINE!
 		)
@@ -35,27 +35,28 @@ IF "%FABRICATE_HOME%" ==  "" (
 	IF "!ARGS_FROM_SETUP!" == "END" (
 		GOTO END
 	)
-	
 	SET OPTS_FROM_SETUP="Empty"
 	
 	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) setup Fabricate opts.
 	for /f "tokens=*" %%i in ('java -cp !CLASSPATH! org.adligo.fabricate.FabricateOptsSetup !ARGS_FROM_SETUP!') do (
 		set LINE=%%i
-		if "!OPTS_FROM_SETUP!" == "Empty" (
-			SET OPTS_FROM_SETUP=!LINE!
+		SET END=!LINE:~0,9!
+		if "!END!" == "LASTLINE " (
+			SET OPTS_FROM_SETUP=!LINE:~9!
 			
 		) else (
 			@ECHO !LINE!
 		)
 	)
-	IF "!OPTS_FROM_SETUP!" == "END" (
+	IF "!OPTS_FROM_SETUP!" == "LASTLINE END" (
 		GOTO END
 	)
 
+	SET OPTS=!OPTS_FROM_SETUP!;!FABRICATE_JAR!
 	REM @diagram_sync on 1/26/2014 with Overview.seq
 	REM main(String [] args) run Fabricate.
-	java !OPTIONS_FROM_SETUP!;!FABRICATE_JAR! org.adligo.fabricate.FabricateController !ARGS_FROM_SETUP! 
+	java !OPTS! org.adligo.fabricate.FabricateController !ARGS_FROM_SETUP! 
 )
 :END
 ENDLOCAL

@@ -1,5 +1,7 @@
 package org.adligo.fabricate.common.system;
 
+import org.adligo.fabricate.common.files.I_FabFileIO;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,6 +23,7 @@ import java.io.InputStream;
  */
 public class Executor implements I_Executor {
   private final I_FabSystem sys_;
+  private final I_FabFileIO files_;
   
   public static String toString(String [] args) {
     StringBuilder sb = new StringBuilder();
@@ -33,6 +36,7 @@ public class Executor implements I_Executor {
   
   protected Executor(I_FabSystem system) {
     sys_ = system;
+    files_ = system.getFileIO();
   }
   
   /* (non-Javadoc)
@@ -45,7 +49,15 @@ public class Executor implements I_Executor {
     
     File dir = null;
     if (inDir != null) {
-      dir = new File(inDir);
+      if (".".equals(inDir)) {
+        File dirIn = files_.instance(inDir);
+        inDir = dirIn.getAbsolutePath();
+        char lastChar = inDir.charAt(inDir.length() -1);
+        if ('.' == lastChar) {
+          inDir = inDir.substring(0, inDir.length() - 2);
+        }
+      }
+      dir = files_.instance(inDir);
       pb.directory(dir);
     }
     Process p = pb.start();

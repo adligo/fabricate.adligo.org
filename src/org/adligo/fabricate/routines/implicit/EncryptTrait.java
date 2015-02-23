@@ -172,7 +172,9 @@ I_InputAware<String> {
 
   @Override
   public List<Class<?>> getClassType(Class<?> interfaceClass) {
-    return Collections.singletonList(String.class);
+    List<Class<?>> cts = new ArrayList<Class<?>>();
+    cts.add(String.class);
+    return Collections.unmodifiableList(cts);
   }
   
   /**

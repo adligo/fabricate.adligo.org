@@ -77,6 +77,7 @@ public interface I_SystemMessages {
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory();
   
   public String getUnableToLoadTheFollowingClass();
+  public String getUnknown();
   public String getUsingTheFollowingRemoteRepositories();
   
   public String getVersionX();

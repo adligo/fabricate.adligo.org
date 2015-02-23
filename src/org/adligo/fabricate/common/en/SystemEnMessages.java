@@ -3,9 +3,6 @@ package org.adligo.fabricate.common.en;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
-  
-
- 
   private static final String BUILDING_FABRICATE_RUNTIME_CLASS_PATH = 
       "Building Fabricate runtime class path.";
   private static final String CHECKING_FABRICATE_RUNTIME_DEPENDENCIES = 
@@ -98,6 +95,7 @@ public class SystemEnMessages implements I_SystemMessages {
       "Using the following remote repositories;";
   private static final String UNABLE_TO_LOAD_THE_FOLLOWING_CLASS = 
       "Unable to load the following class;";
+  private static final String UNKNOWN = "Unknown";
   private static final String VERSION_X = "Version <X/>.";
   
   private SystemEnMessages() {
@@ -310,6 +308,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getUnableToLoadTheFollowingClass() {
     return UNABLE_TO_LOAD_THE_FOLLOWING_CLASS;
+  }
+
+  @Override
+  public String getUnknown() {
+    return UNKNOWN;
   }
   
   @Override

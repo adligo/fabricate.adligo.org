@@ -129,11 +129,14 @@ public class FabricateOptsSetup {
     StringBuilder sb = new StringBuilder();
     
     String fabricateHome = fab_.getFabricateHome();
-    sb.append(fabricateHome + files_.getNameSeparator() + "commons-logging-1.2.jar" + 
+    sb.append(fabricateHome + files_.getNameSeparator() + 
+        "lib" + files_.getNameSeparator() + "commons-logging-1.2.jar" + 
         sys_.getPathSeparator());
-    sb.append(fabricateHome + files_.getNameSeparator() + "httpclient-4.3.5.jar" + 
+    sb.append(fabricateHome + files_.getNameSeparator() + 
+        "lib" + files_.getNameSeparator() + "httpclient-4.3.5.jar" + 
         sys_.getPathSeparator());
-    sb.append(fabricateHome + files_.getNameSeparator() + "httpcore-4.3.2.jar");
+    sb.append(fabricateHome + files_.getNameSeparator() + 
+        "lib" + files_.getNameSeparator() + "httpcore-4.3.2.jar");
     //the script always adds fabricate_??.jar at the end
     
     List<I_Dependency> deps = fab_.getDependencies();

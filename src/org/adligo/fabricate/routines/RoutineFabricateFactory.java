@@ -26,6 +26,7 @@ import java.util.Set;
  *
  */
 public class RoutineFabricateFactory {
+  private static final Set<I_ExpectedRoutineInterface> EMPTY_SET = Collections.emptySet();
   private final I_Fabricate fabricate;
   private final RoutineFactory traits_ = new RoutineFactory();
   private final RoutineFactory commands_ = new RoutineFactory();
@@ -88,8 +89,10 @@ public class RoutineFabricateFactory {
       throws FabricationRoutineCreationException {
     List<I_RoutineBrief> routines = factory.getValues();
     
+    
     for (I_RoutineBrief routine: routines) {
-      I_FabricationRoutine fr = factory.createRoutine(routine.getName(), Collections.emptySet());
+      
+      I_FabricationRoutine fr = factory.createRoutine(routine.getName(), EMPTY_SET);
       if (assignableTo.isAssignableFrom(fr.getClass())) {
         return true;
       }
