@@ -10,7 +10,8 @@
     		<element name="machine" type="tns:machine_info_type"
     			minOccurs="1" maxOccurs="1">
     		</element>
-    		<element name="failure" type="tns:failure_type"
+            <element name="tests" type="tns:tests_type" minOccurs="0" maxOccurs="1"></element>
+            <element name="failure" type="tns:failure_type"
     			minOccurs="0" maxOccurs="1">
     			<annotation>
     				<documentation>
@@ -98,7 +99,7 @@ fab cmd=encrypt
     			</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="processors" type="string">
+    	<attribute name="processors" type="int">
     		<annotation>
     			<documentation>
     				The result of
@@ -110,20 +111,60 @@ fab cmd=encrypt
     </complexType>
 
     <complexType name="failure_type">
-    	<sequence>
+        <annotation>
+        	<documentation>A failure is a indication something catastrophic failed (not including test failures).</documentation>
+        </annotation>
+        <sequence>
     		<element name="detail" type="string"></element>
     	</sequence>
-    	<attribute name="stage" type="string">
+    	<attribute name="command" type="string" use="optional"></attribute>
+    	<attribute name="stage" type="string" use="optional">
     		<annotation>
     			<documentation>The stage which failed.</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="project" type="string">
+        <attribute name="stage_type" type="string" use="optional"></attribute>
+        <attribute name="project" type="string" use="optional">
     		<annotation>
     			<documentation>The project which failed.</documentation>
     		</annotation>
     	</attribute>
+    	<attribute name="task" type="string" use="optional"></attribute>
     </complexType>
-    
+
     <element name="result" type="tns:result_type"></element>
+
+    <complexType name="tests_type">
+    	<sequence>
+    		<element name="coverage" type="tns:coverage_type"
+    			minOccurs="0" maxOccurs="1">
+    		</element>
+    	</sequence>
+    	<attribute name="count" type="unsignedLong" use="required">
+    		<annotation>
+    			<documentation>The total number of tests (may include ignored tests, or other tests which didn't pass or fail).</documentation>
+    		</annotation></attribute>
+    	<attribute name="passed" type="unsignedLong" use="required">
+    		<annotation>
+    			<documentation>The number of tests that passed.</documentation>
+    		</annotation></attribute>
+    	<attribute name="failed" type="unsignedLong" use="required">
+    		<annotation>
+    			<documentation>The number of tests that failed.</documentation>
+    		</annotation></attribute>
+    </complexType>
+
+    <complexType name="coverage_type">
+        <annotation>
+        	<documentation>The tests_type represents tests in the abstract sense so that 
+any testing tool can be bolted to the node.  For junit
+tests or tests4j tests the count and passed would represent
+the respective @Test count and number passed.
+   For tools that track code coverage (like tests4j with tests4j_4jacoco)
+a optional coverage node can be added to track aggregate code coverage.
+ </documentation>
+        </annotation>
+        <attribute name="units" type="unsignedLong" use="required"></attribute>
+    	<attribute name="covered_units" type="unsignedLong" use="required"></attribute>
+    </complexType>
 </schema>

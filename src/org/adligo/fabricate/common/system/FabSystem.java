@@ -30,6 +30,8 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FabSystem implements I_FabSystem {
   
@@ -233,7 +235,7 @@ public class FabSystem implements I_FabSystem {
   }
   
   @Override
-  public I_RunMonitor newRunMonitor(Runnable delegate, int counter) {
+  public I_RunMonitor newRunMonitor(I_LocatableRunable delegate, int counter) {
     return new RunMonitor(this, delegate, counter);
   }
 
@@ -272,6 +274,11 @@ public class FabSystem implements I_FabSystem {
   @Override
   public String getJavaVersion() {
     return ComputerInfoDiscovery.getJavaVersion(this);
+  }
+
+  @Override
+  public ExecutorService newFixedThreadPool(int size) {
+    return Executors.newFixedThreadPool(size);
   }
 
 

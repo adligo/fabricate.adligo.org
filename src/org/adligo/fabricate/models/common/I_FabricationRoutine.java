@@ -1,5 +1,7 @@
 package org.adligo.fabricate.models.common;
 
+import org.adligo.fabricate.common.system.I_LocatableRunable;
+
 
 
 /**
@@ -16,7 +18,8 @@ package org.adligo.fabricate.models.common;
  * @author scott
  *
  */
-public interface I_FabricationRoutine extends I_Fabrication, Runnable {
+public interface I_FabricationRoutine extends I_Fabrication, I_LocatableRunable {
+
   public I_RoutineFactory getTaskFactory();
   
   public void setTaskFactory(I_RoutineFactory factory);

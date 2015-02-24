@@ -1,8 +1,25 @@
 package org.adligo.fabricate.common.i18n;
 
 public interface I_SystemMessages {
-  public String getBuildingFabricateRuntimeClassPath();
   
+  public String getArchiveStageXIsStillSettingUp();
+  public String getArchiveStageXIsStillRunning();
+  public String getArchiveStageXIsStillRunningOnProjectZ() ;
+  public String getArchiveStageXTaskYIsStillRunning();
+  public String getArchiveStageXTaskYIsStillRunningOnProjectZ();
+  
+  public String getCommandXIsStillSettingUp();
+  public String getCommandXIsStillRunning();
+  public String getCommandXIsStillRunningOnProjectZ() ;
+  public String getCommandXTaskYIsStillRunning();
+  public String getCommandXTaskYIsStillRunningOnProjectZ();
+  
+  public String getBuildingFabricateRuntimeClassPath();
+  public String getBuildStageXIsStillSettingUp();
+  public String getBuildStageXIsStillRunning();
+  public String getBuildStageXIsStillRunningOnProjectZ();
+  public String getBuildStageXTaskYIsStillRunning();
+  public String getBuildStageXTaskYIsStillRunningOnProjectZ();
   public String getCheckingFabricateRuntimeDependencies();
   public String getCompiledOnX();
   
@@ -51,6 +68,7 @@ public interface I_SystemMessages {
   public String getPassedTheExtractCheck();
   
   public String getSendingOptsToScript();
+  
   public String getStartingDownloadFromTheFollowingUrl();
   
   public String getToTheFollowingFolder();

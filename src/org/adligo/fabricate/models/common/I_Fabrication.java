@@ -5,29 +5,12 @@ import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
 
 public interface I_Fabrication {
   public I_RoutineBrief getBrief();
-  public String getCaller();
   public I_RoutineFactory getTraitFactory();
-  /**
-   * This should return something like;<br/>
-   * caller + getBrief().getName();<br/>
-   * or<br/>
-   * caller + "/" + getBrief().getName();<br/>
-   * when the caller has a path ('/') already.
-   * @return
-   */
-  public String getStack();
   public I_FabSystem getSystem();
   public I_FabricateXmlDiscovery getLocations();
   
   
   public void setBrief(I_RoutineBrief brief);
-  /**
-   * The caller is the Fabricate routine surrogate for a stack
-   * for stack traces, so that wait messages can
-   * specify what is happening to the user.
-   * @param caller
-   */
-  public void setCaller(String caller);
   public void setLocations(I_FabricateXmlDiscovery locations);
   public void setTraitFactory(I_RoutineFactory factory);
   public void setSystem(I_FabSystem system);

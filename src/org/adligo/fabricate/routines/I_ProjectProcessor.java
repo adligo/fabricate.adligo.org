@@ -8,5 +8,10 @@ package org.adligo.fabricate.routines;
  *
  */
 public interface I_ProjectProcessor {
+  /**
+   * The current project which is getting processed, 
+   * or the last project to be processed (for failures).
+   * @return
+   */
   public String getCurrentProject();
 }

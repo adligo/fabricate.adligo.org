@@ -272,7 +272,7 @@ public class StageManager {
     
     MachineInfoType machine = new MachineInfoType();
     machine.setHostname(hostName);
-    machine.setProcessors("" + Runtime.getRuntime().availableProcessors());
+    machine.setProcessors(Runtime.getRuntime().availableProcessors());
     I_JavaSettings fh = new JavaSettings(fab_.getJava());
     machine.setRam(fh.getXms());
     String[] cpu = ComputerInfoDiscovery.getCpuInfo(sys_, os);

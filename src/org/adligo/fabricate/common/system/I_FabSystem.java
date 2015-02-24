@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
 
 
 public interface I_FabSystem extends I_FabFilesSystem {
@@ -131,6 +132,14 @@ public interface I_FabSystem extends I_FabFilesSystem {
   public ProcessBuilderWrapper newProcessBuilder(String []  args);
   
   /**
+   * delegates to Executors.newFixedThreadPool(int size)
+   * in order to pass a mock for testing.
+   * @param size
+   * @return
+   */
+  public ExecutorService newFixedThreadPool(int size);
+  
+  /**
    * Create a new run monitor to wrap a Runnable,
    * in a way that can be monitored.
    * 
@@ -138,7 +147,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @param counter
    * @return
    */
-  public I_RunMonitor newRunMonitor(Runnable delegate, int counter);
+  public I_RunMonitor newRunMonitor(I_LocatableRunable delegate, int counter);
   
   /**
    * This method provides the Thread.currentThread(),

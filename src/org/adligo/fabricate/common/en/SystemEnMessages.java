@@ -3,10 +3,45 @@ package org.adligo.fabricate.common.en;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
+
+  private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Archive stage <X/>, task <Y/> is still running on project <Z/>.";
+  private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING = 
+      "Archive stage <X/>, task <Y/> is still running.";
+  private static final String ARCHIVE_STAGE_X_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Archive stage <X/> is still running on project <Z/>.";
+  private static final String ARCHIVE_STAGE_X_IS_STILL_RUNNING = 
+      "Archive stage <X/> is still running.";
+  private static final String ARCHIVE_STAGE_X_IS_STILL_SETTING_UP = 
+      "Archive stage <X/> is still setting up.";
+  
+  private static final String BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Build stage <X/>, task <Y/> is still running on project <Z/>.";
+  private static final String BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING = 
+      "Build stage <X/>, task <Y/> is still running.";
+  private static final String BUILD_STAGE_X_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Build stage <X/> is still running on project <Z/>.";
+  private static final String BUILD_STAGE_X_IS_STILL_RUNNING = 
+      "Build stage <X/> is still running.";
+  private static final String BUILD_STAGE_X_IS_STILL_SETTING_UP = 
+      "Build stage <X/> is still setting up.";
+  
+  
   private static final String BUILDING_FABRICATE_RUNTIME_CLASS_PATH = 
       "Building Fabricate runtime class path.";
+
   private static final String CHECKING_FABRICATE_RUNTIME_DEPENDENCIES = 
       "Checking Fabricate runtime dependencies.";
+  private static final String COMMAND_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Command <X/>, task <Y/> is still running on project <Z/>.";
+  private static final String COMMAND_X_TASK_Y_IS_STILL_RUNNING = 
+      "Command <X/>, task <Y/> is still running.";
+  private static final String COMMAND_X_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Command <X/> is still running on project <Z/>.";
+  private static final String COMMAND_X_IS_STILL_RUNNING = 
+      "Command <X/> is still running.";
+  private static final String COMMAND_X_IS_STILL_SETTING_UP = 
+      "Command <X/> is still setting up.";
   private static final String COMPILED_ON_X = "Compiled on <X/>.";
   private static final String THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS = 
       "The following local repository is locked by another process;";
@@ -57,6 +92,7 @@ public class SystemEnMessages implements I_SystemMessages {
   
   private static final String SENDING_OPTS_TO_SCRIPT = 
       "Sending opts to script.";
+  
   private static final String STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
       "Starting download from the following url;";
   public static final SystemEnMessages INSTANCE = new SystemEnMessages();
@@ -102,6 +138,31 @@ public class SystemEnMessages implements I_SystemMessages {
   }
 
   @Override
+  public String getArchiveStageXIsStillSettingUp() {
+    return ARCHIVE_STAGE_X_IS_STILL_SETTING_UP;
+  }
+  
+  @Override
+  public String getArchiveStageXIsStillRunning() {
+    return ARCHIVE_STAGE_X_IS_STILL_RUNNING;
+  }
+  
+  @Override
+  public String getArchiveStageXIsStillRunningOnProjectZ() {
+    return ARCHIVE_STAGE_X_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getArchiveStageXTaskYIsStillRunning() {
+    return ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING;
+  }
+
+  @Override
+  public String getArchiveStageXTaskYIsStillRunningOnProjectZ() {
+    return ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
   public String getDurationWasXMilliseconds() {
     return DURATION_WAS_X_MILLISECONDS;
   }
@@ -129,6 +190,56 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getCheckingFabricateRuntimeDependencies() {
     return CHECKING_FABRICATE_RUNTIME_DEPENDENCIES;
+  }
+
+  @Override
+  public String getCommandXIsStillSettingUp() {
+    return COMMAND_X_IS_STILL_SETTING_UP;
+  }
+  
+  @Override
+  public String getCommandXIsStillRunning() {
+    return COMMAND_X_IS_STILL_RUNNING;
+  }
+  
+  @Override
+  public String getCommandXIsStillRunningOnProjectZ() {
+    return COMMAND_X_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getCommandXTaskYIsStillRunning() {
+    return COMMAND_X_TASK_Y_IS_STILL_RUNNING;
+  }
+
+  @Override
+  public String getCommandXTaskYIsStillRunningOnProjectZ() {
+    return COMMAND_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getBuildStageXIsStillSettingUp() {
+    return BUILD_STAGE_X_IS_STILL_SETTING_UP;
+  }
+  
+  @Override
+  public String getBuildStageXIsStillRunning() {
+    return BUILD_STAGE_X_IS_STILL_RUNNING;
+  }
+  
+  @Override
+  public String getBuildStageXIsStillRunningOnProjectZ() {
+    return BUILD_STAGE_X_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getBuildStageXTaskYIsStillRunning() {
+    return BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING;
+  }
+
+  @Override
+  public String getBuildStageXTaskYIsStillRunningOnProjectZ() {
+    return BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
   }
   
   public String getDidNotPassTheMd5Check() {
@@ -229,7 +340,7 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   public String getPassedTheExtractCheck() {
     return PASSED_THE_EXTRACT_CHECK;
-  }
+  } 
   
   @Override
   public String getStartingDownloadFromTheFollowingUrl() {
@@ -255,6 +366,7 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getTheFollowingArtifact() {
     return THE_FOLLOWING_ARTIFACT;
   }
+
   @Override
   public String getTheFollowingFabricateHomeLibShouldHaveOnlyTheseJars() {
     return THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS;
@@ -304,7 +416,7 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getSendingOptsToScript() {
     return SENDING_OPTS_TO_SCRIPT;
   }
-
+  
   @Override
   public String getUnableToLoadTheFollowingClass() {
     return UNABLE_TO_LOAD_THE_FOLLOWING_CLASS;

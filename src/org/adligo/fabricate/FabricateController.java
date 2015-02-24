@@ -59,7 +59,7 @@ public class FabricateController {
    * The first throwable thrown by either
    * processing of a command or a build or share stage.
    */
-  private Throwable failureThrowable_;
+  private FailureType failure_;
   private Fabricate fab_;
   
   @SuppressWarnings("unused")
@@ -171,8 +171,9 @@ public class FabricateController {
     }
     
     if (commands) {
-      CommandManager presenter = new CommandManager(argCommands, sys_, factory_);
-      presenter.processCommands();
+      CommandManager manager = new CommandManager(argCommands, sys_, factory_);
+      FailureType failure = manager.processCommands();
+      
     } else {
       
     }
@@ -221,31 +222,18 @@ public class FabricateController {
     result.setOs(os);
     String osVersion = sys_.getOperatingSystemVersion(os);
     result.setOsVersion(osVersion);
-    if (failureThrowable_ == null) {
+    if (failure_ == null) {
       result.setSuccessful(true);
     } else {
       result.setSuccessful(false);
-      FailureType failure = new FailureType();
-      //failure.setStage(failureStage_);
-      //failure.setProject(failureProject_);
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      PrintStream ps = new PrintStream(baos);
-      failureThrowable_.printStackTrace(ps);
-      Throwable t = failureThrowable_.getCause();
-      while (t != null) {
-        t.printStackTrace(ps);
-        t = t.getCause();
-      }
-      String stackText = new String(baos.toByteArray());
-      failure.setDetail(stackText);
-      result.setFailure(failure);
+      result.setFailure(failure_);
       
     }
     String hostName = sys_.getHostname();
     
     MachineInfoType machine = new MachineInfoType();
     machine.setHostname(hostName);
-    machine.setProcessors("" + sys_.getAvailableProcessors());
+    machine.setProcessors(sys_.getAvailableProcessors());
     
     machine.setRam(fab_.getXms());
     String[] cpu = sys_.getCpuInfo(os);
@@ -284,8 +272,8 @@ public class FabricateController {
     if (result.isSuccessful()) {
       log_.println(sysMessages_.getFabricationSuccessful());
     } else {
-      if (failureThrowable_ != null) {
-        log_.printTrace(failureThrowable_);
+      if (failure_ != null) {
+        log_.println(failure_.getDetail());
       }
       log_.println(sysMessages_.getFabricationFailed());
     }
