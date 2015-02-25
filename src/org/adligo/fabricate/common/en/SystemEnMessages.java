@@ -122,6 +122,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "The following list of Fabricate libraries contains a circular reference;";
   private static final String THE_FOLLOWING_REMOTE_REPOSITORY_APPEARS_TO_BE_DOWN = 
       "The following remote repository appears to be down;";
+  private static final String THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_DIRECTORY = 
+      "There was a problem creating the following directory;";
   private static final String THERE_WAS_A_PROBLEM_CREATING_RUN_MARKER_IN_THE_FOLLOWING_DIRECTORY =
       "There was a problem creating run.marker in the following directory;";
   
@@ -391,10 +393,16 @@ public class SystemEnMessages implements I_SystemMessages {
     return THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS;
   }
 
+  @Override
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory() {
     return THERE_WAS_A_PROBLEM_CREATING_RUN_MARKER_IN_THE_FOLLOWING_DIRECTORY;
   }
 
+  @Override
+  public String getThereWasAProblemCreatingTheFollowingDirectory() {
+    return THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_DIRECTORY;
+  }
+  
   @Override
   public String getManagingFabricateRuntimeClassPathDependencies() {
     return MANAGING_FABRICATE_RUNTIME_CLASS_PATH_DEPENDENCIES;

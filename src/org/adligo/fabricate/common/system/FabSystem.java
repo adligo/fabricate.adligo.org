@@ -7,7 +7,9 @@ import org.adligo.fabricate.common.files.xml_io.FabXmlFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.DeferredLog;
+import org.adligo.fabricate.common.log.FabFileLog;
 import org.adligo.fabricate.common.log.FabLog;
+import org.adligo.fabricate.common.log.I_FabFileLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.log.I_Print;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
@@ -18,6 +20,7 @@ import org.apache.http.impl.client.HttpClients;
 import java.io.ByteArrayOutputStream;
 import java.io.Console;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,6 +35,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 public class FabSystem implements I_FabSystem {
   
@@ -218,7 +224,21 @@ public class FabSystem implements I_FabSystem {
   public ByteArrayOutputStream newByteArrayOutputStream() {
     return new ByteArrayOutputStream();
   }
+  @Override
+  public DatatypeFactory newDatatypeFactory() throws DatatypeConfigurationException {
+    return DatatypeFactory.newInstance();
+  }
 
+  @Override
+  public I_FabFileLog newFabFileLog(String fileName) throws IOException {
+    return new FabFileLog(fileName, fileIO_);
+  }
+  
+  @Override
+  public ExecutorService newFixedThreadPool(int size) {
+    return Executors.newFixedThreadPool(size);
+  }
+  
   @Override
   public BufferedInputStream newBufferedInputStream(InputStream in) {
     return new BufferedInputStream(in);
@@ -256,7 +276,7 @@ public class FabSystem implements I_FabSystem {
   }
 
   @Override
-  public void setLogFileOutputStream(I_Print ps) {
+  public void setLogFile(I_Print ps) {
     fileLog_ = ps;
     ThreadLocalPrintStream.setLOG_FILE_OUTPUT(ps);
   }
@@ -276,10 +296,8 @@ public class FabSystem implements I_FabSystem {
     return ComputerInfoDiscovery.getJavaVersion(this);
   }
 
-  @Override
-  public ExecutorService newFixedThreadPool(int size) {
-    return Executors.newFixedThreadPool(size);
-  }
+
+
 
 
 

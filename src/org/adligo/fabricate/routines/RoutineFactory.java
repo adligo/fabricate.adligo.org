@@ -19,9 +19,8 @@ import java.util.Set;
 
 /**
  * This class contains the setting overlay logic as follows;
- * Implicit routines are overlaid by fabricate.xml routines,
- * for project specific code (I_ProjectAware) the settings
- * are overlaid with the project.xml routines.
+ * Implicit routines are overlaid (replaced/amended) by fabricate.xml routines.
+ * The above routines are overlaid (replaced/amended) by project.xml routines.
  * 
  *    
  * @author scott
@@ -29,7 +28,6 @@ import java.util.Set;
  */
 public class RoutineFactory implements I_RoutineFactory {
   private Map<String,RoutineBrief> briefs_ = new HashMap<String,RoutineBrief>();
-  
   
   public RoutineFactory() {}
   

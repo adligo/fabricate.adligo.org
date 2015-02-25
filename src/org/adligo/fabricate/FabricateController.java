@@ -1,15 +1,13 @@
 package org.adligo.fabricate;
 
-import org.adligo.fabricate.build.run.StageManager;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
-import org.adligo.fabricate.common.log.FabFileLog;
+import org.adligo.fabricate.common.log.I_FabFileLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
-import org.adligo.fabricate.common.system.ComputerInfoDiscovery;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
@@ -17,8 +15,6 @@ import org.adligo.fabricate.managers.CommandManager;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
-import org.adligo.fabricate.models.fabricate.I_JavaSettings;
-import org.adligo.fabricate.models.fabricate.JavaSettings;
 import org.adligo.fabricate.routines.I_ProjectProcessor;
 import org.adligo.fabricate.routines.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
@@ -27,16 +23,11 @@ import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.MachineInfoType;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.ResultType;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +46,7 @@ public class FabricateController {
   private final I_FabXmlFileIO xmlFiles_;
   private final FabricateXmlDiscovery discovery_;
   private RoutineFabricateFactory factory_;
+  private boolean commands_;
   /**
    * The first throwable thrown by either
    * processing of a command or a build or share stage.
@@ -79,116 +71,121 @@ public class FabricateController {
     FabSystemSetup.setup(sys, args);
     
     log_ = sys.getLog();
-    discovery_ = new FabricateXmlDiscovery(sys);
+    discovery_ = factory.createDiscovery(sys);
     
     if (!discovery_.hasFabricateXml()) {
       log_.println(sysMessages_.getExceptionNoFabricateXmlOrProjectXmlFound());
       return;
     } 
-    String fabricateXmlPath = discovery_.getFabricateXmlPath();
-    String fabricateDir = fabricateXmlPath.substring(0,  fabricateXmlPath.length() - 13);
-    String runMarker = fabricateDir + File.separator + "run.marker";
+    String fabricateDir = discovery_.getFabricateXmlDir();
+    String runMarker = fabricateDir + files_.getNameSeparator() + "run.marker";
     if (files_.exists(runMarker)) {
       log_.println(sysMessages_.getFabricateAppearsToBeAlreadyRunning() + sys_.lineSeperator() +
-          sysMessages_.getFabricateAppearsToBeAlreadyRunningPartTwo());
+          sysMessages_.getFabricateAppearsToBeAlreadyRunningPartTwo() + sys_.lineSeperator() +
+          fabricateDir);
       return;
     } 
     
-    
-    FileOutputStream fos = null;
+    OutputStream fos = null;
     try {
       files_.create(runMarker); 
       files_.deleteOnExit(runMarker);
       
-      
-      fos = new FileOutputStream(runMarker);
+      fos = files_.newFileOutputStream(runMarker);
       String start = argMap.get("start");
       fos.write(start.getBytes("UTF-8"));
       
-      
-      
     } catch (IOException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
+      log_.printTrace(e1);
       log_.println(sysMessages_.getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory() + 
           sys_.lineSeperator() + fabricateDir);
       return;
     } finally {
-      try {
-        fos.close();
-      } catch (IOException x) {
-        //do nothing
+      if (fos != null) {
+        try {
+          fos.close();
+        } catch (IOException x) {
+          //do nothing
+        }
       }
     }
     
-    String outputDir = "output";
+    String outputDir = fabricateDir + files_.getNameSeparator() + "output";
     if (files_.exists(outputDir)) {
       files_.deleteRecursive(outputDir);
     }
-    files_.mkdirs(outputDir);
+    if (!files_.mkdirs(outputDir)) {
+      File dir = files_.instance(outputDir);
+      String absPath = dir.getAbsolutePath();
+      log_.println(sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory() + sys_.lineSeperator() +
+          absPath);
+      return;
+    }
     
-    FabFileLog fileLog = null;
-    if (sys.hasArg(cmdMessages_.getWriteLog(true))) {
-      fileLog = new FabFileLog(outputDir + files_.getNameSeparator() + 
-          "fab.log", files_);
-      sys.setLogFileOutputStream(fileLog);
+    I_FabFileLog fileLog = null;
+    String writeLogArg = cmdMessages_.getWriteLog(true);
+    if (sys.hasArg(writeLogArg)) {
+      fileLog = sys_.newFabFileLog(outputDir + files_.getNameSeparator() + 
+          "fab.log");
+      sys.setLogFile(fileLog);
     }
     
     log_.println(sys_.lineSeperator() + sysMessages_.getFabricating() + 
         sys_.lineSeperator());
     
-    FabricateType fabX =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
-    fab_ = factory.create(sys_, fabX, discovery_);
-    FabricateMutant fm = new FabricateMutant(fab_);
-    List<RoutineParentType> traits =  fabX.getTrait();
-    List<String> argCommands;
-    boolean commands = true;
-    try {
-      if (traits != null) {
-        fm.addTraits(traits);
-      }
-      argCommands = sys_.getArgValues(cmdMessages_.getCommand());
-      
-      if (argCommands != null) {
-        fm.addCommands(fabX);
-      } else {
-        fm.addStages(fabX);
-        commands = false;
-      }
-       
-      fab_ = new Fabricate(fm);
-      factory_ = new RoutineFabricateFactory(fab_, commands);
-    } catch (ClassNotFoundException x) {
-      String message = sysMessages_.getUnableToLoadTheFollowingClass() + 
-        sys_.lineSeperator() + x.getMessage();
-      log_.println(message);
-      log_.printTrace(x);
+    List<String> argCommands = sys_.getArgValues(cmdMessages_.getCommand());
+    if (!addRoutinesToFabricate(factory, argCommands)) {
       return;
     }
     
     if (requiresProjects()) {
-      
+      //TODO add projects manager code
     }
     
-    if (commands) {
-      CommandManager manager = new CommandManager(argCommands, sys_, factory_);
-      FailureType failure = manager.processCommands();
-      
+    if (commands_) {
+      CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_);
+      failure_ = manager.processCommands();
     } else {
-      
+      //TODO add fabrication manager code
     }
-    log_.println("not yet working todo: ");
-    log_.println("add projects manager code");
-    log_.println("add fabrication manager code");
-    log_.println("add classpath to eclipse");
-    log_.println("add fabricate4tests4j");
-    log_.println("add fabricate4junit");
-    
     
     writeResult();
     if (fileLog != null) {
       fileLog.close();
     }
+  }
+
+  public boolean addRoutinesToFabricate(FabricateFactory factory, List<String> argCommands)
+      throws IOException, ClassNotFoundException {
+    String fabricateXmlPath = discovery_.getFabricateXmlPath();
+    FabricateType fabX =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
+    fab_ = factory.create(sys_, fabX, discovery_);
+    FabricateMutant fm = factory.createMutant(fab_);
+    List<RoutineParentType> traits =  fabX.getTrait();
+    
+    commands_ = true;
+    try {
+      if (traits != null) {
+        fm.addTraits(traits);
+      }
+      
+      if (argCommands.size() >= 1) {
+        fm.addCommands(fabX);
+      } else {
+        fm.addStages(fabX);
+        commands_ = false;
+      }
+       
+      fab_ = factory.create(fm);
+      factory_ = factory.createRoutineFabricateFactory(fab_, commands_);
+    } catch (ClassNotFoundException x) {
+      String message = sysMessages_.getUnableToLoadTheFollowingClass() + 
+        sys_.lineSeperator() + x.getMessage();
+      log_.println(message);
+      log_.printTrace(x);
+      return false;
+    }
+    return true;
   }
   
   private boolean requiresProjects() throws FabricationRoutineCreationException {
@@ -201,11 +198,13 @@ public class FabricateController {
   @SuppressWarnings("boxing")
   private void writeResult() throws IOException {
     File resultFile = null;
-    resultFile = files_.create("output" + files_.getNameSeparator() + "result.xml");
+    String fabricateXmlPath = discovery_.getFabricateXmlDir();
+    resultFile = files_.create(fabricateXmlPath + files_.getNameSeparator() + 
+          "output" + files_.getNameSeparator() + "result.xml");
     
     ResultType result = new ResultType();
-    String fabricateXmlPath_ = discovery_.getFabricateXmlDir();
-    File fabricatePath = files_.instance(fabricateXmlPath_);
+    
+    File fabricatePath = files_.instance(fabricateXmlPath);
     
     String passable = sys_.getArgValue(CommandLineArgs.PASSABLE_ARGS_);
     String [] array = CommandLineArgs.fromPassableString(passable);
@@ -227,7 +226,6 @@ public class FabricateController {
     } else {
       result.setSuccessful(false);
       result.setFailure(failure_);
-      
     }
     String hostName = sys_.getHostname();
     
@@ -243,14 +241,12 @@ public class FabricateController {
     machine.setJavaVersion(jv);
     result.setMachine(machine);
     
-    
-    
     long end = sys_.getCurrentTime();
     String startString = sys_.getArgValue("start");
     long start = new Long(startString);
     long dur = end - start;
     if (log_ != null) {
-      if (log_.isLogEnabled(StageManager.class)) {
+      if (log_.isLogEnabled(FabricateController.class)) {
          logDuration(dur);
       }
     } else {
@@ -258,12 +254,11 @@ public class FabricateController {
     }
     
     try {
-      DatatypeFactory df = DatatypeFactory.newInstance();
+      DatatypeFactory df = sys_.newDatatypeFactory();
       Duration duration = df.newDuration(dur);
       result.setDuration(duration);
     } catch (DatatypeConfigurationException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
+      log_.printTrace(e1);
       return;
     }
       

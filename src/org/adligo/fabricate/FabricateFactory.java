@@ -3,7 +3,7 @@ package org.adligo.fabricate;
 import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.I_FabSystem;
-import org.adligo.fabricate.managers.ProjectsManager;
+import org.adligo.fabricate.managers.CommandManager;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
@@ -21,16 +21,18 @@ import org.adligo.fabricate.repository.I_RepositoryFactory;
 import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.repository.LibraryResolver;
 import org.adligo.fabricate.repository.RepositoryManager;
+import org.adligo.fabricate.routines.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FabricateFactory implements I_RepositoryFactory {
-
+  
   public Fabricate create(I_FabSystem sys, FabricateType fab, I_FabricateXmlDiscovery xmlDisc) throws ClassNotFoundException {
     FabricateMutant fm = new FabricateMutant(fab, xmlDisc);
     String fabHome = FabricateEnvironment.INSTANCE.getFabricateHome(sys);
@@ -58,6 +60,15 @@ public class FabricateFactory implements I_RepositoryFactory {
     return tf;
   }
   
+  public Fabricate create(I_Fabricate fab) {
+    return new Fabricate(fab);
+  }
+  
+  public CommandManager createCommandManager(Collection<String> commands, I_FabSystem system, 
+      RoutineFabricateFactory factory) {
+    return new CommandManager(commands, system, factory);
+  }
+  
   public I_DependenciesManager createDependenciesManager(I_FabSystem sys, 
       ConcurrentLinkedQueue<I_Dependency> deps) {
     return new DependenciesManager(sys, deps, this);
@@ -82,6 +93,10 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new LibraryResolver(sys, fabricate);
   }
   
+  public FabricateMutant createMutant(Fabricate fab) {
+    return new FabricateMutant(fab);
+  }
+  
   public RepositoryManager createRepositoryManager(I_FabSystem sys, I_Fabricate fab) {
     return new RepositoryManager(sys, fab, this);
   }
@@ -96,7 +111,9 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new DefaultRepositoryPathBuilder(localRepository, separator);
   }
 
-
+  public RoutineFabricateFactory createRoutineFabricateFactory(I_Fabricate fab, boolean commandsNotStages) {
+    return new RoutineFabricateFactory(fab, commandsNotStages);
+  }
 
 
 }

@@ -94,7 +94,7 @@ public class FabricateMutant implements I_Fabricate {
   }
   
   public void addCommands(FabricateType type) 
-      throws IllegalArgumentException, ClassNotFoundException {
+      throws ClassNotFoundException {
     List<RoutineParentType> routines =  type.getCommand();
     addRoutineParents(routines, commands_, RoutineBriefOrigin.FABRICATE_COMMAND);
   }
@@ -117,7 +117,7 @@ public class FabricateMutant implements I_Fabricate {
     }
   }
   
-  public void addStages(FabricateType type) throws IllegalArgumentException, ClassNotFoundException {
+  public void addStages(FabricateType type) throws ClassNotFoundException {
     StagesAndProjectsType spt =  type.getProjectGroup();
     if (spt != null) {
       StagesType stages = spt.getStages();
@@ -144,7 +144,7 @@ public class FabricateMutant implements I_Fabricate {
   }
   
   public void addTraits(Collection<RoutineParentType> routines) 
-      throws IllegalArgumentException, ClassNotFoundException {
+      throws ClassNotFoundException {
     addRoutineParents(routines, traits_, RoutineBriefOrigin.FABRICATE_TRAIT);
   }
   

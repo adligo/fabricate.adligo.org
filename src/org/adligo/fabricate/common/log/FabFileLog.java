@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author scott
  *
  */
-public class FabFileLog implements I_Print {
+public class FabFileLog implements I_FabFileLog {
   private final ConcurrentLinkedQueue<String> lineQueue = new ConcurrentLinkedQueue<String>();
   private final ConcurrentLinkedQueue<Throwable> throwableQueue = new ConcurrentLinkedQueue<Throwable>();
   private final OutputStream out;

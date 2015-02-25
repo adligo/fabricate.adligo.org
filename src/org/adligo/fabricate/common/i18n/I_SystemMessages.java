@@ -91,7 +91,7 @@ public interface I_SystemMessages {
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   
   public String getTheFollowingArtifact();
-  
+  public String getThereWasAProblemCreatingTheFollowingDirectory();
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory();
   
   public String getUnableToLoadTheFollowingClass();

@@ -106,7 +106,6 @@ public interface I_FabFileIO {
    */
   public String getSlashPath(String absolutePath);
 
-  
   /**
    * Creates a File instance;<br/>
    * return new File(filePath);
@@ -114,6 +113,7 @@ public interface I_FabFileIO {
    * @return
    */
   public File instance(String filePath);
+  
   /**
    * This method lists the files under the path which match the file matcher.
    * @param path
@@ -122,7 +122,6 @@ public interface I_FabFileIO {
    * @throws IOException
    */
   public List<String> list(String path, final I_FileMatcher matcher) throws IOException;
-  
   
   /**
    * @param dirsPath

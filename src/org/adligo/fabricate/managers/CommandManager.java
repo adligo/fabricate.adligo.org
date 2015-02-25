@@ -1,6 +1,5 @@
 package org.adligo.fabricate.managers;
 
-import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
@@ -30,7 +29,6 @@ import java.util.Set;
 public class CommandManager {
   private final List<String> commands_ = new ArrayList<String>();
   private final I_FabSystem system_;
-  private final I_FabLog log_;
   private final I_Fabricate fabricate_;
   private final RoutineFabricateFactory factory_;
   private String command_;
@@ -61,7 +59,6 @@ public class CommandManager {
       RoutineFabricateFactory factory) {
     commands_.addAll(commands);
     system_ = system;
-    log_ = system.getLog();
     factory_ = factory;
     fabricate_ = factory.getFabricate();
   }
@@ -75,7 +72,7 @@ public class CommandManager {
     try {
       for (String command: commands_) {
         command_ = command;
-        RoutineExecutionEngine exe = new RoutineExecutionEngine(system_, executorFactory_, fabricate_.getThreads());
+        RoutineExecutionEngine exe = factory_.createRoutineExecutionEngine(system_, executorFactory_);
         exe.runRoutines();
         if (exe.hadFailure()) {
           failure = exe.getFailure();

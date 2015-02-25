@@ -3,14 +3,19 @@ package org.adligo.fabricate.common.system;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.I_FabFilesSystem;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.log.I_FabFileLog;
 import org.adligo.fabricate.common.log.I_Print;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 
 
 public interface I_FabSystem extends I_FabFilesSystem {
@@ -124,6 +129,21 @@ public interface I_FabSystem extends I_FabFilesSystem {
   public <E> ArrayBlockingQueue<E> newArrayBlockingQueue(Class<E> type, int size);
   
   /**
+   * create a new DatatypeFactory
+   * delegates to DatatypeFactory.newInstance().
+   * added for testing mocks.
+   * @return
+   */
+  public DatatypeFactory newDatatypeFactory() throws DatatypeConfigurationException;
+  
+  /**
+   * Create a logger that writes out to a file.
+   * @param fileName
+   * @return
+   */
+  public I_FabFileLog newFabFileLog(String fileName) throws IOException;
+  
+  /**
    * This method provides a
    * way to pass in a mock for testing.
    * @param args
@@ -165,5 +185,5 @@ public interface I_FabSystem extends I_FabFilesSystem {
   
   public BufferedInputStream newBufferedInputStream(InputStream in);
   
-  public void setLogFileOutputStream(I_Print ps);
+  public void setLogFile(I_Print ps);
 }

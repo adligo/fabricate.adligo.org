@@ -1,5 +1,6 @@
 package org.adligo.fabricate.routines;
 
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
@@ -72,7 +73,13 @@ public class RoutineFabricateFactory {
     addTrait(EncryptTrait.NAME, EncryptTrait.class);
     addTrait(DecryptTrait.NAME, DecryptTrait.class);
   }
-
+  
+  /**
+   * returns true if a stage or command is assignable to the assignableTo class parameter.
+   * @param assignableTo
+   * @return
+   * @throws FabricationRoutineCreationException
+   */
   public boolean anyAssignableTo(Class<?> assignableTo) throws FabricationRoutineCreationException {
     if (anyAssignableTo(assignableTo, commands_)) {
       return true;
@@ -80,15 +87,12 @@ public class RoutineFabricateFactory {
     if (anyAssignableTo(assignableTo, stages_)) {
       return true;
     }
-    if (anyAssignableTo(assignableTo,  traits_)) {
-      return true;
-    }
     return false;
   }
+  
   public boolean anyAssignableTo(Class<?> assignableTo, RoutineFactory factory)
       throws FabricationRoutineCreationException {
     List<I_RoutineBrief> routines = factory.getValues();
-    
     
     for (I_RoutineBrief routine: routines) {
       
@@ -102,6 +106,10 @@ public class RoutineFabricateFactory {
   
   public I_FabricationRoutine createCommand(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
     return commands_.createRoutine(name, interfaces);
+  }
+  
+  public RoutineExecutionEngine createRoutineExecutionEngine(I_FabSystem system, I_RoutineBuilder executorFactory) {
+     return new RoutineExecutionEngine(system, executorFactory, fabricate.getThreads());
   }
   
   public I_FabricationRoutine createStage(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {

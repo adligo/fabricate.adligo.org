@@ -1,6 +1,5 @@
 package org.adligo.fabricate.build.stages;
 
-import org.adligo.fabricate.build.run.StageManager;
 import org.adligo.fabricate.build.stages.tasks.OldCompileTask;
 import org.adligo.fabricate.common.FabRunType;
 import org.adligo.fabricate.common.I_FabSetupStage;
@@ -199,7 +198,6 @@ public class DefaultSetup implements I_FabSetupStage {
     checkDefaultLog(GitStage.class, true, settings);
     checkDefaultLog(JavaJar.class, true, settings);
     checkDefaultLog(LoadAndCleanProjects.class, true, settings);
-    checkDefaultLog(StageManager.class, true, settings);
     checkDefaultLog(OldCompileTask.class, true, settings);
     
     checkDefaultLog(Depot.class, true, settings);
