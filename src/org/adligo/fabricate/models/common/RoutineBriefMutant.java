@@ -21,6 +21,8 @@ import java.util.Map;
  *
  */
 public class RoutineBriefMutant implements I_RoutineBrief {
+  private static final String NULL = "null";
+
   public static Map<String, I_RoutineBrief> convert(List<RoutineParentType> types, 
       RoutineBriefOrigin origin) throws ClassNotFoundException {
     Map<String, I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
@@ -44,6 +46,190 @@ public class RoutineBriefMutant implements I_RoutineBrief {
       }
     }
     return toRet;
+  }
+  /**
+   * Note parameters and nested routines must be in
+   * identical order to have equal return true.
+   * @param me
+   * @param obj
+   * @return
+   */
+  public static boolean equals(I_RoutineBrief me, Object obj) {
+    if (me == obj) {
+      return true;
+    }
+    if (obj instanceof I_RoutineBrief) {
+      I_RoutineBrief other = (I_RoutineBrief) obj;
+      String name = me.getName();
+      String oName = other.getName();
+      if (name == null) {
+        if (oName != null) {
+          return false;
+        }
+      } else if (!name.equals(oName)) {
+        return false;
+      }
+      Class<?> clazz = me.getClazz();
+      Class<?> oClazz = other.getClazz();
+      if (clazz == null) {
+        if (oClazz != null) {
+          return false;
+        }
+      } else if (oClazz == null) {
+        return false;
+      } else if ( !clazz.getName().equals(oClazz.getName())) {
+        return false;
+      }
+      boolean optional = me.isOptional();
+      boolean oOptional = other.isOptional();
+      if (optional != oOptional) {
+        return false;
+      }
+      RoutineBriefOrigin origin = me.getOrigin();
+      RoutineBriefOrigin oOrigin = other.getOrigin();
+      if (origin == null) {
+        if (oOrigin != null) {
+          return false;
+        }
+      } else if (!origin.equals(oOrigin)) {
+        return false;
+      }
+      List<I_Parameter> params = me.getParameters();
+      List<I_Parameter> oParams = other.getParameters();
+      if (params == null) {
+        if (oParams != null) {
+          return false;
+        }
+      } else if (oParams == null) {
+        return false;
+      } else if (params.size() != oParams.size()){
+        return false;
+      } else {
+        for (int i = 0; i < params.size(); i++) {
+          I_Parameter param = params.get(i);
+          I_Parameter oParam = oParams.get(i);
+          if (param == null) {
+            if (oParam != null) {
+              return false;
+            }
+          } else if ( !param.equals(oParam)) {
+            return false;
+          }
+        }
+      }
+      
+      List<I_RoutineBrief> nests = me.getNestedRoutines();
+      List<I_RoutineBrief> oNests = other.getNestedRoutines();
+      if (nests == null) {
+        if (oNests != null) {
+          return false;
+        }
+      } else if (oNests == null) {
+        return false;
+      } else if (nests.size() != oNests.size()){
+        return false;
+      } else {
+        for (int i = 0; i < nests.size(); i++) {
+          I_RoutineBrief nest = nests.get(i);
+          I_RoutineBrief oNest = oNests.get(i);
+          if (nest == null) {
+            if (oNest != null) {
+              return false;
+            }
+          } else if ( !nest.equals(oNest)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+  public static int hashCode(I_RoutineBrief in) {
+    final int prime = 31;
+    int result = 1;
+    Class<?> clazz = in.getClazz();
+    result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
+    String name = in.getName();
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    boolean optional = in.isOptional();
+    result = prime * result + ((optional) ? 1 : 0);
+    RoutineBriefOrigin origin = in.getOrigin();
+    result = prime * result + ((origin == null) ? 0 : origin.hashCode());
+    List<I_Parameter> params = in.getParameters();
+    if (params != null) {
+      for (I_Parameter param: params) {
+        result = prime * result + ((param == null) ? 0 : param.hashCode());
+      }
+    }
+    List<I_RoutineBrief> nests = in.getNestedRoutines();
+    if (nests != null) {
+      for (I_RoutineBrief nest: nests) {
+        result = prime * result + ((nest == null) ? 0 : nest.hashCode());
+      }
+    }
+    return result;
+  }
+  
+  public static String toString(I_RoutineBrief me) {
+    StringBuilder sb = new StringBuilder();
+    StringBuilder indent = new StringBuilder();
+    toString(me, sb, indent);
+    return sb.toString();
+  }
+  
+  public static void toString(I_RoutineBrief me, StringBuilder sb, StringBuilder indent) {
+    String currentIndent = indent.toString();
+    sb.append(currentIndent);
+    sb.append(me.getClass().getSimpleName());
+    sb.append(" [name=");
+    sb.append(me.getName());
+    sb.append(", class=");
+    Class<?> clazz = me.getClazz();
+    if (clazz == null) {
+      sb.append(NULL);
+    } else {
+      sb.append(clazz.getName());
+    }
+    
+    
+    boolean listSubs = false;
+    List<I_Parameter> children = me.getParameters();
+    if (children.size() >= 1) {
+      listSubs = true;
+      sb.append(",");
+      for (I_Parameter child: children) {
+        sb.append(System.lineSeparator());
+        indent.append("\t");
+        ParameterMutant.toString(child, sb, indent);
+        String newIndent = indent.toString();
+        indent.delete(0,newIndent.length());
+        indent.append(currentIndent);
+      }
+    } 
+    
+    List<I_RoutineBrief> nests = me.getNestedRoutines();
+    if (nests.size() >= 1) {
+      if (!listSubs) {
+        sb.append(",");
+        listSubs = true;
+      }
+      for (I_RoutineBrief child: nests) {
+        sb.append(System.lineSeparator());
+        indent.append("\t");
+        toString(child, sb, indent);
+        String newIndent = indent.toString();
+        indent.delete(0,newIndent.length());
+        indent.append(currentIndent);
+      }
+    } 
+    if (!listSubs) {
+      sb.append("]");
+    } else {
+      sb.append(System.lineSeparator());
+      sb.append(currentIndent);
+      sb.append("]");
+    }
   }
   
   private String name_;
@@ -203,7 +389,11 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
   }
 
-
+  @Override
+  public boolean equals(Object obj) {
+    return equals(this, obj);
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getClazz()
    */
@@ -218,6 +408,22 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   public String getName() {
     return name_;
   }
+  
+  @Override
+  public boolean hasParameter(String key) {
+    if (parameters_ == null) {
+      return false;
+    }
+    for (I_Parameter rbm: parameters_) {
+      if (rbm != null) {
+        if (key.equals(rbm.getKey())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#isOptional()
    */
@@ -269,6 +475,19 @@ public class RoutineBriefMutant implements I_RoutineBrief {
       }
     }
     return false;
+  }
+  
+  public void removeParameters(String key) {
+    if (parameters_ == null) {
+      return;
+    }
+    Iterator<ParameterMutant> it = parameters_.iterator();
+    while (it.hasNext()) {
+      ParameterMutant pm = it.next();
+      if (key.equals(pm.getKey())) {
+        it.remove();
+      }
+    }
   }
   
   public void setClazz(Class<? extends I_FabricationRoutine> clazz) {
@@ -334,18 +553,19 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   }
 
   @Override
-  public String getParameter(String key) {
+  public List<String> getParameters(String key) {
     if (parameters_ == null) {
-      return null;
+      return Collections.emptyList();
     }
+    List<String> toRet = new ArrayList<String>();
     for (I_Parameter rbm: parameters_) {
       if (rbm != null) {
         if (key.equals(rbm.getKey())) {
-          return rbm.getValue();
+          toRet.add(rbm.getValue());
         }
       }
     }
-    return null;
+    return toRet;
   }
   
   public ParameterMutant getParameterMutant(String key) {
@@ -360,5 +580,15 @@ public class RoutineBriefMutant implements I_RoutineBrief {
       }
     }
     return null;
+  }
+
+  @Override
+  public int hashCode() {
+    return hashCode(this);
+  }
+
+  @Override
+  public String toString() {
+    return toString(this);
   }
 }

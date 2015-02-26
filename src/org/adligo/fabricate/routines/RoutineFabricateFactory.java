@@ -75,30 +75,50 @@ public class RoutineFabricateFactory {
   }
   
   /**
+   * returns true if a command is assignable to the assignableTo class parameter.
+   * @param assignableTo
+   * @return
+   * @throws FabricationRoutineCreationException
+   */
+  public boolean anyCommandsAssignableTo(Class<?> assignableTo, 
+      List<String> commandLineCommands) throws FabricationRoutineCreationException {
+   
+    for (String name: commandLineCommands) {
+      I_FabricationRoutine fr = commands_.createRoutine(name, EMPTY_SET);
+      if (assignableTo.isAssignableFrom(fr.getClass())) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  /**
    * returns true if a stage or command is assignable to the assignableTo class parameter.
    * @param assignableTo
    * @return
    * @throws FabricationRoutineCreationException
    */
-  public boolean anyAssignableTo(Class<?> assignableTo) throws FabricationRoutineCreationException {
-    if (anyAssignableTo(assignableTo, commands_)) {
-      return true;
-    }
-    if (anyAssignableTo(assignableTo, stages_)) {
-      return true;
-    }
-    return false;
-  }
-  
-  public boolean anyAssignableTo(Class<?> assignableTo, RoutineFactory factory)
-      throws FabricationRoutineCreationException {
-    List<I_RoutineBrief> routines = factory.getValues();
-    
-    for (I_RoutineBrief routine: routines) {
-      
-      I_FabricationRoutine fr = factory.createRoutine(routine.getName(), EMPTY_SET);
+  public boolean anyStagesAssignableTo(Class<?> assignableTo, 
+      List<String> commandLineStages, 
+      List<String> commandStagesSkips) throws FabricationRoutineCreationException {
+   
+    for (String name: commandLineStages) {
+      I_FabricationRoutine fr = stages_.createRoutine(name, EMPTY_SET);
       if (assignableTo.isAssignableFrom(fr.getClass())) {
         return true;
+      }
+    }
+    List<I_RoutineBrief> routines = stages_.getValues();
+    
+    for (I_RoutineBrief routine: routines) {
+      String name = routine.getName();
+      if (!commandLineStages.contains(name) && !commandStagesSkips.contains(name)) {
+        if (!routine.isOptional()) {
+          I_FabricationRoutine fr = stages_.createRoutine(name, EMPTY_SET);
+          if (assignableTo.isAssignableFrom(fr.getClass())) {
+            return true;
+          }
+        }
       }
     }
     return false;

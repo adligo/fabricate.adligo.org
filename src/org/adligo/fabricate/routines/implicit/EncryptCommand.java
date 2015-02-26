@@ -3,9 +3,10 @@ package org.adligo.fabricate.routines.implicit;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
+import org.adligo.fabricate.routines.AbstractRoutine;
 import org.adligo.fabricate.routines.I_InputAware;
 import org.adligo.fabricate.routines.I_PresentationAware;
-import org.adligo.fabricate.routines.I_ResultFactory;
+import org.adligo.fabricate.routines.I_OutputProducer;
 
 /**
  *       
@@ -39,7 +40,7 @@ public class EncryptCommand extends AbstractRoutine implements
     }
     ((I_InputAware<String>) encryptTrait_).setInput(data);
     encryptTrait_.run();
-    String output = ((I_ResultFactory<String>) encryptTrait_).getResult();
+    String output = ((I_OutputProducer<String>) encryptTrait_).getOutput();
     log_.println(implicit_.getTheFollowingLineContainsTheEncryptedResult());
     log_.println(output);
     return true;

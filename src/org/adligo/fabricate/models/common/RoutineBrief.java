@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class RoutineBrief implements I_RoutineBrief {
   
@@ -46,21 +48,24 @@ public class RoutineBrief implements I_RoutineBrief {
    * in the xml node that pertains to this instance.
    */
   private final Class<? extends I_FabricationRoutine> clazz_;
-  private final RoutineBriefOrigin origin_;
-  private final List<I_Parameter> parameters_;
-  private final Map<String, I_Parameter> parametersLookup_;
+  private final int hashCode_;
   private final List<I_RoutineBrief> nestedRoutines_;
   private final Map<String, I_RoutineBrief> nestedRoutinesLookup_;
   /**
    * This is the setting from xml, or null
    */
   private boolean optional_;
+  private final RoutineBriefOrigin origin_;
+  private final List<I_Parameter> parameters_;
+  private final Map<String, List<String>> parametersLookup_;
+
+  
+
   
   /**
    * 
    * @param brief
    */
-  @SuppressWarnings("unused")
   public RoutineBrief(I_RoutineBrief brief) throws IllegalArgumentException {
     name_ = brief.getName();
     if (StringUtils.isEmpty(name_)) {
@@ -90,8 +95,7 @@ public class RoutineBrief implements I_RoutineBrief {
       parameters_ = Collections.emptyList();
     }
     parametersLookup_ = getParametersMap();
-    
-    
+    hashCode_ = RoutineBriefMutant.hashCode(this);
   }
   
 
@@ -109,12 +113,10 @@ public class RoutineBrief implements I_RoutineBrief {
   public String getName() {
     return name_;
   }
-  /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.routines.I_RoutineBrief#isOptional()
-   */
+
   @Override
-  public boolean isOptional() {
-    return optional_;
+  public I_RoutineBrief getNestedRoutine(String name) {
+    return nestedRoutinesLookup_.get(name);
   }
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getOrigin()
@@ -130,12 +132,39 @@ public class RoutineBrief implements I_RoutineBrief {
   public List<I_Parameter> getParameters() {
    return parameters_;
   }
+
+  @Override
+  public List<String> getParameters(String key) {
+    List<String> toRet = parametersLookup_.get(key);
+    if (toRet == null) {
+      return Collections.emptyList();
+    }
+    return toRet;
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getNestedRoutines()
    */
   @Override
   public List<I_RoutineBrief> getNestedRoutines() {
     return nestedRoutines_;
+  }
+  
+  @Override
+  public boolean hasParameter(String key) {
+    List<String> toRet = parametersLookup_.get(key);
+    if (toRet == null) {
+      return false;
+    }
+    return true;
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.routines.I_RoutineBrief#isOptional()
+   */
+  @Override
+  public boolean isOptional() {
+    return optional_;
   }
   
   private Map<String, I_RoutineBrief> getNestedMap() {
@@ -149,13 +178,26 @@ public class RoutineBrief implements I_RoutineBrief {
     return Collections.unmodifiableMap(toRet);
   }
   
-  private Map<String, I_Parameter> getParametersMap() {
+  private Map<String, List<String>> getParametersMap() {
     if (parameters_.size() == 0) {
       return Collections.emptyMap();
     }
-    Map<String,I_Parameter> toRet = new HashMap<String, I_Parameter>();
+    Map<String,List<String>> mutableMap = new HashMap<String, List<String>>();
     for (I_Parameter rou: parameters_) {
-      toRet.put(rou.getKey(), rou);
+      String key = rou.getKey();
+      List<String> values = mutableMap.get(rou.getKey());
+      if (values == null) {
+        values = new ArrayList<String>();
+        mutableMap.put(key, values);
+      }
+      values.add(rou.getValue());
+    }
+    Map<String,List<String>> toRet = new HashMap<String, List<String>>();
+    Set<Entry<String,List<String>>> entries = mutableMap.entrySet();
+    for (Entry<String,List<String>> e: entries) {
+      String key = e.getKey();
+      List<String> vals = e.getValue();
+      toRet.put(key, Collections.unmodifiableList(vals));
     }
     return Collections.unmodifiableMap(toRet);
   }
@@ -185,16 +227,12 @@ public class RoutineBrief implements I_RoutineBrief {
   }
 
   @Override
-  public I_RoutineBrief getNestedRoutine(String name) {
-    return nestedRoutinesLookup_.get(name);
+  public int hashCode() {
+    return hashCode_;
   }
 
   @Override
-  public String getParameter(String key) {
-    I_Parameter toRet = parametersLookup_.get(key);
-    if (toRet == null) {
-      return null;
-    }
-    return toRet.getValue();
+  public String toString() {
+    return RoutineBriefMutant.toString(this);
   }
 }

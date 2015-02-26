@@ -29,8 +29,15 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   
   private static final String S = "-s";
   private static final String SHARE = "--share";
+  
   /**
    * key to a comma delimited String which turns into a  key to a List<String>
+   * and represents non optional stages to skip (not execute).
+   */
+  private static final String SKIP = "skip";
+  /**
+   * key to a comma delimited String which turns into a  key to a List<String>
+   * and represents optional stages to execute (in fabricate.xml order).
    */
   private static final String STAGES = "stages";
   private static final String T = "-t";
@@ -118,6 +125,11 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
       return S;
     }
     return SHARE;
+  }
+
+  @Override
+  public String getSkip() {
+    return SKIP;
   }
   
   @Override

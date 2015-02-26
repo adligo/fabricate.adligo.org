@@ -49,4 +49,18 @@ public class FabricationRoutineCreationException extends InstantiationException 
   public void setActualGenericType(Class<?> actualGenericType) {
     this.actualGenericType = actualGenericType;
   }
+
+  @Override
+  public synchronized Throwable initCause(Throwable cause) {
+    if (cause instanceof FabricationRoutineCreationException) {
+      FabricationRoutineCreationException other = (FabricationRoutineCreationException) cause;
+      setActualGenericType(other.getActualGenericType());
+      setExpectedGenericType(other.getExpectedGenericType());
+      setExpectedInterface(other.getExpectedInterface());
+      setExpectedGenericType(other.getExpectedGenericType());
+      setRoutine(other.getRoutine());
+      setWhichGenericType(other.getWhichGenericType());
+    }
+    return super.initCause(cause);
+  }
 }

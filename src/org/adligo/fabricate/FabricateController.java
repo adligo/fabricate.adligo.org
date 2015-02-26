@@ -15,7 +15,9 @@ import org.adligo.fabricate.managers.CommandManager;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
+import org.adligo.fabricate.routines.I_ProjectBriefsAware;
 import org.adligo.fabricate.routines.I_ProjectProcessor;
+import org.adligo.fabricate.routines.I_ProjectsAware;
 import org.adligo.fabricate.routines.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
@@ -189,8 +191,19 @@ public class FabricateController {
   }
   
   private boolean requiresProjects() throws FabricationRoutineCreationException {
-    if (factory_.anyAssignableTo(I_ProjectProcessor.class)) {
-      return true;
+    if (commands_) {
+      List<String> commands = sys_.getArgValues(cmdMessages_.getCommand());
+      if (factory_.anyCommandsAssignableTo(I_ProjectBriefsAware.class, 
+          commands)) {
+        return true;
+      }
+    } else {
+      List<String> stages = sys_.getArgValues(cmdMessages_.getStages());
+      List<String> skips = sys_.getArgValues(cmdMessages_.getSkip());
+      if (factory_.anyStagesAssignableTo(I_ProjectsAware.class, 
+          stages, skips)) {
+        return true;
+      }
     }
     return false;
   }

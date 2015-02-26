@@ -4,9 +4,10 @@ import org.adligo.fabricate.common.util.ByteMutant;
 import org.adligo.fabricate.models.common.ExpectedRoutineInterface;
 import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
+import org.adligo.fabricate.routines.AbstractRoutine;
 import org.adligo.fabricate.routines.I_GenericTypeAware;
 import org.adligo.fabricate.routines.I_InputAware;
-import org.adligo.fabricate.routines.I_ResultFactory;
+import org.adligo.fabricate.routines.I_OutputProducer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 public class DecryptTrait extends AbstractRoutine implements I_FabricationRoutine, 
-  I_ResultFactory<String>, I_InputAware<String> {
+  I_OutputProducer<String>, I_InputAware<String> {
   /**
    * This is the implicit name of this trait.
    */
@@ -28,7 +29,7 @@ public class DecryptTrait extends AbstractRoutine implements I_FabricationRoutin
   private static Set<I_ExpectedRoutineInterface> getInterfaces() {
     Set<I_ExpectedRoutineInterface> toRet = new HashSet<I_ExpectedRoutineInterface>();
     toRet.add(new ExpectedRoutineInterface(I_InputAware.class, String.class));
-    toRet.add(new ExpectedRoutineInterface(I_ResultFactory.class, String.class));
+    toRet.add(new ExpectedRoutineInterface(I_OutputProducer.class, String.class));
     return Collections.unmodifiableSet(toRet);
   }
   
@@ -95,7 +96,7 @@ public class DecryptTrait extends AbstractRoutine implements I_FabricationRoutin
    * ASCII (non extended) characters.
    */
   @Override
-  public String getResult() {
+  public String getOutput() {
     return output_;
   }
 

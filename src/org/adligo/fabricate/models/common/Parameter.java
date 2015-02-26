@@ -28,20 +28,27 @@ public class Parameter implements I_Parameter {
     }
     return toRet;
   }
-  private List<I_Parameter> children_;
-  private String key_;
-  private String value_;
+  private final List<I_Parameter> children_;
+  private final String key_;
+  private final String value_;
+  private final int hashCode_;
 
   public Parameter(I_Parameter other) {
     key_ = other.getKey();
     value_ = other.getValue();
-    setChildren(other.getChildren());
+    children_ = newChildren(other.getChildren());
+    hashCode_ = ParameterMutant.hashCode(this);
   }
   
   public Parameter(ParamType other) {
     key_ = other.getKey();
     value_ = other.getValue();
-    setChildren(convert(other.getParam()));
+    children_ = newChildren(convert(other.getParam()));
+    hashCode_ = ParameterMutant.hashCode(this);
+  }
+  
+  public boolean equals(Object obj) {
+    return ParameterMutant.equals(this, obj);
   }
   
   public I_Parameter get(int child) {
@@ -58,7 +65,7 @@ public class Parameter implements I_Parameter {
     return value_;
   }
 
-  private void setChildren(Collection<I_Parameter> children) {
+  private List<I_Parameter> newChildren(Collection<I_Parameter> children) {
     List<I_Parameter> toAdd = new ArrayList<I_Parameter>();
     if (children != null) {
       for (I_Parameter child: children) {
@@ -69,10 +76,18 @@ public class Parameter implements I_Parameter {
         }
       }
     }
-    children_ = Collections.unmodifiableList(toAdd);
+    return Collections.unmodifiableList(toAdd);
+  }
+  
+  public int hashCode() {
+    return hashCode_;
   }
   
   public int size() {
     return children_.size();
+  }
+  
+  public String toString() {
+    return ParameterMutant.toString(this);
   }
 }

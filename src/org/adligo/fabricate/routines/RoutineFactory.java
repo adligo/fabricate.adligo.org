@@ -6,7 +6,6 @@ import org.adligo.fabricate.models.common.I_FabricationRoutine;
 import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.I_RoutineFactory;
-import org.adligo.fabricate.models.common.ParameterMutant;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 
@@ -21,7 +20,8 @@ import java.util.Set;
  * This class contains the setting overlay logic as follows;
  * Implicit routines are overlaid (replaced/amended) by fabricate.xml routines.
  * The above routines are overlaid (replaced/amended) by project.xml routines.
- * 
+ * Note there is no way to replace a parameter or nested routine with nothing,
+ * parameters and nested routines may only be replaced by new values.
  *    
  * @author scott
  *
@@ -55,25 +55,8 @@ public class RoutineFactory implements I_RoutineFactory {
     if (current == null) {
       briefs_.put(name, new RoutineBrief(routine));
     } else {
-      Class<?> clazz = routine.getClazz();
-      if (clazz == null) {
-        RoutineBrief overlay = createOverlay(current, routine);
-        //instance comparison
-        if (current != overlay) {
-          briefs_.put(name, overlay);
-        }
-      } else {
-        Class<?> currentClazz = current.getClazz();
-        if ( !clazz.getName().equals(currentClazz.getName())) {
-          briefs_.put(name, new RoutineBrief(routine));
-        } else {
-          RoutineBrief overlay = createOverlay(current, routine);
-          //instance comparison
-          if (current != overlay) {
-            briefs_.put(name, overlay);
-          }
-        }
-      }
+      RoutineBrief overlay = createOverlay(current, routine);
+      briefs_.put(name, overlay);
     }
   }
   
@@ -118,7 +101,7 @@ public class RoutineFactory implements I_RoutineFactory {
             throw ie;
           }
           Iterator<Class<?>> gtypesIt = gtypes.iterator();
-          Iterator<Class<?>> iclassIt = gtypes.iterator();
+          Iterator<Class<?>> iclassIt = iclassTypes.iterator();
           int counter = 0;
           while (gtypesIt.hasNext()) {
             Class<?> gt = gtypesIt.next();
@@ -170,78 +153,46 @@ public class RoutineFactory implements I_RoutineFactory {
   }
   
   private RoutineBrief createOverlay(RoutineBrief current, I_RoutineBrief overlay) {
-    RoutineBriefMutant currentMutant = null;
+    RoutineBriefMutant currentMutant = new RoutineBriefMutant(current);
+    Class<? extends I_FabricationRoutine> clazz = current.getClazz();
+    Class<? extends I_FabricationRoutine> newClazz = overlay.getClazz();
+    if (clazz == null) {
+      currentMutant.setClazz(newClazz);
+    } else if (newClazz != null) {
+      if ( !clazz.getName().equals(newClazz.getName())) {
+        currentMutant.setClazz(newClazz);
+      }
+    }
     List<I_Parameter> params = overlay.getParameters();
     for (I_Parameter param: params) {
       if (param != null) {
         String key = param.getKey();
-        String currentVal = current.getParameter(key);
-        String overlayVal = param.getValue();
-        if (currentVal == null) {
-          if (currentMutant == null) {
-            currentMutant = new RoutineBriefMutant(current);
-          }
-          currentMutant.addParameter(param);
-        } else if (!currentVal.equals(overlayVal)) {
-          if (currentMutant == null) {
-            currentMutant = new RoutineBriefMutant(current);
-          }
-          ParameterMutant pm = currentMutant.getParameterMutant(key);
-          pm.setValue(overlayVal);
-        }
+        if (current.hasParameter(key)) {
+          currentMutant.removeParameters(key);
+        } 
       }
     }
     
+    for (I_Parameter param: params) {
+      if (param != null) {
+        currentMutant.addParameter(param);
+      }
+    }
     List<I_RoutineBrief> nested = overlay.getNestedRoutines();
     for (I_RoutineBrief nest: nested) {
       if (nest != null) {
         String name = nest.getName();
         RoutineBrief currentNest = (RoutineBrief) current.getNestedRoutine(name);
         if (currentNest == null) {
-          if (currentMutant == null) {
-            currentMutant = new RoutineBriefMutant(current);
-          }
           currentMutant.addNestedRoutine(nest);
         } else {
-          Class<?> currentClazz = current.getClazz();
-          Class<?> nestClazz = nest.getClazz();
-          if (currentClazz == null) {
-            if (currentMutant == null) {
-              currentMutant = new RoutineBriefMutant(current);
-            }
-            currentMutant.removeNestedRoutine(name);
-            currentMutant.addNestedRoutine(nest);
-          } else if (nestClazz != null){
-            if (!currentClazz.getName().equals(nestClazz.getName())) {
-              if (currentMutant == null) {
-                currentMutant = new RoutineBriefMutant(current);
-              }
-              currentMutant.removeNestedRoutine(name);
-              currentMutant.addNestedRoutine(nest);
-            } else {
-              if (currentMutant == null) {
-                currentMutant = new RoutineBriefMutant(current);
-              }
-              currentMutant.removeNestedRoutine(name);
-              RoutineBrief newBrief = createOverlay(currentNest, nest);
-              currentMutant.addNestedRoutine(newBrief);
-            }
-          } else {
-            //current class no no nested class, so parameter replacement
-            if (currentMutant == null) {
-              currentMutant = new RoutineBriefMutant(current);
-            }
-            currentMutant.removeNestedRoutine(name);
-            RoutineBrief newBrief = createOverlay(currentNest, nest);
-            currentMutant.addNestedRoutine(newBrief);
-          }
+          currentMutant.removeNestedRoutine(name);
+          RoutineBrief nestedOverlay = createOverlay(currentNest, nest);
+          currentMutant.addNestedRoutine(nestedOverlay);
         }
       }
     }
-    if (currentMutant != null) {
-      return new RoutineBrief(currentMutant);
-    }
-    return current;
+    return new RoutineBrief(currentMutant);
   }
 
 

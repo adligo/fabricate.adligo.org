@@ -165,6 +165,11 @@ public interface I_CommandLineConstants {
   public String getShare(boolean alias);
   
   /**
+   * This arguments turns off non optional stages.
+   * @return
+   */
+  public String getSkip();
+  /**
    * This argument turns on optional stages which are set as optional
    * in the fabricate.xml file.  In English this is 'stages' for command
    * line arguments like;<br/>

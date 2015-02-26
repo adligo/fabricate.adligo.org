@@ -1,4 +1,4 @@
-package org.adligo.fabricate.routines.implicit;
+package org.adligo.fabricate.routines;
 
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_ImplicitTraitMessages;
@@ -13,8 +13,6 @@ import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.I_RoutineFactory;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
-import org.adligo.fabricate.routines.I_ProjectProcessor;
-import org.adligo.fabricate.routines.I_TaskProcessor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
