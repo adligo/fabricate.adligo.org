@@ -35,6 +35,8 @@ public interface I_FabricationRoutine extends I_Fabrication, I_LocatableRunable 
    * run is called on all instances which didn't have
    * it's sibling setup(I_FabricationMemoryMutant memory) method
    * called.
+   * @param memory this is global memory for the entire fabrication.
+   * @param routineMemory this is memory scoped to a set of routine instances of the same class.
    */
-  public void setup(I_FabricationMemory memory) throws FabricationRoutineCreationException;
+  public void setup(I_FabricationMemory memory, I_RoutineMemory routineMemory) throws FabricationRoutineCreationException;
 }

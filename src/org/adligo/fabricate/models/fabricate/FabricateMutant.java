@@ -6,11 +6,15 @@ import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.dependencies.DependencyMutant;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
+import org.adligo.fabricate.models.project.I_ProjectBrief;
+import org.adligo.fabricate.models.project.ProjectBrief;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.JavaType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
+import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesAndProjectsType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StagesType;
@@ -25,18 +29,29 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class FabricateMutant implements I_Fabricate {
+  private Map<String,RoutineBriefMutant> commands_ = new HashMap<String,RoutineBriefMutant>();
+  
+  private List<I_Dependency> dependencies_ = new ArrayList<I_Dependency>();
+  private boolean developmentMode_ = false;
   private String fabricateHome_;
   private String fabricateXmlRunDir_;
+  /**
+   * The directory where fabricate was run from
+   * if it was a project directory (with project.xml)
+   * and not a project group directory (with fabricate.xml).
+   */
   private String fabricateProjectRunDir_;
   private String fabricateDevXmlDir_;
   private String javaHome_;
   private String fabricateRepository_;
   private JavaSettingsMutant javaSettings_;
-  private List<I_Dependency> dependencies_ = new ArrayList<I_Dependency>();
+  
+  private List<ProjectBrief> projects_ = new ArrayList<ProjectBrief>();
   private List<String> remoteRepositories_ = new ArrayList<String>();
   private Map<String,RoutineBriefMutant> traits_ = new HashMap<String,RoutineBriefMutant>();
-  private Map<String,RoutineBriefMutant> commands_ = new HashMap<String,RoutineBriefMutant>();
+  private RoutineBriefMutant scm_;
   private Map<String,RoutineBriefMutant> stages_ = new HashMap<String,RoutineBriefMutant>();
+  private String projectsDir_;
   
   public FabricateMutant() {
   }
@@ -69,6 +84,7 @@ public class FabricateMutant implements I_Fabricate {
   }
 
   public FabricateMutant(I_Fabricate other) {
+    developmentMode_ = other.isDevelopmentMode();
     fabricateHome_ = other.getFabricateHome();
     fabricateRepository_ = other.getFabricateRepository();
     javaHome_ = other.getJavaHome();
@@ -91,6 +107,7 @@ public class FabricateMutant implements I_Fabricate {
     
     setStages(other.getStages());
     setTraits(other.getTraits());
+    projectsDir_ = other.getProjectsDir();
   }
   
   public void addCommands(FabricateType type) 
@@ -137,6 +154,45 @@ public class FabricateMutant implements I_Fabricate {
           for (StageType routine: archiveTypes) {
             RoutineBriefMutant mut = new RoutineBriefMutant(routine, RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE);
             stages_.put(mut.getName(), mut);
+          }
+        }
+      }
+      
+      if (spt != null) {
+        ProjectsType projects =  spt.getProjects();
+        if (projects != null) {
+          RoutineType scm = projects.getScm();
+          if (scm != null) {
+            scm_ = new RoutineBriefMutant(scm, RoutineBriefOrigin.FABRICATE_SCM);
+          }
+          List<ProjectType> projectsList =  projects.getProject();
+          for (ProjectType proj: projectsList) {
+            if (proj != null) {
+              projects_.add(new ProjectBrief(proj));
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  public void addScmAndProjects(FabricateType type) throws ClassNotFoundException {
+    StagesAndProjectsType spt =  type.getProjectGroup();
+    if (spt != null) {
+      
+      
+      if (spt != null) {
+        ProjectsType projects =  spt.getProjects();
+        if (projects != null) {
+          RoutineType scm = projects.getScm();
+          if (scm != null) {
+            scm_ = new RoutineBriefMutant(scm, RoutineBriefOrigin.FABRICATE_SCM);
+          }
+          List<ProjectType> projectsList =  projects.getProject();
+          for (ProjectType proj: projectsList) {
+            if (proj != null) {
+              projects_.add(new ProjectBrief(proj));
+            }
           }
         }
       }
@@ -201,10 +257,25 @@ public class FabricateMutant implements I_Fabricate {
     return javaSettings_;
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getProjects()
+   */
+  public List<I_ProjectBrief> getProjects() {
+    return new ArrayList<I_ProjectBrief>(projects_);
+  }
+  
+
+  public String getProjectsDir() {
+    return projectsDir_;
+  }
+  
   public List<String> getRemoteRepositories() {
     return remoteRepositories_;
   }
   
+  public I_RoutineBrief getScm() {
+    return scm_;
+  }
 
   public Map<String, I_RoutineBrief> getStages() {
     return new HashMap<String,I_RoutineBrief>(stages_);
@@ -334,6 +405,33 @@ public class FabricateMutant implements I_Fabricate {
     }
   }
 
+  public void setProjectsDir(String projectsDir) {
+    projectsDir_ = projectsDir;
+  }
+
+  public boolean isDevelopmentMode() {
+    return developmentMode_;
+  }
+
+  public void setDevelopmentMode(boolean developmentMode) {
+    this.developmentMode_ = developmentMode;
+  }
+
+  public void setProjects(List<? extends I_ProjectBrief> projects) {
+    projects_.clear();
+    for (I_ProjectBrief proj: projects) {
+      if (proj instanceof ProjectBrief) {
+        projects_.add((ProjectBrief) proj);
+      } else if (proj != null) {
+        projects_.add(new ProjectBrief(proj));
+      }
+    }
+  }
+
+  public void setScm(RoutineBriefMutant scm) {
+    this.scm_ = scm;
+  }
+
   private void addRoutineParents(Collection<RoutineParentType> routines, 
       Map<String,RoutineBriefMutant> map, RoutineBriefOrigin origin) 
           throws IllegalArgumentException, ClassNotFoundException {
@@ -344,8 +442,6 @@ public class FabricateMutant implements I_Fabricate {
       }
     }
   }
-
-
  
   
 }

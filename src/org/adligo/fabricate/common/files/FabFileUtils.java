@@ -8,6 +8,12 @@ public class FabFileUtils {
     return getAbsoluteDir(filePath, File.separatorChar);
   }
   
+  /**
+   * always includes the last separator.
+   * @param filePath
+   * @param separator
+   * @return
+   */
   public static String getAbsoluteDir(String filePath, char separator) {
     
     int idx = -1;

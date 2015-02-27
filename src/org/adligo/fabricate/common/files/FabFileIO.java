@@ -612,6 +612,23 @@ public class FabFileIO implements I_FabFileIO {
     return sb.toString();
   }
 
+  public String getParentDir(String dir) {
+    if (dir.charAt(dir.length() -1) == '.') {
+      dir = dir.substring(0, dir.length() - 2);
+    }
+    char [] chars = dir.toCharArray();
+    
+    int last = 0;
+    for (int i = 0; i < chars.length; i++) {
+      char c = chars[i];
+      if (c == File.separatorChar) {
+        if (chars.length - 1 != i) {
+          last = i;
+        }
+      }
+    }
+    return dir.substring(0, last + 1);
+  }
   @Override
   public File instance(String filePath) {
     return new File(filePath);

@@ -4,6 +4,8 @@ import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
+import org.adligo.fabricate.models.common.I_RoutineMemory;
+import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 
 /**
  * This interface is used to create and setup
@@ -26,18 +28,21 @@ public interface I_RoutineBuilder {
   /**
    * The first routine for a routine on the current thread or
    * in group of concurrent routines.
-   * @param memory
+   * @param memory this is global memory for the entire fabrication.
+   * @param routineMemory this is memory scoped to a set of routine instances of the same class.
    * @return
    * @throws FabricationRoutineCreationException
    */
-  public I_FabricationRoutine build(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException;
+  public I_FabricationRoutine build(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory) throws FabricationRoutineCreationException;
   /**
    * The second and subsequent routines for a run of a
    * group of concurrent routine instances are created using 
    * this method.
-   * @param memory
+   * @param memory this is global memory for the entire fabrication.
+   * @param routineMemory this is memory scoped to a set of routine instances of the same class.
+   * @param
    * @return
    * @throws FabricationRoutineCreationException
    */
-  public I_FabricationRoutine build(I_FabricationMemory memory) throws FabricationRoutineCreationException;
+  public I_FabricationRoutine build(I_FabricationMemory memory, I_RoutineMemory routineMemory) throws FabricationRoutineCreationException;
 }

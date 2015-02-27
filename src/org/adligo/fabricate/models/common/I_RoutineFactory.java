@@ -22,6 +22,14 @@ import java.util.Set;
  */
 public interface I_RoutineFactory {
   /**
+   * This method can be used to create project specific overlays
+   * from the ones from fabricate.xml (and the implicit defaults).
+   * @param current
+   * @param overlay
+   * @return
+   */
+  public RoutineBrief createOverlay(I_RoutineBrief current, I_RoutineBrief overlay);
+  /**
    * 
    * @param name
    * @param implementedInterfaces the interfaces that 

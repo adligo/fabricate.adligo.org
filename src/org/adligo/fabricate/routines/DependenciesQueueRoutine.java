@@ -18,7 +18,7 @@ import java.util.List;
  * @author scott
  *
  */
-public abstract class DependenciesQueueRoutine extends AbstractRoutine implements 
+public class DependenciesQueueRoutine extends AbstractRoutine implements 
   I_ConcurrencyAware, I_FabricationRoutine, I_ProjectsAware {
   protected List<I_Project> projects_;
   

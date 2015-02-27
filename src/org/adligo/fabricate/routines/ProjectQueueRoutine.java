@@ -11,6 +11,6 @@ import org.adligo.fabricate.models.common.I_FabricationRoutine;
  *
  */
 public abstract class ProjectQueueRoutine extends AbstractRoutine implements 
-  I_ConcurrencyAware, I_FabricationRoutine, I_ProjectBriefsAware {
+  I_ConcurrencyAware, I_FabricationRoutine {
  
 }

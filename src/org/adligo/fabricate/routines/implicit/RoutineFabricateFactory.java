@@ -1,4 +1,4 @@
-package org.adligo.fabricate.routines;
+package org.adligo.fabricate.routines.implicit;
 
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
@@ -9,10 +9,9 @@ import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
-import org.adligo.fabricate.routines.implicit.DecryptCommand;
-import org.adligo.fabricate.routines.implicit.DecryptTrait;
-import org.adligo.fabricate.routines.implicit.EncryptCommand;
-import org.adligo.fabricate.routines.implicit.EncryptTrait;
+import org.adligo.fabricate.routines.I_RoutineBuilder;
+import org.adligo.fabricate.routines.RoutineExecutionEngine;
+import org.adligo.fabricate.routines.RoutineFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,14 +28,19 @@ import java.util.Set;
 public class RoutineFabricateFactory {
   private static final Set<I_ExpectedRoutineInterface> EMPTY_SET = Collections.emptySet();
   private final I_Fabricate fabricate;
-  private final RoutineFactory traits_ = new RoutineFactory();
-  private final RoutineFactory commands_ = new RoutineFactory();
-  private final RoutineFactory stages_ = new RoutineFactory();
+  private final RoutineFactory traits_;
+  private final RoutineFactory commands_;
+  private final RoutineFactory stages_;
 
-  public RoutineFabricateFactory(I_Fabricate fab, boolean commandsNotStages) {
+  public RoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
+    traits_ = new RoutineFactory(system);
+    commands_ = new RoutineFactory(system);
+    stages_ = new RoutineFactory(system);
     fabricate = fab;
     if (commandsNotStages) {
       addImplicitCommands();
+    } else {
+      addImplicitStages();
     }
     addImplicitTraits();
     
@@ -67,11 +71,21 @@ public class RoutineFabricateFactory {
   public void addImplicitCommands() {
     addCommand(EncryptCommand.NAME, EncryptCommand.class);
     addCommand(DecryptCommand.NAME, DecryptCommand.class);
+    addCommand(PublishCommand.NAME, PublishCommand.class);
+  }
+
+  public void addImplicitStages() {
+    stages_.add(JarStage.JAR_STAGE);
   }
   
   public void addImplicitTraits() {
     addTrait(EncryptTrait.NAME, EncryptTrait.class);
     addTrait(DecryptTrait.NAME, DecryptTrait.class);
+    addTrait(GitCloneRoutine.NAME, GitCloneRoutine.class);
+    addTrait(GitPullRoutine.NAME, GitPullRoutine.class);
+    addTrait(GitCommitRoutine.NAME, GitCommitRoutine.class);
+    addTrait(GitPushRoutine.NAME, GitPushRoutine.class);
+    traits_.add(ObtainTrait.ROUTINE_BRIEF);
   }
   
   /**
@@ -139,6 +153,20 @@ public class RoutineFabricateFactory {
   public I_FabricationRoutine createTrait(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
     return traits_.createRoutine(name, interfaces);
   }
+
+  public I_Fabricate getFabricate() {
+    return fabricate;
+  }
+  public RoutineFactory getTraits() {
+    return traits_;
+  }
+  public RoutineFactory getCommands() {
+    return commands_;
+  }
+  public RoutineFactory getStages() {
+    return stages_;
+  }
+  
   private void addCommand(String name, Class<? extends I_FabricationRoutine> clazz) {
     RoutineBriefMutant bm = new RoutineBriefMutant();
     bm.setName(name);
@@ -153,17 +181,5 @@ public class RoutineFabricateFactory {
     bm.setClazz(clazz);
     bm.setOrigin(RoutineBriefOrigin.IMPLICIT_TRAIT);
     traits_.add(new RoutineBrief(bm));
-  }
-  public I_Fabricate getFabricate() {
-    return fabricate;
-  }
-  public RoutineFactory getTraits() {
-    return traits_;
-  }
-  public RoutineFactory getCommands() {
-    return commands_;
-  }
-  public RoutineFactory getStages() {
-    return stages_;
   }
 }

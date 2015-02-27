@@ -134,6 +134,18 @@ public interface I_CommandLineConstants {
    */
   public String getLog(boolean alias);
   /**
+   * This argument instructs Fabricate to delete the project group/projects directory
+   * and all of it's contents when it is NOT running in development mode
+   * and when the initial fab command was executed in the project group directory.
+   * @param alias
+   * @return for English this will be;
+   * alias == true
+   *     "-p"
+   * alias == false
+   *    "--purge"
+   */
+  public String getPurge(boolean alias);
+  /**
    * This argument instructs Fabricate to rebuild all projects that dependent
    * on the project where the Fabricate program was started.  This applies to 
    * regular project dependency relationships as well as project group dependency

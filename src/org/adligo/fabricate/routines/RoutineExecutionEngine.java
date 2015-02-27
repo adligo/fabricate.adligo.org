@@ -27,16 +27,16 @@ public class RoutineExecutionEngine {
     threads_ = threads;
   }
   
-  public void runRoutines()
+  public void runRoutines(FabricationMemoryMutant memoryMut)
       throws FabricationRoutineCreationException {
     
-    FabricationMemoryMutant memoryMut = new FabricationMemoryMutant();
-    I_FabricationRoutine routine = factory_.build(memoryMut);
+    FabricationMemoryMutant routineMemoryMutant = new FabricationMemoryMutant();
+    I_FabricationRoutine routine = factory_.build(memoryMut, routineMemoryMutant);
     if (routine == null) {
       return;
     }
     FabricationMemory memory = new FabricationMemory(memoryMut);
-    
+    FabricationMemory routineMemory = new FabricationMemory(routineMemoryMutant);
     if (I_ConcurrencyAware.class.isAssignableFrom(routine.getClass())) {
       
       if (threads_ >= 2) {
@@ -45,7 +45,7 @@ public class RoutineExecutionEngine {
           I_RunMonitor monitor = system_.newRunMonitor(routine, i + 1);
           service.submit(monitor);
           monitors_.add(monitor);
-          routine = factory_.build(memory);
+          routine = factory_.build(memory, routineMemory);
         }
         int counter = 0;
         while (true) {

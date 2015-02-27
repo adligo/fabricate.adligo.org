@@ -92,6 +92,15 @@ public interface I_FabFileIO {
    * separator (Unix and Mac '\', Windows '/')
    */
   public String getNameSeparator();
+  
+  /**
+   * returns the parent directory of the dir or file,
+   * includes the last File.separatorChar.
+   * 
+   * @param file
+   * @return
+   */
+  public String getParentDir(String file);
   /**
    * 
    * @param absolutePath a system dependent 

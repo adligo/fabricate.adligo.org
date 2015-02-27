@@ -61,11 +61,15 @@ public interface I_SystemMessages {
   public String getFailed();
   public String getFinished();
   
+  public String getInsteadOfTheFollowingActualGenericType();
+  public String getItWasExpectedToImplementTheFollowingInterface();
+  
   public String getManagingTheFollowingLocalRepository();
   public String getManagingFabricateRuntimeClassPathDependencies();
   public String getNoRemoteRepositoriesCouldBeReached();
   public String getPassedTheMd5Check();
   public String getPassedTheExtractCheck();
+  public String getPleaseEnterYourGitKeystorePassword();
   
   public String getSendingOptsToScript();
   
@@ -92,11 +96,14 @@ public interface I_SystemMessages {
   
   public String getTheFollowingArtifact();
   public String getThereWasAProblemCreatingTheFollowingDirectory();
+  public String getThereWasAProblemCreatingTheFollowingRoutine();
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory();
+  public String getThisMethodMustBeCalledFromTheMainThread();
   
   public String getUnableToLoadTheFollowingClass();
   public String getUnknown();
   public String getUsingTheFollowingRemoteRepositories();
   
   public String getVersionX();
+  public String getWithTheFollowingGenericTypeX();
 }

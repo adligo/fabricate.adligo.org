@@ -1,20 +1,18 @@
 package org.adligo.fabricate.routines;
 
-import org.adligo.fabricate.models.project.I_ProjectBrief;
+import org.adligo.fabricate.models.common.I_FabricationRoutine;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
- * This interface is used by Fabricate
- * to determine if a routine is aware of
- * the project briefs, and sets them 
- * if it is.
- * 
+ * Just a marker interface to show
+ * that a routine is aware of project briefs
+ * (and there for may do something with or to projects).
+ * Get the briefs from the I_Fabricate#getProjects() method.
  * @author scott
  *
  */
-public interface I_ProjectBriefsAware {
-  public List<I_ProjectBrief> getProjectBriefs();
-  public void setProjectBriefs(Collection<I_ProjectBrief> briefs);
+public interface I_ProjectBriefsAware extends I_FabricateAware, I_FabricationRoutine {
+  public List<String> getProjectsToSkip();
+  public void setProjectsToSkip(List<String> projectNames);
 }

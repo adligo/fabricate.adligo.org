@@ -1,7 +1,11 @@
 package org.adligo.fabricate.models.fabricate;
 
 public interface I_FabricateXmlDiscovery {
-
+  /**
+   * @return the absolute directory where fab was executed 
+   * (with a project.xml) including the last
+   * File.separatorChar.
+   */
   public String getProjectXmlDir();
   
   /**
@@ -9,8 +13,15 @@ public interface I_FabricateXmlDiscovery {
    */
   public String getFabricateXmlPath();
   
+  /**
+   * @return the absolute directory where fabricate.xml is including the last
+   * File.separatorChar.
+   */
   public String getFabricateXmlDir();
-
+  /**
+   * @return the absolute directory where dev.xml is including the last
+   * File.separatorChar.
+   */
   public String getDevXmlDir();
 
 }

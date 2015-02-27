@@ -20,10 +20,13 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   private static final String DEVELOPMENT = "--development";
   private static final String G = "-g";
   private static final String GROW_BRANCHES = "--grow-branches";
+
   private static final String L = "-l";
   private static final String LOG = "--log-verbosely";
   private static final String M = "-m";
   private static final String MARK_VERSIONS = "--mark-versions";
+  private static final String P = "-p";
+  private static final String PURGE = "--purge";
   private static final String R = "-r";
   private static final String REBUILD = "--rebuild-dependents";
   
@@ -60,6 +63,7 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
     map_.put(GROW_BRANCHES, G);
     map_.put(LOG, L);
     map_.put(MARK_VERSIONS, M);
+    map_.put(PURGE, P);
     map_.put(REBUILD, R);
     map_.put(SHARE, S);
     map_.put(TEST, T);
@@ -151,6 +155,14 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
       return M;
     }
     return MARK_VERSIONS;
+  }
+
+  @Override
+  public String getPurge(boolean alias) {
+    if (alias) {
+      return P;
+    }
+    return PURGE;
   }
   
   @Override

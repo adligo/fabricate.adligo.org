@@ -3,6 +3,7 @@ package org.adligo.fabricate.routines.implicit;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
+import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.routines.AbstractRoutine;
 import org.adligo.fabricate.routines.I_InputAware;
 import org.adligo.fabricate.routines.I_PresentationAware;
@@ -31,7 +32,7 @@ public class EncryptCommand extends AbstractRoutine implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException {
+  public boolean setup(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory) throws FabricationRoutineCreationException {
     encryptTrait_ = traitFactory_.createRoutine(EncryptTrait.NAME, EncryptTrait.IMPLEMENTED_INTERFACES);
     
     String data =  system_.getArgValue(INPUT_CLA);

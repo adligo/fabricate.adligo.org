@@ -11,15 +11,17 @@ import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.managers.CommandManager;
+import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
 import org.adligo.fabricate.routines.I_ProjectBriefsAware;
-import org.adligo.fabricate.routines.I_ProjectProcessor;
 import org.adligo.fabricate.routines.I_ProjectsAware;
-import org.adligo.fabricate.routines.RoutineFabricateFactory;
+import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
+import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.MachineInfoType;
@@ -62,7 +64,7 @@ public class FabricateController {
   }
   
   public FabricateController(FabSystem sys, String [] args, FabricateFactory factory) 
-      throws ClassNotFoundException, FabricationRoutineCreationException, IOException {
+      throws ClassNotFoundException, IOException {
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
     sys_ = sys;
     files_ = sys.getFileIO();
@@ -80,7 +82,7 @@ public class FabricateController {
       return;
     } 
     String fabricateDir = discovery_.getFabricateXmlDir();
-    String runMarker = fabricateDir + files_.getNameSeparator() + "run.marker";
+    String runMarker = fabricateDir + "run.marker";
     if (files_.exists(runMarker)) {
       log_.println(sysMessages_.getFabricateAppearsToBeAlreadyRunning() + sys_.lineSeperator() +
           sysMessages_.getFabricateAppearsToBeAlreadyRunningPartTwo() + sys_.lineSeperator() +
@@ -112,7 +114,7 @@ public class FabricateController {
       }
     }
     
-    String outputDir = fabricateDir + files_.getNameSeparator() + "output";
+    String outputDir = fabricateDir +  "output";
     if (files_.exists(outputDir)) {
       files_.deleteRecursive(outputDir);
     }
@@ -136,17 +138,18 @@ public class FabricateController {
         sys_.lineSeperator());
     
     List<String> argCommands = sys_.getArgValues(cmdMessages_.getCommand());
-    if (!addRoutinesToFabricate(factory, argCommands)) {
+    if (!finishFabricateSetup(factory, argCommands)) {
       return;
     }
-    
+    FabricationMemoryMutant memory = factory.createMemory();
     if (requiresProjects()) {
+      manageProjectsDirAndMode(factory);
       //TODO add projects manager code
     }
     
     if (commands_) {
       CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_);
-      failure_ = manager.processCommands();
+      failure_ = manager.processCommands(memory);
     } else {
       //TODO add fabrication manager code
     }
@@ -157,12 +160,15 @@ public class FabricateController {
     }
   }
 
-  public boolean addRoutinesToFabricate(FabricateFactory factory, List<String> argCommands)
+  public boolean finishFabricateSetup(FabricateFactory factory, List<String> argCommands)
       throws IOException, ClassNotFoundException {
+    
+    
     String fabricateXmlPath = discovery_.getFabricateXmlPath();
     FabricateType fabX =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
     fab_ = factory.create(sys_, fabX, discovery_);
     FabricateMutant fm = factory.createMutant(fab_);
+    
     List<RoutineParentType> traits =  fabX.getTrait();
     
     commands_ = true;
@@ -178,8 +184,9 @@ public class FabricateController {
         commands_ = false;
       }
        
+      
       fab_ = factory.create(fm);
-      factory_ = factory.createRoutineFabricateFactory(fab_, commands_);
+      factory_ = factory.createRoutineFabricateFactory(sys_, fab_, commands_);
     } catch (ClassNotFoundException x) {
       String message = sysMessages_.getUnableToLoadTheFollowingClass() + 
         sys_.lineSeperator() + x.getMessage();
@@ -189,21 +196,78 @@ public class FabricateController {
     }
     return true;
   }
-  
-  private boolean requiresProjects() throws FabricationRoutineCreationException {
-    if (commands_) {
-      List<String> commands = sys_.getArgValues(cmdMessages_.getCommand());
-      if (factory_.anyCommandsAssignableTo(I_ProjectBriefsAware.class, 
-          commands)) {
-        return true;
-      }
+
+  public void manageProjectsDirAndMode(FabricateFactory factory) throws IOException {
+    FabricateMutant fm = factory.createMutant(fab_);
+    String devXmlDir = discovery_.getDevXmlDir();
+    String projectRunDir = discovery_.getProjectXmlDir();
+    if ( !StringUtils.isEmpty(devXmlDir)) {
+      //it was run from a project directory and a dev.xml file was discovered in
+      // the parent directory
+      fm.setDevelopmentMode(true);
+      fm.setProjectsDir(devXmlDir);
+    } else if (!StringUtils.isEmpty(projectRunDir)){
+      //it was run from the project dir like project_group/projects/projectX
+      String projectsDir = files_.getParentDir(projectRunDir);
+      fm.setProjectsDir(projectsDir);
     } else {
-      List<String> stages = sys_.getArgValues(cmdMessages_.getStages());
-      List<String> skips = sys_.getArgValues(cmdMessages_.getSkip());
-      if (factory_.anyStagesAssignableTo(I_ProjectsAware.class, 
-          stages, skips)) {
-        return true;
+      String runDir = discovery_.getFabricateXmlDir();
+      //it was run from the project group dir
+      if (sys_.hasArg(cmdMessages_.getDevelopment(true))) {
+        //development mode
+        File runDirFile = files_.instance(runDir);
+        String projectsDir = files_.getParentDir(runDir);
+        fm.setProjectsDir(projectsDir);
+        fm.setDevelopmentMode(true);
+        String dev = projectsDir + "dev.xml";
+        if (!files_.exists(dev)) {
+          FabricateDevType devType = new FabricateDevType();
+          String projectGroup = runDirFile.getName();
+          devType.setProjectGroup(projectGroup);
+          xmlFiles_.writeDev_v1_0(dev, devType);
+        }
+      } else {
+        String projectsDir = runDir + "projects";
+        if (files_.exists(projectsDir)) {
+          if (sys_.hasArg(cmdMessages_.getPurge(true))) {
+            files_.deleteRecursive(projectsDir);
+            makeProjectsDir(projectsDir);
+          }
+        } else {
+          makeProjectsDir(projectsDir);
+        }
+        fm.setProjectsDir(projectsDir);
       }
+    }
+    fab_ = factory.create(fm);
+  }
+
+  public void makeProjectsDir(String projectsDir) throws IOException {
+    if (!files_.mkdirs(projectsDir)) {
+      String message = sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory();
+      throw new IOException(message + sys_.lineSeperator() +
+          projectsDir);
+    }
+  }
+  
+  private boolean requiresProjects() {
+    try {
+      if (commands_) {
+        List<String> commands = sys_.getArgValues(cmdMessages_.getCommand());
+        if (factory_.anyCommandsAssignableTo(I_ProjectBriefsAware.class, 
+            commands)) {
+          return true;
+        }
+      } else {
+        List<String> stages = sys_.getArgValues(cmdMessages_.getStages());
+        List<String> skips = sys_.getArgValues(cmdMessages_.getSkip());
+        if (factory_.anyStagesAssignableTo(I_ProjectsAware.class, 
+            stages, skips)) {
+          return true;
+        }
+      }
+    } catch (FabricationRoutineCreationException x) {
+      FabricationRoutineCreationException.log(log_, sysMessages_, x);
     }
     return false;
   }
@@ -212,7 +276,7 @@ public class FabricateController {
   private void writeResult() throws IOException {
     File resultFile = null;
     String fabricateXmlPath = discovery_.getFabricateXmlDir();
-    resultFile = files_.create(fabricateXmlPath + files_.getNameSeparator() + 
+    resultFile = files_.create(fabricateXmlPath + 
           "output" + files_.getNameSeparator() + "result.xml");
     
     ResultType result = new ResultType();

@@ -297,7 +297,7 @@ in order for the task to be executed on the project.</documentation>
     
     <complexType name="stages_and_projects_type">
     	<sequence>
-    		<element name="stages" type="fns:stages_type" minOccurs="1"
+    		<element name="stages" type="fns:stages_type" minOccurs="0"
     			maxOccurs="1">
     		</element>
     		<element name="projects" type="fns:projects_type"

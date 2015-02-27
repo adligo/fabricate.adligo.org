@@ -21,6 +21,13 @@ import javax.xml.datatype.DatatypeFactory;
 public interface I_FabSystem extends I_FabFilesSystem {
   
   /**
+   * This method provides the Thread.currentThread(),
+   * and adds a way to inject a mock for testing.
+   * @return
+   */
+  public Thread currentThread();
+  public String currentThreadName();
+  /**
    * This dialogs the user on the command line, 
    * it should only be used inside the method 'doDialogs'
    * as a implementation of I_PresentationAware.
@@ -169,12 +176,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    */
   public I_RunMonitor newRunMonitor(I_LocatableRunable delegate, int counter);
   
-  /**
-   * This method provides the Thread.currentThread(),
-   * and adds a way to inject a mock for testing.
-   * @return
-   */
-  public Thread currentThread();
+
   
   /**
    * This method provides a new ByteArrayOutputStream()

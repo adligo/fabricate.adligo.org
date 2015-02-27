@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FabricationMemory implements I_FabricationMemory {
+public class FabricationMemory implements I_RoutineMemory {
   private final Map<String,Object> immutable_;
   private Map<String,Object> map_ = new ConcurrentHashMap<String,Object>();
 

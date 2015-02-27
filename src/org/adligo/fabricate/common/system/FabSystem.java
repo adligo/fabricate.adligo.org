@@ -63,6 +63,11 @@ public class FabSystem implements I_FabSystem {
   }
   
   @Override
+  public String currentThreadName() {
+    return Thread.currentThread().getName();
+  }
+  
+  @Override
   public String doDialog(String question, boolean readPassword) {
     Console console = System.console();
     
@@ -84,8 +89,9 @@ public class FabSystem implements I_FabSystem {
   
   @Override
   public List<String> getArgValues(String key) {
-    List<String> toRet = argListVals_.get(key);
-    if (toRet == null) {
+    List<String> toRet = new ArrayList<String>();
+    List<String> vals = argListVals_.get(key);
+    if (vals == null) {
       String valsDelimited  = argMap.get(key);
       if ( !StringUtils.isEmpty(valsDelimited)) {
         List<String> newVals = new ArrayList<String>();

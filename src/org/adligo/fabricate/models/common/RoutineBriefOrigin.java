@@ -34,6 +34,10 @@ public enum RoutineBriefOrigin {
    */
   FABRICATE_COMMAND_TASK,
   /**
+   * The scm from fabricate.xml
+   */
+  FABRICATE_SCM,
+  /**
    * A build stage from fabricate.xml
    */
   FABRICATE_STAGE,

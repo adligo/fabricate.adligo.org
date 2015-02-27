@@ -5,6 +5,8 @@ import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
+import org.adligo.fabricate.models.project.I_ProjectBrief;
+import org.adligo.fabricate.models.project.ProjectBrief;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class Fabricate implements I_Fabricate {
+  private final boolean developmentMode;
   private final List<I_Dependency> dependencies_;
   private final Map<String, I_RoutineBrief> commands_; 
   private final String fabricateHome_;
@@ -27,12 +30,16 @@ public class Fabricate implements I_Fabricate {
   private final String javaHome_;
   private final JavaSettings javaSettings_;
   
+  private final String projectsDir_;
+  private final List<I_ProjectBrief> projects_;
   private final List<String> remoteRepositories_;
   
+  private final I_RoutineBrief scm_;
   private final Map<String, I_RoutineBrief> stages_; 
   private final Map<String, I_RoutineBrief> traits_; 
   
   public Fabricate(I_Fabricate other) {
+    developmentMode = other.isDevelopmentMode();
     commands_ = createImmutableMap(other.getCommands());
     fabricateHome_ = other.getFabricateHome();
     fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
@@ -47,6 +54,7 @@ public class Fabricate implements I_Fabricate {
     fabricateDevXmlDir_ = other.getFabricateDevXmlDir();
     fabricateProjectRunDir_ = other.getFabricateProjectRunDir();
     
+    projectsDir_ = other.getProjectsDir();
     List<String> remotRepos = other.getRemoteRepositories();
     if (remotRepos == null) {
       remoteRepositories_ = Collections.emptyList();
@@ -77,6 +85,27 @@ public class Fabricate implements I_Fabricate {
       dependencies_ = Collections.emptyList();
     }
     
+    List<I_ProjectBrief> projects = other.getProjects();
+    if (projects != null) {
+      List<I_ProjectBrief> newList = new ArrayList<I_ProjectBrief>();
+      for (I_ProjectBrief proj: projects) {
+        if (proj instanceof ProjectBrief) {
+          newList.add(proj); 
+        } else if (proj != null) {
+          newList.add(new ProjectBrief(proj)); 
+        }
+      }
+      projects_ = Collections.unmodifiableList(new ArrayList<I_ProjectBrief>(newList));
+    } else {
+      projects_ = Collections.emptyList();
+    }
+    
+    I_RoutineBrief scm = other.getScm();
+    if (scm != null) {
+      scm_ = new RoutineBrief(scm);
+    } else {
+      scm_ = null;
+    }
     stages_ = createImmutableMap(other.getStages());
     traits_ = createImmutableMap(other.getTraits());
   }
@@ -171,5 +200,23 @@ public class Fabricate implements I_Fabricate {
       }
     }
     return Collections.unmodifiableMap(toRet);
+  }
+
+  public String getProjectsDir() {
+    return projectsDir_;
+  }
+
+  public boolean isDevelopmentMode() {
+    return developmentMode;
+  }
+
+  @Override
+  public List<I_ProjectBrief> getProjects() {
+    return projects_;
+  }
+
+  @Override
+  public I_RoutineBrief getScm() {
+    return scm_;
   }
 }

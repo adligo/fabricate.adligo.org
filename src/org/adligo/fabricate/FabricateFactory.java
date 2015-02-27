@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.managers.CommandManager;
+import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
@@ -21,7 +22,7 @@ import org.adligo.fabricate.repository.I_RepositoryFactory;
 import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.repository.LibraryResolver;
 import org.adligo.fabricate.repository.RepositoryManager;
-import org.adligo.fabricate.routines.RoutineFabricateFactory;
+import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
@@ -92,6 +93,10 @@ public class FabricateFactory implements I_RepositoryFactory {
   public I_LibraryResolver createLibraryResolver(I_FabSystem sys, I_Fabricate fabricate) {
     return new LibraryResolver(sys, fabricate);
   }
+
+  public FabricationMemoryMutant createMemory() {
+    return new FabricationMemoryMutant();
+  }
   
   public FabricateMutant createMutant(Fabricate fab) {
     return new FabricateMutant(fab);
@@ -111,8 +116,8 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new DefaultRepositoryPathBuilder(localRepository, separator);
   }
 
-  public RoutineFabricateFactory createRoutineFabricateFactory(I_Fabricate fab, boolean commandsNotStages) {
-    return new RoutineFabricateFactory(fab, commandsNotStages);
+  public RoutineFabricateFactory createRoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
+    return new RoutineFabricateFactory(system, fab, commandsNotStages);
   }
 
 

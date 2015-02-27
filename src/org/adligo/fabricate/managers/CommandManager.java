@@ -1,6 +1,7 @@
 package org.adligo.fabricate.managers;
 
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
@@ -8,13 +9,15 @@ import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.I_RoutineFactory;
+import org.adligo.fabricate.models.common.I_RoutineMemory;
+import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import org.adligo.fabricate.routines.I_CommandAware;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
 import org.adligo.fabricate.routines.I_TaskProcessor;
 import org.adligo.fabricate.routines.RoutineExecutionEngine;
-import org.adligo.fabricate.routines.RoutineFabricateFactory;
 import org.adligo.fabricate.routines.RoutineFactory;
+import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
 
 import java.io.ByteArrayOutputStream;
@@ -37,20 +40,20 @@ public class CommandManager {
     
 
     @Override
-    public I_FabricationRoutine build(I_FabricationMemoryMutant memory)
+    public I_FabricationRoutine build(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();
-      if (!toRet.setup(memory)) {
+      if (!toRet.setup(memory, routineMemory)) {
         return null;
       }
       return toRet;
     }
 
     @Override
-    public I_FabricationRoutine build(I_FabricationMemory memory)
+    public I_FabricationRoutine build(I_FabricationMemory memory, I_RoutineMemory routineMemory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();
-      toRet.setup(memory);
+      toRet.setup(memory, routineMemory);
       return toRet;
     }
   };
@@ -66,14 +69,14 @@ public class CommandManager {
   /**
    * @return FailureType if failure occurs, otherwise null.
    */
-  public FailureType processCommands() {
+  public FailureType processCommands(FabricationMemoryMutant memory) {
     Throwable failure = null;
     I_FabricationRoutine routine = null;
     try {
       for (String command: commands_) {
         command_ = command;
         RoutineExecutionEngine exe = factory_.createRoutineExecutionEngine(system_, executorFactory_);
-        exe.runRoutines();
+        exe.runRoutines(memory);
         if (exe.hadFailure()) {
           failure = exe.getFailure();
           routine = exe.getRoutineThatFailed();

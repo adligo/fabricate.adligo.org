@@ -28,6 +28,8 @@ public interface I_Fabrication {
    * @return a boolean if this fabrication should run, this allows the 
    * stages to check for command line parameters or other indicators
    * to see if they should run.
+   * @param memory this is global memory for the entire fabrication.
+   * @param routineMemory this is memory scoped to a set of routine instances of the same class.
    */
-  public boolean setup(I_FabricationMemoryMutant memory) throws FabricationRoutineCreationException;
+  public boolean setup(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory) throws FabricationRoutineCreationException;
 }

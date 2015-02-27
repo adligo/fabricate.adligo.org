@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
 
+
   private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
       "Archive stage <X/>, task <Y/> is still running on project <Z/>.";
   private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING = 
@@ -90,6 +91,12 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String FAILED = "failed!";
   private static final String FINISHED = "finished.";
   
+  private static final String INSTEAD_OF_THE_FOLLOWING_ACTUAL_GENERIC_TYPE = 
+      "Instead of the following actual generic type;";
+  private static final String IT_WAS_EXPECTED_TO_IMPLEMENT_THE_FOLLOWING_INTERFACE = 
+      "It was expected to implement the following interface;";
+  
+  
   private static final String SENDING_OPTS_TO_SCRIPT = 
       "Sending opts to script.";
   
@@ -107,6 +114,10 @@ public class SystemEnMessages implements I_SystemMessages {
   
   private static final String PASSED_THE_EXTRACT_CHECK = "passed the extract check.";
   private static final String PASSED_THE_MD5_CHECK = "passed the md5 check.";
+  
+  private static final String PLEASE_ENTER_YOUR_GIT_KEY_STORE_PASSWORD =
+      "Please enter your git key-store password (or just press "
+      + "enter for a key-store without a password).";
   
   private static final String THE_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
       "The download from the following url;";
@@ -126,6 +137,10 @@ public class SystemEnMessages implements I_SystemMessages {
       "There was a problem creating the following directory;";
   private static final String THERE_WAS_A_PROBLEM_CREATING_RUN_MARKER_IN_THE_FOLLOWING_DIRECTORY =
       "There was a problem creating run.marker in the following directory;";
+  private static final String THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_ROUTINE = 
+      "There was a problem creating the following routine;";
+  private static final String THIS_METHOD_MUST_BE_CALLED_FROM_THE_MAIN_THREAD_TRY_MOVING_THE_CALL_TO_SETUP =
+      "This method must be called from the main thread (try moving the call to setup?).";
   
   private static final String TO_THE_FOLLOWING_FOLDER = "to the following folder;";
   
@@ -135,6 +150,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "Unable to load the following class;";
   private static final String UNKNOWN = "Unknown";
   private static final String VERSION_X = "Version <X/>.";
+  private static final String WITH_THE_FOLLOWING_GENERIC_TYPE_X = 
+      "With the following generic type <X/>;";
   
   private SystemEnMessages() {
   }
@@ -337,11 +354,29 @@ public class SystemEnMessages implements I_SystemMessages {
     return FINISHED;
   }
 
+  @Override
+  public String getItWasExpectedToImplementTheFollowingInterface() {
+    return IT_WAS_EXPECTED_TO_IMPLEMENT_THE_FOLLOWING_INTERFACE;
+  }
+  
+  @Override
+  public String getInsteadOfTheFollowingActualGenericType() {
+    return INSTEAD_OF_THE_FOLLOWING_ACTUAL_GENERIC_TYPE;
+  }
+  
+  @Override
   public String getPassedTheMd5Check() {
     return PASSED_THE_MD5_CHECK;
   }
+  
+  @Override
   public String getPassedTheExtractCheck() {
     return PASSED_THE_EXTRACT_CHECK;
+  } 
+  
+  @Override
+  public String getPleaseEnterYourGitKeystorePassword() {
+    return PLEASE_ENTER_YOUR_GIT_KEY_STORE_PASSWORD;
   } 
   
   @Override
@@ -404,6 +439,16 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getThereWasAProblemCreatingTheFollowingRoutine() {
+    return THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_ROUTINE;
+  }
+  
+  @Override
+  public String getThisMethodMustBeCalledFromTheMainThread() {
+    return THIS_METHOD_MUST_BE_CALLED_FROM_THE_MAIN_THREAD_TRY_MOVING_THE_CALL_TO_SETUP;
+  }
+  
+  @Override
   public String getManagingFabricateRuntimeClassPathDependencies() {
     return MANAGING_FABRICATE_RUNTIME_CLASS_PATH_DEPENDENCIES;
   }
@@ -412,8 +457,6 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getManagingTheFollowingLocalRepository() {
     return MANAGING_THE_FOLLOWING_LOCAL_REPOSITORY;
   }
-  
-
   
   @Override
   public String getNoRemoteRepositoriesCouldBeReached() {
@@ -438,5 +481,10 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getVersionX() {
     return VERSION_X;
+  }
+  
+  @Override
+  public String getWithTheFollowingGenericTypeX() {
+    return WITH_THE_FOLLOWING_GENERIC_TYPE_X;
   }
 }

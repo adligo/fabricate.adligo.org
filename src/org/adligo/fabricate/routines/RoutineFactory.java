@@ -1,5 +1,8 @@
 package org.adligo.fabricate.routines;
 
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
@@ -19,7 +22,6 @@ import java.util.Set;
 /**
  * This class contains the setting overlay logic as follows;
  * Implicit routines are overlaid (replaced/amended) by fabricate.xml routines.
- * The above routines are overlaid (replaced/amended) by project.xml routines.
  * Note there is no way to replace a parameter or nested routine with nothing,
  * parameters and nested routines may only be replaced by new values.
  *    
@@ -27,11 +29,15 @@ import java.util.Set;
  *
  */
 public class RoutineFactory implements I_RoutineFactory {
+  private final I_FabSystem system_;
   private Map<String,RoutineBrief> briefs_ = new HashMap<String,RoutineBrief>();
   
-  public RoutineFactory() {}
+  public RoutineFactory(I_FabSystem system) {
+    system_ = system;
+  }
   
-  public RoutineFactory(RoutineFactory other) {
+  public RoutineFactory(I_FabSystem system, RoutineFactory other) {
+    system_ = system;
     briefs_.putAll(other.briefs_);
   }
   
@@ -60,6 +66,49 @@ public class RoutineFactory implements I_RoutineFactory {
     }
   }
   
+  public RoutineBrief createOverlay(I_RoutineBrief current, I_RoutineBrief overlay) {
+    RoutineBriefMutant currentMutant = new RoutineBriefMutant(current);
+    Class<? extends I_FabricationRoutine> clazz = current.getClazz();
+    Class<? extends I_FabricationRoutine> newClazz = overlay.getClazz();
+    if (clazz == null) {
+      currentMutant.setClazz(newClazz);
+    } else if (newClazz != null) {
+      if ( !clazz.getName().equals(newClazz.getName())) {
+        currentMutant.setClazz(newClazz);
+      }
+    }
+    List<I_Parameter> params = overlay.getParameters();
+    for (I_Parameter param: params) {
+      if (param != null) {
+        String key = param.getKey();
+        if (current.hasParameter(key)) {
+          currentMutant.removeParameters(key);
+        } 
+      }
+    }
+    
+    for (I_Parameter param: params) {
+      if (param != null) {
+        currentMutant.addParameter(param);
+      }
+    }
+    List<I_RoutineBrief> nested = overlay.getNestedRoutines();
+    for (I_RoutineBrief nest: nested) {
+      if (nest != null) {
+        String name = nest.getName();
+        RoutineBrief currentNest = (RoutineBrief) current.getNestedRoutine(name);
+        if (currentNest == null) {
+          currentMutant.addNestedRoutine(nest);
+        } else {
+          currentMutant.removeNestedRoutine(name);
+          RoutineBrief nestedOverlay = createOverlay(currentNest, nest);
+          currentMutant.addNestedRoutine(nestedOverlay);
+        }
+      }
+    }
+    return new RoutineBrief(currentMutant);
+  }
+  
   public I_FabricationRoutine createRoutine(String name,
       Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
     I_RoutineBrief brief = briefs_.get(name);
@@ -69,6 +118,12 @@ public class RoutineFactory implements I_RoutineFactory {
     Class<? extends I_FabricationRoutine> clazz = brief.getClazz();
     if (clazz == null) {
       throw new IllegalArgumentException(name);
+    }
+    String thread = system_.currentThreadName();
+    if ( !"main".equals(thread)) {
+      I_FabricateConstants constants = system_.getConstants();
+      I_SystemMessages sysMessges =  constants.getSystemMessages();
+      throw new IllegalStateException(sysMessges.getThisMethodMustBeCalledFromTheMainThread());
     }
     try {
       I_FabricationRoutine instance = clazz.newInstance();
@@ -137,7 +192,7 @@ public class RoutineFactory implements I_RoutineFactory {
       return null;
     }
     List<I_RoutineBrief> nested =  brief.getNestedRoutines();
-    RoutineFactory toRet = new RoutineFactory();
+    RoutineFactory toRet = new RoutineFactory(system_);
     for (I_RoutineBrief nest: nested) {
       toRet.add(nest);
     }
@@ -151,50 +206,5 @@ public class RoutineFactory implements I_RoutineFactory {
   public List<I_RoutineBrief> getValues() {
     return new ArrayList<I_RoutineBrief>(briefs_.values());
   }
-  
-  private RoutineBrief createOverlay(RoutineBrief current, I_RoutineBrief overlay) {
-    RoutineBriefMutant currentMutant = new RoutineBriefMutant(current);
-    Class<? extends I_FabricationRoutine> clazz = current.getClazz();
-    Class<? extends I_FabricationRoutine> newClazz = overlay.getClazz();
-    if (clazz == null) {
-      currentMutant.setClazz(newClazz);
-    } else if (newClazz != null) {
-      if ( !clazz.getName().equals(newClazz.getName())) {
-        currentMutant.setClazz(newClazz);
-      }
-    }
-    List<I_Parameter> params = overlay.getParameters();
-    for (I_Parameter param: params) {
-      if (param != null) {
-        String key = param.getKey();
-        if (current.hasParameter(key)) {
-          currentMutant.removeParameters(key);
-        } 
-      }
-    }
-    
-    for (I_Parameter param: params) {
-      if (param != null) {
-        currentMutant.addParameter(param);
-      }
-    }
-    List<I_RoutineBrief> nested = overlay.getNestedRoutines();
-    for (I_RoutineBrief nest: nested) {
-      if (nest != null) {
-        String name = nest.getName();
-        RoutineBrief currentNest = (RoutineBrief) current.getNestedRoutine(name);
-        if (currentNest == null) {
-          currentMutant.addNestedRoutine(nest);
-        } else {
-          currentMutant.removeNestedRoutine(name);
-          RoutineBrief nestedOverlay = createOverlay(currentNest, nest);
-          currentMutant.addNestedRoutine(nestedOverlay);
-        }
-      }
-    }
-    return new RoutineBrief(currentMutant);
-  }
-
-
   
 }
