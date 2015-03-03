@@ -48,7 +48,9 @@ public class FabSystem implements I_FabSystem {
   private final Map<String,String> argMap = new TreeMap<String,String>();
   private I_FabricateConstants constants_ = FabricateEnConstants.INSTANCE;
   private Executor executor_;
+  private List<ExecutorService> services_ = new ArrayList<ExecutorService>();
   private I_Print fileLog_;
+  
   
   public FabSystem() {
     fileIO_ = new FabFileIO(this);
@@ -80,6 +82,13 @@ public class FabSystem implements I_FabSystem {
     } else {
       return console.readLine(question, new Object[]{});
     }
+  }
+  
+  public void exit(int exitStatus) {
+    for (ExecutorService es: services_) {
+      es.shutdownNow();
+    }
+    System.exit(exitStatus);
   }
   
   @Override
@@ -242,7 +251,19 @@ public class FabSystem implements I_FabSystem {
   
   @Override
   public ExecutorService newFixedThreadPool(int size) {
-    return Executors.newFixedThreadPool(size);
+    if (size <= 1) {
+      ExecutorService toRet = Executors.newSingleThreadExecutor();
+      services_.add(toRet);
+      return toRet;
+    }
+    ExecutorService toRet = Executors.newFixedThreadPool(size);
+    services_.add(toRet);
+    return toRet;
+  }
+  
+  @Override
+  public I_GitCalls newGitCalls() {
+    return new GitCalls(this);
   }
   
   @Override
@@ -261,7 +282,7 @@ public class FabSystem implements I_FabSystem {
   }
   
   @Override
-  public I_RunMonitor newRunMonitor(I_LocatableRunable delegate, int counter) {
+  public I_RunMonitor newRunMonitor(I_LocatableRunnable delegate, int counter) {
     return new RunMonitor(this, delegate, counter);
   }
 
@@ -301,10 +322,5 @@ public class FabSystem implements I_FabSystem {
   public String getJavaVersion() {
     return ComputerInfoDiscovery.getJavaVersion(this);
   }
-
-
-
-
-
 
 }

@@ -1,12 +1,14 @@
 package org.adligo.fabricate.common.system;
 
 import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.util.StringUtils;
+import org.adligo.fabricate.models.common.I_ExecutionEnvironment;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * This is suppose to execute a process similar to a 
@@ -43,12 +45,17 @@ public class Executor implements I_Executor {
    * @see org.adligo.fabricate.common.system.I_Executor#executeProcess(java.io.File, java.lang.String)
    */
   @Override
-  public I_ExecutionResult executeProcess(String inDir, String ... args) throws IOException {
+  public I_ExecutionResult executeProcess(I_ExecutionEnvironment env, String inDir, String ... args) throws IOException {
     ProcessBuilderWrapper pb = sys_.newProcessBuilder(args);
     pb.redirectErrorStream(true);
+    Map<String,String> environment = pb.environment();
+    env.addAllTo(environment);
     
     File dir = null;
-    if (inDir != null) {
+    if (StringUtils.isEmpty(inDir)) {
+      dir = files_.instance(".");
+      pb.directory(dir);
+    } else {
       if (".".equals(inDir)) {
         File dirIn = files_.instance(inDir);
         inDir = dirIn.getAbsolutePath();
@@ -59,8 +66,9 @@ public class Executor implements I_Executor {
       }
       dir = files_.instance(inDir);
       pb.directory(dir);
-    }
+    } 
     Process p = pb.start();
+    
     try {
       p.waitFor();
     } catch (InterruptedException x) {
@@ -93,4 +101,36 @@ public class Executor implements I_Executor {
     return erm;
   }
 
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_Executor#startProcess(java.io.File, java.lang.String)
+   */
+  @Override
+  public I_ExecutingProcess startProcess(I_ExecutionEnvironment env, ExecutorService service, String inDir, String ... args) throws IOException {
+    ProcessBuilderWrapper pb = sys_.newProcessBuilder(args);
+    pb.redirectErrorStream(true);
+    Map<String,String> environment = pb.environment();
+    env.addAllTo(environment);
+    
+    File dir = null;
+    if (StringUtils.isEmpty(inDir)) {
+      dir = files_.instance(".");
+      pb.directory(dir);
+    } else {
+      if (".".equals(inDir)) {
+        File dirIn = files_.instance(inDir);
+        inDir = dirIn.getAbsolutePath();
+        char lastChar = inDir.charAt(inDir.length() -1);
+        if ('.' == lastChar) {
+          inDir = inDir.substring(0, inDir.length() - 2);
+        }
+      }
+      dir = files_.instance(inDir);
+      pb.directory(dir);
+    } 
+    Process p = pb.start();
+    ExecutingProcess ep = new ExecutingProcess(sys_, p);
+    service.execute(ep);
+    return ep;
+  }
 }

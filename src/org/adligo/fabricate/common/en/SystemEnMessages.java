@@ -3,8 +3,6 @@ package org.adligo.fabricate.common.en;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
-
-
   private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
       "Archive stage <X/>, task <Y/> is still running on project <Z/>.";
   private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING = 
@@ -78,6 +76,10 @@ public class SystemEnMessages implements I_SystemMessages {
       "Extraction of the following artifact;";
   private static final String EXTRACTING_THE_FOLLOWING_ARTIFACT = 
       "Extracting the following artifact;";
+  private static final String EXCEPTION_UNABLE_TO_FIND_SSH_AGENT_PID_WHEN_PARSING_OUTPUT_OF_SSH_AGENT =
+      "Exception: Unable to find SSH_AGENT_PID when parsing output of ssh-agent.";
+  private static final String EXCEPTION_UNABLE_TO_FIND_SSH_AUTH_SOCK_WHEN_PARSING_OUTPUT_OF_SSH_AGENT =
+      "Exception: Unable to find SSH_AUTH_SOCK when parsing output of ssh-agent.";
   
   private static final String FABRICATING = "Fabricating...";
   private static final String FABRICATE_ALREADY_RUNNING = 
@@ -90,19 +92,15 @@ public class SystemEnMessages implements I_SystemMessages {
   
   private static final String FAILED = "failed!";
   private static final String FINISHED = "finished.";
+  private static final String FINISHED_GIT_PULL_ON_PROJECT_X = 
+      "Finished git pull on project <X/>.";
+  private static final String FINISHED_GIT_CLONE_ON_PROJECT_X = 
+      "Finished git clone on project <X/>.";
   
   private static final String INSTEAD_OF_THE_FOLLOWING_ACTUAL_GENERIC_TYPE = 
       "Instead of the following actual generic type;";
   private static final String IT_WAS_EXPECTED_TO_IMPLEMENT_THE_FOLLOWING_INTERFACE = 
       "It was expected to implement the following interface;";
-  
-  
-  private static final String SENDING_OPTS_TO_SCRIPT = 
-      "Sending opts to script.";
-  
-  private static final String STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
-      "Starting download from the following url;";
-  public static final SystemEnMessages INSTANCE = new SystemEnMessages();
   
   private static final String MANAGING_FABRICATE_RUNTIME_CLASS_PATH_DEPENDENCIES = 
       "Managing Fabricate runtime class path dependencies.";
@@ -115,9 +113,23 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String PASSED_THE_EXTRACT_CHECK = "passed the extract check.";
   private static final String PASSED_THE_MD5_CHECK = "passed the md5 check.";
   
-  private static final String PLEASE_ENTER_YOUR_GIT_KEY_STORE_PASSWORD =
-      "Please enter your git key-store password (or just press "
-      + "enter for a key-store without a password).";
+  private static final String PLEASE_ENTER_YOUR_GIT_KEY_STORE_PASSPHRASE =
+      "Please enter your git ssh key-store passphrase (or just press "
+      + "enter for a key-store without a passphrase).";
+  private static final String PROJECTS_ARE_LOCATED_IN_THE_FOLLOWING_DIRECTORY = 
+      "Projects are located in the following directory;";
+  
+  private static final String SENDING_OPTS_TO_SCRIPT = 
+      "Sending opts to script.";
+  
+  private static final String STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
+      "Starting download from the following url;";
+  private static final String STARTING_GIT_PULL_ON_PROJECT_X = 
+      "Starting git pull on project <X/>.";
+  private static final String STARTING_GIT_CLONE_ON_PROJECT_X = 
+      "Starting git clone on project <X/>.";
+  
+  public static final SystemEnMessages INSTANCE = new SystemEnMessages();
   
   private static final String THE_DOWNLOAD_FROM_THE_FOLLOWING_URL = 
       "The download from the following url;";
@@ -133,14 +145,32 @@ public class SystemEnMessages implements I_SystemMessages {
       "The following list of Fabricate libraries contains a circular reference;";
   private static final String THE_FOLLOWING_REMOTE_REPOSITORY_APPEARS_TO_BE_DOWN = 
       "The following remote repository appears to be down;";
+  private static final String THE_FOLLOWING_COMMAND_LINE_PROGRAM_EXITED_ABNORMALLY_WITH_EXIT_CODE_X =
+      "The following command line program exited abnormally with exit code <X/>;";
   private static final String THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_DIRECTORY = 
       "There was a problem creating the following directory;";
   private static final String THERE_WAS_A_PROBLEM_CREATING_RUN_MARKER_IN_THE_FOLLOWING_DIRECTORY =
       "There was a problem creating run.marker in the following directory;";
   private static final String THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_ROUTINE = 
       "There was a problem creating the following routine;";
+  private static final String THERE_WAS_A_PROBLEM_DELETING_THE_FOLLOWING_DIRECTORY = 
+      "There was a problem deleting the following directory;";
   private static final String THIS_METHOD_MUST_BE_CALLED_FROM_THE_MAIN_THREAD_TRY_MOVING_THE_CALL_TO_SETUP =
       "This method must be called from the main thread (try moving the call to setup?).";
+  private static final String THIS_VERSION_OF_FABRICATE_REQUIRES_GIT_X_OR_GREATER = 
+      "This version of Fabricate requires Git <X/> or greater, and 'git --version' "
+      + "returned the following;";
+  
+  private static final String TRAIT_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Trait <X/>, task <Y/> is still running on project <Z/>.";
+  private static final String TRAIT_X_TASK_Y_IS_STILL_RUNNING = 
+      "Trait <X/>, task <Y/> is still running.";
+  private static final String TRAIT_X_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Trait <X/> is still running on project <Z/>.";
+  private static final String TRAIT_X_IS_STILL_RUNNING = 
+      "Trait <X/> is still running.";
+  private static final String TRAIT_X_IS_STILL_SETTING_UP = 
+      "Trait <X/> is still setting up.";
   
   private static final String TO_THE_FOLLOWING_FOLDER = "to the following folder;";
   
@@ -322,6 +352,16 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getExceptionUnableToFindSSH_AUTH_SOCKWhenParsingOutputOfSshAgent() {
+    return EXCEPTION_UNABLE_TO_FIND_SSH_AUTH_SOCK_WHEN_PARSING_OUTPUT_OF_SSH_AGENT;
+  }
+  
+  @Override
+  public String getExceptionUnableToFindSSH_AGENT_PIDWhenParsingOutputOfSshAgent() {
+    return EXCEPTION_UNABLE_TO_FIND_SSH_AGENT_PID_WHEN_PARSING_OUTPUT_OF_SSH_AGENT;
+  }
+  
+  @Override
   public String getExtractingTheFollowingArtifact() {
     return EXTRACTING_THE_FOLLOWING_ARTIFACT;
   }
@@ -353,6 +393,16 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getFinished() {
     return FINISHED;
   }
+  
+  @Override
+  public String getFinishedGetCloneOnProjectX() {
+    return FINISHED_GIT_CLONE_ON_PROJECT_X;
+  }
+  
+  @Override
+  public String getFinishedGetPullOnProjectX() {
+    return FINISHED_GIT_PULL_ON_PROJECT_X;
+  }
 
   @Override
   public String getItWasExpectedToImplementTheFollowingInterface() {
@@ -375,18 +425,23 @@ public class SystemEnMessages implements I_SystemMessages {
   } 
   
   @Override
-  public String getPleaseEnterYourGitKeystorePassword() {
-    return PLEASE_ENTER_YOUR_GIT_KEY_STORE_PASSWORD;
+  public String getProjectsAreLocatedInTheFollowingDirectory() {
+    return PROJECTS_ARE_LOCATED_IN_THE_FOLLOWING_DIRECTORY;
   } 
   
   @Override
   public String getStartingDownloadFromTheFollowingUrl() {
     return STARTING_DOWNLOAD_FROM_THE_FOLLOWING_URL;
   }
+
+  @Override
+  public String getStartingGetCloneOnProjectX() {
+    return STARTING_GIT_CLONE_ON_PROJECT_X;
+  }
   
   @Override
-  public String getToTheFollowingFolder() {
-    return TO_THE_FOLLOWING_FOLDER;
+  public String getStartingGetPullOnProjectX() {
+    return STARTING_GIT_PULL_ON_PROJECT_X;
   }
   
   @Override
@@ -414,6 +469,11 @@ public class SystemEnMessages implements I_SystemMessages {
     return THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND;
   }
   @Override
+  public String getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX() {
+    return THE_FOLLOWING_COMMAND_LINE_PROGRAM_EXITED_ABNORMALLY_WITH_EXIT_CODE_X;
+  }
+  
+  @Override
   public String getTheFollowingRemoteRepositoryAppearsToBeDown() {
     return THE_FOLLOWING_REMOTE_REPOSITORY_APPEARS_TO_BE_DOWN;
   }
@@ -434,6 +494,11 @@ public class SystemEnMessages implements I_SystemMessages {
   }
 
   @Override
+  public String getThereWasAProblemDeletingTheFollowingDirectory() {
+    return THERE_WAS_A_PROBLEM_DELETING_THE_FOLLOWING_DIRECTORY;
+  }
+  
+  @Override
   public String getThereWasAProblemCreatingTheFollowingDirectory() {
     return THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_DIRECTORY;
   }
@@ -446,6 +511,41 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getThisMethodMustBeCalledFromTheMainThread() {
     return THIS_METHOD_MUST_BE_CALLED_FROM_THE_MAIN_THREAD_TRY_MOVING_THE_CALL_TO_SETUP;
+  }
+
+  @Override
+  public String getThisVersionOfFabricateRequiresGitXOrGreater() {
+    return THIS_VERSION_OF_FABRICATE_REQUIRES_GIT_X_OR_GREATER;
+  }
+  
+  @Override
+  public String getTraitXIsStillSettingUp() {
+    return TRAIT_X_IS_STILL_SETTING_UP;
+  }
+  
+  @Override
+  public String getToTheFollowingFolder() {
+    return TO_THE_FOLLOWING_FOLDER;
+  }
+  
+  @Override
+  public String getTraitXIsStillRunning() {
+    return TRAIT_X_IS_STILL_RUNNING;
+  }
+  
+  @Override
+  public String getTraitXIsStillRunningOnProjectZ() {
+    return TRAIT_X_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getTraitXTaskYIsStillRunning() {
+    return TRAIT_X_TASK_Y_IS_STILL_RUNNING;
+  }
+
+  @Override
+  public String getTraitXTaskYIsStillRunningOnProjectZ() {
+    return TRAIT_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
   }
   
   @Override

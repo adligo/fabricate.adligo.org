@@ -11,11 +11,11 @@ import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabricateDefaults;
+import org.adligo.fabricate.common.system.GitCalls;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.depot.Depot;
 import org.adligo.fabricate.depot.DepotManager;
 import org.adligo.fabricate.depot.I_Depot;
-import org.adligo.fabricate.git.GitCalls;
 import org.adligo.fabricate.java.JavaJar;
 import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
@@ -30,7 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultSetup implements I_FabSetupStage {
+public class DefaultSetup 
+/*
+implements I_FabSetupStage 
+*/
+{
+  /*
   private final I_FabSystem sys_;
   private final I_FabFileIO files_; 
   private final I_FabXmlFileIO xmlFiles_; 
@@ -216,5 +221,5 @@ public class DefaultSetup implements I_FabSetupStage {
       settings.put(className, value);
     }
   }
-  
+  */
 }

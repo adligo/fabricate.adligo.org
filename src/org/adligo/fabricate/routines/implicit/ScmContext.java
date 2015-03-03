@@ -3,22 +3,13 @@ package org.adligo.fabricate.routines.implicit;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ScmContext {
-  /**
-   * key to the fabricate.xml scm parameter
-   * for the open ssl keystorePassword
-   * which must be encrypted in the file 
-   * using the encrypt, decrypt trait set in fabricate.xml 
-   * (or the implicit one).
-   */
-  public static final String KEYSTORE_PASSWORD = "keystorePassword";
-  /**
-   * key to the fabricate.xml scm parameter
-   * for the git protocol one of (https, ssh)
-   */
-  public static final String PROTOCOL = "protocol";
+
+
   /**
   * key to the fabricate.xml scm parameter
   * for the git server path
@@ -27,47 +18,85 @@ public class ScmContext {
   public static final String PATH = "path";
   /**
    * key to the fabricate.xml scm parameter
+   * for the git protocol one of (https, ssh)
+   */
+  public static final String PROTOCOL = "protocol";
+  /**
+   * key to the fabricate.xml scm parameter
+   * for the git port must be a positive integer.
+   */
+  public static final String PORT = "port";
+  /**
+   * key to the fabricate.xml scm parameter
    * for the git server hostname
    * (i.e. github.com)
    */
   public static final String HOSTNAME = "hostname";
+  /**
+   * key to the fabricate.xml scm paramter
+   * for the git server username.
+   */
+  public static final String USER = "user";
+  private static final Set<String> KNOWN_PROTOCOLS = getKnownProtocols();
+  
+  private static Set<String> getKnownProtocols() {
+    Set<String> toRet = new HashSet<String>();
+    toRet.add("ssh");
+    toRet.add("https");
+    return Collections.unmodifiableSet(toRet);
+  }
+  
   private final String hostname_;
   private final String path_;
   private final String protocol_;
-  private final String keystorePassword_;
+  private final int port_;
+  private final String username_;
   
-  public ScmContext(I_RoutineBrief routine, String keystorePassword) {
-    List<String> hostnames = routine.getParameters(HOSTNAME);
-    if (hostnames == null || hostnames.size() < 1) {
-      throw new IllegalArgumentException(HOSTNAME);
-    }
-    hostname_ = hostnames.get(0);
+  public ScmContext(I_RoutineBrief routine) {
+   
+    hostname_ = routine.getParameter(HOSTNAME);
     if (StringUtils.isEmpty(hostname_)) {
       throw new IllegalArgumentException(HOSTNAME);
     }
     
-    List<String> paths = routine.getParameters(PATH);
-    if (paths == null || paths.size() < 1) {
+    String path = routine.getParameter(PATH);
+    if (StringUtils.isEmpty(path)) {
       throw new IllegalArgumentException(PATH);
     }
-    path_ = paths.get(0);
-    if (StringUtils.isEmpty(path_)) {
-      throw new IllegalArgumentException(PATH);
-    }
+    //fix the path for lazy usage
+    if (path.charAt(path.length() - 1) != '/') {
+        path = path + "/";
+    } 
+    if (path.charAt(0) != '/') {
+      path = "/" + path;
+    } 
+    path_ = path;
     
-    List<String> protocols = routine.getParameters(PROTOCOL);
-    if (paths == null || paths.size() < 1) {
-      protocol_ = "https";
+    String protocol = routine.getParameter(PROTOCOL);
+    if (StringUtils.isEmpty(protocol)) {
+      protocol_ = "https"; 
     } else {
-      String protocol = protocols.get(0);
-      if (StringUtils.isEmpty(protocol)) {
-        protocol_ = "https"; 
-      } else {
-        protocol_ = protocol;
-      }
+      protocol_ = protocol.toLowerCase();
     }
-    //may be empty for ssh without a keystore password
-    keystorePassword_ = keystorePassword;
+    if ( !KNOWN_PROTOCOLS.contains(protocol_)) {
+      throw new IllegalArgumentException(PROTOCOL);
+    }
+    String port = routine.getParameter(PORT);
+    if (StringUtils.isEmpty(port)) {
+      if ("ssh".equals(protocol_)) {
+        port_ = 22;
+      } else {
+        port_ = 443;
+      }
+    } else {
+      port_ = Integer.parseInt(port);
+    }
+    String user = routine.getParameter(USER);
+    if (StringUtils.isEmpty(user)) {
+      username_ = "";
+    } else {
+      username_ = user;
+    }
   }
   
   public String getHostname() {
@@ -79,8 +108,13 @@ public class ScmContext {
   public String getProtocol() {
     return protocol_;
   }
-  public String getKeystorePassword() {
-    return keystorePassword_;
+
+  public String getUsername() {
+    return username_;
+  }
+
+  public int getPort() {
+    return port_;
   }
   
   /*

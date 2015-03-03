@@ -1,6 +1,6 @@
 package org.adligo.fabricate.models.common;
 
-import org.adligo.fabricate.common.system.I_LocatableRunable;
+import org.adligo.fabricate.common.system.I_LocatableRunnable;
 
 
 
@@ -18,7 +18,7 @@ import org.adligo.fabricate.common.system.I_LocatableRunable;
  * @author scott
  *
  */
-public interface I_FabricationRoutine extends I_Fabrication, I_LocatableRunable {
+public interface I_FabricationRoutine extends I_Fabrication, I_LocatableRunnable {
 
   public I_RoutineFactory getTaskFactory();
   
@@ -38,5 +38,5 @@ public interface I_FabricationRoutine extends I_Fabrication, I_LocatableRunable 
    * @param memory this is global memory for the entire fabrication.
    * @param routineMemory this is memory scoped to a set of routine instances of the same class.
    */
-  public void setup(I_FabricationMemory memory, I_RoutineMemory routineMemory) throws FabricationRoutineCreationException;
+  public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory) throws FabricationRoutineCreationException;
 }

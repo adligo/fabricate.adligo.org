@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class CommandLineEnConstants implements I_CommandLineConstants {
   public static final CommandLineEnConstants INSTANCE = new CommandLineEnConstants();
+
+  
   private static final String A = "-a";
   private static final String ARCHIVE = "--archive";
   /**
@@ -18,20 +20,15 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   private static final String CONFIRM = "--confirm-repository-integrity";
   private static final String D = "-d";
   private static final String DEVELOPMENT = "--development";
-  private static final String G = "-g";
-  private static final String GROW_BRANCHES = "--grow-branches";
 
   private static final String L = "-l";
   private static final String LOG = "--log-verbosely";
-  private static final String M = "-m";
-  private static final String MARK_VERSIONS = "--mark-versions";
+  private static final String N = "-n";
+  private static final String NO_SSH_PASSPHRASE = "--no-ssh-keystore-passphrase";
   private static final String P = "-p";
   private static final String PURGE = "--purge";
   private static final String R = "-r";
   private static final String REBUILD = "--rebuild-dependents";
-  
-  private static final String S = "-s";
-  private static final String SHARE = "--share";
   
   /**
    * key to a comma delimited String which turns into a  key to a List<String>
@@ -60,12 +57,10 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
     map_.put(ARCHIVE, A);
     map_.put(CONFIRM, C);
     map_.put(DEVELOPMENT, D);
-    map_.put(GROW_BRANCHES, G);
     map_.put(LOG, L);
-    map_.put(MARK_VERSIONS, M);
+    map_.put(NO_SSH_PASSPHRASE, N);
     map_.put(PURGE, P);
     map_.put(REBUILD, R);
-    map_.put(SHARE, S);
     map_.put(TEST, T);
     map_.put(UPDATE, U);
     map_.put(VERSION, V);
@@ -108,27 +103,11 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   }
 
   @Override
-  public String getGrowBranches(boolean alias) {
-    if (alias) {
-      return G;
-    }
-    return GROW_BRANCHES;
-  }
-  
-  @Override
   public String getLog(boolean alias) {
     if (alias) {
       return L;
     }
     return LOG;
-  }
-  
-  @Override
-  public String getShare(boolean alias) {
-    if (alias) {
-      return S;
-    }
-    return SHARE;
   }
 
   @Override
@@ -150,13 +129,13 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   }
   
   @Override
-  public String getMarkVersions(boolean alias) {
+  public String getNoSshKeystorePassPhrase(boolean alias) {
     if (alias) {
-      return M;
+      return N;
     }
-    return MARK_VERSIONS;
+    return NO_SSH_PASSPHRASE;
   }
-
+  
   @Override
   public String getPurge(boolean alias) {
     if (alias) {

@@ -13,6 +13,5 @@ import java.util.List;
  *
  */
 public interface I_ProjectBriefsAware extends I_FabricateAware, I_FabricationRoutine {
-  public List<String> getProjectsToSkip();
-  public void setProjectsToSkip(List<String> projectNames);
+
 }

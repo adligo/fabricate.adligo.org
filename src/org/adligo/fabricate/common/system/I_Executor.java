@@ -1,6 +1,10 @@
 package org.adligo.fabricate.common.system;
 
+import org.adligo.fabricate.models.common.I_ExecutionEnvironment;
+
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Implementations of this interface are expected to be
@@ -23,12 +27,27 @@ public interface I_Executor {
    *    throw new IOException(er.getOutput());
    * }
    * </code></pre>
+   * 
+   * Note this method should only be used for short processes (less than 3 seconds)
+   * for longer processes use startProcess.
    * @param inDir
    * @param args
    * @return
    * @throws IOException when there was a IOException reading the output 
    * of the process.
    */
-  public abstract I_ExecutionResult executeProcess(String inDir, String... args) throws IOException;
+  public abstract I_ExecutionResult executeProcess(
+      I_ExecutionEnvironment env, String inDir, String... args) throws IOException;
 
+  /**
+   * This method is similar to executeProcess, 
+   * however it is designed for longer running processes.
+   * @param service a single thread executor service.
+   * @param inDir
+   * @param args
+   * @return
+   * @throws IOException
+   */
+  public abstract I_ExecutingProcess startProcess(
+      I_ExecutionEnvironment env, ExecutorService service, String inDir, String... args) throws IOException;
 }

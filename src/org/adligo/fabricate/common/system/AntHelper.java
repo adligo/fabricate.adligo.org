@@ -1,6 +1,4 @@
-package org.adligo.fabricate.git;
-
-import org.adligo.fabricate.common.system.FabSystem;
+package org.adligo.fabricate.common.system;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,11 +22,12 @@ public class AntHelper {
 	  String dir = args[0];
 		try {
 		  FabSystem sys = new FabSystem();
-      if (!GitCalls.check(sys.getExecutor())) {
+		  I_GitCalls calls = sys.newGitCalls();
+      if (!calls.check(sys.getExecutor())) {
         System.out.println("Git does NOT appear to be installed, please install it.");
         return;
       }
-      String desc = GitCalls.describe(sys);
+      String desc = calls.describe();
       File file = new File(dir + File.separator + "version.properties");
       System.out.println("writing " + file.getAbsolutePath());
       FileOutputStream fos = new FileOutputStream(file);

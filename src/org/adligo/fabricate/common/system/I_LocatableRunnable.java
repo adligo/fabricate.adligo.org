@@ -5,7 +5,7 @@ package org.adligo.fabricate.common.system;
  * @author scott
  *
  */
-public interface I_LocatableRunable extends Runnable {
+public interface I_LocatableRunnable extends Runnable {
   /**
    * This should user readable information about
    * where the routine is currently executing.
@@ -22,4 +22,11 @@ public interface I_LocatableRunable extends Runnable {
    * @return
    */
   public String getCurrentLocation();
+  /**
+   * This method provides a way for additional information
+   * to be passed to the main fabricate monitor like
+   * what git is doing.
+   * @return
+   */
+  public String getAdditionalDetail();
 }

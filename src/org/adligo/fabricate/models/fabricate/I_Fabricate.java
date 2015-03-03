@@ -28,6 +28,10 @@ public interface I_Fabricate extends I_JavaSettings {
   public I_JavaSettings getJavaSettings();
   
   public List<I_ProjectBrief> getProjects();
+  /**
+   * includes the last File.separatorChar.
+   * @return
+   */
   public String getProjectsDir();
   
   public List<String> getRemoteRepositories();

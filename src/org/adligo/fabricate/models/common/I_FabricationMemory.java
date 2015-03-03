@@ -9,11 +9,11 @@ import java.util.Map;
  * @author scott
  *
  */
-public interface I_FabricationMemory {
-  public Map<String,Object> get();
+public interface I_FabricationMemory <T> {
+  public Map<String,T> get();
   /**
    * @param key
    * @return
    */
-  public Object get(String key);
+  public T get(String key);
 }

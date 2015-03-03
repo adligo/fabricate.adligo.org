@@ -2,15 +2,15 @@ package org.adligo.fabricate.common.system;
 
 import org.adligo.fabricate.common.log.I_FabLog;
 
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RunMonitor implements I_RunMonitor {
+public class ExecutingProcess implements I_ExecutingProcess {
   private final I_FabSystem system_;
   private final I_FabLog log_;
-  private final I_LocatableRunnable delegate_;
-  private final int sequence_;
+  private final ProcessRunnable delegate_;
   
   private AtomicBoolean finished_ = new AtomicBoolean(false);
   private ArrayBlockingQueue<Boolean> done_;
@@ -22,12 +22,11 @@ public class RunMonitor implements I_RunMonitor {
    * @param delegate
    * @param sequence
    */
-  public RunMonitor(I_FabSystem system, I_LocatableRunnable delegate, int sequence) {
+  public ExecutingProcess(I_FabSystem system, Process process) {
     system_ = system;
     log_ = system.getLog();
     done_ = system_.newArrayBlockingQueue(Boolean.class, 1);
-    delegate_ = delegate;
-    sequence_ = sequence;
+    delegate_ = new ProcessRunnable(process);
   }
   
   @SuppressWarnings("boxing")
@@ -68,6 +67,9 @@ public class RunMonitor implements I_RunMonitor {
     if (caught_ == null) {
       return false;
     }
+    if (delegate_.getExitCode() == 0) {
+      return false;
+    }
     return true;
   }
   
@@ -83,16 +85,27 @@ public class RunMonitor implements I_RunMonitor {
    * @see org.adligo.fabricate.common.system.I_RunMonitor#getDelegate()
    */
   @Override
-  public I_LocatableRunnable getDelegate() {
+  public Runnable getDelegate() {
     return delegate_;
   }
-  /* (non-Javadoc)
-   * @see org.adligo.fabricate.common.system.I_RunMonitor#getSequence()
-   */
+
   @Override
-  public int getSequence() {
-    return sequence_;
+  public List<String> getOutput() {
+    return delegate_.getOutput();
   }
 
+  @Override
+  public void writeInputToProcess(String input, String charSet) {
+    delegate_.writeInputToProcess(input, charSet);
+  }
+
+  @Override
+  public int getExitCode() {
+    return delegate_.getExitCode();
+  }
+
+  public void destroy() {
+    delegate_.destroy();
+  }
 
 }

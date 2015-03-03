@@ -3,6 +3,7 @@ package org.adligo.fabricate.common.system;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.util.StringUtils;
+import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 
 import java.net.UnknownHostException;
 import java.util.Collections;
@@ -27,7 +28,8 @@ public class ComputerInfoDiscovery {
     try {
       if (MAC.equals(os)) {
         I_Executor exe = sys.getExecutor();
-        I_ExecutionResult er = exe.executeProcess(".", "sysctl", "-a"); 
+        I_ExecutionResult er = exe.executeProcess( FabricationMemoryConstants.EMPTY_ENV,
+            ".", "sysctl", "-a"); 
         String cpu = er.getOutput();
         int index = cpu.indexOf(".cpu.brand_string");
         if (index != -1) {
@@ -39,13 +41,15 @@ public class ComputerInfoDiscovery {
         return new String[] {cpu, sysMessages.getUnknown()};
       } else if (WINDOWS.equals(os)){
         I_Executor exe = sys.getExecutor();
-        I_ExecutionResult er = exe.executeProcess(".", "wmic", "cpu", "get", "name"); 
+        I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
+            ".", "wmic", "cpu", "get", "name"); 
         String cpu = er.getOutput();
         cpu = cpu.replaceFirst("Name", "").trim();
         return parseCpuInfo(cpu, 0);
       } else {
         I_Executor exe = sys.getExecutor();
-        I_ExecutionResult er = exe.executeProcess(".", "cat", "/proc/cpuinfo"); 
+        I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
+            ".", "cat", "/proc/cpuinfo"); 
         String cpu = er.getOutput();
         int index = cpu.indexOf("model name\t: ");
         if (index != -1) {
@@ -156,7 +160,8 @@ public class ComputerInfoDiscovery {
     if (MAC.equals(os)) {
       try {
         I_Executor exe = sys.getExecutor();
-        I_ExecutionResult er = exe.executeProcess(".", "sw_vers", "-productVersion");
+        I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
+            ".", "sw_vers", "-productVersion");
         String ver = er.getOutput();
         if (ver != null) {
           StringBuilder sb = getVersionNumbersAndDots(ver);

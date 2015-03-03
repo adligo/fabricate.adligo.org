@@ -5,8 +5,9 @@ import org.adligo.fabricate.common.FabRunType;
 import org.adligo.fabricate.common.I_FabStage;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.system.FabSystem;
+import org.adligo.fabricate.common.system.GitCalls;
+import org.adligo.fabricate.common.system.I_GitCalls;
 import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.git.GitCalls;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectsType;
@@ -26,7 +27,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author scott
  *
  */
-public class GitStage extends OldBaseConcurrentStage implements I_FabStage {
+public class GitStage 
+/*
+extends OldBaseConcurrentStage implements I_FabStage 
+*/
+{
+  /*
   private final ConsolePasswordDialog consolePasswordDialog_;
   private ConcurrentLinkedQueue<ProjectType> projects_ = new ConcurrentLinkedQueue<ProjectType>();
   private int projectCount_;
@@ -57,13 +63,7 @@ public class GitStage extends OldBaseConcurrentStage implements I_FabStage {
     FabricateType fab = ctx.getFabricate();
     StagesAndProjectsType stageAndProj = fab.getProjectGroup();
     ProjectsType projects = stageAndProj.getProjects();
-    /*
-    ScmType scm = projects.getScm();
-    GitServerType git =  scm.getGit();
-    gitUser_ = git.getUser();
-    gitHost_ = git.getHostname();
-    gitPath_ = git.getPath();
-    */
+   
     List<ProjectType> projTypes =  projects.getProject();
     projects_.clear();
     if (log_.isLogEnabled(GitStage.class)) {
@@ -83,7 +83,7 @@ public class GitStage extends OldBaseConcurrentStage implements I_FabStage {
       String gitCommand = ctx_.getArgValue("git");
       
       //TODO this system should be passed
-      GitCalls gc = new GitCalls(new FabSystem());
+      I_GitCalls gc = new GitCalls(new FabSystem());
       gc.setHostname(gitHost_);
       gc.setRemotePath(gitPath_);
       gc.setUser(gitUser_);
@@ -144,7 +144,7 @@ public class GitStage extends OldBaseConcurrentStage implements I_FabStage {
     }
   }
 
-  public void cloneAndCheckout(ProjectType project, GitCalls gc, String proj) {
+  public void cloneAndCheckout(ProjectType project, I_GitCalls gc, String proj) {
     if (log_.isLogEnabled(GitStage.class)) {
       log_.println("Starting git clone for " + proj);
     }
@@ -173,5 +173,5 @@ public class GitStage extends OldBaseConcurrentStage implements I_FabStage {
       }
     }
   }
-
+*/
 }

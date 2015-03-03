@@ -41,7 +41,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author scott
  *
  */
-public abstract class OldBaseConcurrentStage implements I_FabStage {
+public abstract class OldBaseConcurrentStage 
+/*
+implements I_FabStage 
+*/
+{
+  /*
   protected String stageName_;
   protected String projectsPath_;
   protected I_RunContext ctx_;
@@ -53,13 +58,12 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
   private volatile Exception lastException_ = null;
   private Map<String,String> stageParams_ = null;
   private Map<String,Map<String,String>> taskParams_ = null;
-  /**
-   * the key to this is the current threads projects name space
-   * the blocking projects name the value is a ArrayBlockingQueue
-   * with size 1 that the current thread adds to the concurrent hash
-   * map, when a project finishes it spins through the map entries
-   * looking for it's name and adds a item to the BlockingQueue. 
-   */
+  
+   // the key to this is the current threads projects name space
+   // the blocking projects name the value is a ArrayBlockingQueue
+   // with size 1 that the current thread adds to the concurrent hash
+   // map, when a project finishes it spins through the map entries
+   // looking for it's name and adds a item to the BlockingQueue. 
   private ConcurrentHashMap<ProjectBlock, ArrayBlockingQueue<Boolean>> projectBlockMap_ =
       new ConcurrentHashMap<ProjectBlock, ArrayBlockingQueue<Boolean>>();
   
@@ -176,27 +180,18 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
     stageName_ = stageName;
   }
 
-  /**
-   * This method returns a cached non unmodifiable instance
-   * created by setup from the fabricate.xml file, so if it's null 
-   * there is probably calling code that didn't call setup.
-   * 
-   * 
-   * @param project
-   * @return
-   */
+   // This method returns a cached non unmodifiable instance
+   // created by setup from the fabricate.xml file, so if it's null 
+   // there is probably calling code that didn't call setup.
+   
   public Map<String,String> getParams() {
     return stageParams_;
   }
 
-  /**
-   * This method returns a instance
-   * with the project.xml stage params overriding the fabricate.xml stage params.
-   * This should be done in the child class setup and cached as a instance
-   * variable.  
-   * @param project
-   * @return
-   */
+  // This method returns a instance
+  // with the project.xml stage params overriding the fabricate.xml stage params.
+  // This should be done in the child class setup and cached as a instance
+  // variable.  
   public Map<String,String> getParams(FabricateProjectType project) {
     Map<String,String> toRet = new HashMap<String,String>();
     toRet.putAll(stageParams_);
@@ -220,14 +215,10 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
     return toRet;
   }
   
-  /**
-   * This method returns a instance
-   * with the project.xml stage params overriding the fabricate.xml stage params.
-   * This should be done in the child class setup and cached as a instance
-   * variable.  
-   * @param project
-   * @return
-   */
+   // This method returns a instance
+   // with the project.xml stage params overriding the fabricate.xml stage params.
+   // This should be done in the child class setup and cached as a instance
+   // variable.  
   public Map<String,String> getParams(String task, FabricateProjectType project) {
     Map<String,String> toRet = new HashMap<String,String>();
     if (taskParams_ != null) {
@@ -270,15 +261,10 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
     return toRet;
   }
   
-  /**
-   * A threadsafe method to determine if this project
-   * is participating in this stage, for I_FabTask
-   * implementations that require participation ie
-   * CompileAndJar.
-   * @deprecated @see {@link I_ParticipationAware}
-   * @param project
-   * @return
-   */
+   // A threadsafe method to determine if this project
+   // is participating in this stage, for I_FabTask
+   // implementations that require participation ie
+   // CompileAndJar.
   public boolean isParticipant(FabricateProjectType project) {
     ProjectStagesType st = project.getStages();
     if (st != null) {
@@ -293,14 +279,10 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
     return false;
   }
   
-  /**
-   * this method will build a queue 
-   * for sub classes that require participation.
-   * This also updates the projects to done 
-   * in the ProjectsMemeory
-   * 
-   * @return
-   */
+   // this method will build a queue 
+   // for sub classes that require participation.
+   // This also updates the projects to done 
+   // in the ProjectsMemeory
   @SuppressWarnings("unchecked")
   public ConcurrentLinkedQueue<NamedProject> getParticipantQueue() {
     ConcurrentLinkedQueue<NamedProject> queue = getNewProjectDependencyOrder();
@@ -323,15 +305,12 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
     return new ConcurrentLinkedQueue<NamedProject>(list);
   }
   
-  /**
-   * This method can be called by stage/tasks after LoadAndCleanProjects
-   * to obtain a new project queue, if a task for a project
-   * depends on other projects being finished the methods
-   * hasProjectFinishedStage and 
-   * setProjectFinisedForStage can be used to make sure
-   * that execution happens in a nice orderly manor.
-   * @return
-   */
+   // This method can be called by stage/tasks after LoadAndCleanProjects
+   // to obtain a new project queue, if a task for a project
+   // depends on other projects being finished the methods
+   // hasProjectFinishedStage and 
+   // setProjectFinisedForStage can be used to make sure
+   // that execution happens in a nice orderly manor.
   @SuppressWarnings("unchecked")
   protected ConcurrentLinkedQueue<NamedProject> getNewProjectDependencyOrder() {
     ConcurrentHashMap<String, AtomicBoolean> projectStates = new ConcurrentHashMap<String, AtomicBoolean>();
@@ -411,4 +390,5 @@ public abstract class OldBaseConcurrentStage implements I_FabStage {
       }
     }
   }
+  */
 }

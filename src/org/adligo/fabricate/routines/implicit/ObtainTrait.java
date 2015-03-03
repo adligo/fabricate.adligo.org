@@ -12,21 +12,39 @@ import org.adligo.fabricate.routines.ProjectBriefQueueRoutine;
  *
  */
 public class ObtainTrait extends ProjectBriefQueueRoutine {
+  public static final String CLONE = "clone";
+  public static final String CHECKOUT = "checkout";
+  public static final String UPDATE = "update";
+  public static final String LOAD = "load";
   public static final String NAME = "obtain";
   public static final RoutineBrief ROUTINE_BRIEF = getRoutineBrief();
   
   private static RoutineBrief getRoutineBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();
-    rbm.setClazz(ScmTrait.class);
+    rbm.setClazz(ScmRoutine.class);
     rbm.setName(NAME);
     rbm.setOrigin(RoutineBriefOrigin.IMPLICIT_TRAIT);
     
     RoutineBriefMutant clone = new RoutineBriefMutant();
     clone.setClazz(GitCloneRoutine.class);
-    clone.setName("clone");
+    clone.setName(CLONE);
     clone.setOrigin(RoutineBriefOrigin.IMPLICIT_TRAIT_TASK);
     
     rbm.addNestedRoutine(clone);
+    
+    RoutineBriefMutant update = new RoutineBriefMutant();
+    update.setClazz(GitUpdateRoutine.class);
+    update.setName(UPDATE);
+    update.setOrigin(RoutineBriefOrigin.IMPLICIT_TRAIT_TASK);
+    
+    rbm.addNestedRoutine(update);
+    
+    RoutineBriefMutant checkout = new RoutineBriefMutant();
+    checkout.setClazz(GitCloneRoutine.class);
+    checkout.setName(CHECKOUT);
+    checkout.setOrigin(RoutineBriefOrigin.IMPLICIT_TRAIT_TASK);
+    
+    rbm.addNestedRoutine(checkout);
     
     return new RoutineBrief(rbm);
   }

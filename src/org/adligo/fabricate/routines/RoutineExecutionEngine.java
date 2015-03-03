@@ -2,7 +2,7 @@ package org.adligo.fabricate.routines;
 
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
-import org.adligo.fabricate.common.system.I_LocatableRunable;
+import org.adligo.fabricate.common.system.I_LocatableRunnable;
 import org.adligo.fabricate.common.system.I_RunMonitor;
 import org.adligo.fabricate.models.common.FabricationMemory;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
@@ -29,11 +29,21 @@ public class RoutineExecutionEngine {
   
   public void runRoutines(FabricationMemoryMutant memoryMut)
       throws FabricationRoutineCreationException {
+    if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
+      log_.println(RoutineExecutionEngine.class.getName() + " runRoutines(FabricationMemoryMutant)");
+    }
     
     FabricationMemoryMutant routineMemoryMutant = new FabricationMemoryMutant();
     I_FabricationRoutine routine = factory_.build(memoryMut, routineMemoryMutant);
+    
     if (routine == null) {
+      if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
+        log_.println("build of " + factory_.getClass().getName() + " returned null");
+      }
       return;
+    }
+    if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
+      log_.println("created " + routine.getClass());
     }
     FabricationMemory memory = new FabricationMemory(memoryMut);
     FabricationMemory routineMemory = new FabricationMemory(routineMemoryMutant);
@@ -43,6 +53,9 @@ public class RoutineExecutionEngine {
         ExecutorService service =  system_.newFixedThreadPool(threads_);
         for (int i = 0; i < threads_; i++) {
           I_RunMonitor monitor = system_.newRunMonitor(routine, i + 1);
+          if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
+            log_.println("submiting " + routine.getClass());
+          }
           service.submit(monitor);
           monitors_.add(monitor);
           routine = factory_.build(memory, routineMemory);
@@ -56,8 +69,14 @@ public class RoutineExecutionEngine {
             }
             if (!rm.isFinished()) {
               if (counter >= 3) {
-                I_LocatableRunable lr = rm.getDelegate();
-                log_.println(lr.getCurrentLocation());
+                I_LocatableRunnable lr = rm.getDelegate();
+                String message = lr.getCurrentLocation();
+                String additional = lr.getAdditionalDetail();
+                if (additional != null) {
+                  message = message + system_.lineSeperator() +
+                      additional + system_.lineSeperator() + system_.lineSeperator();
+                }
+                log_.println(message);
               }
               try {
                 rm.waitUntilFinished(1000);

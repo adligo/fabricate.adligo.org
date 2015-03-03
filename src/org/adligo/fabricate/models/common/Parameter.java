@@ -28,11 +28,24 @@ public class Parameter implements I_Parameter {
     }
     return toRet;
   }
+  private static final List<I_Parameter> EMPTY_LIST = Collections.emptyList();
+  
   private final List<I_Parameter> children_;
   private final String key_;
   private final String value_;
   private final int hashCode_;
 
+  public Parameter(String key, String value) {
+    this(key,value, EMPTY_LIST);
+  }
+  
+  public Parameter(String key, String value, List<I_Parameter> children) {
+    key_ = key;
+    value_ = value;
+    children_ = newChildren(children);
+    hashCode_ = ParameterMutant.hashCode(this);
+  }
+  
   public Parameter(I_Parameter other) {
     key_ = other.getKey();
     value_ = other.getValue();

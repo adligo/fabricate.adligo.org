@@ -29,7 +29,7 @@
 		    <fileset dir="lib" includes="*.jar"/>
 			<pathelement location="build/classes" />
 		 </path>
-	    <java classname="org.adligo.fabricate.git.AntHelper" classpathref="all.path.ref">
+	    <java classname="org.adligo.fabricate.common.system.AntHelper" classpathref="all.path.ref">
 	       <arg value="build"/>
 	    </java>
 	    <loadproperties>

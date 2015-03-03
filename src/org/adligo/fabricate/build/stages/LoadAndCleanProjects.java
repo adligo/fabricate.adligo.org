@@ -37,7 +37,12 @@ import java.util.concurrent.Semaphore;
  * @author scott
  *
  */
-public class LoadAndCleanProjects extends OldBaseConcurrentStage implements I_FabStage {
+public class LoadAndCleanProjects
+/*
+extends OldBaseConcurrentStage implements I_FabStage 
+*/
+{
+  /*
   public static final String COULD_NOT_FIND_THE_FILE = "Could not find the file ";
 
   private boolean run_ = true;
@@ -176,13 +181,9 @@ public class LoadAndCleanProjects extends OldBaseConcurrentStage implements I_Fa
   }
   
   
-  /**
-   * Note project dependency order is the order 
-   * of projects based on their project dependency.
-   * It doesn't look at external dependencies.
-   * @param ctx_
-   * @throws IllegalStateException
-   */
+   // Note project dependency order is the order 
+   //of projects based on their project dependency.
+   // It doesn't look at external dependencies.
   private void calcProjectDependencyOrder(I_RunContext ctx_) throws IllegalStateException {
     if (log_.isLogEnabled(LoadAndCleanProjects.class)) {
       log_.println("Calculating project dependency order for " + 
@@ -287,5 +288,5 @@ public class LoadAndCleanProjects extends OldBaseConcurrentStage implements I_Fa
     ctx_.putInMemory(DefaultMemoryConstants.PROJECTS_DEPENDENCY_ORDER, list);
   }
 
-  
+  */
 }

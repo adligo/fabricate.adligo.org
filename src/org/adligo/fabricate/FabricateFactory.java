@@ -1,9 +1,12 @@
 package org.adligo.fabricate;
 
+import org.adligo.fabricate.common.system.FabSystem;
+import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.managers.CommandManager;
+import org.adligo.fabricate.managers.ProjectsManager;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
@@ -34,7 +37,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FabricateFactory implements I_RepositoryFactory {
   
-  public Fabricate create(I_FabSystem sys, FabricateType fab, I_FabricateXmlDiscovery xmlDisc) throws ClassNotFoundException {
+  public Fabricate create(FabSystem sys, FabricateType fab, I_FabricateXmlDiscovery xmlDisc) throws ClassNotFoundException {
     FabricateMutant fm = new FabricateMutant(fab, xmlDisc);
     String fabHome = FabricateEnvironment.INSTANCE.getFabricateHome(sys);
     fm.setFabricateHome(fabHome);
@@ -42,7 +45,8 @@ public class FabricateFactory implements I_RepositoryFactory {
     fm.setFabricateRepository(fabRepository);
     String javaHome = FabricateEnvironment.INSTANCE.getJavaHome(sys);
     fm.setJavaHome(javaHome);
-    //return new Fabricate(fm);
+    FabSystemSetup.setup(sys, fab);
+    
     Fabricate tf = new Fabricate(fm);
     FabricateDependencies deps = fab.getDependencies();
     if (deps != null) {
@@ -94,12 +98,16 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new LibraryResolver(sys, fabricate);
   }
 
-  public FabricationMemoryMutant createMemory() {
-    return new FabricationMemoryMutant();
+  public FabricationMemoryMutant<Object> createMemory() {
+    return new FabricationMemoryMutant<Object>();
   }
   
   public FabricateMutant createMutant(Fabricate fab) {
     return new FabricateMutant(fab);
+  }
+  
+  public ProjectsManager createProjectsManager(I_FabSystem system,  RoutineFabricateFactory factory) {
+    return new ProjectsManager(system, factory);
   }
   
   public RepositoryManager createRepositoryManager(I_FabSystem sys, I_Fabricate fab) {

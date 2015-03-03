@@ -8,8 +8,9 @@ import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.NamedProject;
 import org.adligo.fabricate.common.log.ThreadLocalPrintStream;
 import org.adligo.fabricate.common.system.FabSystem;
+import org.adligo.fabricate.common.system.GitCalls;
+import org.adligo.fabricate.common.system.I_GitCalls;
 import org.adligo.fabricate.depot.I_Depot;
-import org.adligo.fabricate.git.GitCalls;
 import org.adligo.fabricate.java.ManifestParser;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
@@ -19,7 +20,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CompileJarAndDeposit extends OldBaseConcurrentStage implements I_FabStage {
+public class CompileJarAndDeposit 
+/*
+extends OldBaseConcurrentStage implements I_FabStage
+*/ {
+  /*
   private ConcurrentLinkedQueue<NamedProject> projectsQueue_;
   private final Semaphore semaphore_ = new Semaphore(1);
   private AtomicInteger projectsFinished_ = new AtomicInteger(0);
@@ -57,7 +62,8 @@ public class CompileJarAndDeposit extends OldBaseConcurrentStage implements I_Fa
         waitForDependentProjectsToFinish(p);
         compile.execute();
         //TODO this system should be passed not created
-        String projectVersion = GitCalls.describe(new FabSystem(), compile.getProjectPath());
+        I_GitCalls calls = new GitCalls(new FabSystem());
+        String projectVersion = calls.describe( compile.getProjectPath());
         OldJarTask jar = new OldJarTask();
         if ( !params.containsKey(ManifestParser.SPECIFICATION_VERSION)) {
           params.put(ManifestParser.SPECIFICATION_VERSION, projectVersion);
@@ -122,7 +128,7 @@ public class CompileJarAndDeposit extends OldBaseConcurrentStage implements I_Fa
       //do nothing this thread didn't acquire the lock
     }
   }
-
+*/
 
 
   

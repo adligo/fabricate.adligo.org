@@ -31,7 +31,7 @@ public interface I_RunMonitor extends Runnable {
    * The delegate runnable.
    * @return
    */
-  public abstract I_LocatableRunable getDelegate();
+  public abstract I_LocatableRunnable getDelegate();
   
   /**
    * Which runnable of this type, run location (command, stage).

@@ -89,8 +89,10 @@ public class CommandManager {
     if (failure != null) {
       FailureType result = new FailureType();
       result.setCommand(command_);
-      if (I_TaskProcessor.class.isAssignableFrom(routine.getClass())) {
-        result.setTask(((I_TaskProcessor) routine).getCurrentTask());
+      if (routine != null) {
+        if (I_TaskProcessor.class.isAssignableFrom(routine.getClass())) {
+          result.setTask(((I_TaskProcessor) routine).getCurrentTask());
+        }
       }
       ByteArrayOutputStream baos = system_.newByteArrayOutputStream();
       PrintStream ps = new PrintStream(baos);

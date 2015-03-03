@@ -81,10 +81,6 @@ public class RoutineFabricateFactory {
   public void addImplicitTraits() {
     addTrait(EncryptTrait.NAME, EncryptTrait.class);
     addTrait(DecryptTrait.NAME, DecryptTrait.class);
-    addTrait(GitCloneRoutine.NAME, GitCloneRoutine.class);
-    addTrait(GitPullRoutine.NAME, GitPullRoutine.class);
-    addTrait(GitCommitRoutine.NAME, GitCommitRoutine.class);
-    addTrait(GitPushRoutine.NAME, GitPushRoutine.class);
     traits_.add(ObtainTrait.ROUTINE_BRIEF);
   }
   

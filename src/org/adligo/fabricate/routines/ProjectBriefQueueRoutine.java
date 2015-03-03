@@ -4,11 +4,11 @@ import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
+import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.project.I_ProjectBrief;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -21,29 +21,31 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  */
 public class ProjectBriefQueueRoutine extends TasksRoutine 
-  implements I_ConcurrencyAware, I_FabricationRoutine, I_ProjectBriefsAware {
+  implements I_ConcurrencyAware, I_FabricationRoutine, I_ProjectBriefsAware, I_ProjectProcessor {
   public static final String QUEUE = "queue";
-  private List<String> projectsToSkip_ = new ArrayList<String>();
   protected ConcurrentLinkedQueue<I_ProjectBrief> queue;
+  private String currentTask_;
+  private String currentProject_;
   
-
   @Override
-  public boolean setup(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory)
+  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
+    if (log_.isLogEnabled(ProjectBriefQueueRoutine.class)) {
+      log_.println(ProjectBriefQueueRoutine.class.getName() + " setup(I_FabricationMemoryMutant, I_RoutineMemoryMutant)");
+    }
     queue = new ConcurrentLinkedQueue<I_ProjectBrief>();
     List<I_ProjectBrief> briefs = fabricate_.getProjects();
-    for (I_ProjectBrief brief: briefs) {
-      if (!projectsToSkip_.contains(brief.getName())) {
-        queue.add(brief);
-      }
-    }
+    //fabricate_ is a Fabricate (immutable instance) and has filtered out null briefs;
+    log_.println(ProjectBriefQueueRoutine.class.getName() + " has " +
+        briefs.size() + " projects");
+    queue.addAll(briefs);
     routineMemory.put(QUEUE, queue);
     return super.setup(memory, routineMemory);
   }
   
   @SuppressWarnings("unchecked")
   @Override
-  public void setup(I_FabricationMemory memory, I_RoutineMemory routineMemory)
+  public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory)
       throws FabricationRoutineCreationException {
     
     queue = (ConcurrentLinkedQueue<I_ProjectBrief>) routineMemory.get(QUEUE);
@@ -54,15 +56,27 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
   public void run() {
     super.run();
     I_ProjectBrief project = queue.poll();
+    if (log_.isLogEnabled(ProjectQueueRoutine.class)) {
+      log_.println(ProjectQueueRoutine.class.getName() + system_.lineSeperator() +
+          " project " + project);
+    }
     while (project != null) {
+      if (log_.isLogEnabled(ProjectQueueRoutine.class)) {
+        log_.println(ProjectQueueRoutine.class.getName() + system_.lineSeperator() +
+            " project " + project);
+      }
+      currentProject_ = project.getName();
       for (TaskContext task: tasks_) {
+        
         I_FabricationRoutine taskRoutine = task.getTask();
+        I_RoutineBrief brief = taskRoutine.getBrief();
+        currentTask_ = brief.getName();
         if (I_ProjectBriefAware.class.isAssignableFrom(taskRoutine.getClass())) {
           ((I_ProjectBriefAware)  taskRoutine).setProjectBrief(project);
         }
-        setupTask(taskRoutine);
         taskRoutine.run();
       }
+      project = queue.poll();
     }
   }
   
@@ -74,13 +88,13 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
   public void setupTask(I_FabricationRoutine taskRoutine) {}
 
   @Override
-  public List<String> getProjectsToSkip() {
-    return projectsToSkip_;
+  public synchronized String getCurrentTask() {
+    return currentTask_;
   }
 
   @Override
-  public void setProjectsToSkip(List<String> projectNames) {
-    projectsToSkip_.addAll(projectNames);
-    projectsToSkip_.remove(null);
+  public synchronized String getCurrentProject() {
+    return currentProject_;
   }
+
 }

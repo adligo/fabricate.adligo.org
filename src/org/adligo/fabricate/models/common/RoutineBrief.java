@@ -134,6 +134,18 @@ public class RoutineBrief implements I_RoutineBrief {
   }
 
   @Override
+  public String getParameter(String key) {
+    List<String> toRet = parametersLookup_.get(key);
+    if (toRet == null) {
+      return null;
+    }
+    if (toRet.size() >= 1) {
+      return toRet.get(0);
+    }
+    return null;
+  }
+  
+  @Override
   public List<String> getParameters(String key) {
     List<String> toRet = parametersLookup_.get(key);
     if (toRet == null) {
@@ -235,4 +247,5 @@ public class RoutineBrief implements I_RoutineBrief {
   public String toString() {
     return RoutineBriefMutant.toString(this);
   }
+
 }

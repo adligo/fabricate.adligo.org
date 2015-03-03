@@ -133,6 +133,20 @@ public class ParameterMutant implements I_Parameter {
   private String value_;
   
   public ParameterMutant() {}
+
+  public ParameterMutant(String key, String value) {
+    key_ = key;
+    value_ = value;
+  }
+  
+  public ParameterMutant(String key, String value, List<I_Parameter> children) {
+    key_ = key;
+    value_ = value;
+    if (children != null && children.size() >= 1) { 
+      setChildren(children);
+    }
+  }
+  
   
   public ParameterMutant(I_Parameter other) {
     key_ = other.getKey();

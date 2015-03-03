@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -36,6 +37,12 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public String doDialog(String question, boolean readPassword);
+  
+  /**
+   * does a System.exit
+   * @param exitStatus
+   */
+  public void exit(int exitStatus);
   /**
    * Stub for System.getenv(String key);
    * @param key
@@ -162,10 +169,18 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * delegates to Executors.newFixedThreadPool(int size)
    * in order to pass a mock for testing.
    * @param size
-   * @return
+   * @return for size <= 1
+   *  Executors.newSingleThreadExecutor()
+   *  otherwise
+   *  Executors.newFixedThreadPool()
    */
   public ExecutorService newFixedThreadPool(int size);
   
+  /**
+   * create a new git calls instance.
+   * @return
+   */
+  public I_GitCalls newGitCalls();
   /**
    * Create a new run monitor to wrap a Runnable,
    * in a way that can be monitored.
@@ -174,7 +189,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @param counter
    * @return
    */
-  public I_RunMonitor newRunMonitor(I_LocatableRunable delegate, int counter);
+  public I_RunMonitor newRunMonitor(I_LocatableRunnable delegate, int counter);
   
 
   

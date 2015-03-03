@@ -3,8 +3,10 @@ package org.adligo.fabricate.java;
 import org.adligo.fabricate.common.system.I_ExecutionResult;
 import org.adligo.fabricate.common.system.I_Executor;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 
 import java.io.IOException;
+import java.util.Collections;
 
 public class JavaCalls {
   private final I_FabSystem sys_;
@@ -15,7 +17,7 @@ public class JavaCalls {
   
   public String getJavaVersion(String homeDir, String seperator) throws IOException, InterruptedException {
     I_Executor exe = sys_.getExecutor();
-    I_ExecutionResult er = exe.executeProcess(".", 
+    I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,  ".", 
         homeDir + seperator + "bin" + seperator + "java", "-version");
     String version = er.getOutput();
     

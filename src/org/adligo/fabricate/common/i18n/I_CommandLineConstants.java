@@ -51,8 +51,7 @@ public interface I_CommandLineConstants {
   public String getAlias(String arg);
   
   /**
-   * This argument indicates that archival stages
-   * should be executed.
+   * This argument instructs Fabricate to run archive stages.
    * @param alias
    * @return for English this will be;
    * alias == true
@@ -61,6 +60,7 @@ public interface I_CommandLineConstants {
    *    "--archive"
    */
   public String getArchive(boolean alias);
+  
   /**
    * This argument key instructs Fabricate to execute 
    * a command, the command itself 
@@ -104,25 +104,6 @@ public interface I_CommandLineConstants {
   public String getDevelopment(boolean alias);
   
   /**
-   * This argument instructs Fabricate to create branches on all projects using the
-   * version setting in fabricate.xml.  Versions are considered
-   * a branch when they do contain the branch prefix. By 
-   * default the branch prefix is 'b', but it may 
-   * be changed using the xml key value with 'branchPrefix' as the key
-   * on the scm node. This command line argument
-   * is executed by the ObtainProjectsPresenter and 
-   * ends Fabrication after it's execution. <br/>
-   * <br/>
-   * @param alias
-   * @return for English this will be;
-   * alias == true
-   *     "-g"
-   * alias == false
-   *    "--grow-branches"
-   */
-  public String getGrowBranches(boolean alias);
-  
-  /**
    * This argument instructs Fabricate to turn on ALL LOGGING,
    * in the scripts and I_FabLog interface.
    * @param alias
@@ -133,6 +114,19 @@ public interface I_CommandLineConstants {
    *    "--log-verbosely"
    */
   public String getLog(boolean alias);
+  
+  /**
+   * This argument instructs Fabricate to assume that the
+   * ssh key-store password is empty for 'paswordless ssh'
+   * when doing git clone, git push, when the protocol is ssh etc.
+   * @param alias
+   * @return for English this will be;
+   * alias == true
+   *     "-n"
+   * alias == false
+   *    "--no-ssh-keystore-passphrase"
+   */
+  public String getNoSshKeystorePassPhrase(boolean alias);
   /**
    * This argument instructs Fabricate to delete the project group/projects directory
    * and all of it's contents when it is NOT running in development mode
@@ -162,21 +156,6 @@ public interface I_CommandLineConstants {
   public String getRebuildDependents(boolean alias);
   
   /**
-   * This argument instructs Fabricate to share all projects
-   * using the source control management system<br/>
-   * This command line argument
-   * is executed by the ObtainProjectsPresenter and 
-   * ends Fabrication after it's execution. 
-   * @param alias
-   * @return for English this will be;
-   * alias == true
-   *     "-s"
-   * alias == false
-   *    "--share"
-   */
-  public String getShare(boolean alias);
-  
-  /**
    * This arguments turns off non optional stages.
    * @return
    */
@@ -202,24 +181,7 @@ public interface I_CommandLineConstants {
    *    "--test"
    */
   public String getTest(boolean alias);
-  /**
-   * This argument instructs Fabricate to tag all projects using the
-   * version setting in fabricate.xml.  Versions are considered
-   * a tag when they do NOT contain the branch prefix. By 
-   * default the branch prefix is 'b', but it may 
-   * be changed using the xml key value with 'branchPrefix' as the key
-   * on the scm node.  This command line argument
-   * is executed by the ObtainProjectsPresenter and 
-   * ends Fabrication after it's execution. <br/>
-   * <br/>
-   * @param alias
-   * @return for English this will be;
-   * alias == true
-   *     "-m"
-   * alias == false
-   *    "--mark-versions"
-   */
-  public String getMarkVersions(boolean alias);
+
   /**
    * This argument instructs Fabricate to update all projects from their various
    * source control management systems (git) before executing commands

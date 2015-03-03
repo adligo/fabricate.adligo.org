@@ -13,8 +13,12 @@ import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.managers.CommandManager;
+import org.adligo.fabricate.managers.ProjectsManager;
+import org.adligo.fabricate.models.common.ExecutionEnvironmentMutant;
+import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
+import org.adligo.fabricate.models.common.MemoryLock;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
 import org.adligo.fabricate.routines.I_ProjectBriefsAware;
@@ -32,6 +36,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +55,7 @@ public class FabricateController {
   private final I_FabXmlFileIO xmlFiles_;
   private final FabricateXmlDiscovery discovery_;
   private RoutineFabricateFactory factory_;
+  private FabricateType fabXml_;
   private boolean commands_;
   /**
    * The first throwable thrown by either
@@ -138,13 +144,19 @@ public class FabricateController {
         sys_.lineSeperator());
     
     List<String> argCommands = sys_.getArgValues(cmdMessages_.getCommand());
-    if (!finishFabricateSetup(factory, argCommands)) {
+    if (!addXmlRoutines(factory, argCommands)) {
       return;
     }
-    FabricationMemoryMutant memory = factory.createMemory();
+    FabricationMemoryMutant<Object> memory = factory.createMemory();
+    memory.put(FabricationMemoryConstants.ENV, new ExecutionEnvironmentMutant());
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.ENV, 
+        Collections.singleton(FabricateController.class.getName())));
     if (requiresProjects()) {
-      manageProjectsDirAndMode(factory);
-      //TODO add projects manager code
+      if (!manageProjectsDirAndMode(factory)) {
+        return;
+      }
+      ProjectsManager pm = factory.createProjectsManager(sys_, factory_);
+      failure_ = pm.setupAndRun(memory);
     }
     
     if (commands_) {
@@ -158,18 +170,19 @@ public class FabricateController {
     if (fileLog != null) {
       fileLog.close();
     }
+    sys_.exit(0);
   }
 
-  public boolean finishFabricateSetup(FabricateFactory factory, List<String> argCommands)
+  private boolean addXmlRoutines(FabricateFactory factory, List<String> argCommands)
       throws IOException, ClassNotFoundException {
     
     
     String fabricateXmlPath = discovery_.getFabricateXmlPath();
-    FabricateType fabX =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
-    fab_ = factory.create(sys_, fabX, discovery_);
+    fabXml_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
+    fab_ = factory.create(sys_, fabXml_, discovery_);
     FabricateMutant fm = factory.createMutant(fab_);
     
-    List<RoutineParentType> traits =  fabX.getTrait();
+    List<RoutineParentType> traits =  fabXml_.getTrait();
     
     commands_ = true;
     try {
@@ -178,9 +191,9 @@ public class FabricateController {
       }
       
       if (argCommands.size() >= 1) {
-        fm.addCommands(fabX);
+        fm.addCommands(fabXml_);
       } else {
-        fm.addStages(fabX);
+        fm.addStages(fabXml_);
         commands_ = false;
       }
        
@@ -197,8 +210,10 @@ public class FabricateController {
     return true;
   }
 
-  public void manageProjectsDirAndMode(FabricateFactory factory) throws IOException {
+  private boolean manageProjectsDirAndMode(FabricateFactory factory) throws IOException, ClassNotFoundException {
     FabricateMutant fm = factory.createMutant(fab_);
+    fm.addScmAndProjects(fabXml_);
+    
     String devXmlDir = discovery_.getDevXmlDir();
     String projectRunDir = discovery_.getProjectXmlDir();
     if ( !StringUtils.isEmpty(devXmlDir)) {
@@ -230,16 +245,31 @@ public class FabricateController {
         String projectsDir = runDir + "projects";
         if (files_.exists(projectsDir)) {
           if (sys_.hasArg(cmdMessages_.getPurge(true))) {
-            files_.deleteRecursive(projectsDir);
+            try {
+              files_.deleteRecursive(projectsDir);
+            } catch (IOException x) {
+              log_.println(sysMessages_.getThereWasAProblemDeletingTheFollowingDirectory() +
+                  sys_.lineSeperator() + projectsDir);
+              if (log_.isLogEnabled(FabricateController.class)) {
+                log_.printTrace(x);
+              }
+              return false;
+            }
             makeProjectsDir(projectsDir);
           }
         } else {
           makeProjectsDir(projectsDir);
         }
-        fm.setProjectsDir(projectsDir);
+        fm.setProjectsDir(projectsDir + files_.getNameSeparator());
       }
     }
+    
     fab_ = factory.create(fm);
+    factory_ = factory.createRoutineFabricateFactory(sys_, fab_, commands_);
+    String dir = fab_.getProjectsDir();
+    String message = sysMessages_.getProjectsAreLocatedInTheFollowingDirectory();
+    log_.println(message + sys_.lineSeperator() + dir); 
+    return true;
   }
 
   public void makeProjectsDir(String projectsDir) throws IOException {

@@ -40,6 +40,8 @@ public interface I_SystemMessages {
   public String getExceptionNoFabricateJarInFabricateHomeLib();
   public String getExceptionNoStartTimeArg();
   public String getExceptionNoJavaHomeSet();
+  public String getExceptionUnableToFindSSH_AUTH_SOCKWhenParsingOutputOfSshAgent();
+  public String getExceptionUnableToFindSSH_AGENT_PIDWhenParsingOutputOfSshAgent();
   
   public String getExtractingTheFollowingArtifact();
   public String getExtractionOfTheFollowingArtifact();
@@ -60,6 +62,8 @@ public interface I_SystemMessages {
   public String getFabricationSuccessful();
   public String getFailed();
   public String getFinished();
+  public String getFinishedGetCloneOnProjectX();
+  public String getFinishedGetPullOnProjectX();
   
   public String getInsteadOfTheFollowingActualGenericType();
   public String getItWasExpectedToImplementTheFollowingInterface();
@@ -69,13 +73,15 @@ public interface I_SystemMessages {
   public String getNoRemoteRepositoriesCouldBeReached();
   public String getPassedTheMd5Check();
   public String getPassedTheExtractCheck();
-  public String getPleaseEnterYourGitKeystorePassword();
+  public String getProjectsAreLocatedInTheFollowingDirectory();
   
   public String getSendingOptsToScript();
   
   public String getStartingDownloadFromTheFollowingUrl();
+  public String getStartingGetCloneOnProjectX();
+  public String getStartingGetPullOnProjectX();
   
-  public String getToTheFollowingFolder();
+
   
   public String getTheDownloadFromTheFollowingUrl();
   /**
@@ -91,14 +97,24 @@ public interface I_SystemMessages {
   
   public String getTheFollowingListOfFabricateLibrariesContainsACircularReference();
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess();
-  
+  public String getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   
   public String getTheFollowingArtifact();
   public String getThereWasAProblemCreatingTheFollowingDirectory();
   public String getThereWasAProblemCreatingTheFollowingRoutine();
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory();
+  public String getThereWasAProblemDeletingTheFollowingDirectory();
   public String getThisMethodMustBeCalledFromTheMainThread();
+  public String getThisVersionOfFabricateRequiresGitXOrGreater();
+  
+  public String getToTheFollowingFolder();
+  public String getTraitXIsStillSettingUp();
+  public String getTraitXIsStillRunning();
+  public String getTraitXIsStillRunningOnProjectZ();
+  public String getTraitXTaskYIsStillRunning();
+  public String getTraitXTaskYIsStillRunningOnProjectZ();
+  
   
   public String getUnableToLoadTheFollowingClass();
   public String getUnknown();

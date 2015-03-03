@@ -1,13 +1,11 @@
 package org.adligo.fabricate.java;
 
-import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.system.Executor;
 import org.adligo.fabricate.common.system.I_ExecutionResult;
 import org.adligo.fabricate.common.system.I_Executor;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +46,8 @@ public class JavaJar {
       log_.println("executing " + sb.toString());
     }
     I_Executor exe = sys_.getExecutor();
-    I_ExecutionResult er = exe.executeProcess(inDir_, allArray);
+    I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
+        inDir_, allArray);
     if (er.getExitCode() != 0) {
       throw new IOException(er.getOutput());
     }

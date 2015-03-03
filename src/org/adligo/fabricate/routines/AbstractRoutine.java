@@ -1,5 +1,8 @@
 package org.adligo.fabricate.routines;
 
+import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_ImplicitTraitMessages;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
@@ -21,7 +24,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class AbstractRoutine implements I_FabricationRoutine {
   protected I_RoutineBrief brief_;
   protected I_FabSystem system_;
+  protected I_FabFileIO files_;
+  protected I_FabXmlFileIO xmlFiles_;
   protected I_FabricateConstants constants_;
+  protected I_CommandLineConstants cmdConstants_;
   protected I_SystemMessages sysMessages_;
   
   protected I_ImplicitTraitMessages implicit_;
@@ -38,6 +44,10 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
   @Override
   public void run() {
     running.set(true);
+  }
+  
+  public String getAdditionalDetail() {
+    return null;
   }
   
   public I_RoutineBrief getBrief() {
@@ -71,10 +81,14 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
   @Override
   public void setSystem(I_FabSystem system) {
     system_ = system;
+    files_ = system.getFileIO();
+    xmlFiles_ = system.getXmlFileIO();
+    
     log_ = system.getLog();
     constants_ = system.getConstants();
     implicit_ = constants_.getImplicitTraitMessages();
     sysMessages_ = constants_.getSystemMessages();
+    cmdConstants_ = constants_.getCommandLineConstants();
   }
 
   public void setBrief(I_RoutineBrief brief) {
@@ -95,7 +109,10 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
    * Do nothing, allow extension classes to override.
    */
   @Override
-  public boolean setup(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory) throws FabricationRoutineCreationException {
+  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
+    if (log_.isLogEnabled(AbstractRoutine.class)) {
+      log_.println(AbstractRoutine.class.getName() + " setup(I_FabricationMemoryMutant, I_RoutineMemoryMutant)");
+    }
     settingUp.set(true);
     return true;
   }
@@ -105,7 +122,7 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
    * Overrides of this method should call this method.
    */
   @Override
-  public void setup(I_FabricationMemory memory, I_RoutineMemory routineMemory) throws FabricationRoutineCreationException {
+  public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory) throws FabricationRoutineCreationException {
     settingUp.set(true);
   }
 
@@ -115,10 +132,13 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
     switch (rbo) {
       case COMMAND:
       case FABRICATE_COMMAND:
+      case IMPLICIT_COMMAND:
       case PROJECT_COMMAND:
         return getCommandCurrentLocation();
       case STAGE:
       case FABRICATE_STAGE:
+      case IMPLICIT_STAGE:
+      case IMPLICIT_TRAIT:
       case PROJECT_STAGE:
         return getBuildCurrentLocation();
       case ARCHIVE_STAGE:

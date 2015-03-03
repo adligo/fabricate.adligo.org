@@ -567,6 +567,21 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
     return toRet;
   }
+
+  @Override
+  public String getParameter(String key) {
+    if (parameters_ == null) {
+      return null;
+    }
+    for (I_Parameter rbm: parameters_) {
+      if (rbm != null) {
+        if (key.equals(rbm.getKey())) {
+          return rbm.getValue();
+        }
+      }
+    }
+    return null;
+  }
   
   public ParameterMutant getParameterMutant(String key) {
     if (parameters_ == null) {
@@ -591,4 +606,5 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   public String toString() {
     return toString(this);
   }
+
 }
