@@ -73,8 +73,8 @@ public class RoutineExecutionEngine {
                 String message = lr.getCurrentLocation();
                 String additional = lr.getAdditionalDetail();
                 if (additional != null) {
-                  message = message + system_.lineSeperator() +
-                      additional + system_.lineSeperator() + system_.lineSeperator();
+                  message = message + system_.lineSeparator() +
+                      additional + system_.lineSeparator() + system_.lineSeparator();
                 }
                 log_.println(message);
               }

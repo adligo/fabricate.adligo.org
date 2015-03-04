@@ -40,7 +40,8 @@ public class CommandManager {
     
 
     @Override
-    public I_FabricationRoutine build(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory)
+    public I_FabricationRoutine build(I_FabricationMemoryMutant<Object> memory, 
+        I_RoutineMemoryMutant<Object> routineMemory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();
       if (!toRet.setup(memory, routineMemory)) {
@@ -50,7 +51,8 @@ public class CommandManager {
     }
 
     @Override
-    public I_FabricationRoutine build(I_FabricationMemory memory, I_RoutineMemory routineMemory)
+    public I_FabricationRoutine build(I_FabricationMemory<Object> memory, 
+        I_RoutineMemory<Object> routineMemory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();
       toRet.setup(memory, routineMemory);
@@ -69,7 +71,7 @@ public class CommandManager {
   /**
    * @return FailureType if failure occurs, otherwise null.
    */
-  public FailureType processCommands(FabricationMemoryMutant memory) {
+  public FailureType processCommands(FabricationMemoryMutant<Object> memory) {
     Throwable failure = null;
     I_FabricationRoutine routine = null;
     try {
@@ -96,7 +98,7 @@ public class CommandManager {
       }
       ByteArrayOutputStream baos = system_.newByteArrayOutputStream();
       PrintStream ps = new PrintStream(baos);
-      ps.append(system_.lineSeperator());
+      ps.append(system_.lineSeparator());
       failure.printStackTrace(ps);
       String detail = baos.toString();
       result.setDetail(detail);

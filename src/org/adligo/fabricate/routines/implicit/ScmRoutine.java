@@ -111,7 +111,7 @@ public class ScmRoutine extends ProjectBriefQueueRoutine {
       if (addResult.getExitCode() != 0) {
         String message = sysMessages_.getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
         message = message.replace("<X/>", "" + addResult.getExitCode());
-        throw new IllegalStateException(message + system_.lineSeperator() +
+        throw new IllegalStateException(message + system_.lineSeparator() +
             "ssh-add");
       }
     } catch (IOException e) {

@@ -51,7 +51,7 @@ public class GitCloneRoutine extends ScmContextInputAwareRoutine {
               throw new RuntimeException(caught);
             } else {
               message = sysMessages_.getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
-              message = message.replace("<X/>", "" + process_.getExitCode()) + system_.lineSeperator() + "ssh-add";
+              message = message.replace("<X/>", "" + process_.getExitCode()) + system_.lineSeparator() + "ssh-add";
               throw new IllegalStateException(message);
             }
           }
@@ -69,7 +69,7 @@ public class GitCloneRoutine extends ScmContextInputAwareRoutine {
           if (result.getExitCode() != 0) {
             message = sysMessages_.getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
             message = message.replace("<X/>", "" + result.getExitCode());
-            throw new IllegalStateException(message + system_.lineSeperator() +
+            throw new IllegalStateException(message + system_.lineSeparator() +
                 projectsDir + ": chmod -R +x " + projectName);
           }
         } catch (IOException x) {

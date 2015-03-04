@@ -115,7 +115,7 @@ public class FabFileIO implements I_FabFileIO {
     } else {
       I_FileMessages messages = constants_.getFileMessages();
       String message = messages.getThereWasAProblemCreatingTheFollowingFile();
-      throw new IOException(message + sys_.lineSeperator() +
+      throw new IOException(message + sys_.lineSeparator() +
           filePath);
     }
   }
@@ -144,7 +144,7 @@ public class FabFileIO implements I_FabFileIO {
     if (!new File(path).delete()) {
       I_FileMessages messages = constants_.getFileMessages();
       throw new IOException(messages.getThereWasAProblemDeletingTheFollowingFile() + 
-          sys_.lineSeperator() + path);
+          sys_.lineSeparator() + path);
     }
   }
   
@@ -152,7 +152,7 @@ public class FabFileIO implements I_FabFileIO {
   public void downloadFile(String url, String file) throws IOException {
     if (log_.isLogEnabled(FabFileIO.class)) {
       I_FileMessages messages = constants_.getFileMessages();
-      log_.println(messages.getStartingDownloadFromX().replaceAll("<X/>", url) + sys_.lineSeperator());
+      log_.println(messages.getStartingDownloadFromX().replaceAll("<X/>", url) + sys_.lineSeparator());
     }
     
     CloseableHttpClient httpClient = sys_.newHttpClient();
@@ -170,7 +170,7 @@ public class FabFileIO implements I_FabFileIO {
         I_FileMessages messages = constants_.getFileMessages();
         String message = messages.getSubmittingAHttpGetToTheFollowingUrlReturnedAnInvalidStatusCodeX();
         message = message.replace("<X/>", "" + statusCode);
-        throw new IOException(message + sys_.lineSeperator() +
+        throw new IOException(message + sys_.lineSeparator() +
             url);
       }
       exiting = false;
@@ -194,7 +194,7 @@ public class FabFileIO implements I_FabFileIO {
     }
     if (log_.isLogEnabled(FabFileIO.class)) {
       I_FileMessages messages = constants_.getFileMessages();
-      log_.println(messages.getFinisedDownloadFromX().replaceAll("<X/>", url) + sys_.lineSeperator());
+      log_.println(messages.getFinisedDownloadFromX().replaceAll("<X/>", url) + sys_.lineSeparator());
     }
   }
 
@@ -405,8 +405,8 @@ public class FabFileIO implements I_FabFileIO {
                 I_FileMessages messages = constants_.getFileMessages();
                 String message = messages.getTheFollowingDownloadIsXPercentComplete().replaceAll(
                     "<X/>", "" + new Double(pctP).intValue());
-                log_.println(message + sys_.lineSeperator() + 
-                    whichFile + sys_.lineSeperator());
+                log_.println(message + sys_.lineSeparator() + 
+                    whichFile + sys_.lineSeparator());
                 pctsToLog.pop();
               }
             }
@@ -502,13 +502,13 @@ public class FabFileIO implements I_FabFileIO {
       boolean lastLine = false;
       for (String line; (line = reader.readLine()) != null;) {
         if (lastLine) {
-          sb.append(sys_.lineSeperator());
+          sb.append(sys_.lineSeparator());
         } else {
           lastLine = true;
         }
         sb.append(line);
       }
-      sb.append(sys_.lineSeperator());
+      sb.append(sys_.lineSeparator());
     } catch (IOException x) {
       throw x;
     } finally {

@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common.i18n;
 
 public interface I_SystemMessages {
-  
+  public String getAntHelperRequiresADirectoryArgument();
   public String getArchiveStageXIsStillSettingUp();
   public String getArchiveStageXIsStillRunning();
   public String getArchiveStageXIsStillRunningOnProjectZ() ;
@@ -64,6 +64,7 @@ public interface I_SystemMessages {
   public String getFinished();
   public String getFinishedGetCloneOnProjectX();
   public String getFinishedGetPullOnProjectX();
+  public String getGitDoesNotAppearToBeInstalledPleaseInstallIt();
   
   public String getInsteadOfTheFollowingActualGenericType();
   public String getItWasExpectedToImplementTheFollowingInterface();

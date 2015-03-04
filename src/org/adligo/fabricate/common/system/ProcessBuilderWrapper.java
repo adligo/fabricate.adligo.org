@@ -9,31 +9,51 @@ import java.util.Map;
  * @author scott
  *
  */
-public class ProcessBuilderWrapper {
+public class ProcessBuilderWrapper implements I_ProcessBuilderWrapper {
   private ProcessBuilder delegate_;
   
   public ProcessBuilderWrapper(ProcessBuilder pb) {
     delegate_ = pb;
   }
 
-  public ProcessBuilderWrapper directory(File directory) {
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_ProcessBuilderWrapper#directory(java.io.File)
+   */
+  @Override
+  public I_ProcessBuilderWrapper directory(File directory) {
     delegate_.directory(directory);
     return this;
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_ProcessBuilderWrapper#environment()
+   */
+  @Override
   public Map<String, String> environment() {
     return delegate_.environment();
   }
 
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_ProcessBuilderWrapper#getDelegate()
+   */
+  @Override
   public ProcessBuilder getDelegate() {
     return delegate_;
   }
   
-  public ProcessBuilderWrapper redirectErrorStream(boolean redirectErrorStream) {
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_ProcessBuilderWrapper#redirectErrorStream(boolean)
+   */
+  @Override
+  public I_ProcessBuilderWrapper redirectErrorStream(boolean redirectErrorStream) {
     delegate_.redirectErrorStream(redirectErrorStream);
     return this;
   }
 
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_ProcessBuilderWrapper#start()
+   */
+  @Override
   public Process start() throws IOException {
     return delegate_.start();
   }

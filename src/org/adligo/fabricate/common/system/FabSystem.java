@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common.system;
 
+import org.adligo.fabricate.common.FabConstantsDiscovery;
 import org.adligo.fabricate.common.en.FabricateEnConstants;
 import org.adligo.fabricate.common.files.FabFileIO;
 import org.adligo.fabricate.common.files.I_FabFileIO;
@@ -73,7 +74,7 @@ public class FabSystem implements I_FabSystem {
   public String doDialog(String question, boolean readPassword) {
     Console console = System.console();
     
-    question = question + lineSeperator();
+    question = question + lineSeparator();
     if (fileLog_ != null) {
       fileLog_.println(question);
     }
@@ -203,7 +204,7 @@ public class FabSystem implements I_FabSystem {
   }
 
   @Override
-  public String lineSeperator() {
+  public String lineSeparator() {
     return System.lineSeparator();
   }
 
@@ -239,11 +240,17 @@ public class FabSystem implements I_FabSystem {
   public ByteArrayOutputStream newByteArrayOutputStream() {
     return new ByteArrayOutputStream();
   }
+
   @Override
   public DatatypeFactory newDatatypeFactory() throws DatatypeConfigurationException {
     return DatatypeFactory.newInstance();
   }
 
+  @Override
+  public ExecutingProcess newExecutingProcess(Process proc)  {
+    return new ExecutingProcess(this, proc);
+  }
+  
   @Override
   public I_FabFileLog newFabFileLog(String fileName) throws IOException {
     return new FabFileLog(fileName, fileIO_);
@@ -277,8 +284,13 @@ public class FabSystem implements I_FabSystem {
   }
 
   @Override
-  public ProcessBuilderWrapper newProcessBuilder(String[] args) {
+  public I_ProcessBuilderWrapper newProcessBuilder(String[] args) {
     return new ProcessBuilderWrapper(new ProcessBuilder(args));
+  }
+  
+  @Override
+  public ProcessRunnable newProcessRunnable(Process proc) {
+    return new ProcessRunnable(proc);
   }
   
   @Override
@@ -322,5 +334,16 @@ public class FabSystem implements I_FabSystem {
   public String getJavaVersion() {
     return ComputerInfoDiscovery.getJavaVersion(this);
   }
+
+  @Override
+  public I_FabricateConstants newFabConstantsDiscovery(String languageCode, String countryCode) {
+    try {
+      return new FabConstantsDiscovery(languageCode, countryCode);
+    } catch (IOException x) {
+      return FabricateEnConstants.INSTANCE;
+    }
+  }
+
+
 
 }

@@ -57,12 +57,12 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
     super.run();
     I_ProjectBrief project = queue.poll();
     if (log_.isLogEnabled(ProjectQueueRoutine.class)) {
-      log_.println(ProjectQueueRoutine.class.getName() + system_.lineSeperator() +
+      log_.println(ProjectQueueRoutine.class.getName() + system_.lineSeparator() +
           " project " + project);
     }
     while (project != null) {
       if (log_.isLogEnabled(ProjectQueueRoutine.class)) {
-        log_.println(ProjectQueueRoutine.class.getName() + system_.lineSeperator() +
+        log_.println(ProjectQueueRoutine.class.getName() + system_.lineSeparator() +
             " project " + project);
       }
       currentProject_ = project.getName();

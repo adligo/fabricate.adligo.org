@@ -90,8 +90,8 @@ public class FabricateController {
     String fabricateDir = discovery_.getFabricateXmlDir();
     String runMarker = fabricateDir + "run.marker";
     if (files_.exists(runMarker)) {
-      log_.println(sysMessages_.getFabricateAppearsToBeAlreadyRunning() + sys_.lineSeperator() +
-          sysMessages_.getFabricateAppearsToBeAlreadyRunningPartTwo() + sys_.lineSeperator() +
+      log_.println(sysMessages_.getFabricateAppearsToBeAlreadyRunning() + sys_.lineSeparator() +
+          sysMessages_.getFabricateAppearsToBeAlreadyRunningPartTwo() + sys_.lineSeparator() +
           fabricateDir);
       return;
     } 
@@ -108,7 +108,7 @@ public class FabricateController {
     } catch (IOException e1) {
       log_.printTrace(e1);
       log_.println(sysMessages_.getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory() + 
-          sys_.lineSeperator() + fabricateDir);
+          sys_.lineSeparator() + fabricateDir);
       return;
     } finally {
       if (fos != null) {
@@ -127,7 +127,7 @@ public class FabricateController {
     if (!files_.mkdirs(outputDir)) {
       File dir = files_.instance(outputDir);
       String absPath = dir.getAbsolutePath();
-      log_.println(sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory() + sys_.lineSeperator() +
+      log_.println(sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory() + sys_.lineSeparator() +
           absPath);
       return;
     }
@@ -140,8 +140,8 @@ public class FabricateController {
       sys.setLogFile(fileLog);
     }
     
-    log_.println(sys_.lineSeperator() + sysMessages_.getFabricating() + 
-        sys_.lineSeperator());
+    log_.println(sys_.lineSeparator() + sysMessages_.getFabricating() + 
+        sys_.lineSeparator());
     
     List<String> argCommands = sys_.getArgValues(cmdMessages_.getCommand());
     if (!addXmlRoutines(factory, argCommands)) {
@@ -202,7 +202,7 @@ public class FabricateController {
       factory_ = factory.createRoutineFabricateFactory(sys_, fab_, commands_);
     } catch (ClassNotFoundException x) {
       String message = sysMessages_.getUnableToLoadTheFollowingClass() + 
-        sys_.lineSeperator() + x.getMessage();
+        sys_.lineSeparator() + x.getMessage();
       log_.println(message);
       log_.printTrace(x);
       return false;
@@ -249,7 +249,7 @@ public class FabricateController {
               files_.deleteRecursive(projectsDir);
             } catch (IOException x) {
               log_.println(sysMessages_.getThereWasAProblemDeletingTheFollowingDirectory() +
-                  sys_.lineSeperator() + projectsDir);
+                  sys_.lineSeparator() + projectsDir);
               if (log_.isLogEnabled(FabricateController.class)) {
                 log_.printTrace(x);
               }
@@ -268,14 +268,14 @@ public class FabricateController {
     factory_ = factory.createRoutineFabricateFactory(sys_, fab_, commands_);
     String dir = fab_.getProjectsDir();
     String message = sysMessages_.getProjectsAreLocatedInTheFollowingDirectory();
-    log_.println(message + sys_.lineSeperator() + dir); 
+    log_.println(message + sys_.lineSeparator() + dir); 
     return true;
   }
 
   public void makeProjectsDir(String projectsDir) throws IOException {
     if (!files_.mkdirs(projectsDir)) {
       String message = sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory();
-      throw new IOException(message + sys_.lineSeperator() +
+      throw new IOException(message + sys_.lineSeparator() +
           projectsDir);
     }
   }

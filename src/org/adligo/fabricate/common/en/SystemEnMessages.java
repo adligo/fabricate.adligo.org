@@ -3,6 +3,9 @@ package org.adligo.fabricate.common.en;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
+
+  private static final String ANT_HELPER_REQUIRES_A_DIRECTORY_ARGUMENT = 
+      "AntHelper requires a directory argument.";
   private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
       "Archive stage <X/>, task <Y/> is still running on project <Z/>.";
   private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING = 
@@ -96,6 +99,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "Finished git pull on project <X/>.";
   private static final String FINISHED_GIT_CLONE_ON_PROJECT_X = 
       "Finished git clone on project <X/>.";
+  private static final String GIT_DOES_NOT_APPEAR_TO_BE_INSTALLED_PLEASE_INSTALL_IT = 
+      "Git does not appear to be installed please install it.";
   
   private static final String INSTEAD_OF_THE_FOLLOWING_ACTUAL_GENERIC_TYPE = 
       "Instead of the following actual generic type;";
@@ -113,9 +118,6 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String PASSED_THE_EXTRACT_CHECK = "passed the extract check.";
   private static final String PASSED_THE_MD5_CHECK = "passed the md5 check.";
   
-  private static final String PLEASE_ENTER_YOUR_GIT_KEY_STORE_PASSPHRASE =
-      "Please enter your git ssh key-store passphrase (or just press "
-      + "enter for a key-store without a passphrase).";
   private static final String PROJECTS_ARE_LOCATED_IN_THE_FOLLOWING_DIRECTORY = 
       "Projects are located in the following directory;";
   
@@ -186,6 +188,10 @@ public class SystemEnMessages implements I_SystemMessages {
   private SystemEnMessages() {
   }
 
+  @Override
+  public String getAntHelperRequiresADirectoryArgument() {
+    return ANT_HELPER_REQUIRES_A_DIRECTORY_ARGUMENT;
+  }
   @Override
   public String getArchiveStageXIsStillSettingUp() {
     return ARCHIVE_STAGE_X_IS_STILL_SETTING_UP;
@@ -291,22 +297,27 @@ public class SystemEnMessages implements I_SystemMessages {
     return BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
   }
   
+  @Override
   public String getDidNotPassTheMd5Check() {
     return DID_NOT_PASS_THE_MD5_CHECK;
   }
   
+  @Override
   public String getFabricating() {
     return FABRICATING;
   }
 
+  @Override
   public String getFabricateAppearsToBeAlreadyRunning() {
     return FABRICATE_ALREADY_RUNNING;
   }
   
+  @Override
   public String getFabricateAppearsToBeAlreadyRunningPartTwo() {
     return FABRICATE_ALREADY_RUNNING_2;
   }
   
+  @Override
   public String getDidNotPassTheExtractCheck() {
     return DID_NOT_PASS_THE_EXTRACT_CHECK;
   }
@@ -380,10 +391,12 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getFabricationFailed() {
     return FABRICATION_FAILED;
   }
+  
   @Override
   public String getFabricationSuccessful() {
     return FABRICATION_SUCCESSFUL;
   }
+  
   @Override
   public String getFailed() {
     return FAILED;
@@ -404,6 +417,11 @@ public class SystemEnMessages implements I_SystemMessages {
     return FINISHED_GIT_PULL_ON_PROJECT_X;
   }
 
+  @Override
+  public String getGitDoesNotAppearToBeInstalledPleaseInstallIt() {
+    return GIT_DOES_NOT_APPEAR_TO_BE_INSTALLED_PLEASE_INSTALL_IT;
+  }
+  
   @Override
   public String getItWasExpectedToImplementTheFollowingInterface() {
     return IT_WAS_EXPECTED_TO_IMPLEMENT_THE_FOLLOWING_INTERFACE;
@@ -449,12 +467,12 @@ public class SystemEnMessages implements I_SystemMessages {
     return USING_THE_FOLLOWING_REMOTE_REPOSITORIES;
   }
   
-
   @Override
   public String getTheDownloadFromTheFollowingUrl() {
     return THE_DOWNLOAD_FROM_THE_FOLLOWING_URL;
   }
   
+  @Override
   public String getTheFollowingArtifact() {
     return THE_FOLLOWING_ARTIFACT;
   }
@@ -468,6 +486,7 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getTheFollowingFabricateLibraryCanNotBeFound() {
     return THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND;
   }
+  
   @Override
   public String getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX() {
     return THE_FOLLOWING_COMMAND_LINE_PROGRAM_EXITED_ABNORMALLY_WITH_EXIT_CODE_X;

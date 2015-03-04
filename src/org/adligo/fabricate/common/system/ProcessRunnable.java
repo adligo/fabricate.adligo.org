@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ProcessRunnable implements Runnable {
+public class ProcessRunnable implements I_ProcessRunnable {
   private final Process process_;
   private int exitValue_ = -1;
   OutputStream processInput_;

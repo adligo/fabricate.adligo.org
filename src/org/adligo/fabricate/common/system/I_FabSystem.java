@@ -3,6 +3,7 @@ package org.adligo.fabricate.common.system;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.I_FabFilesSystem;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.I_FabFileLog;
 import org.adligo.fabricate.common.log.I_Print;
 
@@ -13,7 +14,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -151,6 +151,12 @@ public interface I_FabSystem extends I_FabFilesSystem {
   public DatatypeFactory newDatatypeFactory() throws DatatypeConfigurationException;
   
   /**
+   * returns a new ExecutingProcess
+   * @param proc
+   * @return
+   */
+  public I_ExecutingProcess newExecutingProcess(Process proc);
+  /**
    * Create a logger that writes out to a file.
    * @param fileName
    * @return
@@ -158,13 +164,26 @@ public interface I_FabSystem extends I_FabFilesSystem {
   public I_FabFileLog newFabFileLog(String fileName) throws IOException;
   
   /**
+   * create the constants using languageCode and countryCode
+   * @param languageCode
+   * @param countryCode
+   * @return
+   */
+  public I_FabricateConstants newFabConstantsDiscovery(String languageCode,String countryCode);
+  /**
    * This method provides a
    * way to pass in a mock for testing.
    * @param args
    * @return
    */
-  public ProcessBuilderWrapper newProcessBuilder(String []  args);
+  public I_ProcessBuilderWrapper newProcessBuilder(String []  args);
   
+  /**
+   * returns a new ProcessRunnable instance
+   * @param proc
+   * @return
+   */
+  public I_ProcessRunnable newProcessRunnable(Process proc);
   /**
    * delegates to Executors.newFixedThreadPool(int size)
    * in order to pass a mock for testing.

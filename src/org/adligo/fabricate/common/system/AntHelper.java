@@ -1,8 +1,12 @@
 package org.adligo.fabricate.common.system;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
+import org.adligo.fabricate.common.log.I_FabLog;
+
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * This class helps the fabricate.adligo.org/build.xml
@@ -15,31 +19,51 @@ import java.io.IOException;
  */
 public class AntHelper {
 
-	public static void main(String [] args) {
-	  if (args.length == 0) {
-	    System.out.println("Helper requires a dir argument.");
-	  }
-	  String dir = args[0];
-		try {
-		  FabSystem sys = new FabSystem();
-		  I_GitCalls calls = sys.newGitCalls();
+	@SuppressWarnings("unused")
+  public static void main(String [] args) {
+	  new AntHelper(new FabSystem(), args);
+	}
+	
+	private final I_FabFileIO files_;
+	private final I_FabLog log_;
+	private final I_SystemMessages sysMessages_;
+	
+	public AntHelper(I_FabSystem sys, String [] args) {
+	  files_ = sys.getFileIO();
+	  log_ = sys.getLog();
+	  I_FabricateConstants constants_ = sys.getConstants();
+	  sysMessages_ = constants_.getSystemMessages();
+	      
+	  if (args == null || args.length == 0) {
+      log_.println(sysMessages_.getAntHelperRequiresADirectoryArgument());
+      return;
+    }
+    String dir = args[0];
+    OutputStream fos = null;
+    try {
+      I_GitCalls calls = sys.newGitCalls();
       if (!calls.check(sys.getExecutor())) {
-        System.out.println("Git does NOT appear to be installed, please install it.");
+        log_.println(sysMessages_.getGitDoesNotAppearToBeInstalledPleaseInstallIt());
         return;
       }
       String desc = calls.describe();
-      File file = new File(dir + File.separator + "version.properties");
-      System.out.println("writing " + file.getAbsolutePath());
-      FileOutputStream fos = new FileOutputStream(file);
+      fos = files_.newFileOutputStream(dir + files_.getNameSeparator() + "version.properties");
       fos.write(new String("fabricate_name=fabricate_" + desc + 
-          System.lineSeparator()).getBytes("UTF-8"));
+          sys.lineSeparator()).getBytes("UTF-8"));
       fos.write(new String("fabricate_version=" + desc + 
-          System.lineSeparator()).getBytes("UTF-8"));
-      fos.close();
+          sys.lineSeparator()).getBytes("UTF-8"));
+      
     } catch (IOException e) {
-      e.printStackTrace();
+      log_.printTrace(e);
+    } finally {
+      if (fos != null) {
+        try {
+          fos.close();
+        } catch (IOException e) {
+          //do nothing
+        }
+      }
     }
-    
 	}
 	
 }

@@ -1,7 +1,5 @@
 package org.adligo.fabricate.common.system;
 
-import org.adligo.fabricate.common.log.I_FabLog;
-
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -9,8 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ExecutingProcess implements I_ExecutingProcess {
   private final I_FabSystem system_;
-  private final I_FabLog log_;
-  private final ProcessRunnable delegate_;
+  private final I_ProcessRunnable delegate_;
   
   private AtomicBoolean finished_ = new AtomicBoolean(false);
   private ArrayBlockingQueue<Boolean> done_;
@@ -24,9 +21,8 @@ public class ExecutingProcess implements I_ExecutingProcess {
    */
   public ExecutingProcess(I_FabSystem system, Process process) {
     system_ = system;
-    log_ = system.getLog();
     done_ = system_.newArrayBlockingQueue(Boolean.class, 1);
-    delegate_ = new ProcessRunnable(process);
+    delegate_ = system_.newProcessRunnable(process);
   }
   
   @SuppressWarnings("boxing")
@@ -64,13 +60,13 @@ public class ExecutingProcess implements I_ExecutingProcess {
    * @see org.adligo.fabricate.common.system.I_RunMonitor#hasFailure()
    */
   public boolean hasFailure() {
-    if (caught_ == null) {
-      return false;
+    if (caught_ != null) {
+      return true;
     }
-    if (delegate_.getExitCode() == 0) {
-      return false;
+    if (delegate_.getExitCode() != 0) {
+      return true;
     }
-    return true;
+    return false;
   }
   
   /* (non-Javadoc)

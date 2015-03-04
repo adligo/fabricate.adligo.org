@@ -31,12 +31,13 @@ public class ProjectsManager {
   private final I_FabLog log_;
   private final I_Fabricate fabricate_;
   private final RoutineFabricateFactory factory_;
-  private FabricationMemoryMutant memory_;
+  private FabricationMemoryMutant<Object> memory_;
   private final I_RoutineBuilder executorFactory_ = new I_RoutineBuilder() {
     
 
     @Override
-    public I_FabricationRoutine build(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory)
+    public I_FabricationRoutine build(I_FabricationMemoryMutant<Object> memory, 
+        I_RoutineMemoryMutant<Object> routineMemory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processTraitSetup();
       if (!toRet.setup(memory, routineMemory)) {
@@ -46,7 +47,8 @@ public class ProjectsManager {
     }
 
     @Override
-    public I_FabricationRoutine build(I_FabricationMemory memory, I_RoutineMemory routineMemory)
+    public I_FabricationRoutine build(I_FabricationMemory<Object> memory, 
+        I_RoutineMemory<Object> routineMemory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processTraitSetup();
       toRet.setup(memory, routineMemory);
@@ -61,7 +63,7 @@ public class ProjectsManager {
     fabricate_ = factory.getFabricate();
   }
   
-  public FailureType setupAndRun(FabricationMemoryMutant memory) {
+  public FailureType setupAndRun(FabricationMemoryMutant<Object> memory) {
     memory_ = memory;
     FailureType failure = runObtain();
     if (failure != null) {
@@ -96,7 +98,7 @@ public class ProjectsManager {
       }
       ByteArrayOutputStream baos = system_.newByteArrayOutputStream();
       PrintStream ps = new PrintStream(baos);
-      ps.append(system_.lineSeperator());
+      ps.append(system_.lineSeparator());
       failure.printStackTrace(ps);
       String detail = baos.toString();
       result.setDetail(detail);

@@ -46,27 +46,12 @@ public class Executor implements I_Executor {
    */
   @Override
   public I_ExecutionResult executeProcess(I_ExecutionEnvironment env, String inDir, String ... args) throws IOException {
-    ProcessBuilderWrapper pb = sys_.newProcessBuilder(args);
+    I_ProcessBuilderWrapper pb = sys_.newProcessBuilder(args);
     pb.redirectErrorStream(true);
     Map<String,String> environment = pb.environment();
     env.addAllTo(environment);
     
-    File dir = null;
-    if (StringUtils.isEmpty(inDir)) {
-      dir = files_.instance(".");
-      pb.directory(dir);
-    } else {
-      if (".".equals(inDir)) {
-        File dirIn = files_.instance(inDir);
-        inDir = dirIn.getAbsolutePath();
-        char lastChar = inDir.charAt(inDir.length() -1);
-        if ('.' == lastChar) {
-          inDir = inDir.substring(0, inDir.length() - 2);
-        }
-      }
-      dir = files_.instance(inDir);
-      pb.directory(dir);
-    } 
+    setProcessDir(inDir, pb); 
     Process p = pb.start();
     
     try {
@@ -85,7 +70,7 @@ public class Executor implements I_Executor {
 
       while (line != null) {
         sb.append(line);
-        sb.append(sys_.lineSeperator());
+        sb.append(sys_.lineSeparator());
         line = in.readLine();
       }
     } catch (IOException x) {
@@ -107,11 +92,19 @@ public class Executor implements I_Executor {
    */
   @Override
   public I_ExecutingProcess startProcess(I_ExecutionEnvironment env, ExecutorService service, String inDir, String ... args) throws IOException {
-    ProcessBuilderWrapper pb = sys_.newProcessBuilder(args);
+    I_ProcessBuilderWrapper pb = sys_.newProcessBuilder(args);
     pb.redirectErrorStream(true);
     Map<String,String> environment = pb.environment();
     env.addAllTo(environment);
     
+    setProcessDir(inDir, pb); 
+    Process p = pb.start();
+    I_ExecutingProcess ep = sys_.newExecutingProcess(p);
+    service.execute(ep);
+    return ep;
+  }
+
+  private void setProcessDir(String inDir, I_ProcessBuilderWrapper pb) {
     File dir = null;
     if (StringUtils.isEmpty(inDir)) {
       dir = files_.instance(".");
@@ -127,10 +120,6 @@ public class Executor implements I_Executor {
       }
       dir = files_.instance(inDir);
       pb.directory(dir);
-    } 
-    Process p = pb.start();
-    ExecutingProcess ep = new ExecutingProcess(sys_, p);
-    service.execute(ep);
-    return ep;
+    }
   }
 }

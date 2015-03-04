@@ -6,9 +6,6 @@ import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This class discovers information about
@@ -22,7 +19,6 @@ public class ComputerInfoDiscovery {
   public static final String LINUX = "Linux";
   public static final String WINDOWS = "Windows";
   public static final String MAC = "Mac";
-  private static final Set<String> OS_WITH_SYSCTL = getOsWithSysCtl();
   
   public static String[] getCpuInfo(I_FabSystem sys, String os) {
     try {
@@ -123,12 +119,6 @@ public class ComputerInfoDiscovery {
     return cpu;
   }
   
-  private static Set<String> getOsWithSysCtl() {
-    Set<String> toRet = new HashSet<String>();
-    toRet.add(MAC);
-    toRet.add(LINUX);
-    return Collections.unmodifiableSet(toRet);
-  }
   
   public static String getOperatingSystem(I_FabSystem sys) {
     

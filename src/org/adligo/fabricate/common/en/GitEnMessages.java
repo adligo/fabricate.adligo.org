@@ -4,13 +4,18 @@ import org.adligo.fabricate.common.i18n.I_GitMessages;
 
 public class GitEnMessages implements I_GitMessages {
   private static final String DISCOVERED_X_PROJECTS = "Discovered <X/> projects.";
-  private static final String FINISHED_GIT_CHECKOUT_FOR_THE_FOLLOWING_PROJECT = "Finished git checkout for the following project;";
+  private static final String FINISHED_GIT_CHECKOUT_FOR_THE_FOLLOWING_PROJECT = 
+      "Finished git checkout for the following project;";
   
-  private static final String FINISHED_GIT_CLONE_FOR_THE_FOLLOWING_PROJECT = "Finished git clone for the following project;";
-  private static final String FINISHED_GIT_COMMIT_FOR_THE_FOLLOWING_PROJECT = "Finished git checkout for the following project;";
+  private static final String FINISHED_GIT_CLONE_FOR_THE_FOLLOWING_PROJECT = 
+      "Finished git clone for the following project;";
+  private static final String FINISHED_GIT_COMMIT_FOR_THE_FOLLOWING_PROJECT = 
+      "Finished git commit for the following project;";
  
-  private static final String FINISHED_GIT_PULL_FOR_THE_FOLLOWING_PROJECT = "Finished git pull for the following project;";
-  private static final String FINISHED_GIT_PUSH_FOR_THE_FOLLOWING_PROJECT = "Finished git push for the following project;";
+  private static final String FINISHED_GIT_PULL_FOR_THE_FOLLOWING_PROJECT = 
+      "Finished git pull for the following project;";
+  private static final String FINISHED_GIT_PUSH_FOR_THE_FOLLOWING_PROJECT = 
+      "Finished git push for the following project;";
   
   private static final String FINISHED_WITH_GIT_STAGE = "Finished git stage.";
   

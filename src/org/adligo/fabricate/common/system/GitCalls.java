@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common.system;
 
+import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
@@ -15,6 +16,7 @@ public class GitCalls implements I_GitCalls {
   private final I_FabSystem sys_;
   private final I_SystemMessages messages_;
   private final I_FabLog log_;
+  private final I_FabFileIO files_;
   private final ExecutorService service_;
   
   private String hostname_;
@@ -27,6 +29,7 @@ public class GitCalls implements I_GitCalls {
   public GitCalls(I_FabSystem sys) {
     sys_ = sys;
     log_ = sys.getLog();
+    files_ = sys.getFileIO();
     I_FabricateConstants constants = sys_.getConstants();
     messages_ = constants.getSystemMessages();
     service_ = sys.newFixedThreadPool(1);
@@ -56,7 +59,7 @@ public class GitCalls implements I_GitCalls {
   public boolean checkout(String project, String localProjectDir, String version) throws IOException {
     
     I_Executor exe = sys_.getExecutor();
-    String inDir = localProjectDir + File.separator + project;
+    String inDir = localProjectDir + files_.getNameSeparator() + project;
     
     I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV, inDir, 
         "git", "checkout", version);
@@ -76,32 +79,17 @@ public class GitCalls implements I_GitCalls {
    * @see org.adligo.fabricate.common.system.I_GitCalls#pull(java.lang.String, java.lang.String)
    */
   @Override
-  public boolean pull(I_ExecutionEnvironment env, String project, String localProjectDir) throws IOException {
-    
-    String message = messages_.getStartingGetPullOnProjectX();
-    message = message.replace("<X/>", project);
-    log_.println(message);
-    
+  public I_ExecutingProcess pull(I_ExecutionEnvironment env, String project, String localProjectDir) throws IOException {
     I_Executor exe = sys_.getExecutor();
     String inDir = localProjectDir + File.separator + project;
-    I_ExecutionResult er = exe.executeProcess(env, inDir, 
+    I_ExecutingProcess er = exe.startProcess(env, service_, inDir, 
         "git", "pull");
-    String result = er.getOutput();
-   
-    message = messages_.getFinishedGetPullOnProjectX();
-    message = message.replace("<X/>", project);
-    log_.println(message);
-    
-    if (result != null && result.trim().length() >= 1) {
-      if (isSuccess(result)) {
-        return true;
-      } else {
-        throw new IOException(result);
-      }
-    }
-    return false;
+    return er;
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_GitCalls#isSuccess(java.lang.String result)
+   */
   public boolean isSuccess(String result) {
     if (result.indexOf("fatal:") == -1 && result.indexOf("error:") == -1) {
       return true;
@@ -118,7 +106,6 @@ public class GitCalls implements I_GitCalls {
     I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
         ".", "git", "--version");
     String result = er.getOutput();
-    System.out.println("GitCalls " + result);
     if (result != null && result.trim().length() >= 1) {
       if (isSuccess(result)) {
         StringBuilder sb = new StringBuilder();
@@ -157,7 +144,7 @@ public class GitCalls implements I_GitCalls {
         if (majorVersion.doubleValue() < 1.9 || minorVersion.doubleValue() < 3.0 ) {
           String message = messages_.getThisVersionOfFabricateRequiresGitXOrGreater();
           message = message.replace("<X/>", "1.9.3");
-          throw new IOException(message + sys_.lineSeperator() + result);
+          throw new IOException(message + sys_.lineSeparator() + result);
         }
         return true;
       } else {

@@ -1,14 +1,11 @@
 package org.adligo.fabricate.common.system;
 
-import org.adligo.fabricate.common.log.I_FabLog;
-
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RunMonitor implements I_RunMonitor {
   private final I_FabSystem system_;
-  private final I_FabLog log_;
   private final I_LocatableRunnable delegate_;
   private final int sequence_;
   
@@ -24,7 +21,6 @@ public class RunMonitor implements I_RunMonitor {
    */
   public RunMonitor(I_FabSystem system, I_LocatableRunnable delegate, int sequence) {
     system_ = system;
-    log_ = system.getLog();
     done_ = system_.newArrayBlockingQueue(Boolean.class, 1);
     delegate_ = delegate;
     sequence_ = sequence;

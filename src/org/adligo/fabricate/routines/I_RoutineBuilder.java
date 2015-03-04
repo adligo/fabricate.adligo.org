@@ -33,7 +33,8 @@ public interface I_RoutineBuilder {
    * @return
    * @throws FabricationRoutineCreationException
    */
-  public I_FabricationRoutine build(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory) throws FabricationRoutineCreationException;
+  public I_FabricationRoutine build(I_FabricationMemoryMutant<Object> memory, 
+      I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException;
   /**
    * The second and subsequent routines for a run of a
    * group of concurrent routine instances are created using 
@@ -44,5 +45,6 @@ public interface I_RoutineBuilder {
    * @return
    * @throws FabricationRoutineCreationException
    */
-  public I_FabricationRoutine build(I_FabricationMemory memory, I_RoutineMemory routineMemory) throws FabricationRoutineCreationException;
+  public I_FabricationRoutine build(I_FabricationMemory<Object> memory, 
+      I_RoutineMemory<Object> routineMemory) throws FabricationRoutineCreationException;
 }

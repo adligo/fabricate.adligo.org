@@ -64,7 +64,7 @@ public class FabricateOptsSetup {
       log_.println(CommandLineArgs.END);
       return;
     } else {
-      FabSystemSetup.checkManditoryOptsAndAfterArgs(sys);
+      FabSystemSetup.checkManditoryInjectedArgs(sys);
       workWithFabricateXml(fd);
     }
   }
@@ -171,7 +171,7 @@ public class FabricateOptsSetup {
     if (log_.isLogEnabled(FabricateOptsSetup.class)) {
       I_SystemMessages messages = constants_.getSystemMessages();
       log_.println(messages.getManagingFabricateRuntimeClassPathDependencies() +
-          sys_.lineSeperator());
+          sys_.lineSeparator());
     }
     RepositoryManager rm = factory_.createRepositoryManager(sys_, fab_);
     rm.manageDependencies();

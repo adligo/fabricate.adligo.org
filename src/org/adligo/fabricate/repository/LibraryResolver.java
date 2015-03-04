@@ -71,14 +71,14 @@ public class LibraryResolver implements I_LibraryResolver {
     if (libs_.contains(libName)) {
       I_SystemMessages messages = constants_.getSystemMessages();
       throw new IllegalStateException(messages.getTheFollowingListOfFabricateLibrariesContainsACircularReference() +
-          sys_.lineSeperator() + libs_);
+          sys_.lineSeparator() + libs_);
     }
     libs_.add(libName);
     String xmlFilePath = libDir_ + files_.getNameSeparator() + libName + ".xml";
     if (!files_.exists(xmlFilePath)) {
       I_SystemMessages messages = constants_.getSystemMessages();
       throw new IllegalStateException(messages.getTheFollowingFabricateLibraryCanNotBeFound() +
-          sys_.lineSeperator() + xmlFilePath);
+          sys_.lineSeparator() + xmlFilePath);
     }
     try {
       LibraryType lib = xmlFiles_.parseLibrary_v1_0(xmlFilePath);

@@ -69,18 +69,18 @@ public class RepositoryManager {
   
   public void manageDependencies() {
     if (log_.isLogEnabled(RepositoryManager.class)) {
-      log_.println(messages_.getManagingTheFollowingLocalRepository() + sys_.lineSeperator() +
-          fab_.getFabricateRepository() + sys_.lineSeperator());
+      log_.println(messages_.getManagingTheFollowingLocalRepository() + sys_.lineSeparator() +
+          fab_.getFabricateRepository() + sys_.lineSeparator());
     }
     checkRepositories();
     if (log_.isLogEnabled(RepositoryManager.class)) {
       StringBuilder sb = new StringBuilder();
       sb.append(messages_.getUsingTheFollowingRemoteRepositories());
       for (String repo: repositories_) {
-        sb.append(sys_.lineSeperator());
+        sb.append(sys_.lineSeparator());
         sb.append(repo);
       }
-      log_.println(sb.toString()  + sys_.lineSeperator());
+      log_.println(sb.toString()  + sys_.lineSeparator());
     }
     String localRepo = fab_.getFabricateRepository();
     if (!files_.exists(localRepo)) {
@@ -90,7 +90,7 @@ public class RepositoryManager {
     if (files_.exists(repoLockFile)) {
       log_.println(CommandLineArgs.END);
       throw new RuntimeException(messages_.getTheFollowingLocalRepositoryIsLockedByAnotherProcess() +
-          sys_.lineSeperator() + localRepo);
+          sys_.lineSeparator() + localRepo);
     }
     try {
       files_.create(repoLockFile);
@@ -157,7 +157,7 @@ public class RepositoryManager {
       throw new RuntimeException(e);
     }
     if (log_.isLogEnabled(DependenciesManager.class)) {
-      log_.println("RepositoryManager finished " + sys_.lineSeperator() + 
+      log_.println("RepositoryManager finished " + sys_.lineSeparator() + 
           this);
     }
   }
@@ -182,7 +182,7 @@ public class RepositoryManager {
       } catch (IOException e) {
         I_SystemMessages messages =  constants_.getSystemMessages();
         String line = messages.getTheFollowingRemoteRepositoryAppearsToBeDown();
-        log_.println(line + sys_.lineSeperator() + repo + sys_.lineSeperator());
+        log_.println(line + sys_.lineSeparator() + repo + sys_.lineSeparator());
       }
     }
     if (repositories_.size() == 0) {

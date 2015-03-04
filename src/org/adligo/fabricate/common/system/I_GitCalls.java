@@ -34,11 +34,23 @@ public interface I_GitCalls {
   public boolean check(I_Executor exe) throws IOException;
 
   /**
-   * git describe in the current running directory
+   * This runs 'git describe' in the current running directory,
+   * returns the version of the project or 'snapshot' if the call
+   * to describe returns something like;<br/>
+   * fatal: No names found, cannot describe anything.
    * @return
    * @throws IOException
    */
   public String describe() throws IOException;
+  /**
+   * This runs 'git describe' in the directory passed in and
+   * returns the version of the project or 'snapshot' if the call
+   * to describe returns something like;<br/>
+   * fatal: No names found, cannot describe anything.
+   * @param the directory to run git in.
+   * @return
+   * @throws IOException
+   */
   public String describe(String where) throws IOException;
 
   public String getHostname();
@@ -58,8 +70,9 @@ public interface I_GitCalls {
    * @param env the environment (environment variables) for the git process
    * @param project the name of the project
    * @param projectsDir the directory where the projects are stored
+   * @return I_ExecutingProcess the executing process
    */
-  public boolean pull(I_ExecutionEnvironment env, String project, String projectsDir) throws IOException;
+  public I_ExecutingProcess pull(I_ExecutionEnvironment env, String project, String projectsDir) throws IOException;
 
   /**
    * if the output of a git call is successful

@@ -29,9 +29,9 @@ public interface I_FabLogSystem {
    */
   public I_FabricateConstants getConstants();
   /**
-   * Stub for System.lineSeperator()
+   * Stub for {@link System#lineSeparator()}
    * This method should be preferred over the one in I_FabricateConstants.
    * @return
    */
-  public String lineSeperator();
+  public String lineSeparator();
 }

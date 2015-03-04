@@ -22,7 +22,16 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 public class FabSystemSetup {
-
+  public static final Set<String> DEFALUT_ON_LOGS = getDefaultOns();
+  
+  private static Set<String> getDefaultOns() {
+    Set<String> toRet = new HashSet<String>();
+    
+    toRet.add("org.adligo.fabricate.FabricateController");
+    toRet.add("org.adligo.fabricate.repository.RepositoryManager");
+    return Collections.unmodifiableSet(toRet);
+  }
+  
   @SuppressWarnings("boxing")
   public static Map<String, Boolean> getSettings(FabricateType fabricate, Set<String> defaultOns) {
     Map<String,Boolean> logSets = new HashMap<String,Boolean>();
@@ -59,12 +68,8 @@ public class FabSystemSetup {
       language = tempLang;
       country = tempCountry;
     }
-    I_FabricateConstants constants = null;
-    try {
-      constants = new FabConstantsDiscovery(language, country);
-    } catch (IOException x) {
-      constants = FabricateEnConstants.INSTANCE;
-    }
+    I_FabricateConstants constants = sys.newFabConstantsDiscovery(language, country);
+    
     if (!argMap.containsKey(CommandLineArgs.PASSABLE_ARGS_)) {
       String passableArgs = CommandLineArgs.toPassableString(args);
       argMap.put(CommandLineArgs.PASSABLE_ARGS_, passableArgs);
@@ -80,7 +85,7 @@ public class FabSystemSetup {
     sys.setArgs(argMap);
   }
   
-  public static void checkManditoryOptsAndAfterArgs(I_FabSystem sys) {
+  public static void checkManditoryInjectedArgs(I_FabSystem sys) {
     String version = sys.getArgValue("java");
     if (StringUtils.isEmpty(version)) {
       I_FabricateConstants constants = sys.getConstants();
@@ -99,23 +104,15 @@ public class FabSystemSetup {
       throw new IllegalStateException(sysMessages.getExceptionNoStartTimeArg());
     }
   }
+  
   public static void setup(FabSystem sys, FabricateType fabricate) {
     I_FabricateConstants constants = sys.getConstants();
     I_CommandLineConstants clConstants = constants.getCommandLineConstants();
     boolean debug = sys.hasArg(clConstants.getLog(true));
     
-    Set<String> defaultOns = getDefaultOns();
-    Map<String, Boolean> logSets = getSettings(fabricate, defaultOns);
+    Map<String, Boolean> logSets = getSettings(fabricate, DEFALUT_ON_LOGS);
     FabLog log = new FabLog(logSets, debug);
     sys.setLog(log);
     sys.setConstants(constants);
-  }
-  
-  private static Set<String> getDefaultOns() {
-    Set<String> toRet = new HashSet<String>();
-    
-    toRet.add("org.adligo.fabricate.FabricateController");
-    toRet.add("org.adligo.fabricate.repository.RepositoryManager");
-    return toRet;
   }
 }
