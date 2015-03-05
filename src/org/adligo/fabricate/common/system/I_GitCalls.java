@@ -22,7 +22,7 @@ public interface I_GitCalls {
    * @return
    * @throws IOException
    */
-  public boolean checkout(String project, String projectsDir, String version)
+  public void checkout(String project, String projectsDir, String version)
       throws IOException;
   
   /**
@@ -31,7 +31,7 @@ public interface I_GitCalls {
    * @return
    * @throws IOException
    */
-  public boolean check(I_Executor exe) throws IOException;
+  public void check(I_Executor exe) throws IOException;
 
   /**
    * This runs 'git describe' in the current running directory,

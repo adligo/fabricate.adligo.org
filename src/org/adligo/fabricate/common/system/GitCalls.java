@@ -8,7 +8,6 @@ import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.I_ExecutionEnvironment;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
@@ -56,7 +55,7 @@ public class GitCalls implements I_GitCalls {
    * @see org.adligo.fabricate.common.system.I_GitCalls#checkout(java.lang.String, java.lang.String, java.lang.String)
    */
   @Override
-  public boolean checkout(String project, String localProjectDir, String version) throws IOException {
+  public void checkout(String project, String localProjectDir, String version) throws IOException {
     
     I_Executor exe = sys_.getExecutor();
     String inDir = localProjectDir + files_.getNameSeparator() + project;
@@ -65,14 +64,11 @@ public class GitCalls implements I_GitCalls {
         "git", "checkout", version);
     String result = er.getOutput();
     
-    if (result != null && result.trim().length() >= 1) {
-      if (isSuccess(result)) {
-        return true;
-      } else {
-        throw new IOException(result);
-      }
+    if (isSuccess(result)) {
+      return;
+    } else {
+      throw new IOException(result);
     }
-    return false;
   }
 
   /* (non-Javadoc)
@@ -81,7 +77,7 @@ public class GitCalls implements I_GitCalls {
   @Override
   public I_ExecutingProcess pull(I_ExecutionEnvironment env, String project, String localProjectDir) throws IOException {
     I_Executor exe = sys_.getExecutor();
-    String inDir = localProjectDir + File.separator + project;
+    String inDir = localProjectDir + files_.getNameSeparator() + project;
     I_ExecutingProcess er = exe.startProcess(env, service_, inDir, 
         "git", "pull");
     return er;
@@ -91,6 +87,9 @@ public class GitCalls implements I_GitCalls {
    * @see org.adligo.fabricate.common.system.I_GitCalls#isSuccess(java.lang.String result)
    */
   public boolean isSuccess(String result) {
+    if (StringUtils.isEmpty(result)) {
+      return false;
+    }
     if (result.indexOf("fatal:") == -1 && result.indexOf("error:") == -1) {
       return true;
     }
@@ -101,7 +100,7 @@ public class GitCalls implements I_GitCalls {
    * @see org.adligo.fabricate.common.system.I_GitCalls#check(org.adligo.fabricate.common.system.I_Executor)
    */
   @Override
-  public boolean check(I_Executor exe) throws IOException {
+  public void check(I_Executor exe) throws IOException {
 
     I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
         ".", "git", "--version");
@@ -146,12 +145,12 @@ public class GitCalls implements I_GitCalls {
           message = message.replace("<X/>", "1.9.3");
           throw new IOException(message + sys_.lineSeparator() + result);
         }
-        return true;
+        return;
       } else {
         throw new IOException(result);
       }
     }
-    return false;
+    throw new IOException(result);
   }
 
   /* (non-Javadoc)
@@ -172,10 +171,7 @@ public class GitCalls implements I_GitCalls {
     I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
         where, "git", "describe");
     String result = er.getOutput();
-    if (result == null) {
-      return "snapshot";
-    }
-    if (result.indexOf("fatal:") != -1) {
+    if (StringUtils.isEmpty(result)) {
       return "snapshot";
     }
     if (isSuccess(result)) {

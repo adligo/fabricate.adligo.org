@@ -36,6 +36,7 @@ public class GitCloneRoutine extends ScmContextInputAwareRoutine {
       
       if (!files_.exists(projectsDir + projectName)) {
         try {
+          
           process_ = gitCalls_.clone(env_, projectName, projectsDir);
           while (!process_.isFinished()) {
             try {

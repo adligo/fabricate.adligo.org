@@ -138,9 +138,12 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
       case STAGE:
       case FABRICATE_STAGE:
       case IMPLICIT_STAGE:
-      case IMPLICIT_TRAIT:
       case PROJECT_STAGE:
         return getBuildCurrentLocation();
+      case TRAIT:  
+      case IMPLICIT_TRAIT:
+      case FABRICATE_TRAIT:
+        return getTraitCurrentLocation();
       case ARCHIVE_STAGE:
       case FABRICATE_ARCHIVE_STAGE:
         return getArchiveCurrentLocation();
@@ -266,4 +269,42 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
     }
   }
   
+  private String getTraitCurrentLocation() {
+    if (!running.get()) {
+      if (settingUp.get()) {
+        String message = sysMessages_.getTraitXIsStillSettingUp();
+        message = message.replace("<X/>", brief_.getName());
+        return message;
+      }
+    }
+    String task = null;
+    if (I_TaskProcessor.class.isAssignableFrom(this.getClass())) {
+      task = ((I_TaskProcessor) this).getCurrentTask();
+    }
+    String project = null;
+    if (I_ProjectProcessor.class.isAssignableFrom(this.getClass())) {
+      project = ((I_ProjectProcessor) this).getCurrentProject();
+    }
+    if (task != null && project != null) {
+      String message = sysMessages_.getTraitXTaskYIsStillRunningOnProjectZ();
+      message = message.replace("<X/>", brief_.getName())
+          .replace("<Y/>", task)
+          .replace("<Z/>", project);
+      return message;
+    } else if (task != null) {
+      String message = sysMessages_.getTraitXTaskYIsStillRunning();
+      message = message.replace("<X/>", brief_.getName())
+          .replace("<Y/>", task);
+      return message;
+    } else if (project != null) {
+      String message = sysMessages_.getTraitXIsStillRunningOnProjectZ();
+      message = message.replace("<X/>", brief_.getName())
+          .replace("<Z/>", project);
+      return message;
+    } else {
+      String message = sysMessages_.getTraitXIsStillRunning();
+      message = message.replace("<X/>", brief_.getName());
+      return message;
+    }
+  }
 }

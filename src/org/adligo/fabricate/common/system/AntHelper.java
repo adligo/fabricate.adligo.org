@@ -40,12 +40,16 @@ public class AntHelper {
     }
     String dir = args[0];
     OutputStream fos = null;
+    I_GitCalls calls = sys.newGitCalls();
     try {
-      I_GitCalls calls = sys.newGitCalls();
-      if (!calls.check(sys.getExecutor())) {
-        log_.println(sysMessages_.getGitDoesNotAppearToBeInstalledPleaseInstallIt());
-        return;
-      }
+      calls.check(sys.getExecutor());
+    } catch (IOException x) {
+      log_.println(sysMessages_.getGitDoesNotAppearToBeInstalledPleaseInstallIt());
+      log_.printTrace(x);
+      return;
+    }
+    try {
+      
       String desc = calls.describe();
       fos = files_.newFileOutputStream(dir + files_.getNameSeparator() + "version.properties");
       fos.write(new String("fabricate_name=fabricate_" + desc + 

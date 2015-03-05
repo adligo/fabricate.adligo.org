@@ -23,6 +23,8 @@ import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -34,8 +36,10 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -278,6 +282,10 @@ public class FabSystem implements I_FabSystem {
     return new BufferedInputStream(in);
   }
 
+  public <T> ConcurrentLinkedQueue<T> newConcurrentLinkedQueue(Class<T> type) {
+    return new ConcurrentLinkedQueue<T>();
+  }
+  
   @Override
   public CloseableHttpClient newHttpClient() {
     return HttpClients.createDefault();
@@ -289,8 +297,27 @@ public class FabSystem implements I_FabSystem {
   }
   
   @Override
-  public ProcessRunnable newProcessRunnable(Process proc) {
-    return new ProcessRunnable(proc);
+  public I_ProcessRunnable newProcessRunnable(Process proc) {
+    Class<?> clazz =  proc.getClass();
+    //waitFor method is a small optimization on jdk 1.8+
+    I_Method waitForMethod = null;
+    try {
+      final Method m = clazz.getMethod("waitFor", new Class[] {long.class, TimeUnit.class});
+      waitForMethod = new I_Method() {
+        
+        @Override
+        public Object invoke(Object obj, Object... args) throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+          return m.invoke(obj, args);
+        }
+      };
+    } catch (NoSuchMethodException | SecurityException e) {
+      if (log_.isLogEnabled(FabSystem.class)) {
+        log_.println(FabSystem.class.getName() + 
+            " Process.waitFor is not supported, try jdk 1.8+.");
+      }
+    }
+    return new ProcessRunnable(this, proc, waitForMethod);
   }
   
   @Override

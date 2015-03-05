@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -134,6 +135,12 @@ public interface I_FabSystem extends I_FabFilesSystem {
    */
   public String toScriptArgs();
   
+  /**
+   * return a new ConcurrentLinkedQueue.
+   * @param type
+   * @return
+   */
+  public <T> ConcurrentLinkedQueue<T> newConcurrentLinkedQueue(Class<T> type);
   /**
    * creates a new ArrayBlockingQueue for stubbing.
    * @param type
