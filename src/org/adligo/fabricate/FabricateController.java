@@ -147,8 +147,9 @@ public class FabricateController {
     if (!addXmlRoutines(factory, argCommands)) {
       return;
     }
-    FabricationMemoryMutant<Object> memory = factory.createMemory();
-    memory.put(FabricationMemoryConstants.ENV, new ExecutionEnvironmentMutant());
+    FabricationMemoryMutant<Object> memory = factory.createMemory(sys);
+    memory.put(FabricationMemoryConstants.ENV, 
+        new ExecutionEnvironmentMutant(sysMessages_));
     memory.addLock(new MemoryLock(FabricationMemoryConstants.ENV, 
         Collections.singleton(FabricateController.class.getName())));
     if (requiresProjects()) {

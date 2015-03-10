@@ -69,6 +69,9 @@ public interface I_SystemMessages {
   public String getInsteadOfTheFollowingActualGenericType();
   public String getItWasExpectedToImplementTheFollowingInterface();
   
+  public String getLocksMustContainAtLeastOneAllowedCaller();
+  public String getLocksMayOnlyBeSetOnOrUnderTheCallersPackage();
+  
   public String getManagingTheFollowingLocalRepository();
   public String getManagingFabricateRuntimeClassPathDependencies();
   public String getNoRemoteRepositoriesCouldBeReached();
@@ -81,8 +84,6 @@ public interface I_SystemMessages {
   public String getStartingDownloadFromTheFollowingUrl();
   public String getStartingGetCloneOnProjectX();
   public String getStartingGetPullOnProjectX();
-  
-
   
   public String getTheDownloadFromTheFollowingUrl();
   /**
@@ -102,6 +103,8 @@ public interface I_SystemMessages {
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   
   public String getTheFollowingArtifact();
+  public String getTheMemoryKeyXHasBeenLockedByTheFollowingClasses();
+  
   public String getThereWasAProblemCreatingTheFollowingDirectory();
   public String getThereWasAProblemCreatingTheFollowingRoutine();
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory();

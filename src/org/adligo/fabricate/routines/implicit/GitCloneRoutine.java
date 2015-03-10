@@ -41,6 +41,21 @@ public class GitCloneRoutine extends ScmContextInputAwareRoutine {
           while (!process_.isFinished()) {
             try {
               process_.waitUntilFinished(1000);
+              List<String> output = process_.getOutput();
+              boolean error = false;
+              for (String out: output) {
+                if (!gitCalls_.isSuccess(out)) {
+                  error = true;
+                }
+              }
+              if (error) {
+                StringBuilder sb = new StringBuilder();
+                for (String out: output) {
+                  sb.append(system_.lineSeparator());
+                  sb.append(out);
+                }
+                throw new IOException(sb.toString());
+              }
             } catch (InterruptedException e) {
               system_.currentThread().interrupt();
             }

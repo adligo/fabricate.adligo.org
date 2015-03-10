@@ -107,6 +107,11 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String IT_WAS_EXPECTED_TO_IMPLEMENT_THE_FOLLOWING_INTERFACE = 
       "It was expected to implement the following interface;";
   
+  private static final String LOCKS_MUST_CONTAIN_AT_LEAST_ONE_ALLOWED_CALLER = 
+      "Locks must contain at least one allowed caller.";
+  private static final String LOCKS_MAY_ONLY_BE_SET_ON_OR_UNDER_THE_CALLERS_PACKAGE = 
+      "Locks may only be set on or under the caller's package.";
+  
   private static final String MANAGING_FABRICATE_RUNTIME_CLASS_PATH_DEPENDENCIES = 
       "Managing Fabricate runtime class path dependencies.";
   private static final String MANAGING_THE_FOLLOWING_LOCAL_REPOSITORY = 
@@ -142,13 +147,16 @@ public class SystemEnMessages implements I_SystemMessages {
       "The following Fabricate Home should have only these jars;";
   private static final String THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND = 
       "The following Fabricate library can NOT be found;";
-  
   private static final String THE_FOLLOWING_LIST_OF_FABRICATE_LIBRARIES_CONTAINS_A_CIRCULAR_REFERENCE =
       "The following list of Fabricate libraries contains a circular reference;";
   private static final String THE_FOLLOWING_REMOTE_REPOSITORY_APPEARS_TO_BE_DOWN = 
       "The following remote repository appears to be down;";
   private static final String THE_FOLLOWING_COMMAND_LINE_PROGRAM_EXITED_ABNORMALLY_WITH_EXIT_CODE_X =
       "The following command line program exited abnormally with exit code <X/>;";
+  
+  private static final String THE_MEMORY_KEY_X_HAS_BEEN_LOCKED_BY_THE_FOLLOWING_CLASSES = 
+      "The memory key '<X/>' has been locked by the following classes;";
+  
   private static final String THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_DIRECTORY = 
       "There was a problem creating the following directory;";
   private static final String THERE_WAS_A_PROBLEM_CREATING_RUN_MARKER_IN_THE_FOLLOWING_DIRECTORY =
@@ -433,6 +441,16 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getLocksMustContainAtLeastOneAllowedCaller() {
+    return LOCKS_MUST_CONTAIN_AT_LEAST_ONE_ALLOWED_CALLER;
+  }
+  
+  @Override
+  public String getLocksMayOnlyBeSetOnOrUnderTheCallersPackage() {
+    return LOCKS_MAY_ONLY_BE_SET_ON_OR_UNDER_THE_CALLERS_PACKAGE;
+  }
+  
+  @Override
   public String getPassedTheMd5Check() {
     return PASSED_THE_MD5_CHECK;
   }
@@ -506,7 +524,12 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess() {
     return THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS;
   }
-
+  
+  @Override
+  public String getTheMemoryKeyXHasBeenLockedByTheFollowingClasses() {
+    return THE_MEMORY_KEY_X_HAS_BEEN_LOCKED_BY_THE_FOLLOWING_CLASSES;
+  }
+  
   @Override
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory() {
     return THERE_WAS_A_PROBLEM_CREATING_RUN_MARKER_IN_THE_FOLLOWING_DIRECTORY;

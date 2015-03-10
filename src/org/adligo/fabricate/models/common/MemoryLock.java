@@ -46,13 +46,14 @@ public class MemoryLock implements I_MemoryLock {
     Exception x = new Exception();
     x.fillInStackTrace();
     StackTraceElement [] stack =  x.getStackTrace();
-    if (stack.length < 2) {
-      return false;
-    }
+
     //Note this stack contains
     //0 this class
     //1 FabricationMemoryMutant 
     //2 the class that called FabricationMemoryMutant
+    //and should throw a IndexOutOfBoundsException if the stack is to small,
+    //which will probably never occur.
+    
     StackTraceElement e = stack[2];
     String clazz = e.getClassName();
     if (allowedCallers_.contains(clazz)) {

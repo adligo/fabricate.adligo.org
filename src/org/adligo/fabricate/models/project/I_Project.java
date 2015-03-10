@@ -1,6 +1,7 @@
 package org.adligo.fabricate.models.project;
 
 import org.adligo.fabricate.models.dependencies.I_Dependency;
+import org.adligo.fabricate.models.dependencies.I_LibraryDependency;
 import org.adligo.fabricate.models.dependencies.I_ProjectDependency;
 
 import java.util.List;
@@ -12,9 +13,6 @@ import java.util.List;
  * all information about a project, for now
  * it was a extract from Compile/Jar for
  * the FabricateClasspath2Eclipse command. 
- *   Eventually this will probably contain
- * a lot of information about the project/
- * fabricate run.
  * 
  * @author scott
  */
@@ -26,7 +24,24 @@ public interface I_Project extends I_ProjectBrief {
    */
   public String getDir();
 
+  /**
+   * A list is used to keep order correlated with
+   * the project.xml file.
+   * @return
+   */
   public List<I_Dependency> getDependencies();
+  
+  /**
+   * A list is used to keep order correlated with
+   * the project.xml file.
+   * @return
+   */
+  public List<I_LibraryDependency> getLibraryDependencies();
+  /**
+   * A list is used to keep order correlated with
+   * the project.xml file.
+   * @return
+   */
   public List<I_ProjectDependency> getProjectDependencies();
   
 }

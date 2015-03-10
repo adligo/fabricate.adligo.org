@@ -1,5 +1,7 @@
 package org.adligo.fabricate.routines;
 
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.system.I_LocatableRunnable;
@@ -15,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 
 public class RoutineExecutionEngine {
   private final I_FabSystem system_;
+  private final I_SystemMessages sysMessages_;
   private final I_FabLog log_;
   private final I_RoutineBuilder factory_;
   private final int threads_;
@@ -22,18 +25,21 @@ public class RoutineExecutionEngine {
   
   public RoutineExecutionEngine(I_FabSystem system, I_RoutineBuilder factory, int threads) {
     system_ = system;
+    I_FabricateConstants constants = system.getConstants();
+    sysMessages_ = constants.getSystemMessages();
+    
     log_ = system.getLog();
     factory_ = factory;
     threads_ = threads;
   }
   
-  public void runRoutines(FabricationMemoryMutant memoryMut)
+  public void runRoutines(FabricationMemoryMutant<Object> memoryMut)
       throws FabricationRoutineCreationException {
     if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
       log_.println(RoutineExecutionEngine.class.getName() + " runRoutines(FabricationMemoryMutant)");
     }
     
-    FabricationMemoryMutant routineMemoryMutant = new FabricationMemoryMutant();
+    FabricationMemoryMutant<Object> routineMemoryMutant = new FabricationMemoryMutant<Object>(sysMessages_);
     I_FabricationRoutine routine = factory_.build(memoryMut, routineMemoryMutant);
     
     if (routine == null) {
@@ -45,8 +51,8 @@ public class RoutineExecutionEngine {
     if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
       log_.println("created " + routine.getClass());
     }
-    FabricationMemory memory = new FabricationMemory(memoryMut);
-    FabricationMemory routineMemory = new FabricationMemory(routineMemoryMutant);
+    FabricationMemory<Object> memory = new FabricationMemory<Object>(memoryMut);
+    FabricationMemory<Object> routineMemory = new FabricationMemory<Object>(routineMemoryMutant);
     if (I_ConcurrencyAware.class.isAssignableFrom(routine.getClass())) {
       
       if (threads_ >= 2) {

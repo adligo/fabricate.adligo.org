@@ -1,5 +1,6 @@
 package org.adligo.fabricate;
 
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateEnvironment;
@@ -98,8 +99,9 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new LibraryResolver(sys, fabricate);
   }
 
-  public FabricationMemoryMutant<Object> createMemory() {
-    return new FabricationMemoryMutant<Object>();
+  public FabricationMemoryMutant<Object> createMemory(I_FabSystem sys) {
+    I_FabricateConstants constants = sys.getConstants();
+    return new FabricationMemoryMutant<Object>(constants.getSystemMessages());
   }
   
   public FabricateMutant createMutant(Fabricate fab) {

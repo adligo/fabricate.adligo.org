@@ -1,15 +1,19 @@
 package org.adligo.fabricate.models.common;
 
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FabricationMemoryMutant <T> implements I_RoutineMemoryMutant<T> {
-  public static final String THE_KEY_X_HAS_BEEN_LOCKED_BY_THE_FOLLOWING_CLASSES = "The key '<X/>' has been locked by the following classes;";
+  private final I_SystemMessages sysMessages_;
   private Map<String,T> map_ = new ConcurrentHashMap<String,T>();
   private Map<String, I_MemoryLock> locks_ = new ConcurrentHashMap<String, I_MemoryLock>();
   
-  public FabricationMemoryMutant() {
+  public FabricationMemoryMutant(I_SystemMessages messages) {
+    sysMessages_ = messages;
   }
   
   @Override
@@ -22,7 +26,8 @@ public class FabricationMemoryMutant <T> implements I_RoutineMemoryMutant<T> {
     I_MemoryLock lock = locks_.get(key);
     if (lock != null) {
       if (!lock.isAllowed()) {
-        String message = THE_KEY_X_HAS_BEEN_LOCKED_BY_THE_FOLLOWING_CLASSES.replace("<X/>", key);
+        String message = sysMessages_.getTheMemoryKeyXHasBeenLockedByTheFollowingClasses();
+        message = message.replace("<X/>", key);
         throw new IllegalStateException(message + 
             System.lineSeparator() + lock.getAllowedCallers());
       }
@@ -37,6 +42,32 @@ public class FabricationMemoryMutant <T> implements I_RoutineMemoryMutant<T> {
 
   @Override
   public void addLock(I_MemoryLock lock) {
+    Exception e = new Exception();
+    e.fillInStackTrace();
+    StackTraceElement [] elements = e.getStackTrace();
+    
+    //This code should throw a IndexOutOfBoundsException 
+    // if the stack trace is to small, which will probably never occur.
+    StackTraceElement ste = elements[1];
+    
+    String className = ste.getClassName();
+    int lastDot = className.lastIndexOf(".");
+    String packageName = className.substring(0,  lastDot);
+    Set<String> callers =  lock.getAllowedCallers();
+    
+    boolean checked = false;
+    for (String caller: callers) {
+      if (caller != null) {
+        if (caller.indexOf(packageName) == 0) {
+          checked = true;
+        } else {
+          throw new IllegalArgumentException(sysMessages_.getLocksMayOnlyBeSetOnOrUnderTheCallersPackage());
+        }
+      }
+    } 
+    if (!checked) {
+      throw new IllegalArgumentException(sysMessages_.getLocksMustContainAtLeastOneAllowedCaller());
+    }
     locks_.put(lock.getKey(), lock);
   }
   

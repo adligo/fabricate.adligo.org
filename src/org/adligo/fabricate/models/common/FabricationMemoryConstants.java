@@ -1,5 +1,7 @@
 package org.adligo.fabricate.models.common;
 
+import org.adligo.fabricate.common.en.SystemEnMessages;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -20,7 +22,8 @@ public class FabricationMemoryConstants {
    * impossible to control through java).
    */
   public static final String ENV = "environment";
-  public static final I_ExecutionEnvironment EMPTY_ENV = new ExecutionEnvironment(new ExecutionEnvironmentMutant());
+  public static final I_ExecutionEnvironment EMPTY_ENV = new ExecutionEnvironment(
+      new ExecutionEnvironmentMutant(SystemEnMessages.INSTANCE));
   
   /**
    * key to a String

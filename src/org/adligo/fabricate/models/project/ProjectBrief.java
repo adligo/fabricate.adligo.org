@@ -1,5 +1,6 @@
 package org.adligo.fabricate.models.project;
 
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
 
 /**
@@ -15,31 +16,30 @@ public class ProjectBrief implements I_ProjectBrief {
   private final String version_;
   
   public ProjectBrief(I_ProjectBrief project) {
-    name_ = project.getName();
-    int idx = name_.indexOf(".");
-    if (idx != -1) {
-      shortName_ = name_.substring(0, idx);
-      domanName_ = name_.substring(idx + 1, name_.length());
-    } else {
-      shortName_ = null;
-      domanName_ = null;
-    }
-    version_ = project.getVersion();
+    this(project.getName(), project.getVersion());
   }
   
   public ProjectBrief(ProjectType project) {
-    name_ = project.getName();
+    this(project.getName(), project.getVersion());
+  }
+
+  public ProjectBrief(String name, String version) {
+    name_ = name;
     int idx = name_.indexOf(".");
     if (idx != -1) {
       shortName_ = name_.substring(0, idx);
       domanName_ = name_.substring(idx + 1, name_.length());
     } else {
-      shortName_ = null;
-      domanName_ = null;
+      shortName_ = name;
+      domanName_ = "";
     }
-    version_ = project.getVersion();
+    if (StringUtils.isEmpty(version)) {
+      version_ = "";
+    } else {
+      version_ = version;
+    }
   }
-
+  
   @Override
   public String getName() {
     return name_;
@@ -75,8 +75,6 @@ public class ProjectBrief implements I_ProjectBrief {
       return true;
     if (obj == null)
       return false;
-    if (getClass() != obj.getClass())
-      return false;
     ProjectBrief other = (ProjectBrief) obj;
     if (name_ == null) {
       if (other.name_ != null)
@@ -93,6 +91,6 @@ public class ProjectBrief implements I_ProjectBrief {
 
   @Override
   public String toString() {
-    return "ProjectBrief [name_=" + name_ + ", version_=" + version_ + "]";
+    return "ProjectBrief [name=" + name_ + ", version=" + version_ + "]";
   }
 }
