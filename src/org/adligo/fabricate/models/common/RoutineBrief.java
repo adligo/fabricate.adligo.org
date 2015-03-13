@@ -185,7 +185,17 @@ public class RoutineBrief implements I_RoutineBrief {
     }
     Map<String,I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
     for (I_RoutineBrief rou: nestedRoutines_) {
-      toRet.put(rou.getName(), rou);
+      String name = rou.getName();
+      if (toRet.containsKey(name)) {
+        DuplicateRoutineException dre = new DuplicateRoutineException();
+        dre.setName(name);
+        dre.setOrigin(rou.getOrigin());
+        dre.setParentName(name_);
+        dre.setParentOrigin(origin_);
+        throw dre;
+      } else {
+        toRet.put(rou.getName(), rou);
+      }
     }
     return Collections.unmodifiableMap(toRet);
   }

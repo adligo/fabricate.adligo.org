@@ -61,6 +61,13 @@ public interface I_SystemMessages {
   public String getFabricationFailed();
   public String getFabricationSuccessful();
   public String getFailed();
+  
+  public String getFacetXIsStillSettingUp();
+  public String getFacetXIsStillRunning();
+  public String getFacetXIsStillRunningOnProjectZ();
+  public String getFacetXTaskYIsStillRunning() ;
+  public String getFacetXTaskYIsStillRunningOnProjectZ();
+  
   public String getFinished();
   public String getFinishedGetCloneOnProjectX();
   public String getFinishedGetPullOnProjectX();

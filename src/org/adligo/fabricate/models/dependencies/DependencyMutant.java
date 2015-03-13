@@ -148,6 +148,7 @@ public class DependencyMutant implements I_Dependency {
   public String getGroup() {
     return group_;
   }
+
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getPlatform()
    */
@@ -155,6 +156,7 @@ public class DependencyMutant implements I_Dependency {
   public String getPlatform() {
     return platform_;
   }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getType()
    */

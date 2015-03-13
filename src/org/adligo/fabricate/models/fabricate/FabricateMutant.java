@@ -1,6 +1,7 @@
 package org.adligo.fabricate.models.fabricate;
 
 import org.adligo.fabricate.common.system.FabricateDefaults;
+import org.adligo.fabricate.models.common.DuplicateRoutineException;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
@@ -28,13 +29,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * @author scott
+ *
+ */
 public class FabricateMutant implements I_Fabricate {
-  private Map<String,RoutineBriefMutant> commands_ = new HashMap<String,RoutineBriefMutant>();
+  /**
+   * actually only RoutineBriefMutant instances
+   */
+  private Map<String, I_RoutineBrief> commands_ = new HashMap<String, I_RoutineBrief>();
   
   private List<I_Dependency> dependencies_ = new ArrayList<I_Dependency>();
   private boolean developmentMode_ = false;
+  /**
+   * actually only RoutineBriefMutant instances
+   */
+  private Map<String, I_RoutineBrief> facets_ = new HashMap<String, I_RoutineBrief>();
+  
   private String fabricateHome_;
   private String fabricateXmlRunDir_;
+  
   /**
    * The directory where fabricate was run from
    * if it was a project directory (with project.xml)
@@ -48,9 +62,15 @@ public class FabricateMutant implements I_Fabricate {
   
   private List<ProjectBrief> projects_ = new ArrayList<ProjectBrief>();
   private List<String> remoteRepositories_ = new ArrayList<String>();
-  private Map<String,RoutineBriefMutant> traits_ = new HashMap<String,RoutineBriefMutant>();
+  /**
+   * actually only RoutineBriefMutant instances
+   */
+  private Map<String,I_RoutineBrief> traits_ = new HashMap<String,I_RoutineBrief>();
   private RoutineBriefMutant scm_;
-  private Map<String,RoutineBriefMutant> stages_ = new HashMap<String,RoutineBriefMutant>();
+  /**
+   * actually only RoutineBriefMutant instances
+   */
+  private Map<String,I_RoutineBrief> stages_ = new HashMap<String,I_RoutineBrief>();
   private String projectsDir_;
   
   public FabricateMutant() {
@@ -126,6 +146,11 @@ public class FabricateMutant implements I_Fabricate {
     } else if (dep != null) {
       dependencies_.add(new DependencyMutant(dep));
     }
+  }
+  
+  public void addFacets(Collection<RoutineParentType> routines) 
+      throws ClassNotFoundException {
+    addRoutineParents(routines, facets_, RoutineBriefOrigin.FABRICATE_FACET);
   }
   
   public void addRemoteRepository(String repo) {
@@ -433,12 +458,20 @@ public class FabricateMutant implements I_Fabricate {
   }
 
   private void addRoutineParents(Collection<RoutineParentType> routines, 
-      Map<String,RoutineBriefMutant> map, RoutineBriefOrigin origin) 
+      Map<String,I_RoutineBrief> map, RoutineBriefOrigin origin) 
           throws IllegalArgumentException, ClassNotFoundException {
     if (routines != null) {
-      for (RoutineType routine: routines) {
+      for (RoutineParentType routine: routines) {
         RoutineBriefMutant mut = new RoutineBriefMutant(routine, origin);
-        map.put(mut.getName(), mut);
+        String name = mut.getName();
+        if (map.containsKey(name)) {
+          DuplicateRoutineException dre = new DuplicateRoutineException();
+          dre.setName(name);
+          dre.setOrigin(mut.getOrigin());
+          throw dre;
+        } else {
+          map.put(mut.getName(), mut);
+        }
       }
     }
   }

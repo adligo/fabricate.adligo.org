@@ -41,39 +41,16 @@
 	    	</simpleType>
     	</attribute>
     </complexType>
-    
-    <complexType name="routine_params_parent_type">
+
+
+    <complexType name="routine_type">
     	<complexContent>
     		<extension base="cns:routine_params_type">
-    			<sequence>
-    				<element name="task" type="cns:routine_params_type" minOccurs="0" maxOccurs="unbounded"></element>
-    			</sequence>
+    			<attribute name="class" type="cns:class_type"></attribute>
     		</extension>
     	</complexContent>
     </complexType>
 
-    <complexType name="routine_type">
-    	<complexContent>
-	    	<extension base="cns:routine_params_type">
-	    	<attribute name="class" use="optional">
-	    		<annotation>
-	    			<documentation>
-	    				This must be the name of a
-	    				org.adligo.fabricate.models.common.I_FabricationRoutine
-	    				implementation.
-	    			</documentation>
-	    		</annotation>
-	    		<simpleType>
-	    			<restriction base="normalizedString">
-	    				<whiteSpace value="collapse"></whiteSpace>
-	    				<minLength value="3"></minLength>
-	    			</restriction>
-	    		</simpleType>
-	    	</attribute>
-	    	</extension>
-    	</complexContent>
-    </complexType>
-    
     <complexType name="routine_parent_type">
     	<complexContent>
     		<extension base="cns:routine_type">
@@ -84,4 +61,16 @@
     	</complexContent>
     </complexType>
 
+
+    <simpleType name="class_type">
+        <annotation>
+        	<documentation>
+				This must be the name of a org.adligo.fabricate.models.common.I_FabricationRoutine implementation.
+			</documentation>
+        </annotation>
+        <restriction base="normalizedString">
+			<whiteSpace value="collapse"></whiteSpace>
+			<minLength value="3"></minLength>
+		</restriction>
+    </simpleType>
 </schema>

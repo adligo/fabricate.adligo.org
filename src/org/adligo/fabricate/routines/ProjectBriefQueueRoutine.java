@@ -1,5 +1,6 @@
 package org.adligo.fabricate.routines;
 
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
@@ -33,7 +34,7 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
     if (log_.isLogEnabled(ProjectBriefQueueRoutine.class)) {
       log_.println(ProjectBriefQueueRoutine.class.getName() + " setup(I_FabricationMemoryMutant, I_RoutineMemoryMutant)");
     }
-    queue = new ConcurrentLinkedQueue<I_ProjectBrief>();
+    queue = system_.newConcurrentLinkedQueue(I_ProjectBrief.class);
     List<I_ProjectBrief> briefs = fabricate_.getProjects();
     //fabricate_ is a Fabricate (immutable instance) and has filtered out null briefs;
     log_.println(ProjectBriefQueueRoutine.class.getName() + " has " +

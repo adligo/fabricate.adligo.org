@@ -37,6 +37,16 @@ public interface I_Project extends I_ProjectBrief {
    * @return
    */
   public List<I_LibraryDependency> getLibraryDependencies();
+  
+  /**
+   * Normalized dependencies include actual dependencies from
+   * the project.xml file and dependencies which were in 
+   * libraries referenced by the project.xml file.  This 
+   * does NOT include project dependencies.
+   * @return
+   */
+  public List<I_Dependency> getNormalizedDependencies();
+  
   /**
    * A list is used to keep order correlated with
    * the project.xml file.

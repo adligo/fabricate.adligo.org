@@ -16,10 +16,18 @@ import java.util.List;
  *
  */
 public interface I_Dependency {
+  /**
+   * Information about IDE (Integrated Development Environment [i.e. Eclipse]) specific settings for this dependency.  
+   * @return
+   */
   public I_Ide get(int child);
   
   public abstract String getArtifact();
 
+  /**
+   * Information about IDE (Integrated Development Environment [i.e. Eclipse]) specific settings for this dependency.  
+   * @return
+   */
   public abstract List<I_Ide> getChildren();
 
   public abstract boolean isExtract();

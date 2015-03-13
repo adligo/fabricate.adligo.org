@@ -81,7 +81,7 @@ public class RoutineFabricateFactory {
   public void addImplicitTraits() {
     addTrait(EncryptTrait.NAME, EncryptTrait.class);
     addTrait(DecryptTrait.NAME, DecryptTrait.class);
-    traits_.add(ObtainTrait.ROUTINE_BRIEF);
+    traits_.add(ImplicitProjectFacets.OBTAIN_BRIEF);
   }
   
   /**

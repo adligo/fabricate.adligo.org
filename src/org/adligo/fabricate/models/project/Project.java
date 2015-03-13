@@ -21,6 +21,7 @@ public class Project implements I_Project {
   private final String version_;
   private final List<I_Dependency> dependencies_;
   private final List<I_LibraryDependency> libraryDependencies_;
+  private final List<I_Dependency> normalizedDependencies_;
   private final List<I_ProjectDependency> projectDependencies_;
   
   public Project(I_Project project) {
@@ -29,6 +30,7 @@ public class Project implements I_Project {
     version_ = project.getVersion();
     dependencies_ = copyDependencies(project.getDependencies());
     libraryDependencies_ = copyLibraryDependencies(project.getLibraryDependencies());
+    normalizedDependencies_ = copyDependencies(project.getNormalizedDependencies());
     projectDependencies_ = copyProjectDependencies(project.getProjectDependencies());
   }
   
@@ -50,6 +52,10 @@ public class Project implements I_Project {
 
   public List<I_LibraryDependency> getLibraryDependencies() {
     return libraryDependencies_;
+  }
+  
+  public List<I_Dependency> getNormalizedDependencies() {
+    return normalizedDependencies_;
   }
   
   public List<I_ProjectDependency> getProjectDependencies() {

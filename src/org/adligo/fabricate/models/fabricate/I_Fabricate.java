@@ -7,6 +7,11 @@ import org.adligo.fabricate.models.project.I_ProjectBrief;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * TODO add facets
+ * @author scott
+ *
+ */
 public interface I_Fabricate extends I_JavaSettings {
 
   public List<I_Dependency> getDependencies();

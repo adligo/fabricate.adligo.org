@@ -135,6 +135,10 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
       case IMPLICIT_COMMAND:
       case PROJECT_COMMAND:
         return getCommandCurrentLocation();
+      case FACET:  
+      case IMPLICIT_FACET:
+      case FABRICATE_FACET:
+        return getFacetCurrentLocation();
       case STAGE:
       case FABRICATE_STAGE:
       case IMPLICIT_STAGE:
@@ -264,6 +268,45 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
       return message;
     } else {
       String message = sysMessages_.getCommandXIsStillRunning();
+      message = message.replace("<X/>", brief_.getName());
+      return message;
+    }
+  }
+  
+  private String getFacetCurrentLocation() {
+    if (!running.get()) {
+      if (settingUp.get()) {
+        String message = sysMessages_.getFacetXIsStillSettingUp();
+        message = message.replace("<X/>", brief_.getName());
+        return message;
+      }
+    }
+    String task = null;
+    if (I_TaskProcessor.class.isAssignableFrom(this.getClass())) {
+      task = ((I_TaskProcessor) this).getCurrentTask();
+    }
+    String project = null;
+    if (I_ProjectProcessor.class.isAssignableFrom(this.getClass())) {
+      project = ((I_ProjectProcessor) this).getCurrentProject();
+    }
+    if (task != null && project != null) {
+      String message = sysMessages_.getFacetXTaskYIsStillRunningOnProjectZ();
+      message = message.replace("<X/>", brief_.getName())
+          .replace("<Y/>", task)
+          .replace("<Z/>", project);
+      return message;
+    } else if (task != null) {
+      String message = sysMessages_.getFacetXTaskYIsStillRunning();
+      message = message.replace("<X/>", brief_.getName())
+          .replace("<Y/>", task);
+      return message;
+    } else if (project != null) {
+      String message = sysMessages_.getFacetXIsStillRunningOnProjectZ();
+      message = message.replace("<X/>", brief_.getName())
+          .replace("<Z/>", project);
+      return message;
+    } else {
+      String message = sysMessages_.getFacetXIsStillRunning();
       message = message.replace("<X/>", brief_.getName());
       return message;
     }

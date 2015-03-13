@@ -171,6 +171,20 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     return result;
   }
   
+  public static boolean hasNested(String key, List<I_RoutineBrief> briefs) {
+    if (briefs == null || key == null) {
+      return false;
+    }
+    for (I_RoutineBrief rbm: briefs) {
+      if (rbm != null) {
+        if (key.equals(rbm.getName())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  
   public static String toString(I_RoutineBrief me) {
     StringBuilder sb = new StringBuilder();
     StringBuilder indent = new StringBuilder();
@@ -235,8 +249,14 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   private String name_;
   private Class<? extends I_FabricationRoutine> clazz_;
   private RoutineBriefOrigin origin_;
-  private List<ParameterMutant> parameters_;
-  private List<RoutineBriefMutant> nestedRoutines_;
+  /**
+   * actually only ParameterMutant instances.
+   */
+  private List<I_Parameter> parameters_;
+  /**
+   * actually only RoutineBriefMutant instances.
+   */
+  private List<I_RoutineBrief> nestedRoutines_;
   /**
    * This is the setting from xml, or null
    */
@@ -307,23 +327,11 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     List<RoutineType> nested = routine.getTask();
     if (nested != null) {
       if (nested.size() >= 1) {
-        switch (origin) {
-          case COMMAND:
-            addNested(nested, RoutineBriefOrigin.COMMAND_TASK);
-            break;
-          case PROJECT_COMMAND:
-            addNested(nested, RoutineBriefOrigin.PROJECT_COMMAND_TASK);
-            break;
-          case PROJECT_STAGE:
-            addNested(nested, RoutineBriefOrigin.PROJECT_STAGE_TASK);
-            break;
-          default:
-            addNested(nested, RoutineBriefOrigin.TRAIT_TASK);
-        }
-        
+        addNested(origin, nested);
       }
     }
   }
+
 
   /**
    * 
@@ -356,19 +364,47 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     List<? extends RoutineType> nested = stage.getTask();
     if (nested != null) {
       if (nested.size() >= 1) {
-        if (RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE == origin) {
-          addNested(nested, RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE_TASK);
-        } else {
-          addNested(nested, RoutineBriefOrigin.FABRICATE_STAGE_TASK);
+        switch (origin) {
+          case ARCHIVE_STAGE:
+            addNested(nested, RoutineBriefOrigin.ARCHIVE_STAGE_TASK);
+            break;
+          case FABRICATE_ARCHIVE_STAGE:
+            addNested(nested, RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE_TASK);
+            break;
+          case FABRICATE_STAGE:
+            addNested(nested, RoutineBriefOrigin.FABRICATE_STAGE_TASK);
+            break;
+          case IMPLICIT_ARCHIVE_STAGE:
+            addNested(nested, RoutineBriefOrigin.IMPLICIT_ARCHIVE_STAGE_TASK);
+            break;
+          case IMPLICIT_STAGE:
+            addNested(nested, RoutineBriefOrigin.IMPLICIT_STAGE_TASK);
+            break;
+          case PROJECT_STAGE:
+            addNested(nested, RoutineBriefOrigin.PROJECT_STAGE_TASK);
+            break;
+          case STAGE:
+          default:
+            addNested(nested, RoutineBriefOrigin.STAGE_TASK);
         }
       }
     }
   }
  
   public void addNestedRoutine(I_RoutineBrief nested) {
-    if (nestedRoutines_ == null) {
-      nestedRoutines_ = new ArrayList<RoutineBriefMutant>();
+    String name = nested.getName();
+    if (hasNested(name, nestedRoutines_)) {
+      DuplicateRoutineException dre = new DuplicateRoutineException();
+      dre.setName(name);
+      dre.setOrigin(nested.getOrigin());
+      dre.setParentName(name_);
+      dre.setParentOrigin(origin_);
+      throw dre;
     }
+    if (nestedRoutines_ == null) {
+      nestedRoutines_ = new ArrayList<I_RoutineBrief>();
+    }
+    
     if (nested instanceof RoutineBriefMutant) {
       nestedRoutines_.add((RoutineBriefMutant) nested);
     } else {
@@ -379,7 +415,7 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   
   public void addParameter(I_Parameter param) {
     if (parameters_ == null) {
-      parameters_ = new ArrayList<ParameterMutant>();
+      parameters_ = new ArrayList<I_Parameter>();
     }
     if (param instanceof ParameterMutant) {
       parameters_.add((ParameterMutant) param);
@@ -408,6 +444,7 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   public String getName() {
     return name_;
   }
+  
   
   @Override
   public boolean hasParameter(String key) {
@@ -466,9 +503,9 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     if (nestedRoutines_ == null) {
       return false;
     }
-    Iterator<RoutineBriefMutant> nestedIt = nestedRoutines_.iterator();
+    Iterator<I_RoutineBrief> nestedIt = nestedRoutines_.iterator();
     while(nestedIt.hasNext()) {
-      RoutineBriefMutant next = nestedIt.next();
+      I_RoutineBrief next = nestedIt.next();
       if (name.equals(next.getName())) {
         nestedIt.remove();
         return true;
@@ -481,9 +518,9 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     if (parameters_ == null) {
       return;
     }
-    Iterator<ParameterMutant> it = parameters_.iterator();
+    Iterator<I_Parameter> it = parameters_.iterator();
     while (it.hasNext()) {
-      ParameterMutant pm = it.next();
+      I_Parameter pm = it.next();
       if (key.equals(pm.getKey())) {
         it.remove();
       }
@@ -524,13 +561,85 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
   }
   
+
+  private void addNested(RoutineBriefOrigin origin, List<RoutineType> nested)
+      throws ClassNotFoundException {
+    switch (origin) {
+      case ARCHIVE_STAGE:
+        addNested(nested, RoutineBriefOrigin.ARCHIVE_STAGE_TASK);
+        break;
+      case COMMAND:
+        addNested(nested, RoutineBriefOrigin.COMMAND_TASK);
+        break;
+      case FABRICATE_ARCHIVE_STAGE:
+        addNested(nested, RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE_TASK);
+        break;
+      case FABRICATE_COMMAND:
+        addNested(nested, RoutineBriefOrigin.FABRICATE_COMMAND_TASK);
+        break;
+      case FABRICATE_FACET:
+        addNested(nested, RoutineBriefOrigin.FABRICATE_FACET_TASK);
+        break;
+      case FABRICATE_STAGE:
+        addNested(nested, RoutineBriefOrigin.FABRICATE_STAGE_TASK);
+        break;
+      case FABRICATE_TRAIT:
+        addNested(nested, RoutineBriefOrigin.FABRICATE_TRAIT_TASK);
+        break;
+      case FACET:
+        addNested(nested, RoutineBriefOrigin.FACET_TASK);
+        break;
+      case IMPLICIT_ARCHIVE_STAGE:
+        addNested(nested, RoutineBriefOrigin.IMPLICIT_ARCHIVE_STAGE_TASK);
+        break;
+      case IMPLICIT_COMMAND:
+        addNested(nested, RoutineBriefOrigin.IMPLICIT_COMMAND_TASK);
+        break;
+      case IMPLICIT_FACET:
+        addNested(nested, RoutineBriefOrigin.IMPLICIT_FACET_TASK);
+        break;
+      case IMPLICIT_STAGE:
+        addNested(nested, RoutineBriefOrigin.IMPLICIT_STAGE_TASK);
+        break;
+      case IMPLICIT_TRAIT:
+        addNested(nested, RoutineBriefOrigin.IMPLICIT_TRAIT_TASK);
+        break;
+      case PROJECT_COMMAND:
+        addNested(nested, RoutineBriefOrigin.PROJECT_COMMAND_TASK);
+        break;
+      case PROJECT_STAGE:
+        addNested(nested, RoutineBriefOrigin.PROJECT_STAGE_TASK);
+        break;
+      case PROJECT_TRAIT:
+        addNested(nested, RoutineBriefOrigin.PROJECT_TRAIT_TASK);
+        break;
+      case STAGE:
+        addNested(nested, RoutineBriefOrigin.STAGE_TASK);
+        break;
+      case TRAIT:
+        addNested(nested, RoutineBriefOrigin.TRAIT_TASK);
+        break;
+      default:
+        addNested(nested, RoutineBriefOrigin.TRAIT_TASK);
+    }
+  }
+  
   private void addNested(List<? extends RoutineType> nested, RoutineBriefOrigin origin) 
     throws IllegalArgumentException, ClassNotFoundException {
     if (nested != null) {
-      List<RoutineBriefMutant> nestedMuts = new ArrayList<RoutineBriefMutant>();
+      List<I_RoutineBrief> nestedMuts = new ArrayList<I_RoutineBrief>();
       
       for (RoutineType type: nested) {
         RoutineBriefMutant mut = new RoutineBriefMutant(type, origin);
+        String name = mut.getName();
+        if (hasNested(name, nestedMuts)) {
+          DuplicateRoutineException dre = new DuplicateRoutineException();
+          dre.setName(name);
+          dre.setOrigin(mut.getOrigin());
+          dre.setParentName(name_);
+          dre.setParentOrigin(origin_);
+          throw dre;
+        }
         nestedMuts.add(mut);
       }
       nestedRoutines_ = nestedMuts;
@@ -542,7 +651,7 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     if (nestedRoutines_ == null) {
       return null;
     }
-    for (RoutineBriefMutant rbm: nestedRoutines_) {
+    for (I_RoutineBrief rbm: nestedRoutines_) {
       if (rbm != null) {
         if (name.equals(rbm.getName())) {
           return rbm;
@@ -587,10 +696,10 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     if (parameters_ == null) {
       return null;
     }
-    for (ParameterMutant rbm: parameters_) {
+    for (I_Parameter rbm: parameters_) {
       if (rbm != null) {
         if (key.equals(rbm.getKey())) {
-          return rbm;
+          return (ParameterMutant) rbm;
         }
       }
     }

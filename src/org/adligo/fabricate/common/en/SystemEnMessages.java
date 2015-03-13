@@ -93,6 +93,17 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String FABRICATION_FAILED = "Fabrication failed!";
   private static final String FABRICATION_SUCCESSFUL = "Fabrication successful!";
   
+  private static final String FACET_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Facet <X/>, task <Y/> is still running on project <Z/>.";
+  private static final String FACET_X_TASK_Y_IS_STILL_RUNNING = 
+      "Facet <X/>, task <Y/> is still running.";
+  private static final String FACET_X_IS_STILL_RUNNING_ON_PROJECT_Z = 
+      "Facet <X/> is still running on project <Z/>.";
+  private static final String FACET_X_IS_STILL_RUNNING = 
+      "Facet <X/> is still running.";
+  private static final String FACET_X_IS_STILL_SETTING_UP = 
+      "Facet <X/> is still setting up.";
+  
   private static final String FAILED = "failed!";
   private static final String FINISHED = "finished.";
   private static final String FINISHED_GIT_PULL_ON_PROJECT_X = 
@@ -406,6 +417,31 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getFacetXIsStillSettingUp() {
+    return FACET_X_IS_STILL_SETTING_UP;
+  }
+  
+  @Override
+  public String getFacetXIsStillRunning() {
+    return FACET_X_IS_STILL_RUNNING;
+  }
+  
+  @Override
+  public String getFacetXIsStillRunningOnProjectZ() {
+    return FACET_X_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getFacetXTaskYIsStillRunning() {
+    return FACET_X_TASK_Y_IS_STILL_RUNNING;
+  }
+  
+  @Override
+  public String getFacetXTaskYIsStillRunningOnProjectZ() {
+    return FACET_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
   public String getFailed() {
     return FAILED;
   }
@@ -561,13 +597,13 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
-  public String getTraitXIsStillSettingUp() {
-    return TRAIT_X_IS_STILL_SETTING_UP;
+  public String getToTheFollowingFolder() {
+    return TO_THE_FOLLOWING_FOLDER;
   }
   
   @Override
-  public String getToTheFollowingFolder() {
-    return TO_THE_FOLLOWING_FOLDER;
+  public String getTraitXIsStillSettingUp() {
+    return TRAIT_X_IS_STILL_SETTING_UP;
   }
   
   @Override
@@ -584,7 +620,7 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getTraitXTaskYIsStillRunning() {
     return TRAIT_X_TASK_Y_IS_STILL_RUNNING;
   }
-
+  
   @Override
   public String getTraitXTaskYIsStillRunningOnProjectZ() {
     return TRAIT_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;

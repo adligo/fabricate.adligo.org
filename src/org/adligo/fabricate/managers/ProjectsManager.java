@@ -17,7 +17,7 @@ import org.adligo.fabricate.routines.I_FabricateAware;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
 import org.adligo.fabricate.routines.I_TaskProcessor;
 import org.adligo.fabricate.routines.RoutineExecutionEngine;
-import org.adligo.fabricate.routines.implicit.ObtainTrait;
+import org.adligo.fabricate.routines.implicit.ImplicitProjectFacets;
 import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
 
@@ -90,7 +90,7 @@ public class ProjectsManager {
     }
     if (failure != null) {
       FailureType result = new FailureType();
-      result.setStage(ObtainTrait.NAME);
+      result.setStage(ImplicitProjectFacets.NAME);
       if (routine != null) {
         if (I_TaskProcessor.class.isAssignableFrom(routine.getClass())) {
           result.setTask(((I_TaskProcessor) routine).getCurrentTask());
@@ -109,16 +109,16 @@ public class ProjectsManager {
   
   private I_FabricationRoutine processTraitSetup() throws FabricationRoutineCreationException {
     Set<I_ExpectedRoutineInterface> es = Collections.emptySet();
-    I_FabricationRoutine routine = factory_.createTrait(ObtainTrait.NAME,es);
+    I_FabricationRoutine routine = factory_.createTrait(ImplicitProjectFacets.NAME,es);
 
     routine.setSystem(system_);
     if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
       ((I_FabricateAware) routine).setFabricate(fabricate_);
     } 
     I_RoutineFactory traitFactory = factory_.getTraits();
-    I_RoutineFactory taskFactory = traitFactory.createTaskFactory(ObtainTrait.NAME);
+    I_RoutineFactory taskFactory = traitFactory.createTaskFactory(ImplicitProjectFacets.NAME);
     routine.setTaskFactory(taskFactory);
-    routine.setBrief(ObtainTrait.ROUTINE_BRIEF);
+    routine.setBrief(ImplicitProjectFacets.OBTAIN_BRIEF);
     routine.setTraitFactory(factory_.getTraits());
     if (I_CommandAware.class.isAssignableFrom(routine.getClass())) {
       I_RoutineFactory cmdFactory = factory_.getCommands();

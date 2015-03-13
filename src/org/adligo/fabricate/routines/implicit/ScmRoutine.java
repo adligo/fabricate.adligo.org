@@ -15,14 +15,12 @@ import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.common.MemoryLock;
 import org.adligo.fabricate.routines.I_FabricateAware;
 import org.adligo.fabricate.routines.I_InputAware;
-import org.adligo.fabricate.routines.I_OutputProducer;
 import org.adligo.fabricate.routines.ProjectBriefQueueRoutine;
 import org.adligo.fabricate.routines.SshAgentHelper;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class ScmRoutine extends ProjectBriefQueueRoutine {
   /**
@@ -85,8 +83,8 @@ public class ScmRoutine extends ProjectBriefQueueRoutine {
   public void manageSshKeystorePassword(I_FabricationMemoryMutant<Object> memory, I_RoutineBrief scm)
       throws FabricationRoutineCreationException {
     
-    // TODO figure out how to pipe a password to ssh-add, to make the following work
-    //getKeystorePasswordFromFabricate(memory, scm)
+    // TODO rewrite ssh-add in java so the password can be directly piped from
+    // fabricate to a running ssh-agent
     try{
       I_Executor exe = system_.getExecutor();
       I_ExecutionResult result =  exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
@@ -104,8 +102,6 @@ public class ScmRoutine extends ProjectBriefQueueRoutine {
       env.put(SshAgentHelper.SSH_AUTH_SOCK, sshAgentHelper.getSock());
       env.put(SshAgentHelper.SSH_AGENT_PID, sshAgentHelper.getPid());
       
-      //note I tried to do my own dialog here and pipe the password to ssh-add
-      //but it never really worked
       String loc = getPrivateKeyLocation();
       I_ExecutionResult addResult = exe.executeProcess(env, ".", "ssh-add", loc);
       if (addResult.getExitCode() != 0) {
@@ -180,18 +176,6 @@ public class ScmRoutine extends ProjectBriefQueueRoutine {
     return loc;
   }
 
-  @SuppressWarnings("unchecked")
-  public String decryptPassword(I_FabricationMemoryMutant<Object> memory, 
-      String keystorePassEncryptedValue)
-      throws FabricationRoutineCreationException {
-    String password;
-    I_FabricationRoutine routine = traitFactory_.createRoutine(EncryptTrait.NAME, EncryptTrait.IMPLEMENTED_INTERFACES);
-    ((I_InputAware<String>) routine).setInput(keystorePassEncryptedValue);
-    routine.run();
-    password = ((I_OutputProducer<String>) routine).getOutput();
-    memory.put(FabricationMemoryConstants.GIT_KEYSTORE_PASSWORD, password);
-    return password;
-  }
 
   @Override
   public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory)

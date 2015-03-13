@@ -16,6 +16,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * TODO add facets
+ * TODO throw DuplicateRoutineExceptions
+ * @author scott
+ *
+ */
 public class Fabricate implements I_Fabricate {
   private final boolean developmentMode;
   private final List<I_Dependency> dependencies_;

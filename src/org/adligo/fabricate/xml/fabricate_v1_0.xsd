@@ -48,7 +48,22 @@
 	
     
     <complexType name="fabricate_type">
-    	<sequence>
+        <annotation>
+        	<documentation>
+				Fabricate type represents a complete fabrication environment, which allows the user to execute commands or stages.  
+				Commands allow the environment to be customized for a particular purpose (like Eclipse development).  Stages are 
+				executed on the environment as a ordered group (a process refereed to as fabrication).
+				   Commands, Facets, Stages, Tasks and their tasks must be implementations of org.adligo.fabricate.common.I_FabricationRoutine. 
+				Commands and Stages may execute in a one off, single threaded, concurrent, project dependent, or customizable manor 
+				based on additional interfaces they implement.  Traits allow plug-able code to be shared between Commands and Stages.  
+				Projects may override trait classes but may NOT override command or stage classes.  Projects may always override parameters, 
+				and participate in stages or commands and their tasks.  Facets are used to obtain and load projects and their dependencies.   
+				   The elements of the fabricate_type are ordered by importance, and use by the fabricate program.  
+				   
+				  
+			</documentation>
+        </annotation>
+        <sequence>
     		<element name="java" type="fns:java_type" minOccurs="0"
     			maxOccurs="1">
     		</element>
@@ -58,14 +73,31 @@
     		<element name="dependencies"
     			type="fns:fabricate_dependencies" minOccurs="1" maxOccurs="1">
     		</element>
-            <element name="trait" type="cns:routine_parent_type" minOccurs="0" maxOccurs="unbounded">
+    		<element name="trait" type="cns:routine_parent_type"
+    			minOccurs="0" maxOccurs="unbounded">
+    			<annotation>
+    				<documentation>
+    					Traits provide reusable code between commands
+    					and stages, they were originally added as a way
+    					to encrypt and decrypt key-store passwords for
+    					git. Fabricate includes these default traits
+    					(encrypt and decrypt), but they may be replaced
+    					by specifying a trait node with a identical
+    					name.
+    				</documentation>
+    			</annotation>
+    		</element>
+            <element name="facet" type="cns:routine_parent_type" minOccurs="0" maxOccurs="unbounded">
             	<annotation>
-            		<documentation>Traits provide reusable code between commands and stages,
-they were originally added as a way to encrypt and decrypt
-keystore passwords for git.  Fabricate includes these 
-default traits (encrypt and decrypt), but they may be replaced 
-by specifying a trait node with a identical name.</documentation>
-            	</annotation></element>
+            		<documentation>
+						Facets are special implementations of org.adligo.fabricate.models.common.I_FabricationRoutine 
+						used during project management before commands or stages are executed. They may NOT
+						be overrides by the project.xml files, since they are generally used to obtain and load 
+						the projects and their dependencies.  There are two main implicit facets, obtain and
+						obtainDependencies.
+					</documentation>
+            	</annotation>
+            </element>
             <element name="command" type="cns:routine_parent_type"
     			minOccurs="0" maxOccurs="unbounded">
     		</element>
@@ -97,15 +129,18 @@ by specifying a trait node with a identical name.</documentation>
     		<sequence>
     			<element name="scm" type="cns:routine_type" minOccurs="1" maxOccurs="1">
     				<annotation>
-    					<documentation>The scm node represents a special I_ScmFactories implementation
-class.  When the nodes class is null the name is used to locate
-a default I_ScmFactories implementation 
-(i.e. org.adligo.fabricate.routines.implicit.GitFactories).
-When a class is present then reflection is used to create the
-class of the custom I_ScmFactories implementation
-allowing Fabricate to work with other source control
-management systems.</documentation>
-    				</annotation></element>
+    					<documentation>
+	    					The scm node represents a special I_ScmFactories implementation
+							class.  When the nodes class is null the name is used to locate
+							a default I_ScmFactories implementation 
+							(i.e. org.adligo.fabricate.routines.implicit.GitFactories).
+							When a class is present then reflection is used to create the
+							class of the custom I_ScmFactories implementation
+							allowing Fabricate to work with other source control
+							management systems.
+						</documentation>
+    				</annotation>
+    			</element>
     			<element name="project" type="fns:project_type" minOccurs="1" maxOccurs="unbounded"></element>
     		</sequence>
     	
@@ -224,8 +259,9 @@ management systems.</documentation>
     <complexType name="project_group_type">
         <annotation>
         	<documentation>
-Project groups are projects with fabricate.xml files, 
-fabricate will be able to delegate to other fabrications.</documentation>
+				Project groups are projects with fabricate.xml files, 
+				fabricate will be able to delegate to other fabrications.
+			</documentation>
         </annotation>
         <sequence>
     		<element name="scm" type="cns:routine_type" minOccurs="1"
@@ -246,12 +282,13 @@ fabricate will be able to delegate to other fabrications.</documentation>
 	<complexType name="stage_type">
         <annotation>
         	<documentation>
-Fabricate stages are templates that may be applied to projects
-if the project has a stage with a matching stage name.   By default
-all tasks for a stage are executed on the project, however 
-if a task is optional, then the project must have the task node
-under the stage with matching respective names
-in order for the task to be executed on the project.</documentation>
+				Fabricate stages are templates that may be applied to projects
+				if the project has a stage with a matching stage name.   By default
+				all tasks for a stage are executed on the project, however 
+				if a task is optional, then the project must have the task node
+				under the stage with matching respective names
+				in order for the task to be executed on the project.
+			</documentation>
         </annotation>
         <sequence>
     		<element name="params" type="cns:params_type" minOccurs="0" maxOccurs="1"></element>
@@ -268,10 +305,13 @@ in order for the task to be executed on the project.</documentation>
     	<attribute name="class" use="optional">
     		<annotation>
     			<documentation>
-    				This is a class in the fabricate classpath which
-    				must implement one of;
-    				org.adligo.fabricate.common.I_ScmTask
-    				org.adligo.fabricate.common.I_ProjectTask
+					This is a class in the fabricate classpath which
+					must implement;
+					org.adligo.fabricate.common.I_FabricationRoutine
+					It is optional, and when not present defaults to
+					the implicit stage with a matching name. 
+					When a implicit stage with a matching name is not
+					present Fabrication will abort.
     			</documentation>
     		</annotation>
     		<simpleType>
