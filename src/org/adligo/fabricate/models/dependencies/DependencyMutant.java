@@ -68,6 +68,21 @@ public class DependencyMutant implements I_Dependency {
     result = prime * result + ((version == null) ? 0 : version.hashCode());
     return result;
   }
+  
+  public static String toString(I_Dependency dep) {
+    int size = 0;
+    List<I_Ide> children = dep.getChildren();
+    if (children != null) {
+      size = children.size();
+    }
+    String toRet =  dep.getClass().getSimpleName() + " [artifact=" + dep.getArtifact() + ", extract="
+        + dep.isExtract() + "," + System.lineSeparator() + 
+          "\tfileName=" + dep.getFileName() + ", group=" + dep.getGroup() + "," + System.lineSeparator() +
+          "\tplatform=" + dep.getPlatform() + ", type=" + dep.getType() + "," + System.lineSeparator() + 
+          "\tversion=" + dep.getVersion() + ", ideChidren=" + size + "]";
+    return toRet;
+  }  
+  
   private String artifact_;
   private List<IdeMutant> children_ = new ArrayList<IdeMutant>(); 
   private boolean extract_;
@@ -217,5 +232,10 @@ public class DependencyMutant implements I_Dependency {
   @Override
   public int size() {
     return children_.size();
+  }
+
+  @Override
+  public String toString() {
+    return toString(this);
   }  
 }

@@ -6,6 +6,7 @@ package org.adligo.fabricate.models.common;
  * location.  This intentionally keeps commands, facets, stages, traits and tasks unique
  * by their name.
  * 
+ * 
  * @author scott
  *
  */
@@ -14,9 +15,22 @@ public class DuplicateRoutineException extends RuntimeException {
    * 
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * the origin of the routine that was a duplicate.
+   */
   private RoutineBriefOrigin origin_;
+  /**
+   * the name of the routine that was a duplicate
+   */
   private String name_;
+  /**
+   * the origin of the parent of the routine that was a duplicate.
+   */
   private RoutineBriefOrigin parentOrigin_;
+  /**
+   * The name of the parent routine that was a duplicate,
+   * or if the parentOrigin_ is null and the origin_ is PROJECT_* the project name.
+   */
   private String parentName_;
   
 

@@ -78,7 +78,14 @@ public class RoutineBrief implements I_RoutineBrief {
     if (origin_ == null) {
       throw new IllegalArgumentException("origin");
     }
-    
+    switch (origin_) {
+      case PROJECT_COMMAND:
+      case PROJECT_STAGE:
+        if (clazz_ != null) {
+          throw new IllegalArgumentException("clazz_ != null");
+        }
+      default:
+    }
     List<I_RoutineBrief> nested = brief.getNestedRoutines();
     if (nested != null) {
       nestedRoutines_ = newNestedRoutines(nested);
@@ -99,6 +106,10 @@ public class RoutineBrief implements I_RoutineBrief {
   }
   
 
+  public boolean equals(Object o) {
+    return RoutineBriefMutant.equals(this, o);
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getClazz()
    */

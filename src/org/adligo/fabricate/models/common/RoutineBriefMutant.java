@@ -4,6 +4,7 @@ import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectRoutineType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -386,6 +387,32 @@ public class RoutineBriefMutant implements I_RoutineBrief {
           case STAGE:
           default:
             addNested(nested, RoutineBriefOrigin.STAGE_TASK);
+        }
+      }
+    }
+  }
+  
+  public RoutineBriefMutant(ProjectRoutineType stage, RoutineBriefOrigin origin)  
+      throws IllegalArgumentException, ClassNotFoundException {
+    this(stage.getName(), null, origin);
+    ParamsType params = stage.getParams();
+    if (params != null) {
+      List<I_Parameter> ps = ParameterMutant.convert(params);
+      if (ps.size() >= 1) {
+        setParameters(ps);
+      }
+    }
+    
+    List<? extends RoutineType> nested = stage.getTask();
+    if (nested != null) {
+      if (nested.size() >= 1) {
+        switch (origin) {
+          case PROJECT_COMMAND:
+            addNested(nested, RoutineBriefOrigin.PROJECT_COMMAND_TASK);
+            break;
+          case PROJECT_STAGE:
+          default:
+            addNested(nested, RoutineBriefOrigin.PROJECT_STAGE_TASK);
         }
       }
     }

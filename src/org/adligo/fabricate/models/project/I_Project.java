@@ -1,10 +1,13 @@
 package org.adligo.fabricate.models.project;
 
+import org.adligo.fabricate.models.common.I_Parameter;
+import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.dependencies.I_LibraryDependency;
 import org.adligo.fabricate.models.dependencies.I_ProjectDependency;
 
 import java.util.List;
+import java.util.Map;
 
 
 
@@ -17,6 +20,25 @@ import java.util.List;
  * @author scott
  */
 public interface I_Project extends I_ProjectBrief {
+  /**
+   * Get the attributes that came from the project.xml file.
+   * @return
+   */
+  public abstract List<I_Parameter> getAttributes();
+  
+  /**
+   * Get the command that came from the project.xml file,
+   * with the specified name.
+   * @return
+   */
+  public abstract I_RoutineBrief getCommand(String name);
+  
+  /**
+   * Get the commands that came from the project.xml file.
+   * @return
+   */
+  public abstract Map<String, I_RoutineBrief> getCommands();
+  
   /**
    * This is the system dependent absolute path 
    * of the project.
@@ -54,4 +76,31 @@ public interface I_Project extends I_ProjectBrief {
    */
   public List<I_ProjectDependency> getProjectDependencies();
   
+
+  /**
+   * Get the stage that came from the project.xml file,
+   * with the specified name.
+   * @return
+   */
+  public abstract I_RoutineBrief getStage(String name);
+
+  /**
+   * Get the stages that came from the project.xml file.
+   * @return
+   */
+  public abstract Map<String, I_RoutineBrief> getStages();
+
+
+  /**
+   * Get the trait that came from the project.xml file,
+   * with the specified name.
+   * @return
+   */
+  public abstract I_RoutineBrief getTrait(String name);
+
+  /**
+   * Get the traits that came from the project.xml file.
+   * @return
+   */
+  public abstract Map<String, I_RoutineBrief> getTraits();
 }

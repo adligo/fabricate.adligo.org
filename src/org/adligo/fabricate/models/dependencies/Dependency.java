@@ -145,6 +145,11 @@ public class Dependency implements I_Dependency {
   @Override
   public int size() {
     return children_.size();
+  }
+
+  @Override
+  public String toString() {
+    return DependencyMutant.toString(this);
   } 
   
 }
