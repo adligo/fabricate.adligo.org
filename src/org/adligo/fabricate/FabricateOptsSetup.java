@@ -15,8 +15,8 @@ import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
 import org.adligo.fabricate.models.fabricate.I_JavaSettings;
 import org.adligo.fabricate.repository.I_DependenciesNormalizer;
+import org.adligo.fabricate.repository.I_RepositoryManager;
 import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
-import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 
 import java.io.File;
@@ -173,7 +173,7 @@ public class FabricateOptsSetup {
       log_.println(messages.getManagingFabricateRuntimeClassPathDependencies() +
           sys_.lineSeparator());
     }
-    RepositoryManager rm = factory_.createRepositoryManager(sys_, fab_);
+    I_RepositoryManager rm = factory_.createRepositoryManager(sys_, fab_);
     rm.manageDependencies();
   }
 

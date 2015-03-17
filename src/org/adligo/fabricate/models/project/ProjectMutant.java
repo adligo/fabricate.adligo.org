@@ -14,7 +14,6 @@ import org.adligo.fabricate.models.dependencies.LibraryDependencyMutant;
 import org.adligo.fabricate.models.dependencies.ProjectDependencyMutant;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
-import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.ProjectType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectRoutineType;
@@ -124,7 +123,7 @@ public class ProjectMutant implements I_Project {
     }
   }
   
-  public ProjectMutant(String dir, ProjectType project, FabricateProjectType fabProject) throws ClassNotFoundException {
+  public ProjectMutant(String dir, I_ProjectBrief project, FabricateProjectType fabProject) throws ClassNotFoundException {
     dir_ = dir;
     name_ = project.getName();
     version_ = project.getVersion();

@@ -32,6 +32,7 @@ public class Fabricate implements I_Fabricate {
   private final String fabricateRepository_;
   private final String fabricateProjectRunDir_;
   private final String fabricateXmlRunDir_;
+  private final Map<String, I_RoutineBrief> facets_; 
   
   private final String javaHome_;
   private final JavaSettings javaSettings_;
@@ -50,6 +51,8 @@ public class Fabricate implements I_Fabricate {
     fabricateHome_ = other.getFabricateHome();
     fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
     fabricateRepository_ = other.getFabricateRepository();
+    facets_ = createImmutableMap(other.getFacets());
+    
     javaHome_ = other.getJavaHome();
     I_JavaSettings otherJs = other.getJavaSettings();
     if (otherJs != null) {
@@ -117,6 +120,11 @@ public class Fabricate implements I_Fabricate {
   }
 
   @Override
+  public I_RoutineBrief getCommand(String name) {
+    return commands_.get(name);
+  }
+  
+  @Override
   public Map<String, I_RoutineBrief> getCommands() {
     return commands_;
   }
@@ -150,44 +158,19 @@ public class Fabricate implements I_Fabricate {
     return javaSettings_;
   }
 
-  @Override
-  public List<String> getRemoteRepositories() {
-    return remoteRepositories_;
-  }
-  
 
-  @Override
-  public Map<String, I_RoutineBrief> getStages() {
-    return stages_;
-  }
-
-  @Override
-  public Map<String, I_RoutineBrief> getTraits() {
-    return traits_;
-  }
-  
-  public int getThreads() {
-    if (javaSettings_ == null) {
-      return FabricateDefaults.JAVA_THREADS;
-    }
-    return javaSettings_.getThreads();
-  }
-
-  public String getXms() {
-    if (javaSettings_ == null) {
-      return FabricateDefaults.JAVA_XMS_DEFAULT;
-    }
-    return javaSettings_.getXms();
-  }
-
-  public String getXmx() {
-    if (javaSettings_ == null) {
-      return FabricateDefaults.JAVA_XMX_DEFAULT;
-    }
-    return javaSettings_.getXmx();
-  }
   public String getFabricateXmlRunDir() {
     return fabricateXmlRunDir_;
+  }
+  
+  @Override
+  public I_RoutineBrief getFacet(String name) {
+    return facets_.get(name);
+  }
+
+  @Override
+  public Map<String, I_RoutineBrief> getFacets() {
+    return facets_;
   }
   
   private Map<String,I_RoutineBrief> createImmutableMap(Map<String,I_RoutineBrief> in) {
@@ -217,6 +200,38 @@ public class Fabricate implements I_Fabricate {
   }
 
   @Override
+  public List<String> getRemoteRepositories() {
+    return remoteRepositories_;
+  }
+  
+  @Override
+  public I_RoutineBrief getStage(String name) {
+    return stages_.get(name);
+  }
+  
+  @Override
+  public Map<String, I_RoutineBrief> getStages() {
+    return stages_;
+  }
+
+  @Override
+  public I_RoutineBrief getTrait(String name) {
+    return traits_.get(name);
+  }
+  
+  @Override
+  public Map<String, I_RoutineBrief> getTraits() {
+    return traits_;
+  }
+  
+  public int getThreads() {
+    if (javaSettings_ == null) {
+      return FabricateDefaults.JAVA_THREADS;
+    }
+    return javaSettings_.getThreads();
+  }
+
+  @Override
   public List<I_ProjectBrief> getProjects() {
     return projects_;
   }
@@ -224,5 +239,19 @@ public class Fabricate implements I_Fabricate {
   @Override
   public I_RoutineBrief getScm() {
     return scm_;
+  }
+
+  public String getXms() {
+    if (javaSettings_ == null) {
+      return FabricateDefaults.JAVA_XMS_DEFAULT;
+    }
+    return javaSettings_.getXms();
+  }
+
+  public String getXmx() {
+    if (javaSettings_ == null) {
+      return FabricateDefaults.JAVA_XMX_DEFAULT;
+    }
+    return javaSettings_.getXmx();
   }
 }

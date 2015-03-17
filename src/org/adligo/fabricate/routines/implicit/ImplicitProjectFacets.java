@@ -11,36 +11,66 @@ import org.adligo.fabricate.models.common.RoutineBriefOrigin;
  *
  */
 public class ImplicitProjectFacets {
-  public static final String CLONE = "clone";
-  public static final String CHECKOUT = "checkout";
-  public static final String UPDATE = "update";
-  public static final String LOAD = "load";
-  public static final String NAME = "obtain";
-  public static final RoutineBrief OBTAIN_BRIEF = getRoutineBrief();
+  public static final String CLONE_PROJECT_TASK = "clone project";
+  public static final String CHECKOUT_PROJECT_TASK = "checkout project";
+  public static final String DOWNLOAD_DEPENDENCIES = "download dependencies";
+  public static final RoutineBrief DOWNLOAD_DEPENDENCIES_BRIEF = getDownloadDependenciesBrief();
   
-  private static RoutineBrief getRoutineBrief() {
+  public static final String UPDATE_PROJECT_TASK = "update project";
+  public static final String LOAD_PROJECTS = "load projects";
+  public static final String LOAD_PROJECT_TASK = "load project";
+  public static final RoutineBrief LOAD_PROJECTS_BRIEF = getProjectsLoadBrief();
+  public static final String OBTAIN_PROJECTS = "obtain projects";
+  public static final RoutineBrief OBTAIN_BRIEF = getObtainBrief();
+  
+  private static RoutineBrief getProjectsLoadBrief() {
+    RoutineBriefMutant rbm = new RoutineBriefMutant();
+    rbm.setClazz(LoadProjectsRoutine.class);
+    rbm.setName(LOAD_PROJECTS);
+    rbm.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET);
+    
+    RoutineBriefMutant load = new RoutineBriefMutant();
+    load.setClazz(LoadProjectTask.class);
+    load.setName(LOAD_PROJECT_TASK);
+    load.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET_TASK);
+    rbm.addNestedRoutine(load);
+    
+    
+    return new RoutineBrief(rbm);
+  }
+  
+  private static RoutineBrief getDownloadDependenciesBrief() {
+    RoutineBriefMutant download = new RoutineBriefMutant();
+    download.setClazz(DownloadDependenciesRoutine.class);
+    download.setName(DOWNLOAD_DEPENDENCIES);
+    download.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET_TASK);
+    return new RoutineBrief(download);
+  }
+  
+  
+  private static RoutineBrief getObtainBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();
     rbm.setClazz(ScmRoutine.class);
-    rbm.setName(NAME);
+    rbm.setName(OBTAIN_PROJECTS);
     rbm.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET);
     
     RoutineBriefMutant clone = new RoutineBriefMutant();
     clone.setClazz(GitCloneRoutine.class);
-    clone.setName(CLONE);
+    clone.setName(CLONE_PROJECT_TASK);
     clone.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET_TASK);
     
     rbm.addNestedRoutine(clone);
     
     RoutineBriefMutant update = new RoutineBriefMutant();
     update.setClazz(GitUpdateRoutine.class);
-    update.setName(UPDATE);
+    update.setName(UPDATE_PROJECT_TASK);
     update.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET_TASK);
     
     rbm.addNestedRoutine(update);
     
     RoutineBriefMutant checkout = new RoutineBriefMutant();
     checkout.setClazz(GitCloneRoutine.class);
-    checkout.setName(CHECKOUT);
+    checkout.setName(CHECKOUT_PROJECT_TASK);
     checkout.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET_TASK);
     
     rbm.addNestedRoutine(checkout);

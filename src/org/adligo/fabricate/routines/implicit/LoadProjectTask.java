@@ -1,16 +1,26 @@
 package org.adligo.fabricate.routines.implicit;
 
-import org.adligo.fabricate.common.system.I_GitCalls;
+import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
-import org.adligo.fabricate.models.fabricate.I_Fabricate;
-import org.adligo.fabricate.models.project.I_ProjectBrief;
-import org.adligo.fabricate.routines.AbstractRoutine;
-import org.adligo.fabricate.routines.I_FabricateAware;
-import org.adligo.fabricate.routines.I_ProjectBriefAware;
+import org.adligo.fabricate.models.common.MemoryLock;
+import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.models.dependencies.I_Dependency;
+import org.adligo.fabricate.models.project.Project;
+import org.adligo.fabricate.models.project.ProjectMutant;
+import org.adligo.fabricate.repository.LibraryResolver;
+import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * TODO this class will load the project data (project.xml directory etc) into memory
@@ -19,45 +29,102 @@ import org.adligo.fabricate.routines.I_ProjectBriefAware;
  * @author scott
  *
  */
-public class LoadProjectTask extends AbstractRoutine 
-implements I_ProjectBriefAware, I_FabricateAware {
+public class LoadProjectTask extends ProjectBriefAwareRoutine {
+  public static final String DEPENDENCIES_FILTER = LoadProjectTask.class.getName() + ".dependenciesFilter";
+  private DependenciesFilter dependenciesFilter_;
   
-  protected I_ProjectBrief brief_;
-  protected I_Fabricate fabricate_;
-  protected I_GitCalls gitCalls_;
+  public static final String PROJECTS_QUEUE = LoadProjectTask.class.getName() + ".projects";
+  private ConcurrentLinkedQueue<Project> projects_;
   
-  @Override
-  public I_ProjectBrief getProjectBrief() {
-    return brief_;
-  }
   
   @Override
-  public void setProjectBrief(I_ProjectBrief brief) {
-    brief_ = brief;
-  }
-  
-  @Override
-  public I_Fabricate getFabricate() {
-    return fabricate_;
-  }
-
-  @Override
-  public void setFabricate(I_Fabricate fab) {
-    fabricate_ = fab;
-  }
-
-  @Override
-  public boolean setup(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory)
+  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
-  //TODO
+  
+    dependenciesFilter_ = new DependenciesFilter();
+    routineMemory.put(DEPENDENCIES_FILTER, dependenciesFilter_);
+    
+    projects_ = system_.newConcurrentLinkedQueue(Project.class);
+    routineMemory.put(PROJECTS_QUEUE, projects_);
     return super.setup(memory, routineMemory);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setup(I_FabricationMemory memory, I_RoutineMemory routineMemory)
+  public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory)
       throws FabricationRoutineCreationException {
-    //TODO
+    dependenciesFilter_ = (DependenciesFilter) routineMemory.get(DEPENDENCIES_FILTER);
+    projects_ = (ConcurrentLinkedQueue<Project>) routineMemory.get(PROJECTS_QUEUE);
+    
     super.setup(memory, routineMemory);
+  }
+
+
+  @Override
+  public void run() {
+    
+    String projectsDir = fabricate_.getProjectsDir();
+    String projectName = brief_.getName();
+    
+    String projectDir = projectsDir + files_.getNameSeparator() + projectName;
+    String projectFile = projectDir +  files_.getNameSeparator() + "project.xml";
+    if (log_.isLogEnabled(LoadProjectTask.class)) {
+      log_.println("parseding project '" + projectName + "' ");
+    }
+    FabricateProjectType project = null;
+    try {
+      project = xmlFiles_.parseProject_v1_0(projectFile);
+    } catch (IOException e) {
+      //pass to run monitor
+      throw new RuntimeException(e);
+    }
+    if (log_.isLogEnabled(LoadProjectTask.class)) {
+      log_.println("parsed project '" + projectName + "' ");
+    }
+    List<I_Dependency> libDeps = null;
+    LibraryResolver resolver = new LibraryResolver(system_, fabricate_);
+    ProjectDependenciesType pdeps =  project.getDependencies();
+    if (pdeps != null) {
+      List<LibraryReferenceType> libs  = pdeps.getLibrary();
+      libDeps = resolver.getDependencies(libs);
+    }
+    try {
+      ProjectMutant pm = new ProjectMutant(projectDir, brief_, project);
+      List<I_Dependency> normDeps = new ArrayList<I_Dependency>();
+      normDeps.addAll(libDeps);
+      normDeps.addAll(pm.getDependencies());
+      pm.setNormalizedDependencies(normDeps);
+      dependenciesFilter_.add(normDeps);
+      if (log_.isLogEnabled(LoadProjectTask.class)) {
+        log_.println("project '" + pm.getName() + "' has " + normDeps.size() + " external dependencies.");
+      }
+      
+      Project p = new Project(pm);
+      projects_.add(p);
+    } catch (ClassNotFoundException e) {
+      //pass to run monitor
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void writeToMemory(I_FabricationMemoryMutant<Object> memory) {
+    List<Project> ps = new ArrayList<Project>();
+    ps.addAll(projects_);
+    List<Project> projects = Collections.unmodifiableList(ps);
+    memory.put(FabricationMemoryConstants.LOADED_PROJECTS, projects);
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.LOADED_PROJECTS, 
+              Collections.singletonList(LoadProjectTask.class.getName())));
+    
+    List<I_Dependency> deps =  dependenciesFilter_.get();
+    if (log_.isLogEnabled(LoadProjectTask.class)) {
+      log_.println("LoadProjectTask loaded " + deps.size() + " dependencies.");
+    }
+    memory.put(FabricationMemoryConstants.DEPENDENCIES, deps);
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.DEPENDENCIES, 
+        Collections.singletonList(LoadProjectTask.class.getName())));
+    
+    super.writeToMemory(memory);
   }
 
 

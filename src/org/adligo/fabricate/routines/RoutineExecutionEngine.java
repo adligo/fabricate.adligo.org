@@ -40,27 +40,28 @@ public class RoutineExecutionEngine {
     }
     
     FabricationMemoryMutant<Object> routineMemoryMutant = new FabricationMemoryMutant<Object>(sysMessages_);
-    I_FabricationRoutine routine = factory_.build(memoryMut, routineMemoryMutant);
+    I_FabricationRoutine firstRoutine = factory_.build(memoryMut, routineMemoryMutant);
     
-    if (routine == null) {
+    if (firstRoutine == null) {
       if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
         log_.println("build of " + factory_.getClass().getName() + " returned null");
       }
       return;
     }
     if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
-      log_.println("created " + routine.getClass());
+      log_.println("created " + firstRoutine.getClass());
     }
     FabricationMemory<Object> memory = new FabricationMemory<Object>(memoryMut);
     FabricationMemory<Object> routineMemory = new FabricationMemory<Object>(routineMemoryMutant);
-    if (I_ConcurrencyAware.class.isAssignableFrom(routine.getClass())) {
+    if (I_ConcurrencyAware.class.isAssignableFrom(firstRoutine.getClass())) {
       
       if (threads_ >= 2) {
         ExecutorService service =  system_.newFixedThreadPool(threads_);
+        I_FabricationRoutine routine = firstRoutine;
         for (int i = 0; i < threads_; i++) {
           I_RunMonitor monitor = system_.newRunMonitor(routine, i + 1);
           if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
-            log_.println("submiting " + routine.getClass());
+            log_.println("submiting " + firstRoutine.getClass());
           }
           service.submit(monitor);
           monitors_.add(monitor);
@@ -94,16 +95,17 @@ public class RoutineExecutionEngine {
             }
           }
           if (monitorsFinished == monitors_.size()) {
+            firstRoutine.writeToMemory(memoryMut);
             return;
           } 
         }
       } else {
-        I_RunMonitor monitor = system_.newRunMonitor(routine, 1);
+        I_RunMonitor monitor = system_.newRunMonitor(firstRoutine, 1);
         monitors_.add(monitor);
         monitor.run();
       }
     } else {
-      I_RunMonitor monitor = system_.newRunMonitor(routine, 1);
+      I_RunMonitor monitor = system_.newRunMonitor(firstRoutine, 1);
       monitors_.add(monitor);
       monitor.run();
     }

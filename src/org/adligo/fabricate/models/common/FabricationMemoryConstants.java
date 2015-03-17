@@ -2,9 +2,6 @@ package org.adligo.fabricate.models.common;
 
 import org.adligo.fabricate.common.en.SystemEnMessages;
 
-import java.util.Collections;
-import java.util.Map;
-
 /**
  * This class contains the keys to fabrication shared memory 
  * between all routines.
@@ -12,7 +9,17 @@ import java.util.Map;
  *
  */
 public class FabricationMemoryConstants {
-  public static final FabricationMemoryConstants INSTANCE = new FabricationMemoryConstants();
+  
+  /**
+   * key to a ConcurrentLinkedQueue&lt;String&gt; of the projects
+   * that were cloned.
+   */
+  public static final String CLONED_PROJECTS = "gitClonedProjects";
+  
+  /**
+   * Key to a unmodifiable List&lt;Dependency&gt; usually from the 'load projects' facet.
+   */
+  public static final String DEPENDENCIES = "dependencies";
   
   /**
    * key to a {@link I_ExecutionEnvironment(Mutant)}, which represents
@@ -24,16 +31,13 @@ public class FabricationMemoryConstants {
   public static final String ENV = "environment";
   public static final I_ExecutionEnvironment EMPTY_ENV = new ExecutionEnvironment(
       new ExecutionEnvironmentMutant(SystemEnMessages.INSTANCE));
+
+  public static final FabricationMemoryConstants INSTANCE = new FabricationMemoryConstants();
   
   /**
-   * key to a String
+   * Key to a unmodifiable List<Project> usually from the 'load projects' facet.
    */
-  public static final String GIT_KEYSTORE_PASSWORD = "gitKeystorePassword";
-  /**
-   * key to a ConcurrentLinkedQueue<String> of the projects
-   * that were cloned.
-   */
-  public static final String CLONED_PROJECTS = "gitClonedProjects";
+  public static final String LOADED_PROJECTS = "loadedProjects";
   
   /**
    * key to a boolean which shows that

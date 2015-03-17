@@ -28,15 +28,20 @@ import java.util.Set;
 public class RoutineFabricateFactory {
   private static final Set<I_ExpectedRoutineInterface> EMPTY_SET = Collections.emptySet();
   private final I_Fabricate fabricate;
-  private final RoutineFactory traits_;
+  
   private final RoutineFactory commands_;
+  private final RoutineFactory facets_;
   private final RoutineFactory stages_;
-
+  private final RoutineFactory traits_;
+  
   public RoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
-    traits_ = new RoutineFactory(system);
+    facets_ = new RoutineFactory(system);
     commands_ = new RoutineFactory(system);
     stages_ = new RoutineFactory(system);
+    traits_ = new RoutineFactory(system);
     fabricate = fab;
+    
+    addImplicitFacets();
     if (commandsNotStages) {
       addImplicitCommands();
     } else {
@@ -51,6 +56,15 @@ public class RoutineFabricateFactory {
         commands_.add(command.getValue());
       }
     }
+    /*
+    Map<String, I_RoutineBrief> facets = fab.getF
+    if (cmds != null & cmds.size() >= 1) {
+      Set<Entry<String, I_RoutineBrief>> commands = cmds.entrySet();
+      for (Entry<String,I_RoutineBrief> command: commands) {
+        commands_.add(command.getValue());
+      }
+    }
+    */
     
     Map<String, I_RoutineBrief> stages = fab.getStages();
     if (stages != null & stages.size() >= 1) {
@@ -68,6 +82,13 @@ public class RoutineFabricateFactory {
       }
     }
   }
+  
+  public void addImplicitFacets() {
+    facets_.add(ImplicitProjectFacets.OBTAIN_BRIEF);
+    facets_.add(ImplicitProjectFacets.LOAD_PROJECTS_BRIEF);
+    facets_.add(ImplicitProjectFacets.DOWNLOAD_DEPENDENCIES_BRIEF);
+  }
+  
   public void addImplicitCommands() {
     addCommand(EncryptCommand.NAME, EncryptCommand.class);
     addCommand(DecryptCommand.NAME, DecryptCommand.class);
@@ -81,7 +102,6 @@ public class RoutineFabricateFactory {
   public void addImplicitTraits() {
     addTrait(EncryptTrait.NAME, EncryptTrait.class);
     addTrait(DecryptTrait.NAME, DecryptTrait.class);
-    traits_.add(ImplicitProjectFacets.OBTAIN_BRIEF);
   }
   
   /**
@@ -133,6 +153,9 @@ public class RoutineFabricateFactory {
     }
     return false;
   }
+  public I_FabricationRoutine createFacet(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
+    return facets_.createRoutine(name, interfaces);
+  }
   
   public I_FabricationRoutine createCommand(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
     return commands_.createRoutine(name, interfaces);
@@ -150,17 +173,22 @@ public class RoutineFabricateFactory {
     return traits_.createRoutine(name, interfaces);
   }
 
-  public I_Fabricate getFabricate() {
-    return fabricate;
-  }
-  public RoutineFactory getTraits() {
-    return traits_;
-  }
+
   public RoutineFactory getCommands() {
     return commands_;
   }
+  public I_Fabricate getFabricate() {
+    return fabricate;
+  }
+  public RoutineFactory getFacets() {
+    return facets_;
+  }
+
   public RoutineFactory getStages() {
     return stages_;
+  }
+  public RoutineFactory getTraits() {
+    return traits_;
   }
   
   private void addCommand(String name, Class<? extends I_FabricationRoutine> clazz) {

@@ -82,6 +82,7 @@ public interface I_SystemMessages {
   public String getManagingTheFollowingLocalRepository();
   public String getManagingFabricateRuntimeClassPathDependencies();
   public String getNoRemoteRepositoriesCouldBeReached();
+  public String getNoRoutineFoundWithNameX();
   public String getPassedTheMd5Check();
   public String getPassedTheExtractCheck();
   public String getProjectsAreLocatedInTheFollowingDirectory();

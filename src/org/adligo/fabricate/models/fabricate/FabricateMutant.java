@@ -124,6 +124,7 @@ public class FabricateMutant implements I_Fabricate {
     setCommands(other.getCommands());
     List<I_Dependency> deps = other.getDependencies();
     setDependencies(deps);
+    setFacets(other.getFacets());
     
     setStages(other.getStages());
     setTraits(other.getTraits());
@@ -229,6 +230,11 @@ public class FabricateMutant implements I_Fabricate {
     addRoutineParents(routines, traits_, RoutineBriefOrigin.FABRICATE_TRAIT);
   }
   
+  @Override
+  public I_RoutineBrief getCommand(String name) {
+    return commands_.get(name);
+  }
+  
   public Map<String, I_RoutineBrief> getCommands() {
     return new HashMap<String,I_RoutineBrief>(commands_);
   }
@@ -266,6 +272,15 @@ public class FabricateMutant implements I_Fabricate {
     return fabricateXmlRunDir_;
   }
 
+  public I_RoutineBrief getFacet(String name) {
+    return facets_.get(name);
+  }
+  
+  public Map<String,I_RoutineBrief> getFacets() {
+    return new HashMap<String,I_RoutineBrief>(facets_);
+  }
+
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getJavaHome()
    */
@@ -302,8 +317,18 @@ public class FabricateMutant implements I_Fabricate {
     return scm_;
   }
 
+  @Override
+  public I_RoutineBrief getStage(String name) {
+    return stages_.get(name);
+  }
+  
   public Map<String, I_RoutineBrief> getStages() {
     return new HashMap<String,I_RoutineBrief>(stages_);
+  }
+
+  @Override
+  public I_RoutineBrief getTrait(String name) {
+    return traits_.get(name);
   }
   
   public Map<String, I_RoutineBrief> getTraits() {
@@ -331,6 +356,10 @@ public class FabricateMutant implements I_Fabricate {
     return javaSettings_.getXmx();
   }
   
+  public boolean isDevelopmentMode() {
+    return developmentMode_;
+  }
+
   public void setCommands(Map<String, I_RoutineBrief> commands) {
     commands_.clear();
     if (commands != null && commands.size() >= 1) {
@@ -365,6 +394,21 @@ public class FabricateMutant implements I_Fabricate {
 
   public void setFabricateXmlRunDir(String fabricateXmlRunDir) {
     this.fabricateXmlRunDir_ = fabricateXmlRunDir;
+  }
+  
+  public void setFacets(Map<String, I_RoutineBrief> facets) {
+    facets_.clear();
+    if (facets != null && facets.size() >= 1) {
+      Set<Entry<String, I_RoutineBrief>> entries = facets.entrySet();
+      for (Entry<String,I_RoutineBrief> e: entries) {
+        I_RoutineBrief v = e.getValue();
+        if (v instanceof RoutineBriefMutant) {
+          facets_.put(e.getKey(), (RoutineBriefMutant) v);
+        } else {
+          facets_.put(e.getKey(), new RoutineBriefMutant(v));
+        }
+      }
+    }
   }
   
   public void setJavaHome(String javaHome) {
@@ -434,10 +478,6 @@ public class FabricateMutant implements I_Fabricate {
     projectsDir_ = projectsDir;
   }
 
-  public boolean isDevelopmentMode() {
-    return developmentMode_;
-  }
-
   public void setDevelopmentMode(boolean developmentMode) {
     this.developmentMode_ = developmentMode;
   }
@@ -475,6 +515,5 @@ public class FabricateMutant implements I_Fabricate {
       }
     }
   }
- 
-  
+
 }

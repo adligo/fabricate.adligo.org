@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tns:fabricate_project xmlns:tns="http://www.adligo.org/fabricate/xml/io_v1/project_v1_0.xsd" 
+<pns:fabricate_project xmlns:pns="http://www.adligo.org/fabricate/xml/io_v1/project_v1_0.xsd" 
     xmlns:lns="http://www.adligo.org/fabricate/xml/io_v1/library_v1_0.xsd" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >
-    <tns:stages>
-        <tns:stage name="jar" />
-        <tns:stage name="build-fabricate-archives" />
-    </tns:stages>
-    <tns:dependencies>
+    <pns:dependencies>
 	    <lns:dependency group="org.apache.commons" artifact="commons-logging" version="1.2" />
 	    <lns:dependency group="org.apache.commons" artifact="commons-codec" version="1.10" />
 	    <lns:dependency group="org.apache.commons" artifact="httpclient" version="4.3.5" />
 	    <lns:dependency group="org.apache.commons" artifact="httpcore" version="4.3.2" />
-	 </tns:dependencies>
- </tns:fabricate_project>
+	 </pns:dependencies>
+    <pns:stages>
+        <pns:stage name="jar" />
+        <pns:stage name="build-fabricate-archives" />
+    </pns:stages>
+</pns:fabricate_project>

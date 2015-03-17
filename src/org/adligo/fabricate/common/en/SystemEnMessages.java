@@ -129,7 +129,7 @@ public class SystemEnMessages implements I_SystemMessages {
       "Managing the following local repository;";
   private static final String NO_REMOTE_REPOSITORIES_COULD_BE_REACHED = 
       "No remote repositories could be reached.";
-  
+  private static final String NO_ROUTINE_FOUND_WITH_NAME_X = "No routine found with name '<X/>'.";
   
   private static final String PASSED_THE_EXTRACT_CHECK = "passed the extract check.";
   private static final String PASSED_THE_MD5_CHECK = "passed the md5 check.";
@@ -641,6 +641,13 @@ public class SystemEnMessages implements I_SystemMessages {
     return NO_REMOTE_REPOSITORIES_COULD_BE_REACHED;
   }
 
+  
+  @Override
+  public String getNoRoutineFoundWithNameX() {
+    return NO_ROUTINE_FOUND_WITH_NAME_X;
+  }
+
+  
   @Override
   public String getSendingOptsToScript() {
     return SENDING_OPTS_TO_SCRIPT;

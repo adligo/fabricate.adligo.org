@@ -113,7 +113,11 @@ public class RoutineFactory implements I_RoutineFactory {
       Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
     I_RoutineBrief brief = briefs_.get(name);
     if (brief == null) {
-      throw new IllegalArgumentException(name);
+      I_FabricateConstants constants_ = system_.getConstants();
+      I_SystemMessages sysMes = constants_.getSystemMessages();
+      String message = sysMes.getNoRoutineFoundWithNameX();
+      message = message.replaceAll("<X/>", name);
+      throw new IllegalArgumentException(message);
     }
     Class<? extends I_FabricationRoutine> clazz = brief.getClazz();
     if (clazz == null) {

@@ -111,20 +111,24 @@ fab cmd=encrypt
     </complexType>
 
     <complexType name="failure_type">
-        <annotation>
-        	<documentation>A failure is a indication something catastrophic failed (not including test failures).</documentation>
-        </annotation>
-        <sequence>
+    	<annotation>
+    		<documentation>
+    			A failure is a indication something catastrophic failed
+    			(not including test failures).
+    		</documentation>
+    	</annotation>
+    	<sequence>
     		<element name="detail" type="string"></element>
     	</sequence>
     	<attribute name="command" type="string" use="optional"></attribute>
-    	<attribute name="stage" type="string" use="optional">
+        <attribute name="facet" type="string"></attribute>
+        <attribute name="stage" type="string" use="optional">
     		<annotation>
     			<documentation>The stage which failed.</documentation>
     		</annotation>
     	</attribute>
-        <attribute name="stage_type" type="string" use="optional"></attribute>
-        <attribute name="project" type="string" use="optional">
+    	<attribute name="stage_type" type="string" use="optional"></attribute>
+    	<attribute name="project" type="string" use="optional">
     		<annotation>
     			<documentation>The project which failed.</documentation>
     		</annotation>

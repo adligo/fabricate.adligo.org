@@ -71,7 +71,7 @@ public abstract class TasksRoutine extends AbstractRoutine implements I_Fabricat
       }
       routine.setSystem(system_);
       routine.setLocations(locations_);
-      if (I_Fabricate.class.isAssignableFrom(routine.getClass())) {
+      if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
         ((I_FabricateAware) routine).setFabricate(fabricate_);
       }
       setupTask(routine);
@@ -89,5 +89,13 @@ public abstract class TasksRoutine extends AbstractRoutine implements I_Fabricat
    * @param taskRoutine
    */
   public void setupTask(I_FabricationRoutine taskRoutine) {}
+
+  @Override
+  public void writeToMemory(I_FabricationMemoryMutant<Object> memory) {
+    for (TaskContext tc: tasks_) {
+      tc.getTask().writeToMemory(memory);
+    }
+    super.writeToMemory(memory);
+  }
 
 }

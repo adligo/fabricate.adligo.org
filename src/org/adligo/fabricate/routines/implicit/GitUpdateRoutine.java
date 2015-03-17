@@ -8,7 +8,6 @@ import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -21,7 +20,7 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
   
   @SuppressWarnings("unchecked")
   @Override
-  public boolean setup(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory)
+  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
     if (!system_.hasArg(cmdConstants_.getUpdate(true))) {
       return false;
@@ -32,7 +31,7 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
 
   @SuppressWarnings("unchecked")
   @Override
-  public void setup(I_FabricationMemory memory, I_RoutineMemory routineMemory)
+  public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory)
       throws FabricationRoutineCreationException {
     clonedProjects_ = (ConcurrentLinkedQueue<String>) memory.get(FabricationMemoryConstants.CLONED_PROJECTS);
     super.setup(memory, routineMemory);
@@ -49,7 +48,7 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
         String projectDir = projectsDir +  projectName;
         try {
           String desc = gitCalls_.describe(projectDir);
-          if (gitCalls_.isSuccess(desc)) {
+          if ( !"snapshot".equals(desc)) {
             //its on a tag, so revert to the trunk before update
             gitCalls_.checkout(projectName, projectsDir, "trunk");
           }
@@ -62,6 +61,4 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
     }
     super.run();
   }
-  
-
 }

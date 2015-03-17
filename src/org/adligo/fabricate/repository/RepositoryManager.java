@@ -6,6 +6,7 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import org.adligo.fabricate.models.project.I_Project;
@@ -28,14 +29,14 @@ import java.util.concurrent.Executors;
  * @author scott
  *
  */
-public class RepositoryManager {
+public class RepositoryManager implements I_RepositoryManager {
   private List<String> repositories_ = new ArrayList<String>();
 
   private final I_FabSystem sys_;
   private final I_FabLog log_;
   private final I_FabFileIO files_;
   private final I_Fabricate fab_;
-  private final List<I_Project> projects_ = new ArrayList<I_Project>();
+  private final ConcurrentLinkedQueue<I_Dependency> dependencies_;
   private final I_FabricateConstants constants_;
   private final I_SystemMessages messages_;
   private final I_RepositoryFactory factory_;
@@ -49,24 +50,13 @@ public class RepositoryManager {
     fab_ = fab;
     setRepositories(fab_.getRemoteRepositories());
     factory_ = factory;
+    dependencies_ = sys_.newConcurrentLinkedQueue(I_Dependency.class);
   }
   
-  public void addProjects(Collection<I_Project> projects) {
-    for (I_Project proj : projects) {
-      if (proj != null) {
-        projects_.add(proj);
-      }
-    }
-  }
-  
-  /**
-   * only for testing
-   * @return
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#manageDependencies()
    */
-  public List<I_Project> getProjects() {
-    return projects_;
-  }
-  
+  @Override
   public void manageDependencies() {
     if (log_.isLogEnabled(RepositoryManager.class)) {
       log_.println(messages_.getManagingTheFollowingLocalRepository() + sys_.lineSeparator() +
@@ -101,24 +91,15 @@ public class RepositoryManager {
     files_.deleteOnExit(repoLockFile);
     int threads = fab_.getThreads();
     List<I_Dependency> fds = fab_.getDependencies();
-    I_DependenciesNormalizer norm = factory_.createDependenciesNormalizer();
-    if (projects_.size() >= 1) {
-      for (I_Project proj: projects_) {
-        List<I_Dependency> pdeps = proj.getDependencies();
-        norm.add(pdeps);
-      }
-    } else {
-      norm.add(fds);
-    }
+    dependencies_.addAll(fds);
     
-    ConcurrentLinkedQueue<I_Dependency> deps = norm.get();
-    if (deps.size() >= 1) {
+    if (dependencies_.size() >= 1) {
       I_SystemMessages messages = constants_.getSystemMessages();
       log_.println(messages.getCheckingFabricateRuntimeDependencies());
         
       
       if (threads <= 1) {
-        I_DependenciesManager dm = factory_.createDependenciesManager(sys_, deps);
+        I_DependenciesManager dm = factory_.createDependenciesManager(sys_, dependencies_);
         dm.setOnMainThread(true);
         dm.setRemoteRepositories(repositories_);
         dm.run();
@@ -126,7 +107,7 @@ public class RepositoryManager {
         ExecutorService es = Executors.newFixedThreadPool(threads);
         Set<I_DependenciesManager> dms = new HashSet<I_DependenciesManager>();
         for (int i = 0; i < threads; i++) {
-          I_DependenciesManager dm = factory_.createDependenciesManager(sys_, deps);
+          I_DependenciesManager dm = factory_.createDependenciesManager(sys_, dependencies_);
           dm.setOnMainThread(true);
           dm.setRemoteRepositories(repositories_);
           dm.setFabricate(fab_);
@@ -169,6 +150,10 @@ public class RepositoryManager {
     }
   }
 
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#checkRepositories()
+   */
+  @Override
   public void checkRepositories() {
     Iterator<String> repos = repositories_.iterator();
     while (repos.hasNext()) {
@@ -189,6 +174,22 @@ public class RepositoryManager {
       I_SystemMessages messages =  constants_.getSystemMessages();
       throw new RuntimeException(messages.getNoRemoteRepositoriesCouldBeReached());
     }
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#getDependencies()
+   */
+  @Override
+  public ConcurrentLinkedQueue<I_Dependency> getDependencies() {
+    return dependencies_;
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#addDependencies(java.util.concurrent.ConcurrentLinkedQueue)
+   */
+  @Override
+  public void addDependencies(ConcurrentLinkedQueue<I_Dependency> dependencies) {
+    dependencies_.addAll(dependencies);
   }
 
 }

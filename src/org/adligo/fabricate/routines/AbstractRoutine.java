@@ -18,6 +18,7 @@ import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
+import org.adligo.fabricate.repository.I_RepositoryFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -29,6 +30,7 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
   protected I_FabricateConstants constants_;
   protected I_CommandLineConstants cmdConstants_;
   protected I_SystemMessages sysMessages_;
+  protected I_RepositoryFactory repositoryFactory_;
   
   protected I_ImplicitTraitMessages implicit_;
   protected I_FabLog log_;
@@ -54,7 +56,6 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
     return brief_;
   }
   
-  
   @Override
   public I_RoutineFactory getTaskFactory() {
     return taskFactory_;
@@ -68,16 +69,15 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
   public I_FabSystem getSystem() {
     return system_;
   }
-  @Override
-  public void setTaskFactory(I_RoutineFactory factory) {
-    taskFactory_ = factory;
+
+  public void setBrief(I_RoutineBrief brief) {
+    this.brief_ = brief;
   }
   
-  @Override
-  public void setTraitFactory(I_RoutineFactory factory) {
-    traitFactory_ = factory;
+  public void setRepositoryFactory(I_RepositoryFactory repositoryFactory) {
+    this.repositoryFactory_ = repositoryFactory;
   }
-
+  
   @Override
   public void setSystem(I_FabSystem system) {
     system_ = system;
@@ -90,11 +90,21 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
     sysMessages_ = constants_.getSystemMessages();
     cmdConstants_ = constants_.getCommandLineConstants();
   }
-
-  public void setBrief(I_RoutineBrief brief) {
-    this.brief_ = brief;
+  
+  @Override
+  public void setTaskFactory(I_RoutineFactory factory) {
+    taskFactory_ = factory;
+  }
+  
+  @Override
+  public void setTraitFactory(I_RoutineFactory factory) {
+    traitFactory_ = factory;
   }
 
+  public I_RepositoryFactory getRepositoryFactory() {
+    return repositoryFactory_;
+  }
+  
   @Override
   public I_FabricateXmlDiscovery getLocations() {
     return locations_;
@@ -103,27 +113,6 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
   @Override
   public void setLocations(I_FabricateXmlDiscovery locations) {
     locations_ = locations;
-  }
-
-  /**
-   * Do nothing, allow extension classes to override.
-   */
-  @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
-    if (log_.isLogEnabled(AbstractRoutine.class)) {
-      log_.println(AbstractRoutine.class.getName() + " setup(I_FabricationMemoryMutant, I_RoutineMemoryMutant)");
-    }
-    settingUp.set(true);
-    return true;
-  }
-
-  /**
-   * /**
-   * Overrides of this method should call this method.
-   */
-  @Override
-  public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory) throws FabricationRoutineCreationException {
-    settingUp.set(true);
   }
 
   @Override
@@ -156,6 +145,33 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
     return AbstractRoutine.class.getName() + ".getCurrentLocation() unknown location for " + rbo;
   }
 
+
+  /**
+   * /**
+   * Overrides of this method should call this method.
+   */
+  @Override
+  public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory) throws FabricationRoutineCreationException {
+    settingUp.set(true);
+  }
+  
+  /**
+   * Do nothing, allow extension classes to override.
+   */
+  @Override
+  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
+    if (log_.isLogEnabled(AbstractRoutine.class)) {
+      log_.println(AbstractRoutine.class.getName() + " setup(I_FabricationMemoryMutant, I_RoutineMemoryMutant)");
+    }
+    settingUp.set(true);
+    return true;
+  }
+  
+  /**
+   * sub classes may override
+   */
+  public void writeToMemory(I_FabricationMemoryMutant<Object> memory) {}
+  
   private String getArchiveCurrentLocation() {
     if (!running.get()) {
       if (settingUp.get()) {

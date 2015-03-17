@@ -16,6 +16,7 @@ public interface I_Fabricate extends I_JavaSettings {
 
   public List<I_Dependency> getDependencies();
   
+  public I_RoutineBrief getCommand(String name);
   public Map<String, I_RoutineBrief> getCommands();
   
   public String getFabricateHome();
@@ -27,6 +28,9 @@ public interface I_Fabricate extends I_JavaSettings {
   public String getFabricateXmlRunDir();
   
   public String getFabricateRepository();
+  
+  public I_RoutineBrief getFacet(String name);
+  public Map<String,I_RoutineBrief> getFacets();
   
   public String getJavaHome();
 
@@ -42,8 +46,11 @@ public interface I_Fabricate extends I_JavaSettings {
   public List<String> getRemoteRepositories();
   
   public I_RoutineBrief getScm();
+  
+  public I_RoutineBrief getStage(String name);
   public Map<String, I_RoutineBrief> getStages();
   
+  public I_RoutineBrief getTrait(String name);
   public Map<String, I_RoutineBrief> getTraits();
   
   public boolean isDevelopmentMode();

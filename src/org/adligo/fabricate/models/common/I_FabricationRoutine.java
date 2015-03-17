@@ -39,4 +39,12 @@ public interface I_FabricationRoutine extends I_Fabrication, I_LocatableRunnable
    * @param routineMemory this is memory scoped to a set of routine instances of the same class.
    */
   public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory) throws FabricationRoutineCreationException;
+
+  /**
+   * This method is called on the first routine
+   * in a series of routines so that it may pass data
+   * to the subsequent routines.
+   * @param memory
+   */
+  public void writeToMemory(I_FabricationMemoryMutant<Object> memory);
 }

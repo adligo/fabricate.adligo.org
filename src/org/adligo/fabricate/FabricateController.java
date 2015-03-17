@@ -21,6 +21,7 @@ import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.MemoryLock;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
+import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.routines.I_ProjectBriefsAware;
 import org.adligo.fabricate.routines.I_ProjectsAware;
 import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
@@ -156,7 +157,8 @@ public class FabricateController {
       if (!manageProjectsDirAndMode(factory)) {
         return;
       }
-      ProjectsManager pm = factory.createProjectsManager(sys_, factory_);
+      RepositoryManager rm = factory.createRepositoryManager(sys_, fab_);
+      ProjectsManager pm = factory.createProjectsManager(sys_, factory_, rm);
       failure_ = pm.setupAndRun(memory);
     }
     
@@ -176,7 +178,6 @@ public class FabricateController {
 
   private boolean addXmlRoutines(FabricateFactory factory, List<String> argCommands)
       throws IOException, ClassNotFoundException {
-    
     
     String fabricateXmlPath = discovery_.getFabricateXmlPath();
     fabXml_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);

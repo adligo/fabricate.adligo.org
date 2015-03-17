@@ -23,6 +23,7 @@ import org.adligo.fabricate.repository.I_DependenciesNormalizer;
 import org.adligo.fabricate.repository.I_DependencyManager;
 import org.adligo.fabricate.repository.I_LibraryResolver;
 import org.adligo.fabricate.repository.I_RepositoryFactory;
+import org.adligo.fabricate.repository.I_RepositoryManager;
 import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.repository.LibraryResolver;
 import org.adligo.fabricate.repository.RepositoryManager;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FabricateFactory implements I_RepositoryFactory {
-  
   public Fabricate create(FabSystem sys, FabricateType fab, I_FabricateXmlDiscovery xmlDisc) throws ClassNotFoundException {
     FabricateMutant fm = new FabricateMutant(fab, xmlDisc);
     String fabHome = FabricateEnvironment.INSTANCE.getFabricateHome(sys);
@@ -108,8 +108,8 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new FabricateMutant(fab);
   }
   
-  public ProjectsManager createProjectsManager(I_FabSystem system,  RoutineFabricateFactory factory) {
-    return new ProjectsManager(system, factory);
+  public ProjectsManager createProjectsManager(I_FabSystem system,  RoutineFabricateFactory factory, I_RepositoryManager rm) {
+    return new ProjectsManager(system, factory, rm);
   }
   
   public RepositoryManager createRepositoryManager(I_FabSystem sys, I_Fabricate fab) {
