@@ -30,12 +30,13 @@ public class GitCloneRoutine extends ScmContextInputAwareRoutine {
     String projectsDir = fabricate_.getProjectsDir();
     String projectName = brief_.getName();
     if (!clonedProjects_.contains(projectName)) {
-      String message = sysMessages_.getStartingGetCloneOnProjectX();
-      message = message.replace("<X/>", projectName);
-      log_.println(message);
+      
       
       if (!files_.exists(projectsDir + projectName)) {
         try {
+          String message = sysMessages_.getStartingGetCloneOnProjectX();
+          message = message.replace("<X/>", projectName);
+          log_.println(message);
           
           process_ = gitCalls_.clone(env_, projectName, projectsDir);
           while (!process_.isFinished()) {

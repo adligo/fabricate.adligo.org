@@ -26,6 +26,11 @@ public class ProjectsManager {
     if (loadFailure != null) {
       return loadFailure;
     }
+    setup_.clearRoutines();
+    FailureType downloadFailure = executor_.run(ImplicitProjectFacets.DOWNLOAD_DEPENDENCIES, setup_, memory);
+    if (downloadFailure != null) {
+      return downloadFailure;
+    }
     return null;
   }
 

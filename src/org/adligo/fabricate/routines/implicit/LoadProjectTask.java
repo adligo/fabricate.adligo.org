@@ -91,14 +91,20 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     try {
       ProjectMutant pm = new ProjectMutant(projectDir, brief_, project);
       List<I_Dependency> normDeps = new ArrayList<I_Dependency>();
-      normDeps.addAll(libDeps);
-      normDeps.addAll(pm.getDependencies());
-      pm.setNormalizedDependencies(normDeps);
-      dependenciesFilter_.add(normDeps);
+      if (libDeps != null && libDeps.size() >= 1) {
+        normDeps.addAll(libDeps);
+      }
+      List<I_Dependency> deps = pm.getDependencies();
+      if (deps != null && deps.size() >= 1) {
+        normDeps.addAll(deps);
+      }
+      if (normDeps.size() >= 1) {
+        pm.setNormalizedDependencies(normDeps);
+        dependenciesFilter_.add(normDeps);
+      }
       if (log_.isLogEnabled(LoadProjectTask.class)) {
         log_.println("project '" + pm.getName() + "' has " + normDeps.size() + " external dependencies.");
       }
-      
       Project p = new Project(pm);
       projects_.add(p);
     } catch (ClassNotFoundException e) {
