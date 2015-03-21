@@ -148,7 +148,7 @@ public class ScmRoutine extends ProjectBriefQueueRoutine {
    */
   
   public String getPrivateKeyLocation() {
-    String keyLocFromFile = brief_.getParameter(PRIVATE_KEY_LOCATION);
+    String keyLocFromFile = brief_.getParameterValue(PRIVATE_KEY_LOCATION);
     String loc = "";
     String userHome = system_.getProperty("user.home", "");
     if (StringUtils.isEmpty(userHome)) {

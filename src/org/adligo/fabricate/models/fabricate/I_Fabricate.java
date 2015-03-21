@@ -48,6 +48,7 @@ public interface I_Fabricate extends I_JavaSettings {
   public I_RoutineBrief getScm();
   
   public I_RoutineBrief getStage(String name);
+  public List<String> getStageOrder();
   public Map<String, I_RoutineBrief> getStages();
   
   public I_RoutineBrief getTrait(String name);

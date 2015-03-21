@@ -348,7 +348,7 @@
     
     <complexType name="stages_type">
     	<sequence>
-    		<element name="stage" type="fns:stage_type" minOccurs="1"
+    		<element name="stage" type="fns:stage_type" minOccurs="0"
     			maxOccurs="unbounded">
     		</element>
     		<element name="archiveStage" type="fns:stage_type" minOccurs="0" maxOccurs="unbounded"></element>

@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
@@ -134,6 +135,13 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public String toScriptArgs();
+
+  /**
+   * return a new ConcurrentLinkedQueue.
+   * @param type
+   * @return
+   */
+  public <T,V> ConcurrentHashMap<T,V> newConcurrentHashMap(Class<T> keyType, Class<V> valType);
   
   /**
    * return a new ConcurrentLinkedQueue.
@@ -141,6 +149,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public <T> ConcurrentLinkedQueue<T> newConcurrentLinkedQueue(Class<T> type);
+  
   /**
    * creates a new ArrayBlockingQueue for stubbing.
    * @param type
@@ -163,6 +172,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public I_ExecutingProcess newExecutingProcess(Process proc);
+  
   /**
    * Create a logger that writes out to a file.
    * @param fileName
@@ -177,6 +187,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public I_FabricateConstants newFabConstantsDiscovery(String languageCode,String countryCode);
+  
   /**
    * This method provides a
    * way to pass in a mock for testing.
@@ -191,6 +202,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public I_ProcessRunnable newProcessRunnable(Process proc);
+  
   /**
    * delegates to Executors.newFixedThreadPool(int size)
    * in order to pass a mock for testing.
@@ -207,6 +219,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public I_GitCalls newGitCalls();
+  
   /**
    * Create a new run monitor to wrap a Runnable,
    * in a way that can be monitored.
@@ -216,8 +229,6 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public I_RunMonitor newRunMonitor(I_LocatableRunnable delegate, int counter);
-  
-
   
   /**
    * This method provides a new ByteArrayOutputStream()

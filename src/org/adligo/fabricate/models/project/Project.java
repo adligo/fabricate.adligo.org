@@ -65,6 +65,11 @@ public class Project implements I_Project {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    return ProjectMutant.equals(obj, this);
+  }
+  
+  @Override
   public List<I_Parameter> getAttributes() {
     return attributes_;
   }
@@ -143,6 +148,16 @@ public class Project implements I_Project {
     return version_;
   }
 
+  @Override
+  public int hashCode() {
+    return ProjectMutant.hashCode(this);
+  }
+  
+  @Override
+  public String toString() {
+    return ProjectMutant.toString(this);
+  }
+  
   private List<I_Parameter> copyAttributes(List<I_Parameter> attributes) {
     List<I_Parameter> copy = new ArrayList<I_Parameter>();
     if (attributes == null || attributes.size() == 0) {
@@ -243,4 +258,6 @@ public class Project implements I_Project {
     }
     return Collections.unmodifiableMap(copy);
   }
+  
+  
 }

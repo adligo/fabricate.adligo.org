@@ -164,7 +164,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
         sb.append(jarFilePath);
       }
     }
-    
+    /*
     List<ProjectDependencyType> projects = depsType.getProject();
     if (projects != null) {
       I_Depot depot = ctx_.getDepot();
@@ -177,6 +177,7 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
         sb.append(file);
       }
     }
+    */
   }
   
   

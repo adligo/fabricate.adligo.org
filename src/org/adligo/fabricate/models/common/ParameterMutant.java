@@ -1,11 +1,15 @@
 package org.adligo.fabricate.models.common;
 
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 public class ParameterMutant implements I_Parameter {
   public static List<I_Parameter> convert(ParamsType params) {
@@ -76,6 +80,23 @@ public class ParameterMutant implements I_Parameter {
     }
     return false;
   }
+  public static String [] getValueDelimited(String value, String delimitor) {
+    String [] delimited = null;
+    
+    if (StringUtils.isEmpty(value)) {
+      delimited = new String[1];
+      delimited[0] = value;
+    } else {
+      StringTokenizer st = new StringTokenizer(value, delimitor);
+      List<String> tokens = new ArrayList<String>();
+      while (st.hasMoreTokens()) {
+        tokens.add(st.nextToken());
+      }
+      delimited = tokens.toArray(new String[tokens.size()]);
+    }
+    return delimited;
+  }
+  
   public static int hashCode(I_Parameter param) {
     final int prime = 31;
     int result = 1;
@@ -179,6 +200,10 @@ public class ParameterMutant implements I_Parameter {
     return value_;
   }
 
+  public String [] getValueDelimited(String delimitor) {
+    return getValueDelimited(value_, delimitor);
+  }
+  
   @Override
   public int hashCode() {
     return hashCode(this);

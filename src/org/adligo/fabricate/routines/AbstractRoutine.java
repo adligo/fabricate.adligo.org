@@ -40,6 +40,13 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
   private AtomicBoolean settingUp = new AtomicBoolean(false);
   private AtomicBoolean running = new AtomicBoolean(false);
   
+  public void makeDir(String dir) {
+    if (!files_.mkdirs(dir)) {
+      String message = sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory();
+      message = message + system_.lineSeparator() + dir;
+      throw new RuntimeException(message);
+    }
+  }
   /**
    * Overrides of this method should call this method.
    */

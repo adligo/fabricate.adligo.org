@@ -1,10 +1,8 @@
 package org.adligo.fabricate.build.stages.tasks;
 
-import org.adligo.fabricate.common.I_FabTask;
 import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.I_StageContext;
 import org.adligo.fabricate.common.NamedProject;
-import org.adligo.fabricate.depot.DepotEntryMutant;
 import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.project.I_Project;
@@ -19,7 +17,7 @@ import java.util.Map;
  * @author scott
  *
  */
-public class OldDepositTask extends OldBaseTask implements I_FabTask {
+public class OldDepositTask extends OldBaseTask {
   private I_Depot depot_;
   
   @Override
@@ -29,11 +27,12 @@ public class OldDepositTask extends OldBaseTask implements I_FabTask {
   }
 
   public void execute(String inputFile, String artifactType) {
-    
-    DepotEntryMutant dem = new DepotEntryMutant();
+    /*
+    ArtifactMutant dem = new ArtifactMutant();
     dem.setArtifactType(artifactType);
     dem.setProjectName(projectName_); 
     depot_.add(inputFile, dem);
+    */
   }
   @Override
   public void setup(I_RunContext ctx, I_StageContext stageCtx, I_Project project) {

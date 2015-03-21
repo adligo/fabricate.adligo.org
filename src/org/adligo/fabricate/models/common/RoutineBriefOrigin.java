@@ -112,6 +112,14 @@ public enum RoutineBriefOrigin {
   /**
    * From a project.xml command.
    */
+  PROJECT_ARCHIVE_STAGE, 
+  /**
+   * From a project.xml command/task.
+   */
+  PROJECT_ARCHIVE_STAGE_TASK, 
+  /**
+   * From a project.xml command.
+   */
   PROJECT_COMMAND, 
   /**
    * From a project.xml command/task.

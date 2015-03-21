@@ -127,6 +127,18 @@ public interface I_CommandLineConstants {
    *    "--no-ssh-keystore-passphrase"
    */
   public String getNoSshKeystorePassPhrase(boolean alias);
+  
+  /**
+   * This comma delimited argument instructs Fabricate to build platforms,
+   * other than the default 'JSE'.  Platforms are always compared ignoring
+   * case, and the legacy platforms are 'JSE', 'GWT' and 'JME'.  The JSE platform
+   * is always built first by default.<br/>
+   * @return for English this will be;<br/>
+   *  "platforms"<br/>
+   * @return
+   */
+  public String getPlatforms();
+  
   /**
    * This argument instructs Fabricate to delete the project group/projects directory
    * and all of it's contents when it is NOT running in development mode

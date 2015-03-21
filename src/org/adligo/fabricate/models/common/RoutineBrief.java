@@ -57,7 +57,7 @@ public class RoutineBrief implements I_RoutineBrief {
   private boolean optional_;
   private final RoutineBriefOrigin origin_;
   private final List<I_Parameter> parameters_;
-  private final Map<String, List<String>> parametersLookup_;
+  private final Map<String, List<String>> parametersValueLookup_;
 
   
 
@@ -101,7 +101,7 @@ public class RoutineBrief implements I_RoutineBrief {
     } else {
       parameters_ = Collections.emptyList();
     }
-    parametersLookup_ = getParametersMap();
+    parametersValueLookup_ = getParametersValueMap();
     hashCode_ = RoutineBriefMutant.hashCode(this);
   }
   
@@ -136,6 +136,17 @@ public class RoutineBrief implements I_RoutineBrief {
   public RoutineBriefOrigin getOrigin() {
     return origin_;
   }
+  
+  @Override
+  public I_Parameter getParameter(String key) {
+    return RoutineBriefMutant.getParameter(parameters_, key);
+  }
+
+  @Override
+  public List<I_Parameter> getParameters(String key) {
+    return RoutineBriefMutant.getParameters(parameters_, key);
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getParameters()
    */
@@ -145,8 +156,8 @@ public class RoutineBrief implements I_RoutineBrief {
   }
 
   @Override
-  public String getParameter(String key) {
-    List<String> toRet = parametersLookup_.get(key);
+  public String getParameterValue(String key) {
+    List<String> toRet = parametersValueLookup_.get(key);
     if (toRet == null) {
       return null;
     }
@@ -155,10 +166,10 @@ public class RoutineBrief implements I_RoutineBrief {
     }
     return null;
   }
-  
+
   @Override
-  public List<String> getParameters(String key) {
-    List<String> toRet = parametersLookup_.get(key);
+  public List<String> getParameterValues(String key) {
+    List<String> toRet = parametersValueLookup_.get(key);
     if (toRet == null) {
       return Collections.emptyList();
     }
@@ -175,11 +186,53 @@ public class RoutineBrief implements I_RoutineBrief {
   
   @Override
   public boolean hasParameter(String key) {
-    List<String> toRet = parametersLookup_.get(key);
+    List<String> toRet = parametersValueLookup_.get(key);
     if (toRet == null) {
       return false;
     }
     return true;
+  }
+  
+  @Override
+  public boolean isCommand() {
+    switch (origin_) {
+      case COMMAND:
+      case FABRICATE_COMMAND:
+      case IMPLICIT_COMMAND:
+      case PROJECT_COMMAND:
+        return true;
+      default:
+        break;
+    }
+    return false;
+  }
+  
+  @Override
+  public boolean isStage() {
+    switch (origin_) {
+      case FABRICATE_STAGE:
+      case PROJECT_STAGE:
+      case IMPLICIT_STAGE:
+      case STAGE:
+        return true;
+      default:
+        break;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isArchivalStage() {
+    switch (origin_) {
+      case FABRICATE_ARCHIVE_STAGE:
+      case PROJECT_ARCHIVE_STAGE:
+      case IMPLICIT_ARCHIVE_STAGE:
+      case ARCHIVE_STAGE:
+        return true;
+      default:
+        break;
+    }
+    return false;
   }
   
   /* (non-Javadoc)
@@ -211,7 +264,7 @@ public class RoutineBrief implements I_RoutineBrief {
     return Collections.unmodifiableMap(toRet);
   }
   
-  private Map<String, List<String>> getParametersMap() {
+  private Map<String, List<String>> getParametersValueMap() {
     if (parameters_.size() == 0) {
       return Collections.emptyMap();
     }

@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.ArtifactType;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
@@ -39,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class Depot implements I_Depot {
+  private final I_FabSystem system_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
   private String dir_;
@@ -49,55 +51,54 @@ public class Depot implements I_Depot {
    * at instance construction time, and updated
    * as new things are added to the depot directory
    */
-  private ConcurrentHashMap<String,ConcurrentHashMap<String,String>> 
-      artifactTypesToProjectsToArtifacts_ = 
-      new ConcurrentHashMap<String, ConcurrentHashMap<String,String>>();
+  private ConcurrentHashMap<ArtifactKey, String> artifactKeysToArtifacts_ = 
+      new ConcurrentHashMap<ArtifactKey, String>();
   
   public Depot(String dir, DepotContext ctx, DepotType depot) {
     dir_ = dir;
+    system_ = ctx.getSystem();
     files_ = ctx.getFiles();
     xmlFiles_ = ctx.getXmlFiles();
     log_ = ctx.getLog();
     List<ArtifactType> artifacts = depot.getArtifact();
     for (ArtifactType art: artifacts) {
-      String type = art.getType();
-      ConcurrentHashMap<String,String> typeMap =  artifactTypesToProjectsToArtifacts_.get(type);
-      if (typeMap == null) {
-        typeMap = new ConcurrentHashMap<String, String>();
-        artifactTypesToProjectsToArtifacts_.putIfAbsent(type, typeMap);
-        typeMap = artifactTypesToProjectsToArtifacts_.get(type);
-      }
+      String platform = art.getPlatform();
       String project = art.getProject();
       String file = art.getFilename();
-      //the stored file is relative to the depot
-      typeMap.put(project, dir + File.separator + file);
+      String type = art.getType();
       
+      String artDir = getArtifactDir(type, platform);
+      String depotFileName = getDepotFile(artDir, file);
+      artifactKeysToArtifacts_.put(new ArtifactKey(project, type, platform), depotFileName);
     }
   }
 
   @Override
-  public boolean add(String externalFile, I_DepotEntry entryData) {
+  public boolean add(String externalFile, I_Artifact entryData) {
     String projectName = entryData.getProjectName();
     if (StringUtils.isEmpty(projectName)) {
-      throw new IllegalArgumentException("No projectName!");
+      throw new IllegalArgumentException("No project name!");
     }
-    String artifactType = entryData.getArtifactType();
+    String artifactType = entryData.getType();
     if (StringUtils.isEmpty(artifactType)) {
-      throw new IllegalArgumentException("No artifactType!");
+      throw new IllegalArgumentException("No artifact platform!");
     }
-    File file = new File(externalFile);
-    if (!file.exists()) {
-      throw new IllegalArgumentException("No externalFile!");
+    if (!files_.exists(externalFile)) {
+      throw new IllegalArgumentException("No external file!");
     }
-    String fileName = file.getName();
-    String artDir = dir_ + File.separator + artifactType + "s";
-    File artFile = new File(artDir);
-    if (!artFile.exists()) {
-      if (!new File(artDir).mkdirs()) {
+    String artDir = null;
+    
+    //should throw a npe
+    String platform = entryData.getPlatformName();
+    artDir = getArtifactDir(artifactType, platform);
+    
+    if (!files_.exists(artDir)) {
+      if (!files_.mkdirs(artDir)) {
         throw new IllegalStateException("problem creating " + artDir);
       }
     }
-    String depotFileName = artDir + File.separator + fileName;
+    String fileName = entryData.getFileName();
+    String depotFileName = getDepotFile(artDir, fileName);
     
     File depotFile = new File(depotFileName);
     if (depotFile.exists()) {
@@ -109,67 +110,86 @@ public class Depot implements I_Depot {
       log_.println("Moving file " + externalFile + System.lineSeparator() +
             "\tto " + depotFileName + System.lineSeparator());
     }
+    File inFile = files_.instance(externalFile);
     try {
-      Files.move(file.toPath(), out.toPath(), StandardCopyOption.ATOMIC_MOVE);
+      Files.move(inFile.toPath(), out.toPath(), StandardCopyOption.ATOMIC_MOVE);
     } catch (IOException e) {
       throw new IllegalStateException(e);
     } 
     //ok the file is in
-    ConcurrentHashMap<String, String> subMap = artifactTypesToProjectsToArtifacts_.get(artifactType);
-    if (subMap == null) {
-      artifactTypesToProjectsToArtifacts_.putIfAbsent(artifactType, new ConcurrentHashMap<String, String>());
-      subMap = artifactTypesToProjectsToArtifacts_.get(artifactType);
-    }
-    subMap.put(projectName, depotFileName);
+    String platformName = getPlatformLower(platform);
+    ArtifactKey aKey = new ArtifactKey(projectName, artifactType, platformName);
+    artifactKeysToArtifacts_.put(aKey, depotFileName);
+    
     if (log_.isLogEnabled(Depot.class)) {
       log_.println("Depot now has " + artifactType + "/" + projectName + "/" + depotFileName);
     }
     return true;
   }
 
+  private String getDepotFile(String artDir, String fileName) {
+    String depotFileName = artDir + files_.getNameSeparator() + fileName;
+    return depotFileName;
+  }
+
+  private String getArtifactDir(String artifactType, String platform) {
+    String artDir;
+    platform = platform.toLowerCase();
+    if ("jse".equalsIgnoreCase(platform)) {
+      artDir = dir_ + files_.getNameSeparator() + artifactType + "s";
+    } else {
+      artDir = dir_ + files_.getNameSeparator() + platform + "_" + artifactType + "s";
+    }
+    return artDir;
+  }
+
+  private String getPlatformLower(String platform) {
+    String artDir;
+    platform = platform.toLowerCase();
+    if ("jse".equalsIgnoreCase(platform) || platform == null) {
+      return "jse";
+    } else {
+      return platform.toLowerCase();
+    }
+  }
+  
   public void store() {
-    DepotType type = new DepotType();
-    Set<Entry<String,ConcurrentHashMap<String, String>>>
-     es = artifactTypesToProjectsToArtifacts_.entrySet();
+    DepotType depotType = new DepotType();
+    Set<Entry<ArtifactKey,String>>
+     es = artifactKeysToArtifacts_.entrySet();
     
-    List<ArtifactType> artifacts = type.getArtifact();
+    List<ArtifactType> artifacts = depotType.getArtifact();
     
-    int depotDir = dir_.length() + 1;
     
-    for (Entry<String,ConcurrentHashMap<String, String>> e: es) {
-      String artType = e.getKey();
-      ConcurrentHashMap<String, String> projToFile = e.getValue();
-      Set<Entry<String,String>> pfes = projToFile.entrySet();
-      for (Entry<String,String> pfe: pfes) {
-        String project = pfe.getKey();
-        String fileAbs = pfe.getValue();
-        String relFile = fileAbs.substring(depotDir, fileAbs.length());
-        ArtifactType art = new ArtifactType();
-        art.setFilename(relFile);
-        art.setProject(project);
-        art.setType(artType);
-        artifacts.add(art);
-      }
+    for (Entry<ArtifactKey,String> e: es) {
+      ArtifactKey artPlatform = e.getKey();
+      String file = e.getValue();
+      String project = artPlatform.getProjectName();
+      String platform = artPlatform.getPlatformName();
+      String type = artPlatform.getArtifactType();
+      
+      ArtifactType art = new ArtifactType();
+      File fullFile = files_.instance(file);
+      String shortFile = fullFile.getName();
+      
+      art.setFilename(shortFile);
+      art.setProject(project);
+      platform = platform.toUpperCase();
+      art.setPlatform(platform);
+      art.setType(type);
+      artifacts.add(art);
     }
     try {
-      xmlFiles_.writeDepot_v1_0(dir_ + File.separator + "depot.xml", type);
+      xmlFiles_.writeDepot_v1_0(dir_ + files_.getNameSeparator() + "depot.xml", depotType);
     } catch (Exception x) {
         throw new RuntimeException(x);
     }
   }
 
   @Override
-  public String get(String projectName) {
-    return get(projectName, "jar");
-  }
-
-  @Override
-  public String get(String projectName, String artifactType) {
-    ConcurrentHashMap<String, String> subMap = artifactTypesToProjectsToArtifacts_.get(artifactType);
-    if (subMap == null) {
-      return null;
-    }
-    String file =  subMap.get(projectName);
+  public String get(String projectName, String artifactType, String platformName) {
+    String platform = getPlatformLower(platformName);
+    String file = artifactKeysToArtifacts_.get(new ArtifactKey(projectName, artifactType, platform));
     if (file == null) {
       throw new IllegalStateException("There isn't a file for the following project/artifact;" + System.lineSeparator() +
           "\t" + projectName + "," + artifactType);

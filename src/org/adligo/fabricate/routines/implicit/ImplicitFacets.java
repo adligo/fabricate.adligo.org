@@ -10,7 +10,7 @@ import org.adligo.fabricate.models.common.RoutineBriefOrigin;
  * @author scott
  *
  */
-public class ImplicitProjectFacets {
+public class ImplicitFacets {
   public static final String CLONE_PROJECT_TASK = "clone project";
   public static final String CHECKOUT_PROJECT_TASK = "checkout project";
   public static final String DOWNLOAD_DEPENDENCIES = "download dependencies";

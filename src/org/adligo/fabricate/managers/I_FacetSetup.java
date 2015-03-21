@@ -6,7 +6,7 @@ import org.adligo.fabricate.models.common.I_FabricationRoutine;
 public interface I_FacetSetup {
 
   /**
-   * Create a facet from the implicit obtain
+   * Create a facet from a implicit 
    * facet, fabricate.xml or a merge using a facets name.
    * @param name
    * @return

@@ -155,8 +155,4 @@ public class DepotManager {
     return depot_;
   }
   
-  public boolean remove(I_DepotEntry entry) {
-    // TODO Auto-generated method stub
-    return false;
-  }
 }

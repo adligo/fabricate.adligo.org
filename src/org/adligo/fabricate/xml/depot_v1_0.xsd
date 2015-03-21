@@ -11,33 +11,36 @@
     </complexType>
     
     <complexType name="artifact_type">
-    	<attribute name="project" type="string" use="required">
+        <attribute name="filename" type="string">
     		<annotation>
-				<documentation>
-					The name of the project that this artifact 
-					came from.
-				</documentation>
-			</annotation>
+    			<documentation>
+    				Each file may be different having version
+    				information in the file name.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+        <attribute name="project" type="string" use="required">
+    		<annotation>
+    			<documentation>
+    				The name of the project that this artifact came
+    				from.
+    			</documentation>
+    		</annotation>
+    	</attribute>
+    	<attribute name="platform" type="string">
+    		<annotation>
+    			<documentation>
+    				The platform of the artifact i.e.; JSE (Java
+    				Standard Edition) GWT (Google Web Toolkit) JME (Java
+    				Micro Edition) Note the platform is also the
+    				directory where the jar is stored in the depot.
+    			</documentation>
+    		</annotation>
     	</attribute>
     	<attribute name="type" type="string">
     		<annotation>
-				<documentation>
-					The type of artifact ie jar, jme-jar exc.
-					Note the files are stored in a folder by type i.e.
-					depot
-					   |-jars
-					   |-jme-jars
-				</documentation>
-			</annotation>
-    	</attribute>
-    	<attribute name="filename" type="string">
-    		<annotation>
-				<documentation>
-					Each file may be different having version information
-					in the file name.
-				</documentation>
-			</annotation>
-    	</attribute>
+    			<documentation>This is the type of artifact, i.e. 'jar', 'war', 'sar', 'zip', 'tar' exc.</documentation>
+    		</annotation></attribute>
     </complexType>
 
 

@@ -78,6 +78,10 @@ public class Parameter implements I_Parameter {
     return value_;
   }
 
+  public String [] getValueDelimited(String delimitor) {
+    return ParameterMutant.getValueDelimited(value_, delimitor);
+  }
+  
   private List<I_Parameter> newChildren(Collection<I_Parameter> children) {
     List<I_Parameter> toAdd = new ArrayList<I_Parameter>();
     if (children != null) {

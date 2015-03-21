@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandLineEnConstants implements I_CommandLineConstants {
+  
+
   public static final CommandLineEnConstants INSTANCE = new CommandLineEnConstants();
 
   
@@ -25,6 +27,8 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   private static final String LOG = "--log-verbosely";
   private static final String N = "-n";
   private static final String NO_SSH_PASSPHRASE = "--no-ssh-keystore-passphrase";
+  private static final String PLATFORMS = "platforms";
+
   private static final String P = "-p";
   private static final String PURGE = "--purge";
   private static final String R = "-r";
@@ -134,6 +138,11 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
       return N;
     }
     return NO_SSH_PASSPHRASE;
+  }
+  
+  @Override
+  public String getPlatforms() {
+    return PLATFORMS;
   }
   
   @Override

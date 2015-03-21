@@ -109,6 +109,7 @@ public interface I_SystemMessages {
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess();
   public String getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
+  public String getTheFollowingRequiredFileIsMissing();
   
   public String getTheFollowingArtifact();
   public String getTheMemoryKeyXHasBeenLockedByTheFollowingClasses();

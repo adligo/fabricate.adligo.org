@@ -7,5 +7,6 @@ public interface I_Parameter {
   public List<I_Parameter> getChildren();
   public String getKey();
   public String getValue();
+  public String [] getValueDelimited(String delimitor);
   public int size();
 }

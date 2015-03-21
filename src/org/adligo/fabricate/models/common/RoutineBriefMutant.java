@@ -146,6 +146,36 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
     return false;
   }
+  
+  public static I_Parameter getParameter(List<I_Parameter> params, String key) {
+    if (params == null) {
+      return null;
+    }
+    for (I_Parameter rbm: params) {
+      if (rbm != null) {
+        if (key.equals(rbm.getKey())) {
+          return rbm;
+        }
+      }
+    }
+    return null;
+  }
+  
+  public static List<I_Parameter> getParameters(List<I_Parameter> params, String key) {
+    if (params == null) {
+      return Collections.emptyList();
+    }
+    List<I_Parameter> toRet = new ArrayList<I_Parameter>();
+    for (I_Parameter rbm: params) {
+      if (rbm != null) {
+        if (key.equals(rbm.getKey())) {
+          toRet.add(rbm);
+        }
+      }
+    }
+    return toRet;
+  }
+  
   public static int hashCode(I_RoutineBrief in) {
     final int prime = 31;
     int result = 1;
@@ -488,6 +518,23 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     return false;
   }
   
+  @Override
+  public boolean isCommand() {
+    if (origin_ == null) {
+      return false;
+    }
+    switch (origin_) {
+      case COMMAND:
+      case FABRICATE_COMMAND:
+      case IMPLICIT_COMMAND:
+      case PROJECT_COMMAND:
+        return true;
+      default:
+        break;
+    }
+    return false;
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#isOptional()
    */
@@ -498,6 +545,41 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
     return optional_;
   }
+  
+  @Override
+  public boolean isStage() {
+    if (origin_ == null) {
+      return false;
+    }
+    switch (origin_) {
+      case FABRICATE_STAGE:
+      case PROJECT_STAGE:
+      case IMPLICIT_STAGE:
+      case STAGE:
+        return true;
+      default:
+        break;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isArchivalStage() {
+    if (origin_ == null) {
+      return false;
+    }
+    switch (origin_) {
+      case FABRICATE_ARCHIVE_STAGE:
+      case PROJECT_ARCHIVE_STAGE:
+      case IMPLICIT_ARCHIVE_STAGE:
+      case ARCHIVE_STAGE:
+        return true;
+      default:
+        break;
+    }
+    return false;
+  }
+
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getOrigin()
    */
@@ -505,6 +587,17 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   public RoutineBriefOrigin getOrigin() {
     return origin_;
   }
+  
+  @Override
+  public I_Parameter getParameter(String key) {
+    return getParameter(parameters_, key);
+  }
+
+  @Override
+  public List<I_Parameter> getParameters(String key) {
+    return getParameters(parameters_, key);
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getParameters()
    */
@@ -515,6 +608,7 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
     return new ArrayList<I_Parameter>(parameters_);
   }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.routines.I_RoutineBrief#getNestedRoutines()
    */
@@ -689,7 +783,7 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   }
 
   @Override
-  public List<String> getParameters(String key) {
+  public List<String> getParameterValues(String key) {
     if (parameters_ == null) {
       return Collections.emptyList();
     }
@@ -705,7 +799,7 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   }
 
   @Override
-  public String getParameter(String key) {
+  public String getParameterValue(String key) {
     if (parameters_ == null) {
       return null;
     }
@@ -718,6 +812,7 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
     return null;
   }
+
   
   public ParameterMutant getParameterMutant(String key) {
     if (parameters_ == null) {
@@ -742,5 +837,6 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   public String toString() {
     return toString(this);
   }
+
 
 }

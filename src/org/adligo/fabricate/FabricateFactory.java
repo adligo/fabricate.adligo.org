@@ -7,6 +7,7 @@ import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.managers.CommandManager;
+import org.adligo.fabricate.managers.FabricationManager;
 import org.adligo.fabricate.managers.ProjectsManager;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
@@ -94,6 +95,10 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new DependencyManager(sys, repos, builder);
   }
 
+  public FabricationManager createFabricationManager(I_FabSystem system,  RoutineFabricateFactory factory, I_RepositoryManager rm) {
+    return new FabricationManager(system, factory, rm);
+  }
+  
   @Override
   public I_LibraryResolver createLibraryResolver(I_FabSystem sys, I_Fabricate fabricate) {
     return new LibraryResolver(sys, fabricate);

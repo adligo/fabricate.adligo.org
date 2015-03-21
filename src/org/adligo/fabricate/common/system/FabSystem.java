@@ -282,6 +282,10 @@ public class FabSystem implements I_FabSystem {
     return new BufferedInputStream(in);
   }
 
+  public <T, V> ConcurrentHashMap<T, V> newConcurrentHashMap(Class<T> keyType, Class<V> valueType) {
+    return new ConcurrentHashMap<T,V>();
+  }
+  
   public <T> ConcurrentLinkedQueue<T> newConcurrentLinkedQueue(Class<T> type) {
     return new ConcurrentLinkedQueue<T>();
   }

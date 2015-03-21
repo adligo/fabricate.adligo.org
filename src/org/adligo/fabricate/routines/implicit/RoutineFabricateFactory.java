@@ -84,9 +84,9 @@ public class RoutineFabricateFactory {
   }
   
   public void addImplicitFacets() {
-    facets_.add(ImplicitProjectFacets.OBTAIN_BRIEF);
-    facets_.add(ImplicitProjectFacets.LOAD_PROJECTS_BRIEF);
-    facets_.add(ImplicitProjectFacets.DOWNLOAD_DEPENDENCIES_BRIEF);
+    facets_.add(ImplicitFacets.OBTAIN_BRIEF);
+    facets_.add(ImplicitFacets.LOAD_PROJECTS_BRIEF);
+    facets_.add(ImplicitFacets.DOWNLOAD_DEPENDENCIES_BRIEF);
   }
   
   public void addImplicitCommands() {
@@ -96,7 +96,7 @@ public class RoutineFabricateFactory {
   }
 
   public void addImplicitStages() {
-    stages_.add(JarStage.JAR_STAGE);
+    stages_.add(ImplicitStages.JAR_BRIEF);
   }
   
   public void addImplicitTraits() {

@@ -162,6 +162,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "The following list of Fabricate libraries contains a circular reference;";
   private static final String THE_FOLLOWING_REMOTE_REPOSITORY_APPEARS_TO_BE_DOWN = 
       "The following remote repository appears to be down;";
+  private static final String THE_FOLLOWING_REQUIRED_FILE_IS_MISSING = 
+      "The following required file is missing;";
   private static final String THE_FOLLOWING_COMMAND_LINE_PROGRAM_EXITED_ABNORMALLY_WITH_EXIT_CODE_X =
       "The following command line program exited abnormally with exit code <X/>;";
   
@@ -539,6 +541,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getTheFollowingFabricateLibraryCanNotBeFound() {
     return THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND;
+  }
+  
+  @Override
+  public String getTheFollowingRequiredFileIsMissing() {
+    return THE_FOLLOWING_REQUIRED_FILE_IS_MISSING;
   }
   
   @Override

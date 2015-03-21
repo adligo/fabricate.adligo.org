@@ -109,12 +109,16 @@
         	<documentation>
 </documentation></annotation>
         <sequence>
-			<element name="stage" type="pns:project_routine_type" minOccurs="1" maxOccurs="unbounded">
-				<annotation>
-					<documentation>
-Note a project stage may override both archive and non archive
-stages.</documentation>
-				</annotation></element>
-		</sequence>
+        	<element name="stage" type="pns:project_routine_type"
+        		minOccurs="0" maxOccurs="unbounded">
+        		<annotation>
+        			<documentation>
+        				Note a project stage may override both archive
+        				and non archive stages.
+        			</documentation>
+        		</annotation>
+        	</element>
+        	<element name="projectArchiveStage" type="pns:project_routine_type" minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
 	</complexType>
 </schema>

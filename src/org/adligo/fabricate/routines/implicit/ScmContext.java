@@ -54,12 +54,12 @@ public class ScmContext {
   
   public ScmContext(I_RoutineBrief routine) {
    
-    hostname_ = routine.getParameter(HOSTNAME);
+    hostname_ = routine.getParameterValue(HOSTNAME);
     if (StringUtils.isEmpty(hostname_)) {
       throw new IllegalArgumentException(HOSTNAME);
     }
     
-    String path = routine.getParameter(PATH);
+    String path = routine.getParameterValue(PATH);
     if (StringUtils.isEmpty(path)) {
       throw new IllegalArgumentException(PATH);
     }
@@ -72,7 +72,7 @@ public class ScmContext {
     } 
     path_ = path;
     
-    String protocol = routine.getParameter(PROTOCOL);
+    String protocol = routine.getParameterValue(PROTOCOL);
     if (StringUtils.isEmpty(protocol)) {
       protocol_ = "https"; 
     } else {
@@ -81,7 +81,7 @@ public class ScmContext {
     if ( !KNOWN_PROTOCOLS.contains(protocol_)) {
       throw new IllegalArgumentException(PROTOCOL);
     }
-    String port = routine.getParameter(PORT);
+    String port = routine.getParameterValue(PORT);
     if (StringUtils.isEmpty(port)) {
       if ("ssh".equals(protocol_)) {
         port_ = 22;
@@ -91,7 +91,7 @@ public class ScmContext {
     } else {
       port_ = Integer.parseInt(port);
     }
-    String user = routine.getParameter(USER);
+    String user = routine.getParameterValue(USER);
     if (StringUtils.isEmpty(user)) {
       username_ = "";
     } else {

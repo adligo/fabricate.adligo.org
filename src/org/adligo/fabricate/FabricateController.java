@@ -13,6 +13,7 @@ import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.managers.CommandManager;
+import org.adligo.fabricate.managers.FabricationManager;
 import org.adligo.fabricate.managers.ProjectsManager;
 import org.adligo.fabricate.models.common.ExecutionEnvironmentMutant;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
@@ -153,11 +154,12 @@ public class FabricateController {
         new ExecutionEnvironmentMutant(sysMessages_));
     memory.addLock(new MemoryLock(FabricationMemoryConstants.ENV, 
         Collections.singleton(FabricateController.class.getName())));
+    
+    RepositoryManager rm = factory.createRepositoryManager(sys_, fab_);
     if (requiresProjects()) {
       if (!manageProjectsDirAndMode(factory)) {
         return;
       }
-      RepositoryManager rm = factory.createRepositoryManager(sys_, fab_);
       ProjectsManager pm = factory.createProjectsManager(sys_, factory_, rm);
       failure_ = pm.setupAndRun(memory);
     }
@@ -166,7 +168,8 @@ public class FabricateController {
       CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_);
       failure_ = manager.processCommands(memory);
     } else {
-      //TODO add fabrication manager code
+      FabricationManager fabManager = factory.createFabricationManager(sys_, factory_, rm);
+      failure_ = fabManager.setupAndRun(memory);
     }
     
     writeResult();

@@ -1,5 +1,6 @@
 package org.adligo.fabricate.models.project;
 
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.models.common.DuplicateRoutineException;
 import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
@@ -26,6 +27,100 @@ import java.util.List;
 import java.util.Map;
 
 public class ProjectMutant implements I_Project {
+  public static boolean equals(Object o, I_Project p) {
+    if (o == p) {
+      return true;
+    }
+    if (o instanceof I_Project) {
+      I_Project other = (I_Project) o;
+      String name = p.getName();
+      String oName = other.getName();
+      if (name == null) {
+        if (oName == null) {
+          return true;
+        }
+        return false;
+      } else if (name.equals(oName)) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+  
+  public static int hashCode(I_Project p) {
+    final int prime = 31;
+    int result = 1;
+    String name = p.getName();
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    return result;
+  }
+  
+  public static String toString(I_Project p) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(p.getClass().getSimpleName());
+    sb.append(" [name=");
+    sb.append(p.getName());
+    sb.append(", dir=");
+    sb.append(p.getDir());
+    String version = p.getVersion();
+    if (!StringUtils.isEmpty(version)) {
+      sb.append(", version=");
+      sb.append(version);
+    }
+    
+    List<I_Parameter> attribs = p.getAttributes();
+    if (attribs != null) {
+      sb.append(", attributes=");
+      sb.append(attribs.size());
+    }
+    
+    Map<String,I_RoutineBrief> commands = p.getCommands();
+    if (commands != null) {
+      sb.append(", commands=");
+      sb.append(commands.size());
+    }
+    
+    List<I_Dependency> deps = p.getDependencies();
+    if (deps != null) {
+      sb.append(", dependencies=");
+      sb.append(deps.size());
+    }
+    
+    List<I_LibraryDependency> ldeps = p.getLibraryDependencies();
+    if (ldeps != null) {
+      sb.append(", libraryDependencies=");
+      sb.append(ldeps.size());
+    }
+    
+    List<I_Dependency> ndeps = p.getNormalizedDependencies();
+    if (ndeps != null) {
+      sb.append(", normalizedDependencies=");
+      sb.append(ndeps.size());
+    }
+    
+    List<I_ProjectDependency> pdeps = p.getProjectDependencies();
+    if (pdeps != null) {
+      sb.append(", projectDependencies=");
+      sb.append(pdeps.size());
+    }
+    
+    
+    Map<String,I_RoutineBrief> stages = p.getStages();
+    if (stages != null) {
+      sb.append(", stages=");
+      sb.append(stages.size());
+    }
+    
+    Map<String,I_RoutineBrief> traits = p.getTraits();
+    if (traits != null) {
+      sb.append(", traits=");
+      sb.append(traits.size());
+    }
+    sb.append("]");
+    return sb.toString();
+  }
+  
   /**
    * actually only ParameterMutant instances.
    * This instance must be protected from external modification
@@ -268,6 +363,12 @@ public class ProjectMutant implements I_Project {
       }
     }
   }
+  
+  @Override
+  public boolean equals(Object obj) {
+    return equals(obj, this);
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.project.foo#getAttributes()
    */
@@ -375,6 +476,16 @@ public class ProjectMutant implements I_Project {
   
   public String getVersion() {
     return version_;
+  }
+  
+  @Override
+  public int hashCode() {
+    return hashCode(this);
+  }
+
+  @Override
+  public String toString() {
+    return toString(this);
   }
   
   public void setAttributes(Collection<? extends I_Parameter> attributes) {
@@ -499,4 +610,5 @@ public class ProjectMutant implements I_Project {
       }
     }
   }
+
 }

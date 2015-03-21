@@ -42,6 +42,7 @@ public class Fabricate implements I_Fabricate {
   private final List<String> remoteRepositories_;
   
   private final I_RoutineBrief scm_;
+  private final List<String> stageOrder_; 
   private final Map<String, I_RoutineBrief> stages_; 
   private final Map<String, I_RoutineBrief> traits_; 
   
@@ -116,6 +117,18 @@ public class Fabricate implements I_Fabricate {
       scm_ = null;
     }
     stages_ = createImmutableMap(other.getStages());
+    List<String> stageOrderIn = other.getStageOrder();
+    if (stageOrderIn != null && stageOrderIn.size() >= 1) {
+      List<String> copy = new ArrayList<String>();
+      for (String stage: stageOrderIn) {
+        if (stage != null) {
+          copy.add(stage);
+        }
+      }
+      stageOrder_ = Collections.unmodifiableList(copy);
+    } else {
+      stageOrder_ = Collections.emptyList();
+    }
     traits_ = createImmutableMap(other.getTraits());
   }
 
@@ -173,24 +186,6 @@ public class Fabricate implements I_Fabricate {
     return facets_;
   }
   
-  private Map<String,I_RoutineBrief> createImmutableMap(Map<String,I_RoutineBrief> in) {
-    if (in == null || in.size() == 0) {
-      return Collections.emptyMap();
-    }
-    Map<String,I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
-    Set<Entry<String, I_RoutineBrief>> entries = in.entrySet();
-    for (Entry<String, I_RoutineBrief> e: entries) {
-      I_RoutineBrief v = e.getValue();
-      if (v instanceof RoutineBrief) {
-        toRet.put(e.getKey(), v);
-      } else {
-        //this will throw a npe for v == null
-        toRet.put(e.getKey(), new RoutineBrief(v));
-      }
-    }
-    return Collections.unmodifiableMap(toRet);
-  }
-
   public String getProjectsDir() {
     return projectsDir_;
   }
@@ -207,6 +202,12 @@ public class Fabricate implements I_Fabricate {
   @Override
   public I_RoutineBrief getStage(String name) {
     return stages_.get(name);
+  }
+  
+
+  @Override
+  public List<String> getStageOrder() {
+    return stageOrder_;
   }
   
   @Override
@@ -254,4 +255,23 @@ public class Fabricate implements I_Fabricate {
     }
     return javaSettings_.getXmx();
   }
+  
+  private Map<String,I_RoutineBrief> createImmutableMap(Map<String,I_RoutineBrief> in) {
+    if (in == null || in.size() == 0) {
+      return Collections.emptyMap();
+    }
+    Map<String,I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
+    Set<Entry<String, I_RoutineBrief>> entries = in.entrySet();
+    for (Entry<String, I_RoutineBrief> e: entries) {
+      I_RoutineBrief v = e.getValue();
+      if (v instanceof RoutineBrief) {
+        toRet.put(e.getKey(), v);
+      } else {
+        //this will throw a npe for v == null
+        toRet.put(e.getKey(), new RoutineBrief(v));
+      }
+    }
+    return Collections.unmodifiableMap(toRet);
+  }
+
 }

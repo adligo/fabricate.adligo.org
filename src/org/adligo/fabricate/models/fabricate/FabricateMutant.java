@@ -71,6 +71,8 @@ public class FabricateMutant implements I_Fabricate {
    * actually only RoutineBriefMutant instances
    */
   private Map<String,I_RoutineBrief> stages_ = new HashMap<String,I_RoutineBrief>();
+  private List<String> stageOrder_ = new ArrayList<String>();
+  
   private String projectsDir_;
   
   public FabricateMutant() {
@@ -160,6 +162,19 @@ public class FabricateMutant implements I_Fabricate {
     }
   }
   
+  public void addStage(I_RoutineBrief rb) {
+    String name = rb.getName();
+    if (stageOrder_.contains(name)) {
+      throw new IllegalArgumentException("Duplicate stage name " + name);
+    }
+    stageOrder_.add(name);
+    if (rb instanceof RoutineBriefMutant) {
+      stages_.put(name, rb);
+    } else {
+      stages_.put(name, new RoutineBriefMutant(rb));
+    }
+  }
+  
   public void addStages(FabricateType type) throws ClassNotFoundException {
     StagesAndProjectsType spt =  type.getProjectGroup();
     if (spt != null) {
@@ -170,7 +185,7 @@ public class FabricateMutant implements I_Fabricate {
         if (stageTypes != null) {
           for (StageType routine: stageTypes) {
             RoutineBriefMutant mut = new RoutineBriefMutant(routine, RoutineBriefOrigin.FABRICATE_STAGE);
-            stages_.put(mut.getName(), mut);
+            addStage(mut);
           }
         }
         
@@ -201,6 +216,8 @@ public class FabricateMutant implements I_Fabricate {
       }
     }
   }
+
+
   
   public void addScmAndProjects(FabricateType type) throws ClassNotFoundException {
     StagesAndProjectsType spt =  type.getProjectGroup();
@@ -326,6 +343,10 @@ public class FabricateMutant implements I_Fabricate {
     return new HashMap<String,I_RoutineBrief>(stages_);
   }
 
+  public List<String> getStageOrder() {
+    return new ArrayList<String>(stageOrder_);
+  }
+  
   @Override
   public I_RoutineBrief getTrait(String name) {
     return traits_.get(name);
@@ -448,12 +469,7 @@ public class FabricateMutant implements I_Fabricate {
       Set<Entry<String, I_RoutineBrief>> entries = stages.entrySet();
       for (Entry<String,I_RoutineBrief> e: entries) {
         I_RoutineBrief v = e.getValue();
-        if (v instanceof RoutineBriefMutant) {
-          stages_.put(e.getKey(), (RoutineBriefMutant) v);
-        } else {
-          //should throw a npe for null v
-          stages_.put(e.getKey(), new RoutineBriefMutant(v));
-        }
+        addStage(v);
       }
     }
   }

@@ -1,21 +1,22 @@
 package org.adligo.fabricate.routines.implicit;
 
 import org.adligo.fabricate.models.project.I_Project;
-import org.adligo.fabricate.routines.AbstractRoutine;
+import org.adligo.fabricate.routines.I_FabricateAware;
 import org.adligo.fabricate.routines.I_ProjectAware;
 
-public class DepositRoutine extends AbstractRoutine implements I_ProjectAware {
-
+public class ProjectAwareRoutine  extends FabricateAwareRoutine
+implements I_ProjectAware, I_FabricateAware {
+  
+  protected I_Project project_;
+  
   @Override
   public I_Project getProject() {
-    // TODO Auto-generated method stub
-    return null;
+    return project_;
   }
-
+  
   @Override
   public void setProject(I_Project project) {
-    // TODO Auto-generated method stub
-    
+    project_ = project;
   }
-
+  
 }
