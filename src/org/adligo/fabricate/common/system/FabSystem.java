@@ -375,6 +375,11 @@ public class FabSystem implements I_FabSystem {
     }
   }
 
+  @Override
+  public String pathSeparator() {
+    return File.pathSeparator;
+  }
+
 
 
 }

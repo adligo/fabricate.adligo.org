@@ -69,6 +69,7 @@ public class RoutineExecutionEngine {
         }
         int counter = 0;
         while (true) {
+          boolean failure = false;
           int monitorsFinished = 0;
           for (I_RunMonitor rm: monitors_) {
             if (rm.getSequence() == 1) {
@@ -90,9 +91,17 @@ public class RoutineExecutionEngine {
               } catch (InterruptedException e) {
                 system_.currentThread().interrupt();
               }
+              if (rm.hasFailure()) {
+                failure = true;
+                break;
+              }
             } else {
               monitorsFinished++;
             }
+          }
+          if (failure) {
+            service.shutdownNow();
+            break;
           }
           if (monitorsFinished == monitors_.size()) {
             firstRoutine.writeToMemory(memoryMut);

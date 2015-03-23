@@ -48,6 +48,16 @@ public class ProjectMutant implements I_Project {
     return false;
   }
   
+  public static List<I_Parameter> getAttributes(String key, List<I_Parameter> attributes) {
+    ArrayList<I_Parameter> toRet = new ArrayList<I_Parameter>();
+    for (I_Parameter attrib: attributes) {
+      if (key.equals(attrib.getKey())) {
+        toRet.add(attrib);
+      }
+    }
+    return toRet;
+  }
+  
   public static int hashCode(I_Project p) {
     final int prime = 31;
     int result = 1;
@@ -378,7 +388,10 @@ public class ProjectMutant implements I_Project {
     return new ArrayList<I_Parameter>(attributes_);
   }
 
-
+  public List<I_Parameter> getAttributes(String key) {
+    return getAttributes(key, attributes_);
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.project.foo#getCommand(java.lang.String)
    */

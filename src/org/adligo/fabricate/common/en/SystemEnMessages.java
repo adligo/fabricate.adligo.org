@@ -16,7 +16,9 @@ public class SystemEnMessages implements I_SystemMessages {
       "Archive stage <X/> is still running.";
   private static final String ARCHIVE_STAGE_X_IS_STILL_SETTING_UP = 
       "Archive stage <X/> is still setting up.";
-  
+  private static final String ARCHIVE_STAGE_X_PROJECT_Y_IS_WAITING_ON_THE_FOLLOWING_PROJECTS =
+      "Archive stage <X/>, project <Y/> is waiting on the following projects;";
+ 
   private static final String BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
       "Build stage <X/>, task <Y/> is still running on project <Z/>.";
   private static final String BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING = 
@@ -27,7 +29,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "Build stage <X/> is still running.";
   private static final String BUILD_STAGE_X_IS_STILL_SETTING_UP = 
       "Build stage <X/> is still setting up.";
-  
+  private static final String BUILD_STAGE_X_PROJECT_Y_IS_WAITING_ON_THE_FOLLOWING_PROJECTS =
+      "Build stage <X/>, project <Y/> is waiting on the following projects;";
   
   private static final String BUILDING_FABRICATE_RUNTIME_CLASS_PATH = 
       "Building Fabricate runtime class path.";
@@ -44,6 +47,9 @@ public class SystemEnMessages implements I_SystemMessages {
       "Command <X/> is still running.";
   private static final String COMMAND_X_IS_STILL_SETTING_UP = 
       "Command <X/> is still setting up.";
+  private static final String COMMAND_X_PROJECT_Y_IS_WAITING_ON_THE_FOLLOWING_PROJECTS =
+      "Command <X/>, project <Y/> is waiting on the following projects;";
+  
   private static final String COMPILED_ON_X = "Compiled on <X/>.";
   private static final String THE_FOLLOWING_LOCAL_REPOSITORY_IS_LOCKED_BY_ANOTHER_PROCESS = 
       "The following local repository is locked by another process;";
@@ -84,6 +90,7 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String EXCEPTION_UNABLE_TO_FIND_SSH_AUTH_SOCK_WHEN_PARSING_OUTPUT_OF_SSH_AGENT =
       "Exception: Unable to find SSH_AUTH_SOCK when parsing output of ssh-agent.";
   
+ 
   private static final String FABRICATING = "Fabricating...";
   private static final String FABRICATE_ALREADY_RUNNING = 
       "Fabricate appears to already be running ";
@@ -103,6 +110,9 @@ public class SystemEnMessages implements I_SystemMessages {
       "Facet <X/> is still running.";
   private static final String FACET_X_IS_STILL_SETTING_UP = 
       "Facet <X/> is still setting up.";
+  private static final String FACET_X_IS_WAITING_ON_PROJECTS_WHICH_PROJECT_Y_DEPENDS_ON_IN_ORDER_TO_START =
+      "Facet <X/>, project <Y/> is waiting on the following projects;";
+  
   
   private static final String FAILED = "failed!";
   private static final String FINISHED = "finished.";
@@ -127,9 +137,19 @@ public class SystemEnMessages implements I_SystemMessages {
       "Managing Fabricate runtime class path dependencies.";
   private static final String MANAGING_THE_FOLLOWING_LOCAL_REPOSITORY = 
       "Managing the following local repository;";
+  private static final String NO_PROJECT_FOUND_WITH_NAME_X = "No project found with name <X/>.";
   private static final String NO_REMOTE_REPOSITORIES_COULD_BE_REACHED = 
       "No remote repositories could be reached.";
   private static final String NO_ROUTINE_FOUND_WITH_NAME_X = "No routine found with name '<X/>'.";
+  
+  private static final String RUNNING_ARCHIVE_STAGE_X = "\tRunning archive stage '<X/>'.";
+  private static final String RUNNING_ARCHIVE_STAGES = "Running archive stages...";
+  private static final String RUNNING_BUILD_STAGE_X = "\tRunning build stage '<X/>'.";
+  private static final String RUNNING_BUILD_STAGES = "Running build stages...";
+  private static final String RUNNING_COMMAND_X = "\tRunning command '<X/>'.";
+  private static final String RUNNING_COMMANDS = "Running commands...";
+  private static final String RUNNING_FACET_X = "\tRunning facet '<X/>'.";
+  private static final String RUNNING_FACETS = "Running facets...";
   
   private static final String PASSED_THE_EXTRACT_CHECK = "passed the extract check.";
   private static final String PASSED_THE_MD5_CHECK = "passed the md5 check.";
@@ -239,6 +259,11 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getArchiveStageXProjectYIsWaitingOnTheFollowingProjects() {
+    return ARCHIVE_STAGE_X_PROJECT_Y_IS_WAITING_ON_THE_FOLLOWING_PROJECTS;
+  }
+  
+  @Override
   public String getDurationWasXMilliseconds() {
     return DURATION_WAS_X_MILLISECONDS;
   }
@@ -277,10 +302,15 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getCommandXIsStillRunning() {
     return COMMAND_X_IS_STILL_RUNNING;
   }
-  
+
   @Override
   public String getCommandXIsStillRunningOnProjectZ() {
     return COMMAND_X_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getCommandXProjectYIsWaitingOnTheFollowingProjects() {
+    return COMMAND_X_PROJECT_Y_IS_WAITING_ON_THE_FOLLOWING_PROJECTS;
   }
   
   @Override
@@ -291,6 +321,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getCommandXTaskYIsStillRunningOnProjectZ() {
     return COMMAND_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getBuildStageXProjectYIsWaitingOnTheFollowingProjects() {
+    return BUILD_STAGE_X_PROJECT_Y_IS_WAITING_ON_THE_FOLLOWING_PROJECTS;
   }
   
   @Override
@@ -444,6 +479,11 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getFacetXIProjectYIsWaitingOnTheFollowingProjects() {
+    return FACET_X_IS_WAITING_ON_PROJECTS_WHICH_PROJECT_Y_DEPENDS_ON_IN_ORDER_TO_START;
+  }
+  
+  @Override
   public String getFailed() {
     return FAILED;
   }
@@ -501,6 +541,47 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getProjectsAreLocatedInTheFollowingDirectory() {
     return PROJECTS_ARE_LOCATED_IN_THE_FOLLOWING_DIRECTORY;
+  } 
+
+  
+  @Override
+  public String getRunningArchiveStages() {
+    return RUNNING_ARCHIVE_STAGES;
+  } 
+  
+  @Override
+  public String getRunningArchiveStageX() {
+    return RUNNING_ARCHIVE_STAGE_X;
+  } 
+  
+  @Override
+  public String getRunningCommands() {
+    return RUNNING_COMMANDS;
+  } 
+
+  @Override
+  public String getRunningCommandX() {
+    return RUNNING_COMMAND_X;
+  } 
+  
+  @Override
+  public String getRunningBuildStages() {
+    return RUNNING_BUILD_STAGES;
+  } 
+  
+  @Override
+  public String getRunningBuildStageX() {
+    return RUNNING_BUILD_STAGE_X;
+  } 
+  
+  @Override
+  public String getRunningFacets() {
+    return RUNNING_FACETS;
+  } 
+
+  @Override
+  public String getRunningFacetX() {
+    return RUNNING_FACET_X;
   } 
   
   @Override
@@ -644,11 +725,15 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getNoProjectFoundWithNameX() {
+    return NO_PROJECT_FOUND_WITH_NAME_X;
+  }
+  
+  @Override
   public String getNoRemoteRepositoriesCouldBeReached() {
     return NO_REMOTE_REPOSITORIES_COULD_BE_REACHED;
   }
 
-  
   @Override
   public String getNoRoutineFoundWithNameX() {
     return NO_ROUTINE_FOUND_WITH_NAME_X;

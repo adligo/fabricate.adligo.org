@@ -31,6 +31,7 @@ public class Fabricate implements I_Fabricate {
   
   private final String fabricateRepository_;
   private final String fabricateProjectRunDir_;
+  private final String fabricateVersion_;
   private final String fabricateXmlRunDir_;
   private final Map<String, I_RoutineBrief> facets_; 
   
@@ -50,6 +51,8 @@ public class Fabricate implements I_Fabricate {
     developmentMode = other.isDevelopmentMode();
     commands_ = createImmutableMap(other.getCommands());
     fabricateHome_ = other.getFabricateHome();
+    
+    fabricateVersion_ = other.getFabricateVersion();
     fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
     fabricateRepository_ = other.getFabricateRepository();
     facets_ = createImmutableMap(other.getFacets());
@@ -171,7 +174,10 @@ public class Fabricate implements I_Fabricate {
     return javaSettings_;
   }
 
-
+  public String getFabricateVersion() {
+    return fabricateVersion_;
+  }
+  
   public String getFabricateXmlRunDir() {
     return fabricateXmlRunDir_;
   }

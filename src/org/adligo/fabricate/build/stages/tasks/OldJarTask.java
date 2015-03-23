@@ -104,14 +104,15 @@ public class OldJarTask extends OldBaseTask implements I_FabTask {
 
   public void execute() throws IOException {
     //TODO this system should be passed
-    JavaJar jj = new JavaJar(new FabSystem(), dir_, whichJar_);
+    /*
+    JavaJar jar = new JavaJar(new FabSystem(), dir_, whichJar_);
     List<String> params = new ArrayList<String>();
     
     params.add(fileName_);
     params.add(manifestFileName_);
     params_.add(JarParam.C);
     
-    jj.jar(params_, params , "classes");
+    jar.jar(params_, params , "classes");
     if (includeSrc_) {
       params_.remove(JarParam.c);
       params_.remove(JarParam.m);
@@ -119,9 +120,10 @@ public class OldJarTask extends OldBaseTask implements I_FabTask {
       
       params_.add(JarParam.u);
       for (int i = 0; i < srcDirs_.length; i++) {
-        jj.jar(params_, params , srcDirs_[i]);
+        jar.jar(params_, params , srcDirs_[i]);
       }
     }
+    */
   }
 
   /***

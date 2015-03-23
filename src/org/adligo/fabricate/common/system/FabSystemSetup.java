@@ -25,7 +25,10 @@ public class FabSystemSetup {
     Set<String> toRet = new HashSet<String>();
     
     toRet.add("org.adligo.fabricate.FabricateController");
-    toRet.add("org.adligo.fabricate.repository.RepositoryManager");
+    toRet.add("org.adligo.fabricate.managers.CommandManager");
+    toRet.add("org.adligo.fabricate.managers.FabricationManager");
+    toRet.add("org.adligo.fabricate.managers.ProjectsManager");
+    
     return Collections.unmodifiableSet(toRet);
   }
   

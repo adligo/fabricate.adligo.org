@@ -10,7 +10,6 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.Properties;
 
 public class FabConstantsDiscovery implements I_FabricateConstants {

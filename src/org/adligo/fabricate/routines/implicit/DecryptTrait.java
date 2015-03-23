@@ -23,7 +23,7 @@ public class DecryptTrait extends AbstractRoutine implements I_FabricationRoutin
   /**
    * This is the implicit name of this trait.
    */
-  public static final String NAME = "decryptTrait";
+  public static final String NAME = "decrypt";
   public static final Set<I_ExpectedRoutineInterface> IMPLEMENTED_INTERFACES = getInterfaces();
   
   private static Set<I_ExpectedRoutineInterface> getInterfaces() {

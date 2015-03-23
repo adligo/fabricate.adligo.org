@@ -11,6 +11,9 @@ import org.adligo.fabricate.models.common.RoutineBriefOrigin;
  *
  */
 public class ImplicitFacets {
+  public static final String SETUP_PROJECTS = "setup projects";
+  public static final RoutineBrief SETUP_PROJECTS_BRIEF = getSetupProjectsBrief();
+  
   public static final String CLONE_PROJECT_TASK = "clone project";
   public static final String CHECKOUT_PROJECT_TASK = "checkout project";
   public static final String DOWNLOAD_DEPENDENCIES = "download dependencies";
@@ -23,6 +26,15 @@ public class ImplicitFacets {
   public static final String OBTAIN_PROJECTS = "obtain projects";
   public static final RoutineBrief OBTAIN_BRIEF = getObtainBrief();
   
+  private static RoutineBrief getSetupProjectsBrief() {
+    RoutineBriefMutant rbm = new RoutineBriefMutant();
+    rbm.setClazz(SetupProjectsRoutine.class);
+    rbm.setName(SETUP_PROJECTS);
+    rbm.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET);
+    
+    return new RoutineBrief(rbm);
+  }
+  
   private static RoutineBrief getProjectsLoadBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();
     rbm.setClazz(LoadProjectsRoutine.class);
@@ -34,7 +46,6 @@ public class ImplicitFacets {
     load.setName(LOAD_PROJECT_TASK);
     load.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET_TASK);
     rbm.addNestedRoutine(load);
-    
     
     return new RoutineBrief(rbm);
   }

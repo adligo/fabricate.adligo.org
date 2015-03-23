@@ -7,6 +7,7 @@ import org.adligo.fabricate.models.common.I_ExecutionEnvironment;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
@@ -88,10 +89,22 @@ public class Executor implements I_Executor {
 
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.common.system.I_Executor#startProcess(java.io.File, java.lang.String)
+   * @see org.adligo.fabricate.common.system.I_Executor#startProcess(I_ExecutionEnvironment env, ExecutorService service, String inDir, String ... args)
    */
   @Override
   public I_ExecutingProcess startProcess(I_ExecutionEnvironment env, ExecutorService service, String inDir, String ... args) throws IOException {
+    return startProcessPrivate(env, service, inDir, args);
+  }
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_Executor#startProcess(I_ExecutionEnvironment env, ExecutorService service, String inDir, List<String> args)
+   */
+  @Override
+  public I_ExecutingProcess startProcess(I_ExecutionEnvironment env, ExecutorService service, String inDir, List<String> args) throws IOException {
+    return startProcessPrivate(env, service, inDir, args.toArray(new String[args.size()]));
+  }
+  
+  private I_ExecutingProcess startProcessPrivate(I_ExecutionEnvironment env, ExecutorService service,
+      String inDir, String [] args) throws IOException {
     I_ProcessBuilderWrapper pb = sys_.newProcessBuilder(args);
     pb.redirectErrorStream(true);
     Map<String,String> environment = pb.environment();

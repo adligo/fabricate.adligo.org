@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -105,6 +106,10 @@ public class FabFileIO implements I_FabFileIO {
     if (outEx != null) {
       tracker.onCloseException(outEx);
     }
+  }
+  
+  public void copy(String from, String to, StandardCopyOption opt) throws IOException {
+    Files.copy(new File(from).toPath(), new File(to).toPath(), opt);
   }
   
   @Override
@@ -440,6 +445,11 @@ public class FabFileIO implements I_FabFileIO {
     return new File(filePath).exists();
   }
 
+  @Override
+  public void move(String from, String to, StandardCopyOption options) throws IOException {
+    Files.move(new File(from).toPath(), new File(to).toPath(), options);
+  }
+  
   @Override
   public boolean mkdirs(String dirsPath) {
     return new File(dirsPath).mkdirs();

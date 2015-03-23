@@ -1,5 +1,8 @@
 package org.adligo.fabricate.managers;
 
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
@@ -32,6 +35,9 @@ import java.util.Set;
 public class CommandManager {
   private final List<String> commands_ = new ArrayList<String>();
   private final I_FabSystem system_;
+  private final I_FabricateConstants constants_;
+  private final I_SystemMessages sysMessages_;
+  private final I_FabLog log_;
   private final I_Fabricate fabricate_;
   private final RoutineFabricateFactory factory_;
   private String command_;
@@ -64,6 +70,9 @@ public class CommandManager {
       RoutineFabricateFactory factory) {
     commands_.addAll(commands);
     system_ = system;
+    log_ = system.getLog();
+    constants_ = system.getConstants();
+    sysMessages_ = constants_.getSystemMessages();
     factory_ = factory;
     fabricate_ = factory.getFabricate();
   }
@@ -76,6 +85,11 @@ public class CommandManager {
     I_FabricationRoutine routine = null;
     try {
       for (String command: commands_) {
+        if (log_.isLogEnabled(CommandManager.class)) {
+          String message = sysMessages_.getRunningCommandX();
+          message = message.replace("<X/>", command);
+          log_.println(message);
+        }
         command_ = command;
         RoutineExecutionEngine exe = factory_.createRoutineExecutionEngine(system_, executorFactory_);
         exe.runRoutines(memory);

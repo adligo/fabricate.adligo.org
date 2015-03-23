@@ -7,12 +7,14 @@ public interface I_SystemMessages {
   public String getArchiveStageXIsStillRunningOnProjectZ() ;
   public String getArchiveStageXTaskYIsStillRunning();
   public String getArchiveStageXTaskYIsStillRunningOnProjectZ();
+  public String getArchiveStageXProjectYIsWaitingOnTheFollowingProjects();
   
   public String getCommandXIsStillSettingUp();
   public String getCommandXIsStillRunning();
   public String getCommandXIsStillRunningOnProjectZ() ;
   public String getCommandXTaskYIsStillRunning();
   public String getCommandXTaskYIsStillRunningOnProjectZ();
+  public String getCommandXProjectYIsWaitingOnTheFollowingProjects();
   
   public String getBuildingFabricateRuntimeClassPath();
   public String getBuildStageXIsStillSettingUp();
@@ -20,6 +22,8 @@ public interface I_SystemMessages {
   public String getBuildStageXIsStillRunningOnProjectZ();
   public String getBuildStageXTaskYIsStillRunning();
   public String getBuildStageXTaskYIsStillRunningOnProjectZ();
+  public String getBuildStageXProjectYIsWaitingOnTheFollowingProjects();
+  
   public String getCheckingFabricateRuntimeDependencies();
   public String getCompiledOnX();
   
@@ -46,6 +50,7 @@ public interface I_SystemMessages {
   public String getExtractingTheFollowingArtifact();
   public String getExtractionOfTheFollowingArtifact();
   
+  public String getFacetXIProjectYIsWaitingOnTheFollowingProjects();
   public String getFabricateByAdligo();
   public String getFabricating();
   public String getFabricateAppearsToBeAlreadyRunning();
@@ -81,11 +86,24 @@ public interface I_SystemMessages {
   
   public String getManagingTheFollowingLocalRepository();
   public String getManagingFabricateRuntimeClassPathDependencies();
+  
+  public String getNoProjectFoundWithNameX();
   public String getNoRemoteRepositoriesCouldBeReached();
   public String getNoRoutineFoundWithNameX();
+  
   public String getPassedTheMd5Check();
   public String getPassedTheExtractCheck();
   public String getProjectsAreLocatedInTheFollowingDirectory();
+  
+  
+  public String getRunningArchiveStageX();
+  public String getRunningArchiveStages();
+  public String getRunningBuildStageX();
+  public String getRunningBuildStages();
+  public String getRunningCommandX();
+  public String getRunningCommands();
+  public String getRunningFacetX();
+  public String getRunningFacets();
   
   public String getSendingOptsToScript();
   

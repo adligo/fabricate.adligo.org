@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public abstract class TasksRoutine extends AbstractRoutine implements I_FabricateAware, I_TaskProcessor {
+public abstract class TasksRoutine extends AbstractRoutine implements I_FabricateAware {
   private static final Set<I_ExpectedRoutineInterface> EMPTY_SET = Collections.emptySet();
   protected List<TaskContext> tasks_ = new ArrayList<TaskContext>();
   protected I_Fabricate fabricate_;
@@ -23,7 +23,6 @@ public abstract class TasksRoutine extends AbstractRoutine implements I_Fabricat
   private I_RoutineMemoryMutant<Object> routineMemoryMutant_;
   private I_FabricationMemory<Object> memory_;
   private I_RoutineMemory<Object> routineMemory_;
-  private String currentTask;
   
   @Override
   public I_Fabricate getFabricate() {
@@ -71,6 +70,7 @@ public abstract class TasksRoutine extends AbstractRoutine implements I_Fabricat
       }
       routine.setSystem(system_);
       routine.setLocations(locations_);
+      routine.setTraitFactory(traitFactory_);
       if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
         ((I_FabricateAware) routine).setFabricate(fabricate_);
       }

@@ -46,8 +46,8 @@ public class FabricateMutant implements I_Fabricate {
    */
   private Map<String, I_RoutineBrief> facets_ = new HashMap<String, I_RoutineBrief>();
   
+  private String fabricateDevXmlDir_;
   private String fabricateHome_;
-  private String fabricateXmlRunDir_;
   
   /**
    * The directory where fabricate was run from
@@ -55,7 +55,9 @@ public class FabricateMutant implements I_Fabricate {
    * and not a project group directory (with fabricate.xml).
    */
   private String fabricateProjectRunDir_;
-  private String fabricateDevXmlDir_;
+  private String fabricateVersion_;
+  private String fabricateXmlRunDir_;
+  
   private String javaHome_;
   private String fabricateRepository_;
   private JavaSettingsMutant javaSettings_;
@@ -110,9 +112,12 @@ public class FabricateMutant implements I_Fabricate {
     fabricateHome_ = other.getFabricateHome();
     fabricateRepository_ = other.getFabricateRepository();
     javaHome_ = other.getJavaHome();
-    fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
+    
     fabricateDevXmlDir_ = other.getFabricateDevXmlDir();
     fabricateProjectRunDir_ = other.getFabricateProjectRunDir();
+    
+    fabricateVersion_ = other.getFabricateVersion();
+    fabricateXmlRunDir_ = other.getFabricateXmlRunDir();
     
     I_JavaSettings otherJava = other.getJavaSettings();
     if (otherJava == null) {
@@ -285,6 +290,10 @@ public class FabricateMutant implements I_Fabricate {
     return fabricateRepository_;
   }
   
+  public String getFabricateVersion() {
+    return fabricateVersion_;
+  }
+  
   public String getFabricateXmlRunDir() {
     return fabricateXmlRunDir_;
   }
@@ -413,6 +422,10 @@ public class FabricateMutant implements I_Fabricate {
     this.fabricateRepository_ = fabricateRepository;
   }
 
+  public void setFabricateVersion(String fabricateVersion) {
+    this.fabricateVersion_ = fabricateVersion;
+  }
+  
   public void setFabricateXmlRunDir(String fabricateXmlRunDir) {
     this.fabricateXmlRunDir_ = fabricateXmlRunDir;
   }

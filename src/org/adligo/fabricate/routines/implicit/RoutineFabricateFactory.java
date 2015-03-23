@@ -84,6 +84,7 @@ public class RoutineFabricateFactory {
   }
   
   public void addImplicitFacets() {
+    facets_.add(ImplicitFacets.SETUP_PROJECTS_BRIEF);
     facets_.add(ImplicitFacets.OBTAIN_BRIEF);
     facets_.add(ImplicitFacets.LOAD_PROJECTS_BRIEF);
     facets_.add(ImplicitFacets.DOWNLOAD_DEPENDENCIES_BRIEF);
@@ -102,6 +103,7 @@ public class RoutineFabricateFactory {
   public void addImplicitTraits() {
     addTrait(EncryptTrait.NAME, EncryptTrait.class);
     addTrait(DecryptTrait.NAME, DecryptTrait.class);
+    addTrait(NameJar.NAME, NameJar.class);
   }
   
   /**

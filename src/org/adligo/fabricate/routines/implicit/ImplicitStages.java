@@ -23,7 +23,7 @@ public class ImplicitStages {
   
   private static RoutineBrief getJarBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();
-    rbm.setClazz(DependenciesQueueRoutine.class);
+    rbm.setClazz(JarRoutine.class);
     rbm.setName(JAR);
     rbm.setOrigin(RoutineBriefOrigin.IMPLICIT_STAGE);
     
@@ -34,7 +34,7 @@ public class ImplicitStages {
     rbm.addNestedRoutine(gen);
     
     RoutineBriefMutant comp = new RoutineBriefMutant();
-    comp.setClazz(CompileTask.class);
+    comp.setClazz(CompileSourceTask.class);
     comp.setName(COMPILE_SOURCE_TASK);
     comp.setOrigin(RoutineBriefOrigin.IMPLICIT_STAGE_TASK);
     rbm.addNestedRoutine(comp);
@@ -42,6 +42,12 @@ public class ImplicitStages {
     //leaving obfuscate out of the implicit jar stage,
     // users may add it in fabricate.xml if they want
     // obfuscation.
+    
+    RoutineBriefMutant add = new RoutineBriefMutant();
+    add.setClazz(AddFilesTask.class);
+    add.setName(ADD_FILES_TASK);
+    add.setOrigin(RoutineBriefOrigin.IMPLICIT_STAGE_TASK);
+    rbm.addNestedRoutine(add);
     
     RoutineBriefMutant jar = new RoutineBriefMutant();
     jar.setClazz(CreateJarTask.class);

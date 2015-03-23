@@ -22,11 +22,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  */
 public class ProjectBriefQueueRoutine extends TasksRoutine 
-  implements I_ConcurrencyAware, I_FabricationRoutine, I_ProjectBriefsAware, I_ProjectProcessor {
+  implements I_ConcurrencyAware, I_FabricationRoutine, I_ProjectBriefsAware {
   public static final String QUEUE = "queue";
   protected ConcurrentLinkedQueue<I_ProjectBrief> queue;
-  private String currentTask_;
-  private String currentProject_;
   
   @Override
   public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
@@ -36,9 +34,11 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
     }
     queue = system_.newConcurrentLinkedQueue(I_ProjectBrief.class);
     List<I_ProjectBrief> briefs = fabricate_.getProjects();
-    //fabricate_ is a Fabricate (immutable instance) and has filtered out null briefs;
-    log_.println(ProjectBriefQueueRoutine.class.getName() + " has " +
-        briefs.size() + " projects");
+    if (log_.isLogEnabled(ProjectBriefQueueRoutine.class)) {
+      //fabricate_ is a Fabricate (immutable instance) and has filtered out null briefs;
+      log_.println(ProjectBriefQueueRoutine.class.getName() + " has " +
+          briefs.size() + " projects");
+    }
     queue.addAll(briefs);
     routineMemory.put(QUEUE, queue);
     return super.setup(memory, routineMemory);
@@ -55,7 +55,8 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
 
   @Override
   public void run() {
-    super.run();
+    setRunning();
+    
     I_ProjectBrief project = queue.poll();
     if (log_.isLogEnabled(ProjectQueueRoutine.class)) {
       log_.println(ProjectQueueRoutine.class.getName() + system_.lineSeparator() +
@@ -66,12 +67,15 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
         log_.println(ProjectQueueRoutine.class.getName() + system_.lineSeparator() +
             " project " + project);
       }
-      currentProject_ = project.getName();
+      String currentProject = project.getName();
+      locationInfo_.setCurrentProject(currentProject);
+      
       for (TaskContext task: tasks_) {
         
         I_FabricationRoutine taskRoutine = task.getTask();
         I_RoutineBrief brief = taskRoutine.getBrief();
-        currentTask_ = brief.getName();
+        String currentTask = brief.getName();
+        locationInfo_.setCurrentTask(currentTask);
         if (I_ProjectBriefAware.class.isAssignableFrom(taskRoutine.getClass())) {
           ((I_ProjectBriefAware)  taskRoutine).setProjectBrief(project);
         }
@@ -87,15 +91,5 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
    * @param taskRoutine
    */
   public void setupTask(I_FabricationRoutine taskRoutine) {}
-
-  @Override
-  public synchronized String getCurrentTask() {
-    return currentTask_;
-  }
-
-  @Override
-  public synchronized String getCurrentProject() {
-    return currentProject_;
-  }
 
 }

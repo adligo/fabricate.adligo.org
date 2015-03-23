@@ -116,11 +116,6 @@ public class GitCloneRoutine extends ScmContextInputAwareRoutine {
   }
 
   @Override
-  public String getCurrentLocation() {
-    return super.getCurrentLocation();
-  }
-
-  @Override
   public String getAdditionalDetail() {
     if (process_ != null) {
       List<String> lines = process_.getOutput();

@@ -22,7 +22,7 @@ public class ProjectBlock {
    * The project which has started and must finish before the waiting project can start.
    */
   private final String blockingProject_;
-  private final AtomicBoolean unblocked_;
+  private final AtomicBoolean blocked_;
   private final ArrayBlockingQueue<Boolean> block_;
   
   public ProjectBlock(String project, String blockingProject) {
@@ -33,7 +33,7 @@ public class ProjectBlock {
     project_ = project;
     blockingProject_ = blockingProject;
     block_ = block;
-    unblocked_ = new AtomicBoolean(false);
+    blocked_ = new AtomicBoolean(true);
   }
 
   public String getProject() {
@@ -44,6 +44,9 @@ public class ProjectBlock {
     return blockingProject_;
   }
   
+  public boolean isBlocking() {
+    return blocked_.get();
+  }
   /**
    * @param milliseconds
    * @return
@@ -52,12 +55,12 @@ public class ProjectBlock {
    * @throws InterruptedException
    */
   public synchronized boolean waitUntilUnblocked(int milliseconds) throws InterruptedException {
-    if (unblocked_.get()) {
+    if (!blocked_.get()) {
       return true;
     }
     Boolean unblocked = block_.poll(milliseconds, TimeUnit.MILLISECONDS);
     if (unblocked != null) {
-      unblocked_.set(true);
+      blocked_.set(false);
       return true;
     }
     return false;
@@ -70,7 +73,7 @@ public class ProjectBlock {
   @Override
   public String toString() {
     return "ProjectBlock [project=" + project_ + ", blockingProject=" + blockingProject_
-        + ", blocked=" + !unblocked_.get() + "]";
+        + ", blocked=" + blocked_.get() + "]";
   }
 
 }

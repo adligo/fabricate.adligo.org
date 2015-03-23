@@ -1,5 +1,7 @@
 package org.adligo.fabricate.java;
 
+import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.I_ExecutingProcess;
 import org.adligo.fabricate.common.system.I_ExecutionResult;
 import org.adligo.fabricate.common.system.I_Executor;
 import org.adligo.fabricate.common.system.I_FabSystem;
@@ -10,28 +12,39 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 public class JavaCompiler {
   private I_FabSystem sys_;
+  private I_FabLog log_;
   private String inDir_;
   private String javaC_;
   
   public JavaCompiler(I_FabSystem sys, String inDir, String javaC) {
     sys_ = sys;
+    log_ = sys.getLog();
     inDir_ = inDir;
     javaC_ = javaC;
     
   }
-  public void compile(Map<JavaCParam,String> params, List<String> javaFiles) throws IOException {
+  
+  public I_ExecutingProcess compile(Map<JavaCParam,String> params, List<String> javaFiles) throws IOException {
 
     List<String> args = buildArgs(javaC_, params);
     args.addAll(javaFiles);
     I_Executor exe = sys_.getExecutor();
-    I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
-        inDir_, args.toArray(new String[args.size()]));
-    if (er.getExitCode() != 0) {
-      throw new IOException(er.getOutput());
+    ExecutorService es = sys_.newFixedThreadPool(1);
+    if (log_.isLogEnabled(JavaCompiler.class)) {
+      StringBuilder lb = new StringBuilder();
+      for (String arg: args) {
+        if (lb.length() >= 1) {
+          lb.append(" ");
+        }
+        lb.append(arg);
+      }
+      log_.println("Running the following java compile;" + sys_.lineSeparator() + lb.toString());
     }
+    return exe.startProcess(FabricationMemoryConstants.EMPTY_ENV, es, inDir_, args);
   }
   
   private List<String> buildArgs(String whichJavaC, Map<JavaCParam,String> params) {

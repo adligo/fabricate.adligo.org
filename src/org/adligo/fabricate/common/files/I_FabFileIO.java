@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.zip.ZipFile;
 
@@ -32,6 +33,16 @@ public interface I_FabFileIO {
    * @throws IOException
    */
   public int check(String url) throws IOException;
+  
+  /**
+   * copy a file
+   * @param from
+   * @param to
+   * @param opt
+   * @throws IOException
+   */
+  public void copy(String from, String to, StandardCopyOption opt) throws IOException;
+  
   /**
    * Creates a new file;<br/>
    * new File(filePath).createNewFile();
@@ -139,6 +150,14 @@ public interface I_FabFileIO {
    */
   public boolean mkdirs(String dirsPath);
   
+  /**
+   * 
+   * @param from
+   * @param to
+   * @param options
+   * @throws IOException
+   */
+  public void move(String from, String to, StandardCopyOption options) throws IOException;
   /**
    * 
    * @param file

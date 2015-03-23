@@ -7,7 +7,6 @@ import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.common.MemoryLock;
-import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.project.Project;
 import org.adligo.fabricate.models.project.ProjectMutant;
@@ -19,7 +18,9 @@ import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -66,11 +67,12 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     String projectsDir = fabricate_.getProjectsDir();
     String projectName = brief_.getName();
     
-    String projectDir = projectsDir + files_.getNameSeparator() + projectName;
+    String projectDir = projectsDir + projectName + files_.getNameSeparator();
     String projectFile = projectDir +  files_.getNameSeparator() + "project.xml";
     if (log_.isLogEnabled(LoadProjectTask.class)) {
       log_.println("parseding project '" + projectName + "' ");
     }
+    
     FabricateProjectType project = null;
     try {
       project = xmlFiles_.parseProject_v1_0(projectFile);
@@ -111,6 +113,15 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
       //pass to run monitor
       throw new RuntimeException(e);
     }
+    String buildDir = projectDir + files_.getNameSeparator() + "build";
+    if (files_.exists(buildDir)) {
+      try {
+        files_.deleteRecursive(buildDir);
+      } catch (IOException e) {
+        //pass to run monitor
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   @Override
@@ -122,6 +133,16 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     memory.addLock(new MemoryLock(FabricationMemoryConstants.LOADED_PROJECTS, 
               Collections.singletonList(LoadProjectTask.class.getName())));
     
+    Map<String, Project> projectsMap = new HashMap<String,Project>();
+    for (Project project: projects_) {
+      projectsMap.put(project.getName(), project);
+    }
+    projectsMap = Collections.unmodifiableMap(projectsMap);
+    memory.put(FabricationMemoryConstants.LOADED_PROJECTS_MAP, projectsMap);
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.LOADED_PROJECTS_MAP, 
+              Collections.singletonList(LoadProjectTask.class.getName())));
+    
+    
     List<I_Dependency> deps =  dependenciesFilter_.get();
     if (log_.isLogEnabled(LoadProjectTask.class)) {
       log_.println("LoadProjectTask loaded " + deps.size() + " dependencies.");
@@ -129,6 +150,7 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     memory.put(FabricationMemoryConstants.DEPENDENCIES, deps);
     memory.addLock(new MemoryLock(FabricationMemoryConstants.DEPENDENCIES, 
         Collections.singletonList(LoadProjectTask.class.getName())));
+    
     
     super.writeToMemory(memory);
   }

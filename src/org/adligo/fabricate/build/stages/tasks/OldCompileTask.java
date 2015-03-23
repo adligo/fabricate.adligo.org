@@ -13,7 +13,6 @@ import org.adligo.fabricate.common.i18n.I_ProjectMessages;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
-import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.java.JavaCParam;
 import org.adligo.fabricate.java.JavaCompiler;
 import org.adligo.fabricate.models.common.I_Parameter;
@@ -27,7 +26,6 @@ import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependenciesType;
-import org.adligo.fabricate.xml.io_v1.project_v1_0.ProjectDependencyType;
 
 import java.io.File;
 import java.io.IOException;
@@ -196,7 +194,6 @@ public class OldCompileTask extends OldBaseTask implements I_FabTask {
         }
         params.put(JavaCParam.CP, cp);
       }
-      
       
       List<String> allFiles = new ArrayList<String>();
       for (int i = 0; i < srcDirs_.length; i++) {

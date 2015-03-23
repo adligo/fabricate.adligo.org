@@ -24,7 +24,6 @@ public interface I_FabricationRoutine extends I_Fabrication, I_LocatableRunnable
   
   public void setTaskFactory(I_RoutineFactory factory);
   
-  
   /**
    * This method should be used to setup up this routine
    * finding (and casting) all traits, before the routine

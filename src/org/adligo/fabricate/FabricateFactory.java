@@ -6,6 +6,7 @@ import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.java.JavaFactory;
 import org.adligo.fabricate.managers.CommandManager;
 import org.adligo.fabricate.managers.FabricationManager;
 import org.adligo.fabricate.managers.ProjectsManager;
@@ -48,6 +49,7 @@ public class FabricateFactory implements I_RepositoryFactory {
     String javaHome = FabricateEnvironment.INSTANCE.getJavaHome(sys);
     fm.setJavaHome(javaHome);
     FabSystemSetup.setup(sys, fab);
+    
     
     Fabricate tf = new Fabricate(fm);
     FabricateDependencies deps = fab.getDependencies();
@@ -95,6 +97,10 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new DependencyManager(sys, repos, builder);
   }
 
+  public JavaFactory createJavaFactory() {
+    return new JavaFactory();
+  }
+  
   public FabricationManager createFabricationManager(I_FabSystem system,  RoutineFabricateFactory factory, I_RepositoryManager rm) {
     return new FabricationManager(system, factory, rm);
   }

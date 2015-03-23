@@ -71,6 +71,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public int getAvailableProcessors();
+  
   /**
    * @param os
    * @return  a array of two strings;
@@ -78,6 +79,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * 2) the cpu speed
    */
   public String[] getCpuInfo(String os);
+  
   /**
    * @see I_Executor, this method also provides a
    * way to pass in a mock for testing.
@@ -87,6 +89,7 @@ public interface I_FabSystem extends I_FabFilesSystem {
   
   public String getOperatingSystem();
   public String getOperatingSystemVersion(String os);
+  
   /**
    * This returns the system dependent separator for class path entries.
    * an alias to File.pathSeparator(), for stubbing.
@@ -229,6 +232,12 @@ public interface I_FabSystem extends I_FabFilesSystem {
    * @return
    */
   public I_RunMonitor newRunMonitor(I_LocatableRunnable delegate, int counter);
+  
+  /**
+   * The system dependent class path separator.
+   * @return
+   */
+  public String pathSeparator();
   
   /**
    * This method provides a new ByteArrayOutputStream()

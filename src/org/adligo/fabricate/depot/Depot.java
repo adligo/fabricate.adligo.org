@@ -61,15 +61,17 @@ public class Depot implements I_Depot {
     xmlFiles_ = ctx.getXmlFiles();
     log_ = ctx.getLog();
     List<ArtifactType> artifacts = depot.getArtifact();
-    for (ArtifactType art: artifacts) {
-      String platform = art.getPlatform();
-      String project = art.getProject();
-      String file = art.getFilename();
-      String type = art.getType();
-      
-      String artDir = getArtifactDir(type, platform);
-      String depotFileName = getDepotFile(artDir, file);
-      artifactKeysToArtifacts_.put(new ArtifactKey(project, type, platform), depotFileName);
+    if (artifacts != null) {
+      for (ArtifactType art: artifacts) {
+        String platform = art.getPlatform();
+        String project = art.getProject();
+        String file = art.getFilename();
+        String type = art.getType();
+        
+        String artDir = getArtifactDir(type, platform);
+        String depotFileName = getDepotFile(artDir, file);
+        artifactKeysToArtifacts_.put(new ArtifactKey(project, type, platform), depotFileName);
+      }
     }
   }
 
@@ -81,38 +83,32 @@ public class Depot implements I_Depot {
     }
     String artifactType = entryData.getType();
     if (StringUtils.isEmpty(artifactType)) {
-      throw new IllegalArgumentException("No artifact platform!");
+      throw new IllegalArgumentException("No artifact type!");
+    }
+    String platform = entryData.getPlatformName();
+    if (StringUtils.isEmpty(platform)) {
+      throw new IllegalArgumentException("No platform!");
     }
     if (!files_.exists(externalFile)) {
       throw new IllegalArgumentException("No external file!");
     }
     String artDir = null;
     
-    //should throw a npe
-    String platform = entryData.getPlatformName();
     artDir = getArtifactDir(artifactType, platform);
     
-    if (!files_.exists(artDir)) {
-      if (!files_.mkdirs(artDir)) {
-        throw new IllegalStateException("problem creating " + artDir);
-      }
-    }
     String fileName = entryData.getFileName();
     String depotFileName = getDepotFile(artDir, fileName);
     
-    File depotFile = new File(depotFileName);
-    if (depotFile.exists()) {
+    if (files_.exists(depotFileName)) {
       throw new IllegalStateException("The following file already exists in the depot." + System.lineSeparator() +
           "\t" + depotFileName);
     }
-    File out = new File(depotFileName);
     if (log_.isLogEnabled(Depot.class)) {
       log_.println("Moving file " + externalFile + System.lineSeparator() +
             "\tto " + depotFileName + System.lineSeparator());
     }
-    File inFile = files_.instance(externalFile);
     try {
-      Files.move(inFile.toPath(), out.toPath(), StandardCopyOption.ATOMIC_MOVE);
+      files_.move(externalFile, depotFileName, StandardCopyOption.ATOMIC_MOVE);
     } catch (IOException e) {
       throw new IllegalStateException(e);
     } 
@@ -127,6 +123,48 @@ public class Depot implements I_Depot {
     return true;
   }
 
+  @Override
+  public boolean deleteIfPresent(I_Artifact entryData) {
+    String projectName = entryData.getProjectName();
+    if (StringUtils.isEmpty(projectName)) {
+      throw new IllegalArgumentException("No project name!");
+    }
+    String artifactType = entryData.getType();
+    if (StringUtils.isEmpty(artifactType)) {
+      throw new IllegalArgumentException("No artifact type!");
+    }
+    String platform = entryData.getPlatformName();
+    if (StringUtils.isEmpty(platform)) {
+      throw new IllegalArgumentException("No platform type!");
+    }
+    String artDir = null;
+    
+    artDir = getArtifactDir(artifactType, platform);
+    
+    String fileName = entryData.getFileName();
+    String depotFileName = getDepotFile(artDir, fileName);
+    if (log_.isLogEnabled(Depot.class)) {
+      log_.println("Checking if should delete file " + depotFileName);
+    }
+    if (files_.exists(depotFileName)) {
+      if (log_.isLogEnabled(Depot.class)) {
+        log_.println("Deleting file " + depotFileName);
+      }
+      try {
+        files_.delete(depotFileName);
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      } 
+    }
+    String platformName = getPlatformLower(platform);
+    ArtifactKey aKey = new ArtifactKey(projectName, artifactType, platformName);
+    artifactKeysToArtifacts_.remove(aKey);
+    
+    if (log_.isLogEnabled(Depot.class)) {
+      log_.println("Depot now has " + artifactType + "/" + projectName + "/" + depotFileName);
+    }
+    return true;
+  }
   private String getDepotFile(String artDir, String fileName) {
     String depotFileName = artDir + files_.getNameSeparator() + fileName;
     return depotFileName;

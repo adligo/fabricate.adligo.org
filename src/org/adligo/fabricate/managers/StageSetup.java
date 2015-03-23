@@ -49,16 +49,17 @@ public class StageSetup implements I_StageSetup {
   @Override
   public I_FabricationRoutine processStageSetup(String name) throws FabricationRoutineCreationException {
     Set<I_ExpectedRoutineInterface> es = Collections.emptySet();
-    I_FabricationRoutine routine = factory_.createFacet(name,es);
+    I_FabricationRoutine routine = factory_.createStage(name,es);
     routines_.add(routine);
     
     routine.setSystem(system_);
     if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
       ((I_FabricateAware) routine).setFabricate(fabricate_);
     } 
-    I_RoutineFactory traitFactory = factory_.getFacets();
-    I_RoutineFactory taskFactory = traitFactory.createTaskFactory(name);
+    I_RoutineFactory stageFactory = factory_.getStages();
+    I_RoutineFactory taskFactory = stageFactory.createTaskFactory(name);
     routine.setTaskFactory(taskFactory);
+    
     routine.setTraitFactory(factory_.getTraits());
     if (I_CommandAware.class.isAssignableFrom(routine.getClass())) {
       I_RoutineFactory cmdFactory = factory_.getCommands();

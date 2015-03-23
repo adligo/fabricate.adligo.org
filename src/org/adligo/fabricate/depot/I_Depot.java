@@ -10,10 +10,17 @@ public interface I_Depot {
   public boolean add(String externalFile, I_Artifact entryData);
   
   /**
+   * remove a projects artifact from the depot
+   * @param entryData
+   * @return
+   */
+  public boolean deleteIfPresent(I_Artifact entryData);
+  
+  /**
   * @param projectName
   * @param artifactType the type of artifact (i.e. jar, war, sar exc)
   * @param platformName
-  * @return the full abstract path name for the jar
+  * @return the full absolute path name for the jar
   * added to the depot by the project with the projectName parameter
   */
   public String get(String projectName, String artifactType, String platformName);

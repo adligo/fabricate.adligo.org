@@ -31,6 +31,7 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
   protected I_CommandLineConstants cmdConstants_;
   protected I_SystemMessages sysMessages_;
   protected I_RepositoryFactory repositoryFactory_;
+  protected final RoutineLocationInfo locationInfo_ = new RoutineLocationInfo();
   
   protected I_ImplicitTraitMessages implicit_;
   protected I_FabLog log_;
@@ -47,14 +48,12 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
       throw new RuntimeException(message);
     }
   }
-  /**
-   * Overrides of this method should call this method.
-   */
+  
   @Override
   public void run() {
-    running.set(true);
+    setRunning();
   }
-  
+ 
   public String getAdditionalDetail() {
     return null;
   }
@@ -146,6 +145,8 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
         return getTraitCurrentLocation();
       case ARCHIVE_STAGE:
       case FABRICATE_ARCHIVE_STAGE:
+      case IMPLICIT_ARCHIVE_STAGE:
+      case PROJECT_ARCHIVE_STAGE:
         return getArchiveCurrentLocation();
       default:
     }
@@ -179,6 +180,14 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
    */
   public void writeToMemory(I_FabricationMemoryMutant<Object> memory) {}
   
+  /**
+   * Overrides of this method should call this method first before they
+   * do anything else.
+   */
+  protected void setRunning() {
+    running.set(true);
+  }
+  
   private String getArchiveCurrentLocation() {
     if (!running.get()) {
       if (settingUp.get()) {
@@ -187,29 +196,24 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
         return message;
       }
     }
-    String task = null;
-    if (I_TaskProcessor.class.isAssignableFrom(this.getClass())) {
-      task = ((I_TaskProcessor) this).getCurrentTask();
-    }
-    String project = null;
-    if (I_ProjectProcessor.class.isAssignableFrom(this.getClass())) {
-      project = ((I_ProjectProcessor) this).getCurrentProject();
-    }
-    if (task != null && project != null) {
+    String currentTask = locationInfo_.getCurrentTask();
+    String currentProject = locationInfo_.getCurrentProject();
+    
+    if (currentTask != null && currentProject != null) {
       String message = sysMessages_.getArchiveStageXTaskYIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task)
-          .replace("<Z/>", project);
+          .replace("<Y/>", currentTask)
+          .replace("<Z/>", currentProject);
       return message;
-    } else if (task != null) {
+    } else if (currentTask != null) {
       String message = sysMessages_.getArchiveStageXTaskYIsStillRunning();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task);
+          .replace("<Y/>", currentTask);
       return message;
-    } else if (project != null) {
+    } else if (currentProject != null) {
       String message = sysMessages_.getArchiveStageXIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Z/>", project);
+          .replace("<Z/>", currentProject);
       return message;
     } else {
       String message = sysMessages_.getArchiveStageXIsStillRunning();
@@ -226,29 +230,29 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
         return message;
       }
     }
-    String task = null;
-    if (I_TaskProcessor.class.isAssignableFrom(this.getClass())) {
-      task = ((I_TaskProcessor) this).getCurrentTask();
+
+    String currentTask = locationInfo_.getCurrentTask();
+    String currentProject = locationInfo_.getCurrentProject();
+    if (log_.isLogEnabled(AbstractRoutine.class)) {
+      log_.println("got currentTask '" + currentTask + "' currentProject '" + 
+          currentProject + "' on locationInfo " + locationInfo_.toString() + system_.lineSeparator() +
+          this.toString());
     }
-    String project = null;
-    if (I_ProjectProcessor.class.isAssignableFrom(this.getClass())) {
-      project = ((I_ProjectProcessor) this).getCurrentProject();
-    }
-    if (task != null && project != null) {
+    if (currentTask != null && currentProject != null) {
       String message = sysMessages_.getBuildStageXTaskYIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task)
-          .replace("<Z/>", project);
+          .replace("<Y/>", currentTask)
+          .replace("<Z/>", currentProject);
       return message;
-    } else if (task != null) {
+    } else if (currentTask != null) {
       String message = sysMessages_.getBuildStageXTaskYIsStillRunning();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task);
+          .replace("<Y/>", currentTask);
       return message;
-    } else if (project != null) {
+    } else if (currentProject != null) {
       String message = sysMessages_.getBuildStageXIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Z/>", project);
+          .replace("<Z/>", currentProject);
       return message;
     } else {
       String message = sysMessages_.getBuildStageXIsStillRunning();
@@ -265,29 +269,24 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
         return message;
       }
     }
-    String task = null;
-    if (I_TaskProcessor.class.isAssignableFrom(this.getClass())) {
-      task = ((I_TaskProcessor) this).getCurrentTask();
-    }
-    String project = null;
-    if (I_ProjectProcessor.class.isAssignableFrom(this.getClass())) {
-      project = ((I_ProjectProcessor) this).getCurrentProject();
-    }
-    if (task != null && project != null) {
+
+    String currentTask = locationInfo_.getCurrentTask();
+    String currentProject = locationInfo_.getCurrentProject();
+    if (currentTask != null && currentProject != null) {
       String message = sysMessages_.getCommandXTaskYIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task)
-          .replace("<Z/>", project);
+          .replace("<Y/>", currentTask)
+          .replace("<Z/>", currentProject);
       return message;
-    } else if (task != null) {
+    } else if (currentTask != null) {
       String message = sysMessages_.getCommandXTaskYIsStillRunning();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task);
+          .replace("<Y/>", currentTask);
       return message;
-    } else if (project != null) {
+    } else if (currentProject != null) {
       String message = sysMessages_.getCommandXIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Z/>", project);
+          .replace("<Z/>", currentProject);
       return message;
     } else {
       String message = sysMessages_.getCommandXIsStillRunning();
@@ -304,29 +303,25 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
         return message;
       }
     }
-    String task = null;
-    if (I_TaskProcessor.class.isAssignableFrom(this.getClass())) {
-      task = ((I_TaskProcessor) this).getCurrentTask();
-    }
-    String project = null;
-    if (I_ProjectProcessor.class.isAssignableFrom(this.getClass())) {
-      project = ((I_ProjectProcessor) this).getCurrentProject();
-    }
-    if (task != null && project != null) {
+    
+    String currentTask = locationInfo_.getCurrentTask();
+    String currentProject = locationInfo_.getCurrentProject();
+    
+    if (currentTask != null && currentProject != null) {
       String message = sysMessages_.getFacetXTaskYIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task)
-          .replace("<Z/>", project);
+          .replace("<Y/>", currentTask)
+          .replace("<Z/>", currentProject);
       return message;
-    } else if (task != null) {
+    } else if (currentTask != null) {
       String message = sysMessages_.getFacetXTaskYIsStillRunning();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task);
+          .replace("<Y/>", currentTask);
       return message;
-    } else if (project != null) {
+    } else if (currentProject != null) {
       String message = sysMessages_.getFacetXIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Z/>", project);
+          .replace("<Z/>", currentProject);
       return message;
     } else {
       String message = sysMessages_.getFacetXIsStillRunning();
@@ -343,29 +338,24 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
         return message;
       }
     }
-    String task = null;
-    if (I_TaskProcessor.class.isAssignableFrom(this.getClass())) {
-      task = ((I_TaskProcessor) this).getCurrentTask();
-    }
-    String project = null;
-    if (I_ProjectProcessor.class.isAssignableFrom(this.getClass())) {
-      project = ((I_ProjectProcessor) this).getCurrentProject();
-    }
-    if (task != null && project != null) {
+    String currentTask = locationInfo_.getCurrentTask();
+    String currentProject = locationInfo_.getCurrentProject();
+    
+    if (currentTask != null && currentProject != null) {
       String message = sysMessages_.getTraitXTaskYIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task)
-          .replace("<Z/>", project);
+          .replace("<Y/>", currentTask)
+          .replace("<Z/>", currentProject);
       return message;
-    } else if (task != null) {
+    } else if (currentTask != null) {
       String message = sysMessages_.getTraitXTaskYIsStillRunning();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Y/>", task);
+          .replace("<Y/>", currentTask);
       return message;
-    } else if (project != null) {
+    } else if (currentProject != null) {
       String message = sysMessages_.getTraitXIsStillRunningOnProjectZ();
       message = message.replace("<X/>", brief_.getName())
-          .replace("<Z/>", project);
+          .replace("<Z/>", currentProject);
       return message;
     } else {
       String message = sysMessages_.getTraitXIsStillRunning();

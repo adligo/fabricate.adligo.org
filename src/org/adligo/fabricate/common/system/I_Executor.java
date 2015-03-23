@@ -3,6 +3,7 @@ package org.adligo.fabricate.common.system;
 import org.adligo.fabricate.models.common.I_ExecutionEnvironment;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -49,4 +50,6 @@ public interface I_Executor {
    */
   public abstract I_ExecutingProcess startProcess(
       I_ExecutionEnvironment env, ExecutorService service, String inDir, String... args) throws IOException;
+  public abstract I_ExecutingProcess startProcess(
+      I_ExecutionEnvironment env, ExecutorService service, String inDir, List<String> args) throws IOException;
 }

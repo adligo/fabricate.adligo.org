@@ -25,6 +25,7 @@ public interface I_Fabricate extends I_JavaSettings {
 
   public String getFabricateDevXmlDir();
   
+  public String getFabricateVersion();
   public String getFabricateXmlRunDir();
   
   public String getFabricateRepository();

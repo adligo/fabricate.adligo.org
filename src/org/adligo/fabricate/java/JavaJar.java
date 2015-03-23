@@ -14,28 +14,45 @@ public class JavaJar {
   private I_FabSystem sys_;
   private I_FabLog log_;
   private String inDir_;
-  private String javaC_;
+  private String jarPath_;
   
-  public JavaJar(I_FabSystem sys, String inDir, String javaC) {
+  public JavaJar(I_FabSystem sys, String inDir, String jarPath) {
     sys_ = sys;
     log_ = sys.getLog();
     inDir_ = inDir;
-    javaC_ = javaC;
+    jarPath_ = jarPath;
     
   }
-  public void jar(List<JarParam> args, List<String> params, String c_arg) throws IOException {
+  /**
+   * 
+   * @param args
+   * @param params which come between the initial Jar arguments and the -C Jar arguments.
+   *   This is usually the jar output name (when args contains JarParam.c) and additional files
+   *   that should be included in the jar (classes, xml files, exc). 
+   *   Note that since jar is usually executed from the build directory, most of the 
+   *   additional content must be copied into the build directory to have it show up 
+   *   correctly in the jar file, which makes the params usually contain only the 
+   *   manifest input file and file name for the new jar file.
+   * @param dirs
+   *    This contains the list of directories to add to the jar.
+   * @throws IOException
+   */
+  public void jar(List<JarParam> args, List<String> params, List<String> dirs) throws IOException {
 
     String argString = buildArgs(args);
     List<String> all = new ArrayList<String>();
-    all.add(javaC_);
+    all.add(jarPath_);
     all.add(argString);
-    all.addAll(params);
-    if (args.contains(JarParam.C)) {
-      all.add(JarParam.C.toString());
-      all.add(c_arg);
-      all.add(".");
+    if (params.size() >= 1) {
+      all.addAll(params);
     }
-    
+    for (String dir: dirs) {
+      if (args.contains(JarParam.C)) {
+        all.add(JarParam.C.toString());
+        all.add(dir);
+        all.add(".");
+      }
+    }
     String [] allArray = all.toArray(new String[all.size()]);
     if (log_.isLogEnabled(JavaJar.class)) {
       StringBuilder sb = new StringBuilder();

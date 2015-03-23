@@ -50,7 +50,7 @@ I_InputAware<String> {
   /**
    * This is the implicit name of this trait.
    */
-  public static final String NAME = "encryptTrait";
+  public static final String NAME = "encrypt";
   public static final Set<I_ExpectedRoutineInterface> IMPLEMENTED_INTERFACES = getInterfaces();
   
   private static Set<I_ExpectedRoutineInterface> getInterfaces() {

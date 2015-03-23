@@ -1,6 +1,7 @@
 package org.adligo.fabricate;
 
 import org.adligo.fabricate.common.files.I_FabFileIO;
+import org.adligo.fabricate.common.files.PatternFileMatcher;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
@@ -10,8 +11,13 @@ import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
+import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.util.StringUtils;
+import org.adligo.fabricate.depot.Depot;
+import org.adligo.fabricate.depot.DepotContext;
+import org.adligo.fabricate.java.JavaFactory;
+import org.adligo.fabricate.java.ManifestParser;
 import org.adligo.fabricate.managers.CommandManager;
 import org.adligo.fabricate.managers.FabricationManager;
 import org.adligo.fabricate.managers.ProjectsManager;
@@ -27,6 +33,7 @@ import org.adligo.fabricate.routines.I_ProjectBriefsAware;
 import org.adligo.fabricate.routines.I_ProjectsAware;
 import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
+import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
@@ -48,7 +55,10 @@ import javax.xml.datatype.Duration;
 
 
 public class FabricateController {
+  private static FabricateEnvironment ENV = FabricateEnvironment.INSTANCE;
+  
   private final FabSystem sys_;
+  
   private final I_CommandLineConstants cmdMessages_;
   private final I_FabricateConstants constants_;
   private final I_SystemMessages sysMessages_;
@@ -149,10 +159,18 @@ public class FabricateController {
     if (!addXmlRoutines(factory, argCommands)) {
       return;
     }
-    FabricationMemoryMutant<Object> memory = factory.createMemory(sys);
-    memory.put(FabricationMemoryConstants.ENV, 
-        new ExecutionEnvironmentMutant(sysMessages_));
-    memory.addLock(new MemoryLock(FabricationMemoryConstants.ENV, 
+    FabricationMemoryMutant<Object> memory = addMemoryValues(sys, factory);
+    
+    String depotDir = fab_.getFabricateXmlRunDir() + "depot";
+    String depotFile = depotDir + files_.getNameSeparator() + "depot.xml";
+    DepotType depotType = null;
+    if (files_.exists(depotFile)) {
+      depotType = xmlFiles_.parseDepot_v1_0(depotFile);
+    } else {
+      depotType = new DepotType();
+    }
+    memory.put(FabricationMemoryConstants.DEPOT, new Depot(depotDir, new DepotContext(sys_), depotType));
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.DEPOT, 
         Collections.singleton(FabricateController.class.getName())));
     
     RepositoryManager rm = factory.createRepositoryManager(sys_, fab_);
@@ -160,16 +178,31 @@ public class FabricateController {
       if (!manageProjectsDirAndMode(factory)) {
         return;
       }
+      if (log_.isLogEnabled(FabricateController.class)) {
+        log_.println(sys_.lineSeparator() + sysMessages_.getRunningFacets());
+      }
       ProjectsManager pm = factory.createProjectsManager(sys_, factory_, rm);
       failure_ = pm.setupAndRun(memory);
     }
     
     if (commands_) {
+      if (log_.isLogEnabled(FabricateController.class)) {
+        log_.println(sys_.lineSeparator() + sysMessages_.getRunningCommands());
+      }
       CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_);
       failure_ = manager.processCommands(memory);
     } else {
+      if (log_.isLogEnabled(FabricateController.class)) {
+        log_.println(sys_.lineSeparator() + sysMessages_.getRunningBuildStages());
+      }
       FabricationManager fabManager = factory.createFabricationManager(sys_, factory_, rm);
-      failure_ = fabManager.setupAndRun(memory);
+      failure_ = fabManager.setupAndRunBuildStages(memory);
+      if (sys_.hasArg(cmdMessages_.getArchive(true))) {
+        if (log_.isLogEnabled(FabricateController.class)) {
+          log_.println(sys_.lineSeparator() + sysMessages_.getRunningArchiveStages());
+        }
+        log_.println("TODO fabManager.setupAndRunArchiveStages");
+      }
     }
     
     writeResult();
@@ -179,6 +212,25 @@ public class FabricateController {
     sys_.exit(0);
   }
 
+  private FabricationMemoryMutant<Object> addMemoryValues(FabSystem sys, FabricateFactory factory) {
+    FabricationMemoryMutant<Object> memory = factory.createMemory(sys);
+    memory.put(FabricationMemoryConstants.ENV, 
+        new ExecutionEnvironmentMutant(sysMessages_));
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.ENV, 
+        Collections.singleton(FabricateController.class.getName())));
+    
+    String javaHome = ENV.getJavaHome(sys_);
+    memory.put(FabricationMemoryConstants.JAVA_HOME, javaHome);
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.JAVA_HOME, 
+        Collections.singleton(FabricateController.class.getName())));
+    
+    JavaFactory jFactory = factory.createJavaFactory();
+    memory.put(FabricationMemoryConstants.JAVA_FACTORY, jFactory);
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.JAVA_FACTORY, 
+        Collections.singleton(FabricateController.class.getName())));
+    return memory;
+  }
+
   private boolean addXmlRoutines(FabricateFactory factory, List<String> argCommands)
       throws IOException, ClassNotFoundException {
     
@@ -186,6 +238,19 @@ public class FabricateController {
     fabXml_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
     fab_ = factory.create(sys_, fabXml_, discovery_);
     FabricateMutant fm = factory.createMutant(fab_);
+    
+    String fabricateHome = fm.getFabricateHome();
+    PatternFileMatcher pfm = new PatternFileMatcher(files_, sys_, "fabricate*", true);
+    List<String> files = files_.list(fabricateHome + files_.getNameSeparator() + "lib", pfm);
+    if (files.size() != 1) {
+      throw new IllegalStateException("no fabricate*.jar in " + fabricateHome + " lib?");
+    }
+    JavaFactory jFactory = factory.createJavaFactory();
+    ManifestParser mp = jFactory.newManifestParser();
+    String fabricateJar = files.get(0);
+    mp.readManifest(fabricateJar);
+    String version = mp.get("Specification-Version");
+    fm.setFabricateVersion(version);
     
     List<RoutineParentType> traits =  fabXml_.getTrait();
     
@@ -411,5 +476,13 @@ public class FabricateController {
       message = message.replaceFirst("<X/>", "" + bd.toPlainString());
       log_.println(message);
     }
+  }
+
+  public static FabricateEnvironment getENV() {
+    return ENV;
+  }
+
+  public static void setENV(FabricateEnvironment eNV) {
+    ENV = eNV;
   }
 }

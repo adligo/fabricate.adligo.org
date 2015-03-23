@@ -52,8 +52,8 @@ public class FacetSetup implements I_FacetSetup {
     if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
       ((I_FabricateAware) routine).setFabricate(fabricate_);
     } 
-    I_RoutineFactory traitFactory = factory_.getFacets();
-    I_RoutineFactory taskFactory = traitFactory.createTaskFactory(name);
+    I_RoutineFactory facetFactory = factory_.getFacets();
+    I_RoutineFactory taskFactory = facetFactory.createTaskFactory(name);
     routine.setTaskFactory(taskFactory);
     routine.setTraitFactory(factory_.getTraits());
     if (I_CommandAware.class.isAssignableFrom(routine.getClass())) {

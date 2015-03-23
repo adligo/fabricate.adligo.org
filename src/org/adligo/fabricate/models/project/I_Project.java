@@ -20,11 +20,18 @@ import java.util.Map;
  * @author scott
  */
 public interface I_Project extends I_ProjectBrief {
+
   /**
    * Get the attributes that came from the project.xml file.
    * @return
    */
   public abstract List<I_Parameter> getAttributes();
+  
+  /**
+   * Get the attributes that came from the project.xml file.
+   * @return
+   */
+  public List<I_Parameter> getAttributes(String key);
   
   /**
    * Get the command that came from the project.xml file,

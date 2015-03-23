@@ -95,8 +95,9 @@ public class RepositoryManager implements I_RepositoryManager {
     
     if (dependencies_.size() >= 1) {
       I_SystemMessages messages = constants_.getSystemMessages();
-      log_.println(messages.getCheckingFabricateRuntimeDependencies());
-        
+      if (log_.isLogEnabled(RepositoryManager.class)) {
+        log_.println(messages.getCheckingFabricateRuntimeDependencies());
+      }
       
       if (threads <= 1) {
         I_DependenciesManager dm = factory_.createDependenciesManager(sys_, dependencies_);
@@ -136,10 +137,6 @@ public class RepositoryManager implements I_RepositoryManager {
     } catch (IOException e) {
       log_.println(CommandLineArgs.END);
       throw new RuntimeException(e);
-    }
-    if (log_.isLogEnabled(DependenciesManager.class)) {
-      log_.println("RepositoryManager finished " + sys_.lineSeparator() + 
-          this);
     }
   }
   private void setRepositories(List<String> repositories ) {
