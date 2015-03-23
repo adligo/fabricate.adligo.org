@@ -48,6 +48,15 @@ public class ProjectMutant implements I_Project {
     return false;
   }
   
+  public static I_Parameter getAttribute(String key, List<I_Parameter> attributes) {
+    for (I_Parameter attrib: attributes) {
+      if (key.equals(attrib.getKey())) {
+        return attrib;
+      }
+    }
+    return null;
+  }
+  
   public static List<I_Parameter> getAttributes(String key, List<I_Parameter> attributes) {
     ArrayList<I_Parameter> toRet = new ArrayList<I_Parameter>();
     for (I_Parameter attrib: attributes) {
@@ -388,6 +397,10 @@ public class ProjectMutant implements I_Project {
     return new ArrayList<I_Parameter>(attributes_);
   }
 
+  public I_Parameter getAttribute(String key) {
+    return getAttribute(key, attributes_);
+  }
+  
   public List<I_Parameter> getAttributes(String key) {
     return getAttributes(key, attributes_);
   }

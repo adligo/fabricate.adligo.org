@@ -4,6 +4,10 @@ import org.adligo.fabricate.common.system.I_FabSystem;
 
 public class JavaFactory {
 
+  public JavaCalls newJavaCalls(I_FabSystem sys) {
+    return new JavaCalls(sys);
+  }
+  
   public JavaCompiler newJavaCompiler(I_FabSystem sys,String inDir,String javaC) {
     return new JavaCompiler(sys, inDir, javaC);
   }

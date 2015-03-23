@@ -5,6 +5,11 @@ import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @see I_Dependency 
+ * @author scott
+ *
+ */
 public class DependencyMutant implements I_Dependency {
   public static List<I_Dependency> convert(List<DependencyType> types) {
     List<I_Dependency> toRet = new ArrayList<I_Dependency>();
@@ -60,6 +65,7 @@ public class DependencyMutant implements I_Dependency {
     result = prime * result + ((artifact == null) ? 0 : artifact.hashCode());
     String fileName = dep.getFileName();
     result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+    
     String group = dep.getGroup();
     result = prime * result + ((group == null) ? 0 : group.hashCode());
     String type = dep.getType();
@@ -89,7 +95,7 @@ public class DependencyMutant implements I_Dependency {
   private String fileName_;
   private String group_;
   private String platform_;
-  private String type_;
+  private String type_ = DependencyConstants.JAR;
   private String version_;
   
   public DependencyMutant() {}
@@ -119,7 +125,10 @@ public class DependencyMutant implements I_Dependency {
     fileName_ = other.getFileName();
     group_ = other.getGroup();
     platform_ = other.getPlatform();
-    type_ = other.getType();
+    String type = other.getType();
+    if (type != null) {
+      type_ = type;
+    }
     version_ = other.getVersion();
   }
   
@@ -149,6 +158,7 @@ public class DependencyMutant implements I_Dependency {
   public boolean isExtract() {
     return extract_;
   }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getFileName()
    */
@@ -210,6 +220,7 @@ public class DependencyMutant implements I_Dependency {
   public void setExtract(boolean extract) {
     this.extract_ = extract;
   }
+  
   public void setFileName(String fileName) {
     this.fileName_ = fileName;
   }
@@ -237,5 +248,5 @@ public class DependencyMutant implements I_Dependency {
   @Override
   public String toString() {
     return toString(this);
-  }  
+  }
 }

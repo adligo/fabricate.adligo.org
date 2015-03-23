@@ -75,6 +75,11 @@ public class Project implements I_Project {
   }
 
   @Override
+  public I_Parameter getAttribute(String key) {
+    return ProjectMutant.getAttribute(key, attributes_);
+  }
+  
+  @Override
   public List<I_Parameter> getAttributes(String key) {
     return ProjectMutant.getAttributes(key, attributes_);
   }

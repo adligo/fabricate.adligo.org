@@ -28,6 +28,11 @@ public interface I_Project extends I_ProjectBrief {
   public abstract List<I_Parameter> getAttributes();
   
   /**
+   * Get the first attribute that came from the project.xml file.
+   * @return
+   */
+  public I_Parameter getAttribute(String key);
+  /**
    * Get the attributes that came from the project.xml file.
    * @return
    */

@@ -6,6 +6,7 @@ import org.adligo.fabricate.common.system.I_ExecutingProcess;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.java.JavaCParam;
+import org.adligo.fabricate.java.JavaCalls;
 import org.adligo.fabricate.java.JavaCompiler;
 import org.adligo.fabricate.java.JavaFactory;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
@@ -16,6 +17,7 @@ import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.models.dependencies.DependencyConstants;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.dependencies.I_ProjectDependency;
 import org.adligo.fabricate.repository.DefaultRepositoryPathBuilder;
@@ -25,11 +27,13 @@ import org.adligo.fabricate.routines.I_PlatformAware;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class CompileSourceTask extends ProjectAwareRoutine implements I_PlatformAware {
   private static final String SRC_DIRS = "srcDirs";
+  private static final String JDK_SRC_DIR = "jdkSrcDir";
   private I_RepositoryPathBuilder repositoryPathBuilder_;
   private I_Depot depot_;
   private String platform_;
@@ -68,9 +72,9 @@ public class CompileSourceTask extends ProjectAwareRoutine implements I_Platform
     }
     repositoryPathBuilder_ = new DefaultRepositoryPathBuilder(
         fabricate_.getFabricateRepository(), files_.getNameSeparator());
-    String [] srcDirs = getSrcDirs();
+    List<String> srcDirs = getSrcDirs();
     if (log_.isLogEnabled(CompileSourceTask.class)) {
-      log_.println(CompileSourceTask.class.getSimpleName() + " using srcDirs " + srcDirs.length);
+      log_.println(CompileSourceTask.class.getSimpleName() + " using srcDirs " + srcDirs.size());
     }
     CommonBuildDir cbd = new CommonBuildDir(files_);
     String buildDir = cbd.getBuildDir(project_);
@@ -100,23 +104,23 @@ public class CompileSourceTask extends ProjectAwareRoutine implements I_Platform
       log_.println(CompileSourceTask.class.getSimpleName() + " using matcher " + matcher);
     }
     List<String> srcFiles = new ArrayList<String>();
-    for (int i = 0; i < srcDirs.length; i++) {
-      String srcDir = srcDirs[i];
+    for (String srcDir: srcDirs) {
       if (log_.isLogEnabled(CompileSourceTask.class)) {
         log_.println(CompileSourceTask.class.getSimpleName() + " checking for source files in " + srcDir);
       }
       try {
         List<String> files = files_.list(srcDir, matcher);
+        srcFiles.addAll(files);
         if (log_.isLogEnabled(CompileSourceTask.class)) {
           log_.println(CompileSourceTask.class.getSimpleName() + " got " + files.size() + " source files in " + srcDir);
         }
-        srcFiles.addAll(files);
       } catch (IOException e1) {
         throw new RuntimeException(e1);
       }
     }
     if (log_.isLogEnabled(CompileSourceTask.class)) {
-      log_.println(CompileSourceTask.class.getSimpleName() + " using " + srcFiles.size() + " source files.");
+      log_.println(CompileSourceTask.class.getSimpleName() + " using " + srcFiles.size() + " source files for project " + 
+          project_.getName() + ".");
     }
     String dir = project_.getDir();
     JavaCompiler jc = jFactory_.newJavaCompiler(system_, dir, javaC);
@@ -124,6 +128,11 @@ public class CompileSourceTask extends ProjectAwareRoutine implements I_Platform
     StringBuilder sb = new StringBuilder();
     buildClasspath(sb);
     String cp = sb.toString();
+    if (log_.isLogEnabled(CompileSourceTask.class)) {
+      log_.println(CompileSourceTask.class.getSimpleName() + " project " + 
+          project_.getName() + " is using the following classpath;" + system_.lineSeparator() +
+          cp);
+    }
     Map<JavaCParam, String> params = new HashMap<JavaCParam, String>();
     cp = cp + system_.pathSeparator() + "classes";
     params.put(JavaCParam.CP, cp);
@@ -131,6 +140,10 @@ public class CompileSourceTask extends ProjectAwareRoutine implements I_Platform
     
     int projectDirLen = project_.getDir().length();
     List<String> relSrcFiles = new ArrayList<String>();
+    if (log_.isLogEnabled(CompileSourceTask.class)) {
+      log_.println(CompileSourceTask.class.getSimpleName() + " changing " + srcFiles.size() + " files paths to relative file paths for project " + 
+          project_.getName() + ".");
+    }
     for (String srcFile: srcFiles) {
       relSrcFiles.add(srcFile.substring(projectDirLen, srcFile.length()));
     }
@@ -210,22 +223,35 @@ public class CompileSourceTask extends ProjectAwareRoutine implements I_Platform
     
   }
 
-  private String [] getSrcDirs() {
-    I_Parameter firstSrcDirs = brief_.getParameter(SRC_DIRS);
+  private List<String> getSrcDirs() {
+    List<String> toRet = new ArrayList<String>();
+    I_Parameter firstSrcDirs = project_.getAttribute(SRC_DIRS);
     if (firstSrcDirs == null) {
-      return new String[] {project_.getDir() + "src"};
-    }
-    String [] srcDirs = firstSrcDirs.getValueDelimited(",");
-    if (srcDirs.length == 1) {
-      if (StringUtils.isEmpty(srcDirs[0])) {
-        return new String[] {project_.getDir() + "src"};
+      toRet.add(project_.getDir() + "src");
+    } else {
+      String [] srcDirs = firstSrcDirs.getValueDelimited(",");
+      if (srcDirs.length == 1) {
+        if (StringUtils.isEmpty(srcDirs[0])) {
+          toRet.add(project_.getDir() + "src");
+        }
+      } 
+      if (toRet.size() == 0) {
+        for (int i = 0; i < srcDirs.length; i++) {
+          String dir = srcDirs[i];
+          toRet.add(project_.getDir() + dir);
+        }
       }
-    } 
-    for (int i = 0; i < srcDirs.length; i++) {
-      String dir = srcDirs[i];
-      srcDirs[i] = project_.getDir() + dir;
     }
-    return srcDirs;
+    I_Parameter jdkSrcDir = project_.getAttribute(JDK_SRC_DIR);
+    if (jdkSrcDir != null) {
+      String dir = jdkSrcDir.getValue();
+      JavaCalls jc =  jFactory_.newJavaCalls(system_);
+      String javaVersion = system_.getJavaVersion();
+      String majorVersion = "" + jc.getJavaMajorVersion(javaVersion);
+      
+      toRet.add(project_.getDir() + dir + majorVersion);
+    }
+    return toRet;
   }
 
   @Override
@@ -239,11 +265,17 @@ public class CompileSourceTask extends ProjectAwareRoutine implements I_Platform
   }
   
   private boolean addJar(StringBuilder sb, boolean first, String jarFilePath) {
+    if (log_.isLogEnabled(CompileSourceTask.class)) {
+      log_.println(CompileSourceTask.class.getSimpleName() + " project " + project_.getName() + " adding jar " +
+          system_.lineSeparator() + jarFilePath);
+    }
     if (!files_.exists(jarFilePath)) {
       String message = sysMessages_.getTheFollowingRequiredFileIsMissing() +
           system_.lineSeparator() + jarFilePath;
+      //pass to run monitor
       throw new RuntimeException(message);
     }
+    
     if (first) {
       first = false;
     } else {
@@ -258,14 +290,40 @@ public class CompileSourceTask extends ProjectAwareRoutine implements I_Platform
     boolean first = true;
     List<I_Dependency> deps = project_.getNormalizedDependencies();
     if (deps != null) {
-      for (I_Dependency dep: deps) {
-        String jarFilePath = repositoryPathBuilder_.getArtifactPath(new Dependency(dep));
-        first = addJar(sb, first, jarFilePath);
+      int count = 0;
+      
+      Iterator<I_Dependency> dit = deps.iterator();
+      while(dit.hasNext()) {
+        I_Dependency dep = dit.next();
+        if (DependencyConstants.JAR.equalsIgnoreCase(dep.getType())) {
+          String depPlat = dep.getPlatform();
+          boolean add = false;
+          if (depPlat == null) {
+            add = true;
+          } else if (platform_.equalsIgnoreCase(depPlat)) {
+            add = true;
+          }
+          if (add) {
+            String jarFilePath = repositoryPathBuilder_.getArtifactPath(new Dependency(dep));
+            first = addJar(sb, first, jarFilePath);
+            count++;
+          }
+        }
+      }
+      if (log_.isLogEnabled(CompileSourceTask.class)) {
+        log_.println(CompileSourceTask.class.getSimpleName() + " project " + project_.getName() + " has " +
+            count + " normalized dependenices.");
       }
     }
     List<I_ProjectDependency> projects = project_.getProjectDependencies();
     if (projects != null) {
-      for (I_ProjectDependency dep: projects) { 
+      if (log_.isLogEnabled(CompileSourceTask.class)) {
+        log_.println(CompileSourceTask.class.getSimpleName() + " project " + project_.getName() + " has " +
+            projects.size() + " projects dependenices.");
+      }
+      Iterator<I_ProjectDependency> pit = projects.iterator();
+      while (pit.hasNext()) {
+        I_ProjectDependency dep = pit.next();
         String projectName = dep.getProjectName();
         String jarFilePath = depot_.get(projectName, "jar", platform_);
         first = addJar(sb, first, jarFilePath);

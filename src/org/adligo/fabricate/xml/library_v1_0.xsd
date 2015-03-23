@@ -19,7 +19,9 @@
     
     <complexType name="dependency_type">
     	<sequence>
-    		<element name="ide" type="tns:ide_type" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="ide" type="tns:ide_type" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</element>
     	</sequence>
     	<attribute name="group" type="string" use="required">
     		<annotation>

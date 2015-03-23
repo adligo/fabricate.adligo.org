@@ -50,6 +50,6 @@ public interface I_Executor {
    */
   public abstract I_ExecutingProcess startProcess(
       I_ExecutionEnvironment env, ExecutorService service, String inDir, String... args) throws IOException;
-  public abstract I_ExecutingProcess startProcess(
+  public abstract I_ExecutingProcess startProcessWithList(
       I_ExecutionEnvironment env, ExecutorService service, String inDir, List<String> args) throws IOException;
 }

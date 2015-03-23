@@ -44,7 +44,7 @@ public class JavaCompiler {
       }
       log_.println("Running the following java compile;" + sys_.lineSeparator() + lb.toString());
     }
-    return exe.startProcess(FabricationMemoryConstants.EMPTY_ENV, es, inDir_, args);
+    return exe.startProcessWithList(FabricationMemoryConstants.EMPTY_ENV, es, inDir_, args);
   }
   
   private List<String> buildArgs(String whichJavaC, Map<JavaCParam,String> params) {

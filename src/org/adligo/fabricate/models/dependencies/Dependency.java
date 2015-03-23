@@ -19,18 +19,18 @@ public class Dependency implements I_Dependency {
     return toRet;
   }
   
-  private String artifact_;
-  private List<I_Ide> children_; 
-  private boolean extract_;
-  private String fileName_;
-  private String group_;
-  private String platform_;
-  private String type_;
-  private String version_;
+  private final String artifact_;
+  private final List<I_Ide> children_; 
+  private final boolean extract_;
+  private final String fileName_;
+  private final String group_;
+  private final String platform_;
+  private final String type_;
+  private final String version_;
   
   public Dependency(I_Dependency other) {
     artifact_ = other.getArtifact();
-    setChildren(other.getChildren());
+    children_ = getChildren(other.getChildren());
     extract_ = other.isExtract();
     fileName_ = other.getFileName();
     group_ = other.getGroup();
@@ -42,18 +42,24 @@ public class Dependency implements I_Dependency {
   @SuppressWarnings("boxing")
   public Dependency(DependencyType other) {
     artifact_ = other.getArtifact();
-    setChildren(IdeMutant.convert(other.getIde()));
+    children_ = getChildren(IdeMutant.convert(other.getIde()));
     Boolean oe = other.isExtract();
-    extract_ = false;
+    boolean setExtract = false;
     if (oe != null) {
       if (oe) {
-        extract_ = true;
+        setExtract = true;
       }
     }
+    extract_ = setExtract;
     fileName_ = other.getFileName();
     group_ = other.getGroup();
     platform_ = other.getPlatform();
-    type_ = other.getType();
+    String type = other.getType();
+    if (type == null) {
+      type_ = DependencyConstants.JAR;
+    } else {
+      type_ = type;
+    }
     version_ = other.getVersion();
   }
   
@@ -83,6 +89,7 @@ public class Dependency implements I_Dependency {
   public boolean isExtract() {
     return extract_;
   }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getFileName()
    */
@@ -124,7 +131,7 @@ public class Dependency implements I_Dependency {
     return DependencyMutant.hashCode(this);
   }
   
-  private void setChildren(List<I_Ide> children) {
+  private List<I_Ide> getChildren(List<I_Ide> children) {
     List<I_Ide> toAdd = new ArrayList<I_Ide>();
     if (children != null) {
       for(I_Ide child: children) {
@@ -135,7 +142,7 @@ public class Dependency implements I_Dependency {
         }
       }
     }
-    children_ = Collections.unmodifiableList(toAdd);
+    return Collections.unmodifiableList(toAdd);
   }
 
   @Override
@@ -150,6 +157,8 @@ public class Dependency implements I_Dependency {
   @Override
   public String toString() {
     return DependencyMutant.toString(this);
-  } 
+  }
+
+
   
 }

@@ -7,11 +7,16 @@ import java.util.List;
  * from the xml file.  Implementation may be immutable
  * or mutable.  Equals and hashCode are done performing the following fields;
  * Artifact
+ * IdeOnly
  * FileName
  * Group
- * Platform
  * Type
  * Version
+ * Note platform is omitted from equals and hashCode, because equals and hashCode
+ * are used to determine uniqueness in the local repository, and it is possible
+ * to have the same dependency required for multiple platforms (which should only
+ * be downloaded once).
+ * 
  * @author scott
  *
  */
