@@ -91,6 +91,7 @@ public class JarRoutine extends DependenciesQueueRoutine {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean setup(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
@@ -100,6 +101,7 @@ public class JarRoutine extends DependenciesQueueRoutine {
     return toRet;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory)
       throws FabricationRoutineCreationException {
