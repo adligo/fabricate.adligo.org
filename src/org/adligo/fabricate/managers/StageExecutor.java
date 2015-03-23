@@ -33,7 +33,7 @@ public class StageExecutor {
     I_RoutineBuilder routineBuilder = new I_RoutineBuilder() {
       
       @Override
-      public I_FabricationRoutine build(I_FabricationMemoryMutant<Object> memory, 
+      public I_FabricationRoutine buildInitial(I_FabricationMemoryMutant<Object> memory, 
           I_RoutineMemoryMutant<Object> routineMemory)
           throws FabricationRoutineCreationException {
         I_FabricationRoutine toRet = setup.processStageSetup(stageName);

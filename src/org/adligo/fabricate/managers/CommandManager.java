@@ -46,7 +46,7 @@ public class CommandManager {
     
 
     @Override
-    public I_FabricationRoutine build(I_FabricationMemoryMutant<Object> memory, 
+    public I_FabricationRoutine buildInitial(I_FabricationMemoryMutant<Object> memory, 
         I_RoutineMemoryMutant<Object> routineMemory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();

@@ -40,7 +40,7 @@ public class RoutineExecutionEngine {
     }
     
     FabricationMemoryMutant<Object> routineMemoryMutant = new FabricationMemoryMutant<Object>(sysMessages_);
-    I_FabricationRoutine firstRoutine = factory_.build(memoryMut, routineMemoryMutant);
+    I_FabricationRoutine firstRoutine = factory_.buildInitial(memoryMut, routineMemoryMutant);
     
     if (firstRoutine == null) {
       if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
