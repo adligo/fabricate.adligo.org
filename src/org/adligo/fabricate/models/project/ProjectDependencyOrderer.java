@@ -29,7 +29,15 @@ public class ProjectDependencyOrderer {
     system_ = sys;
     log_ = sys.getLog();
     
-    
+    if (projects.size() == 0) {
+      throw new IllegalArgumentException("projects");
+    }
+    if (projects.size() == 1) {
+      I_Project prj = projects.get(0);
+      names_.add(prj.getName());
+      projects_.add(prj);
+      return;
+    }
     Iterator<I_Project> it0 = projects.iterator();
     Map<String,I_Project> alphaOrder = new TreeMap<String,I_Project>();
     while (it0.hasNext()) {
@@ -57,7 +65,6 @@ public class ProjectDependencyOrderer {
           names_);
     }
     int counter = 0;
-    int lastNames = names_.size();
     
     while (copy.size() > 0) {
       it = copy.iterator();
@@ -65,18 +72,7 @@ public class ProjectDependencyOrderer {
       if (counter >= 1000) {
         throw new IllegalStateException("1000 trys to order the projects by ");
       }
-      if (log_.isLogEnabled(ProjectDependencyOrderer.class)) {
-        List<String> left = new ArrayList<String>();
-        for (I_Project proj: copy) {
-          left.add(proj.getName());
-        }
-        log_.println(ProjectDependencyOrderer.class.getSimpleName() + ".init loop " + counter + 
-            " projects with out project dependency is now " + 
-            names_.size() + system_.lineSeparator() + 
-            names_+ system_.lineSeparator() + 
-            " the following projects are still left;" + system_.lineSeparator() + 
-            left);
-      }
+      logProgress(copy, counter);
       while (it.hasNext()) {
         I_Project proj = it.next();
         List<I_ProjectDependency> pdeps = proj.getProjectDependencies();
@@ -102,6 +98,22 @@ public class ProjectDependencyOrderer {
     }
     names_ = Collections.unmodifiableList(names_);
     projects_ = Collections.unmodifiableList(projects_);
+  }
+
+
+  private void logProgress(List<I_Project> copy, int counter) {
+    if (log_.isLogEnabled(ProjectDependencyOrderer.class)) {
+      List<String> left = new ArrayList<String>();
+      for (I_Project proj: copy) {
+        left.add(proj.getName());
+      }
+      log_.println(ProjectDependencyOrderer.class.getSimpleName() + ".init loop " + counter + 
+          " projects with out project dependency is now " + 
+          names_.size() + system_.lineSeparator() + 
+          names_+ system_.lineSeparator() + 
+          " the following projects are still left;" + system_.lineSeparator() + 
+          left);
+    }
   }
 
 

@@ -1,5 +1,6 @@
 package org.adligo.fabricate.routines.implicit;
 
+import org.adligo.fabricate.depot.I_Depot;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
@@ -21,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class JarRoutine extends DependenciesQueueRoutine implements I_ParticipationAware {
-  
   private List<String> platforms_;
   
   @SuppressWarnings("unchecked")
@@ -31,8 +31,9 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
     
     I_Project project =  projectsQueue_.poll();
     while (project != null) {
-      
-      waitForProjectsDependedOnToFinish(project);
+      if (!singleProject_) {
+        waitForProjectsDependedOnToFinish(project);
+      }
       String name = brief_.getName();
       String currentProject = project.getName();
       locationInfo_.setCurrentProject(currentProject);
@@ -101,6 +102,7 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
   public boolean setup(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     
+    depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
     platforms_ = (List<String>) memory.get(FabricationMemoryConstants.PLATFORMS);
     if (log_.isLogEnabled(JarRoutine.class)) {
       log_.println(JarRoutine.class.getSimpleName() + ".setup.super") ;
@@ -117,6 +119,12 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
     platforms_ = (List<String>) memory.get(FabricationMemoryConstants.PLATFORMS);
     super.setup(memory, routineMemory);
     
+  }
+
+  @Override
+  public void writeToMemory(I_FabricationMemoryMutant<Object> memory) {
+    depot_.store();
+    super.writeToMemory(memory);
   }
 
 }

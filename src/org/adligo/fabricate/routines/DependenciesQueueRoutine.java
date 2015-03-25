@@ -1,5 +1,7 @@
 package org.adligo.fabricate.routines;
 
+import org.adligo.fabricate.depot.I_Depot;
+import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
@@ -16,8 +18,10 @@ import org.adligo.fabricate.models.project.ProjectDependencyOrderer;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -35,9 +39,16 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
   I_ConcurrencyAware, I_FabricationRoutine, I_ProjectsAware {
   protected static final String PROJECTS_BLOCK_MAP = "projectsBlockMap";
   protected static final String PROJECTS_QUEUE = "projectsQueue";
+  /**
+   * key to a boolean in the routine memory
+   */
+  protected static final String SINGLE_PROJECT = "singleProject";
+  
+  protected I_Depot depot_;
   
   protected List<I_Project> projects_;
   protected ConcurrentLinkedQueue<I_Project> projectsQueue_;
+  protected boolean singleProject_;
   
   // the key to this is the current threads projects name space
   // the blocking projects name the value is a ArrayBlockingQueue
@@ -54,6 +65,7 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
     projects_ = new ArrayList<I_Project>(projects);
   }
   
+  @SuppressWarnings("unchecked")
   @Override
   public boolean setup(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
@@ -64,12 +76,22 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
     if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
       log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup ProjectDependencyOrderer");
     }
-    ProjectDependencyOrderer orderer = new ProjectDependencyOrderer(participants, system_);
+    List<I_Project> allProjects = (List<I_Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS);
+    ProjectDependencyOrderer orderer = new ProjectDependencyOrderer(allProjects, system_);
     if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
-      log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup orderer");
+      log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup orderer ");
     }
     
-    List<I_Project> orderedProjects = orderer.getProjects();
+    List<I_Project> orderedProjects = new ArrayList<I_Project>(orderer.getProjects());
+    Iterator<I_Project> opIt = orderedProjects.iterator();
+    Set<String> cachedProjects = new HashSet<String>();
+    while(opIt.hasNext()) {
+      I_Project proj = opIt.next();
+      if (!participants.contains(proj)) {
+        cachedProjects.add(proj.getName());
+        opIt.remove();
+      }
+    }
     projectsQueue_.addAll(orderedProjects);
     routineMemory.put(PROJECTS_QUEUE, projectsQueue_);
     if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
@@ -84,18 +106,33 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
     // i.e. If it wasn't done here, projectA which depends on projectB
     // could put that it depended on B in the map, with out projectB
     // notifying it.
-    for (I_Project project: orderedProjects) {
-      List<I_ProjectDependency> pdeps =  project.getProjectDependencies();
-      for (I_ProjectDependency dep: pdeps) {
-        String projectName = project.getName();
-        String blockingProjectName = dep.getProjectName();
-        projectBlockMap_.put(new ProjectBlockKey(projectName, blockingProjectName), 
-            new ProjectBlock(projectName, blockingProjectName));
+    if (participants.size() > 1) {
+      singleProject_ = false;
+      routineMemory.put(SINGLE_PROJECT, false);
+      for (I_Project project: allProjects) {
+        List<I_ProjectDependency> pdeps =  project.getProjectDependencies();
+        for (I_ProjectDependency dep: pdeps) {
+          String projectName = project.getName();
+          String blockingProjectName = dep.getProjectName();
+          ProjectBlock value = new ProjectBlock(projectName, blockingProjectName);
+          if (cachedProjects.contains(blockingProjectName)) {
+            try {
+              value.setProjectFinished();
+            } catch (InterruptedException e) {
+              system_.currentThread().interrupt();
+            }
+          }
+          projectBlockMap_.put(new ProjectBlockKey(projectName, blockingProjectName), 
+              value);
+        }
       }
-    }
-    routineMemory.put(PROJECTS_BLOCK_MAP, projectBlockMap_);
-    if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
-      log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup.super");
+      routineMemory.put(PROJECTS_BLOCK_MAP, projectBlockMap_);
+      if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+        log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup.super");
+      }
+    } else {
+      singleProject_ = true;
+      routineMemory.put(SINGLE_PROJECT, true);
     }
     return super.setup(memory, routineMemory);
   }
@@ -106,8 +143,9 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
       throws FabricationRoutineCreationException {
     
     projectBlockMap_ = (ConcurrentHashMap<ProjectBlockKey, ProjectBlock>) routineMemory.get(PROJECTS_BLOCK_MAP);
-    
     projectsQueue_ = (ConcurrentLinkedQueue<I_Project>) routineMemory.get(PROJECTS_QUEUE);
+    singleProject_ = (boolean) routineMemory.get(SINGLE_PROJECT);
+    
     super.setup(memory, routineMemory);
   }
 
@@ -182,8 +220,9 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
     setRunning();
     I_Project project =  projectsQueue_.poll();
     while (project != null) {
-      
-      waitForProjectsDependedOnToFinish(project);
+      if (!singleProject_) {
+        waitForProjectsDependedOnToFinish(project);
+      }
       String name = brief_.getName();
       boolean command = brief_.isCommand();
       boolean stage = brief_.isStage();

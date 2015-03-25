@@ -43,7 +43,7 @@ public class LibraryResolver implements I_LibraryResolver {
     constants_ = sys.getConstants();
     files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
-    libDir_ = fab.getFabricateXmlRunDir() + files_.getNameSeparator() + "lib";
+    libDir_ = fab.getFabricateXmlRunDir() + "lib";
   }
   
   @Override

@@ -33,6 +33,13 @@ public interface I_Depot {
   public String getDir();
   
   /**
+   * If the depot is aware of the project artifacts this returns true.
+   * @param projectName
+   * @return
+   */
+  public boolean has(String projectName);
+  
+  /**
    * this writes out the depot.xml file
    * for other runs, and should not be called my multiple threads
    * only once at the end of each stage (during writeMemory)/

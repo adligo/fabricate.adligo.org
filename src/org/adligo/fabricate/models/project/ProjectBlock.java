@@ -66,6 +66,10 @@ public class ProjectBlock {
     return false;
   }
   
+  /**
+   * This should be called when the blockingProject has finished.
+   * @throws InterruptedException
+   */
   public void setProjectFinished() throws InterruptedException {
     block_.put(Boolean.TRUE);
   }

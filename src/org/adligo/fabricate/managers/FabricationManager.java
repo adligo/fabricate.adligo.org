@@ -62,7 +62,7 @@ public class FabricationManager {
   
   @SuppressWarnings("unchecked")
   public FailureType setupAndRunBuildStages(FabricationMemoryMutant<Object> memory) {
-    List<I_Project> projects = (List<I_Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS);
+    List<I_Project> projects = (List<I_Project>) memory.get(FabricationMemoryConstants.PARTICIPATING_PROJECTS);
     setup_.setProjects(projects);
     
     List<String> stages = fab_.getStageOrder();

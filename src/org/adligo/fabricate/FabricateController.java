@@ -165,6 +165,9 @@ public class FabricateController {
     String depotDir = fab_.getFabricateXmlRunDir() + "depot";
     String depotFile = depotDir + files_.getNameSeparator() + "depot.xml";
     DepotType depotType = null;
+    if (log_.isLogEnabled(FabricateController.class)) {
+      log_.println("checking depot file " + depotFile);
+    }
     if (files_.exists(depotFile)) {
       depotType = xmlFiles_.parseDepot_v1_0(depotFile);
     } else {

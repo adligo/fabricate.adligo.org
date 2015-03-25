@@ -1,6 +1,5 @@
 package org.adligo.fabricate.depot;
 
-import org.adligo.fabricate.common.I_RunContext;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.log.I_FabLog;
@@ -11,8 +10,8 @@ import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -61,9 +60,12 @@ public class Depot implements I_Depot {
     xmlFiles_ = ctx.getXmlFiles();
     log_ = ctx.getLog();
     List<ArtifactType> artifacts = depot.getArtifact();
+    
     if (artifacts != null) {
       for (ArtifactType art: artifacts) {
         String platform = art.getPlatform();
+        platform = platform.toLowerCase();
+        
         String project = art.getProject();
         String file = art.getFilename();
         String type = art.getType();
@@ -72,6 +74,9 @@ public class Depot implements I_Depot {
         String depotFileName = getDepotFile(artDir, file);
         artifactKeysToArtifacts_.put(new ArtifactKey(project, type, platform), depotFileName);
       }
+    }
+    if (log_.isLogEnabled(Depot.class)) {
+      log_.println("Creating depot with " + artifactKeysToArtifacts_.size() + " artifacts.");
     }
   }
 
@@ -118,7 +123,7 @@ public class Depot implements I_Depot {
     artifactKeysToArtifacts_.put(aKey, depotFileName);
     
     if (log_.isLogEnabled(Depot.class)) {
-      log_.println("Depot now has " + artifactType + "/" + projectName + "/" + depotFileName);
+      log_.println("Depot now has " + artifactType + "/" + projectName + "/" + fileName);
     }
     return true;
   }
@@ -243,5 +248,15 @@ public class Depot implements I_Depot {
   @Override
   public String getDir() {
     return dir_;
+  }
+
+  @Override
+  public boolean has(String projectName) {
+    Set<ArtifactKey> ks = artifactKeysToArtifacts_.keySet();
+    Set<String> projects = new HashSet<String>();
+    for (ArtifactKey ak: ks) {
+      projects.add(ak.getProjectName());
+    }
+    return projects.contains(projectName);
   }
 }

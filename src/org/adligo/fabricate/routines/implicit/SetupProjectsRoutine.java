@@ -59,6 +59,7 @@ public class SetupProjectsRoutine extends FabricateAwareRoutine implements
     depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
     nameJarTrait_ = traitFactory_.createRoutine(NameJar.NAME, NameJar.IMPLEMENTED_INTERFACES);
     projects_ = (List<Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS);
+    projectsMap_ = (Map<String,Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS_MAP);
     
     I_CommandLineConstants clConstants = constants_.getCommandLineConstants();
     String value = system_.getArgValue(clConstants.getPlatforms());
@@ -78,13 +79,19 @@ public class SetupProjectsRoutine extends FabricateAwareRoutine implements
 
     queue_ = system_.newConcurrentLinkedQueue(Project.class);
     String projectRunDir = fabricate_.getFabricateProjectRunDir();
+    if (log_.isLogEnabled(SetupProjectsRoutine.class)) {
+      log_.println(SetupProjectsRoutine.class.getName() + " projectRunDir " +
+           system_.lineSeparator() + projectRunDir);  
+    }
     File prFile = files_.instance(projectRunDir);
     String project = prFile.getName();
     
+    String rebuildDependents = cmdConstants_.getRebuildDependents(true);
+    
     List<Project> participants = new ArrayList<Project>();
-    if (projectRunDir == null) {
+    if (StringUtils.isEmpty(projectRunDir)) {
       participants.addAll(projects_);
-    } else {
+    } else if (system_.hasArg(rebuildDependents)) {
       Set<String> initialParticipants = new HashSet<String>();
       for (Project proj: projects_) {
         addIfParticipant(project, initialParticipants, proj);
@@ -104,13 +111,22 @@ public class SetupProjectsRoutine extends FabricateAwareRoutine implements
       for (String part: initialParticipants) {
         participants.add(projectsMap_.get(part));
       }
+    } else {
+      File file = files_.instance(projectRunDir);
+      String projectName = file.getName();
+      Project prj = projectsMap_.get(projectName);
+      if (log_.isLogEnabled(SetupProjectsRoutine.class)) {
+        log_.println(SetupProjectsRoutine.class.getName() + " got the following project for name " + projectName +
+             system_.lineSeparator() + prj);  
+      }
+      participants.add(prj);
     }
     memory.put(FabricationMemoryConstants.PARTICIPATING_PROJECTS, Collections.unmodifiableList(participants));
     memory.addLock(new MemoryLock(FabricationMemoryConstants.PARTICIPATING_PROJECTS, 
         Collections.singletonList(SetupProjectsRoutine.class.getName())));
     
     
-    queue_.addAll(projects_);
+    queue_.addAll(participants);
     //if (log_.isLogEnabled(SetupProjectsRoutine.class)) {
       log_.println(SetupProjectsRoutine.class.getSimpleName() + " setup with " + queue_.size() + " participants." );
     //}
