@@ -11,4 +11,10 @@ package org.adligo.fabricate.common.log;
 public interface I_FabLog extends I_Print {
   public boolean hasAllLogsEnabled();
   public boolean isLogEnabled(Class<?> clazz);
+  /**
+   * This ends (closes the file, ignores println and printTrance after this) 
+   * the logging that can be done from this log instance.
+   * @return
+   */
+  public void derail();
 }

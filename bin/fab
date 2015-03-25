@@ -1,9 +1,11 @@
 #! /bin/sh
 
 # This is the fabricate shell script, to execute fabricate.
-# Licensed by Adligo Inc. 
+# Licensed by Adligo Inc using the following license. 
 # http://www.apache.org/licenses/LICENSE-2.0
 # Note Fabricate uses the UTF-8 char set by default.
+#
+
 
 if [ -z "$FABRICATE_HOME" ]; then
     echo "Fabricate requires the FABRICATE_HOME environment variable to be set."
@@ -14,8 +16,31 @@ CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpcore-4.3.2.jar
 CLASSPATH=$CLASSPATH:$FABRICATE_HOME/lib/httpclient-4.3.5.jar
 FABRICATE_JAR=$FABRICATE_HOME/lib/@FABRICATE_NAME@.jar 
 CLASSPATH=$CLASSPATH:$FABRICATE_JAR
+
+# Note for NetBeans debugging that 
+# -agentpath:/var/folders/g8/8krz3q551s19dk6nx5yh5zlr0000gn/T/NBProfiler2256814587473421670.link/deployed/jdk16/mac/libprofilerinterface.jnilib=/var/folders/g8/8krz3q551s19dk6nx5yh5zlr0000gn/T/NBProfiler2256814587473421670.link,5140
+# should only be passed to the main process, so there is some manipulation of arguments
+# also note it is the convention to pass this last
+AGENTPATH=
 ARGS="$@"
 
+if [[ "$ARGS" == *"-agentpath:"* ]] 
+then
+	AGENTPATH=`echo $ARGS | sed 's/.*-agentpath://g'`
+	AGENTPATH=`echo $AGENTPATH | sed 's/ .*//g'`
+	AGENTPATH=-agentpath:$AGENTPATH
+	#echo AGENTPATH=$AGENTPATH
+	AGENTPATH_LEN=${#AGENTPATH}
+	
+	
+	AGENTPATH_START=`echo $ARGS | awk 'END{print index($0,"-agentpath:")}'`
+	AGENTPATH_START=$((AGENTPATH_START - 1))
+	ARGS_LEN=${#ARGS}
+	#echo AGENTPATH_LEN=$AGENTPATH_LEN
+	AGENTPATH_END=$((AGENTPATH_START + AGENTPATH_LEN))
+	ARGS_2=${ARGS:0:$AGENTPATH_START}${ARGS:AGENTPATH_END:$ARGS_LEN}
+	ARGS=$ARGS_2
+fi
 
 # @diagram_sync on 1/26/2014 with Overview.seq
 # main(String [] args) setup Fabricate args.
@@ -56,7 +81,7 @@ else
 		OPTS=$OPTIONS_FROM_SETUP:$FABRICATE_JAR
 		# @diagram_sync on 1/26/2014 with Overview.seq
 		# main(String [] args) run Fabricate.
-		java  $OPTS org.adligo.fabricate.FabricateController $ARGS_FROM_SETUP
+		java  $OPTS $AGENTPATH org.adligo.fabricate.FabricateController $ARGS_FROM_SETUP 
 	fi
 fi
 

@@ -69,6 +69,7 @@ public class FabricateController {
   private RoutineFabricateFactory factory_;
   private FabricateType fabXml_;
   private boolean commands_;
+  I_FabFileLog fileLog_ = null;
   /**
    * The first throwable thrown by either
    * processing of a command or a build or share stage.
@@ -144,12 +145,12 @@ public class FabricateController {
       return;
     }
     
-    I_FabFileLog fileLog = null;
+    
     String writeLogArg = cmdMessages_.getWriteLog(true);
     if (sys.hasArg(writeLogArg)) {
-      fileLog = sys_.newFabFileLog(outputDir + files_.getNameSeparator() + 
+      fileLog_ = sys_.newFabFileLog(outputDir + files_.getNameSeparator() + 
           "fab.log");
-      sys.setLogFile(fileLog);
+      sys.setLogFile(fileLog_);
     }
     
     log_.println(sys_.lineSeparator() + sysMessages_.getFabricating() + 
@@ -183,6 +184,9 @@ public class FabricateController {
       }
       ProjectsManager pm = factory.createProjectsManager(sys_, factory_, rm);
       failure_ = pm.setupAndRun(memory);
+      if (checkFailure()) {
+        return;
+      }
     }
     
     if (commands_) {
@@ -191,12 +195,18 @@ public class FabricateController {
       }
       CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_);
       failure_ = manager.processCommands(memory);
+      if (checkFailure()) {
+        return;
+      }
     } else {
       if (log_.isLogEnabled(FabricateController.class)) {
         log_.println(sys_.lineSeparator() + sysMessages_.getRunningBuildStages());
       }
       FabricationManager fabManager = factory.createFabricationManager(sys_, factory_, rm);
       failure_ = fabManager.setupAndRunBuildStages(memory);
+      if (checkFailure()) {
+        return;
+      }
       if (sys_.hasArg(cmdMessages_.getArchive(true))) {
         if (log_.isLogEnabled(FabricateController.class)) {
           log_.println(sys_.lineSeparator() + sysMessages_.getRunningArchiveStages());
@@ -206,10 +216,15 @@ public class FabricateController {
     }
     
     writeResult();
-    if (fileLog != null) {
-      fileLog.close();
+    
+  }
+
+  private boolean checkFailure() throws IOException {
+    if (failure_ != null) {
+      writeResult();
+      return true;
     }
-    sys_.exit(0);
+    return false;
   }
 
   private FabricationMemoryMutant<Object> addMemoryValues(FabSystem sys, FabricateFactory factory) {
@@ -449,6 +464,11 @@ public class FabricateController {
       }
       log_.println(sysMessages_.getFabricationFailed());
     }
+    log_.derail();
+    if (fileLog_ != null) {
+      fileLog_.close();
+    }
+    sys_.exit(0);
   }
   
   public void logDuration(long duration) {

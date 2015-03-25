@@ -1,5 +1,6 @@
 package org.adligo.fabricate.managers;
 
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
@@ -22,6 +23,7 @@ import java.util.Set;
 
 public class StageSetup implements I_StageSetup {
   private final I_FabSystem system_;
+  private final I_FabLog log_;
   private final I_Fabricate fabricate_;
   private final RoutineFabricateFactory factory_;
   private final List<I_FabricationRoutine> routines_ = new ArrayList<I_FabricationRoutine>();
@@ -33,6 +35,7 @@ public class StageSetup implements I_StageSetup {
     factory_ = factory;
     repositoryManager_ = rm;
     system_ = system;
+    log_ = system.getLog();
   }
   
   public void clearRoutines() {
@@ -50,7 +53,11 @@ public class StageSetup implements I_StageSetup {
   public I_FabricationRoutine processStageSetup(String name) throws FabricationRoutineCreationException {
     Set<I_ExpectedRoutineInterface> es = Collections.emptySet();
     I_FabricationRoutine routine = factory_.createStage(name,es);
+    if (log_.isLogEnabled(StageSetup.class)) {
+      log_.println(StageSetup.class.getSimpleName() + ".processStageSetup created the following routine;" + routine);
+    }
     routines_.add(routine);
+    
     
     routine.setSystem(system_);
     if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
@@ -61,15 +68,25 @@ public class StageSetup implements I_StageSetup {
     routine.setTaskFactory(taskFactory);
     
     routine.setTraitFactory(factory_.getTraits());
-    if (I_CommandAware.class.isAssignableFrom(routine.getClass())) {
+    if (log_.isLogEnabled(StageSetup.class)) {
+      log_.println(StageSetup.class.getSimpleName() + ".processStageSetup setTraitFactory");
+    }
+    
+    if (routine instanceof I_CommandAware) {
       I_RoutineFactory cmdFactory = factory_.getCommands();
       ((I_CommandAware) routine).setCommandFactory(cmdFactory);
     }
-    if (I_RepositoryManagerAware.class.isAssignableFrom(routine.getClass())) {
+    if (routine instanceof I_RepositoryManagerAware) {
       ((I_RepositoryManagerAware) routine).setRepositoryManager(repositoryManager_);
     }
-    if (I_ProjectsAware.class.isAssignableFrom(routine.getClass())) {
+    if (routine instanceof I_ProjectsAware) {
+      if (log_.isLogEnabled(StageSetup.class)) {
+        log_.println(StageSetup.class.getSimpleName() + ".processStageSetup setProjects " + projects_.size());
+      }
       ((I_ProjectsAware) routine).setProjects(projects_);
+    }
+    if (log_.isLogEnabled(StageSetup.class)) {
+      log_.println(StageSetup.class.getSimpleName() + ".processStageSetup returning ");
     }
     return routine;
   }

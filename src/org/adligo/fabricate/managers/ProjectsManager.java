@@ -31,22 +31,34 @@ public class ProjectsManager {
     if (obtainFailure != null) {
       return obtainFailure;
     }
+    logSuccess(ImplicitFacets.OBTAIN_PROJECTS);
     setup_.clearRoutines();
     FailureType loadFailure = runFacet(ImplicitFacets.LOAD_PROJECTS, memory);
     if (loadFailure != null) {
       return loadFailure;
     }
+    logSuccess(ImplicitFacets.LOAD_PROJECTS);
     setup_.clearRoutines();
     FailureType downloadFailure = runFacet(ImplicitFacets.DOWNLOAD_DEPENDENCIES, memory);
     if (downloadFailure != null) {
       return downloadFailure;
     }
+    logSuccess(ImplicitFacets.DOWNLOAD_DEPENDENCIES);
     setup_.clearRoutines();
     FailureType failure = runFacet(ImplicitFacets.SETUP_PROJECTS, memory);
     if (failure != null) {
       return failure;
     }
+    logSuccess(ImplicitFacets.SETUP_PROJECTS);
     return null;
+  }
+
+  private void logSuccess(String p) {
+    if (log_.isLogEnabled(ProjectsManager.class)) {
+      String message = sysMessages_.getFacetXCompletedSuccessfully();
+      message = message.replace("<X/>", p);
+      log_.println(message);
+    }
   }
 
   private FailureType runFacet(String facet, FabricationMemoryMutant<Object> memory) {

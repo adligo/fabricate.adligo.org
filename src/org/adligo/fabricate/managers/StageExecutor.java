@@ -36,9 +36,18 @@ public class StageExecutor {
       public I_FabricationRoutine buildInitial(I_FabricationMemoryMutant<Object> memory, 
           I_RoutineMemoryMutant<Object> routineMemory)
           throws FabricationRoutineCreationException {
+        if (log_.isLogEnabled(StageExecutor.class)) {
+          log_.println(StageExecutor.class.getName() + ".buildInitial(memory, routineMemory)");
+        }
         I_FabricationRoutine toRet = setup.processStageSetup(stageName);
         if (!toRet.setup(memory, routineMemory)) {
+          if (log_.isLogEnabled(StageExecutor.class)) {
+            log_.println(StageExecutor.class.getName() + " buildInitial returning null");
+          }
           return null;
+        }
+        if (log_.isLogEnabled(StageExecutor.class)) {
+          log_.println(StageExecutor.class.getName() + " buildInitial returning " + stageName );
         }
         return toRet;
       }

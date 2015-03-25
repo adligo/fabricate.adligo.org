@@ -13,7 +13,10 @@ import org.adligo.fabricate.models.common.I_FabricationRoutine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RoutineExecutionEngine {
   private final I_FabSystem system_;
@@ -22,6 +25,10 @@ public class RoutineExecutionEngine {
   private final I_RoutineBuilder factory_;
   private final int threads_;
   private final List<I_RunMonitor> monitors_ = new ArrayList<I_RunMonitor>();
+  private final AtomicBoolean failure_  = new AtomicBoolean(false);
+  private Throwable failureThrowable_;
+  private I_FabricationRoutine routineFailure_;
+  
   
   public RoutineExecutionEngine(I_FabSystem system, I_RoutineBuilder factory, int threads) {
     system_ = system;
@@ -33,6 +40,7 @@ public class RoutineExecutionEngine {
     threads_ = threads;
   }
   
+  @SuppressWarnings("static-access")
   public void runRoutines(FabricationMemoryMutant<Object> memoryMut)
       throws FabricationRoutineCreationException {
     if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
@@ -68,15 +76,12 @@ public class RoutineExecutionEngine {
           routine = factory_.build(memory, routineMemory);
         }
         int counter = 0;
-        while (true) {
-          boolean failure = false;
+        AtomicBoolean running = new AtomicBoolean(true);
+        while (running.get()) {
           int monitorsFinished = 0;
           for (I_RunMonitor rm: monitors_) {
-            if (rm.getSequence() == 1) {
-              counter++;
-            }
-            if (!rm.isFinished()) {
-              if (counter >= 3) {
+           if (!rm.isFinished()) {
+              if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
                 I_LocatableRunnable lr = rm.getDelegate();
                 String message = lr.getCurrentLocation();
                 String additional = lr.getAdditionalDetail();
@@ -92,50 +97,88 @@ public class RoutineExecutionEngine {
                 system_.currentThread().interrupt();
               }
               if (rm.hasFailure()) {
-                failure = true;
+                failure_.set(true);
+                failureThrowable_ = rm.getCaught();
+                routineFailure_ = (I_FabricationRoutine) rm.getDelegate();
                 break;
               }
             } else {
               monitorsFinished++;
             }
           }
-          if (failure) {
-            service.shutdownNow();
+          if (!failure_.get()) {
+            for (I_RunMonitor rm: monitors_) {
+              if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
+                log_.println(RoutineExecutionEngine.class.getSimpleName() + " checking " + rm.getDelegate() +
+                    " which hasFailure() ? " + rm.hasFailure());
+              }
+              if (rm.hasFailure()) {
+                if (failureThrowable_ == null) {
+                  failureThrowable_ = rm.getCaught();
+                  if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
+                    log_.println(RoutineExecutionEngine.class.getSimpleName() + " failureThrowable " + failureThrowable_);
+                  }
+                  routineFailure_ = (I_FabricationRoutine) rm.getDelegate();
+                }
+                failure_.set(true);
+                break;
+              }
+            }
+          }
+          if (failure_.get()) {
+            processFailure(service, running);
             break;
           }
           if (monitorsFinished == monitors_.size()) {
+            
             firstRoutine.writeToMemory(memoryMut);
+            service.shutdownNow();
+            running.set(false);
             return;
           } 
+          try {
+            system_.currentThread().sleep(1000);
+          } catch (InterruptedException e) {
+            log_.printTrace(e);
+            system_.currentThread().interrupt();
+          }
         }
       } else {
         I_RunMonitor monitor = system_.newRunMonitor(firstRoutine, 1);
         monitors_.add(monitor);
         monitor.run();
+        if (monitor.hasFailure()) {
+          failure_.set(true);
+          failureThrowable_ = monitor.getCaught();
+          routineFailure_ = firstRoutine;
+        }
       }
     } else {
       I_RunMonitor monitor = system_.newRunMonitor(firstRoutine, 1);
       monitors_.add(monitor);
       monitor.run();
+      if (monitor.hasFailure()) {
+        failure_.set(true);
+        failureThrowable_ = monitor.getCaught();
+        routineFailure_ = firstRoutine;
+      }
     }
+  }
+
+  private void processFailure(ExecutorService service, AtomicBoolean running) {
+    for (I_RunMonitor rm: monitors_) {
+      rm.getThread().interrupt();
+    }
+    running.set(false);
+    service.shutdownNow();
   }
   
   public boolean hadFailure() {
-    for (I_RunMonitor rm: monitors_) {
-      if (rm.hasFailure()) {
-        return true;
-      }
-    }
-    return false;
+    return failure_.get();
   }
   
   public Throwable getFailure() {
-    for (I_RunMonitor rm: monitors_) {
-      if (rm.hasFailure()) {
-        return rm.getCaught();
-      }
-    }
-    return null;
+    return failureThrowable_;
   }
   
   public I_FabricationRoutine getRoutineThatFailed() {

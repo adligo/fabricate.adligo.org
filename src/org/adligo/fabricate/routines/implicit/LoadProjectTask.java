@@ -68,9 +68,10 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     String projectName = brief_.getName();
     
     String projectDir = projectsDir + projectName + files_.getNameSeparator();
-    String projectFile = projectDir +  files_.getNameSeparator() + "project.xml";
+    String projectFile = projectDir +  "project.xml";
     if (log_.isLogEnabled(LoadProjectTask.class)) {
-      log_.println("parseding project '" + projectName + "' ");
+      log_.println("parseing project '" + projectName + "' " + system_.lineSeparator() +
+          projectFile);
     }
     
     FabricateProjectType project = null;
@@ -125,7 +126,7 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
   }
 
   @Override
-  public void writeToMemory(I_FabricationMemoryMutant<Object> memory) {
+  public synchronized void writeToMemory(I_FabricationMemoryMutant<Object> memory) {
     List<Project> ps = new ArrayList<Project>();
     ps.addAll(projects_);
     List<Project> projects = Collections.unmodifiableList(ps);
@@ -134,8 +135,14 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
               Collections.singletonList(LoadProjectTask.class.getName())));
     
     Map<String, Project> projectsMap = new HashMap<String,Project>();
+    if (log_.isLogEnabled(LoadProjectTask.class)) {
+      log_.println("LoadProjectTask loaded " + projects_.size() + " projects.");
+    }
     for (Project project: projects_) {
       projectsMap.put(project.getName(), project);
+    }
+    if (log_.isLogEnabled(LoadProjectTask.class)) {
+      log_.println("LoadProjectTask loaded " + projectsMap.size() + " projects.");
     }
     projectsMap = Collections.unmodifiableMap(projectsMap);
     memory.put(FabricationMemoryConstants.LOADED_PROJECTS_MAP, projectsMap);

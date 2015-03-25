@@ -1,7 +1,11 @@
 package org.adligo.fabricate.common.log;
 
+import org.adligo.fabricate.common.util.MethodBlocker;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FabLog implements I_FabLog {
   /**
@@ -48,6 +52,7 @@ public class FabLog implements I_FabLog {
 
   private Map<String,Boolean> logSettings_ = new HashMap<String,Boolean>();
   private boolean allOn_ = false;
+  private AtomicBoolean derailed_ = new AtomicBoolean(false);
   
   public FabLog(Map<String,Boolean> logSettings, boolean allOn) {
     if (allOn) {
@@ -75,16 +80,26 @@ public class FabLog implements I_FabLog {
   @SuppressWarnings("deprecation")
   @Override
   public void println(String p) {
-    ThreadLocalPrintStream.println(p);
+    if (!derailed_.get()) {
+      ThreadLocalPrintStream.println(p);
+    }
   }
 
   @SuppressWarnings("deprecation")
   @Override
   public void printTrace(Throwable t) {
-    ThreadLocalPrintStream.printTrace(t);
+    if (!derailed_.get()) {
+      ThreadLocalPrintStream.printTrace(t);
+    }
   }
   @Override
   public boolean hasAllLogsEnabled() {
     return allOn_;
+  }
+  @Override
+  public void derail() {
+    MethodBlocker mb = new MethodBlocker(FabLog.class, "derail", Collections.singleton("org.adligo.fabricate.FabricateController"));
+    mb.checkAllowed();
+    derailed_.set(true);
   }
 }

@@ -38,6 +38,12 @@ public interface I_RunMonitor extends Runnable {
    * @return
    */
   public abstract int getSequence();
+  
+  /**
+   * return the thread that is running this instance.
+   * @return
+   */
+  public Thread getThread();
 
   /**
    * Wait for the runnable to finish running for a specific number of milliseconds.

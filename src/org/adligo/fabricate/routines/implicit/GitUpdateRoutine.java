@@ -1,11 +1,16 @@
 package org.adligo.fabricate.routines.implicit;
 
+import org.adligo.fabricate.common.system.I_ExecutingProcess;
+import org.adligo.fabricate.managers.ProjectsManager;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
+import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
+import org.adligo.fabricate.models.project.ProjectMutant;
+import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -49,10 +54,31 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
         try {
           String desc = gitCalls_.describe(projectDir);
           if ( !"snapshot".equals(desc)) {
-            //its on a tag, so revert to the trunk before update
-            gitCalls_.checkout(projectName, projectsDir, "trunk");
+            //its on a tag, so revert to the master before update
+            //note i noticed that some projects use trunk log4j for instance.
+            //try to read the defaultGitBranch attribute
+            String defaultBranch = "master";
+            try {
+              String projectFile = projectDir + files_.getNameSeparator() + "project.xml";
+              FabricateProjectType fpt = xmlFiles_.parseProject_v1_0(projectFile);
+              ProjectMutant pm = new ProjectMutant(projectDir, brief_, fpt);
+              I_Parameter dgb = pm.getAttribute("defaultGitBranch");
+              if (dgb != null) {
+                defaultBranch = dgb.getValue();
+              }
+            } catch (Exception e) {
+              // TODO Auto-generated catch block
+            }
+            gitCalls_.checkout(projectName, projectsDir, defaultBranch);
           }
-          gitCalls_.pull(env_, projectName, projectsDir);
+          I_ExecutingProcess ep = gitCalls_.pull(env_, projectName, projectsDir);
+          while (!ep.isFinished()) {
+            try {
+              ep.waitUntilFinished(1000);
+            } catch (InterruptedException e) {
+              system_.currentThread().interrupt();
+            }
+          }
         } catch (IOException x) {
           //pass to the RunMonitor
           throw new RuntimeException(x);

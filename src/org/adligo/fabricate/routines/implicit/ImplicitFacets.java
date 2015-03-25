@@ -3,6 +3,7 @@ package org.adligo.fabricate.routines.implicit;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
+import org.adligo.fabricate.routines.ProjectBriefQueueRoutine;
 
 /**
  * This class just contains the routine brief
@@ -37,7 +38,7 @@ public class ImplicitFacets {
   
   private static RoutineBrief getProjectsLoadBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();
-    rbm.setClazz(LoadProjectsRoutine.class);
+    rbm.setClazz(ProjectBriefQueueRoutine.class);
     rbm.setName(LOAD_PROJECTS);
     rbm.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET);
     

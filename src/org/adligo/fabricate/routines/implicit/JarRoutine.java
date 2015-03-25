@@ -20,7 +20,7 @@ import org.adligo.fabricate.routines.TaskContext;
 import java.util.Iterator;
 import java.util.List;
 
-public class JarRoutine extends DependenciesQueueRoutine {
+public class JarRoutine extends DependenciesQueueRoutine implements I_ParticipationAware {
   
   private List<String> platforms_;
   
@@ -36,6 +36,10 @@ public class JarRoutine extends DependenciesQueueRoutine {
       String name = brief_.getName();
       String currentProject = project.getName();
       locationInfo_.setCurrentProject(currentProject);
+      
+      if (log_.isLogEnabled(JarRoutine.class)) {
+        log_.println(JarRoutine.class.getSimpleName() + ".run() starting project '" + currentProject + "'.") ;
+      }
       
       I_RoutineBrief projectRoutineBrief = project.getStage(name);
       Iterator<String> platforms = platforms_.iterator();
@@ -74,7 +78,8 @@ public class JarRoutine extends DependenciesQueueRoutine {
               ((I_PlatformAware)  taskRoutine).setPlatform(platform);
             }
             if (log_.isLogEnabled(JarRoutine.class)) {
-              log_.println("starting task '" + currentTask + "' on project '" + currentProject + "' locationInfo " + 
+              log_.println(JarRoutine.class.getSimpleName() + "starting task '" + currentTask + "' "
+                  + "on project '" + currentProject + "' locationInfo " + 
                   locationInfo_.toString() +
                   system_.lineSeparator() +
                   this.toString()) ;
@@ -97,6 +102,9 @@ public class JarRoutine extends DependenciesQueueRoutine {
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     
     platforms_ = (List<String>) memory.get(FabricationMemoryConstants.PLATFORMS);
+    if (log_.isLogEnabled(JarRoutine.class)) {
+      log_.println(JarRoutine.class.getSimpleName() + ".setup.super") ;
+    }
     boolean toRet = super.setup(memory, routineMemory);
     return toRet;
   }

@@ -2,6 +2,7 @@ package org.adligo.fabricate.common.i18n;
 
 public interface I_SystemMessages {
   public String getAntHelperRequiresADirectoryArgument();
+  public String getArchiveStageXCompletedSuccessfully();
   public String getArchiveStageXIsStillSettingUp();
   public String getArchiveStageXIsStillRunning();
   public String getArchiveStageXIsStillRunningOnProjectZ() ;
@@ -9,6 +10,7 @@ public interface I_SystemMessages {
   public String getArchiveStageXTaskYIsStillRunningOnProjectZ();
   public String getArchiveStageXProjectYIsWaitingOnTheFollowingProjects();
   
+  public String getCommandXCompletedSuccessfully();
   public String getCommandXIsStillSettingUp();
   public String getCommandXIsStillRunning();
   public String getCommandXIsStillRunningOnProjectZ() ;
@@ -17,6 +19,7 @@ public interface I_SystemMessages {
   public String getCommandXProjectYIsWaitingOnTheFollowingProjects();
   
   public String getBuildingFabricateRuntimeClassPath();
+  public String getBuildStageXCompletedSuccessfully();
   public String getBuildStageXIsStillSettingUp();
   public String getBuildStageXIsStillRunning();
   public String getBuildStageXIsStillRunningOnProjectZ();
@@ -50,6 +53,7 @@ public interface I_SystemMessages {
   public String getExtractingTheFollowingArtifact();
   public String getExtractionOfTheFollowingArtifact();
   
+  public String getFacetXCompletedSuccessfully();
   public String getFacetXIProjectYIsWaitingOnTheFollowingProjects();
   public String getFabricateByAdligo();
   public String getFabricating();

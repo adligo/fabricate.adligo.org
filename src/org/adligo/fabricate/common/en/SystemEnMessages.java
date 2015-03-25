@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
 
+  private static final String ARCHIVE_STAGE_X_COMPLETED_SUCCESSFULLY = "Archive stage <X/> completed successfully.";
   private static final String ANT_HELPER_REQUIRES_A_DIRECTORY_ARGUMENT = 
       "AntHelper requires a directory argument.";
   private static final String ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
@@ -19,6 +20,8 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String ARCHIVE_STAGE_X_PROJECT_Y_IS_WAITING_ON_THE_FOLLOWING_PROJECTS =
       "Archive stage <X/>, project <Y/> is waiting on the following projects;";
  
+  private static final String BUILD_STAGE_X_COMPLETED_SUCCESSFULLY = "Build stage <X/> completed successfully.";
+  
   private static final String BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
       "Build stage <X/>, task <Y/> is still running on project <Z/>.";
   private static final String BUILD_STAGE_X_TASK_Y_IS_STILL_RUNNING = 
@@ -37,6 +40,8 @@ public class SystemEnMessages implements I_SystemMessages {
 
   private static final String CHECKING_FABRICATE_RUNTIME_DEPENDENCIES = 
       "Checking Fabricate runtime dependencies.";
+  private static final String COMMAND_X_COMPLETED_SUCCESSFULLY = "Command <X/> completed successfully.";
+  
   private static final String COMMAND_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
       "Command <X/>, task <Y/> is still running on project <Z/>.";
   private static final String COMMAND_X_TASK_Y_IS_STILL_RUNNING = 
@@ -99,6 +104,8 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String FABRICATE_BY_ADLIGO = "Fabricate by Adligo.";
   private static final String FABRICATION_FAILED = "Fabrication failed!";
   private static final String FABRICATION_SUCCESSFUL = "Fabrication successful!";
+  
+  private static final String FACET_X_COMPLETED_SUCCESSFULLY = "Facet <X/> completed successfully.";
   
   private static final String FACET_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z = 
       "Facet <X/>, task <Y/> is still running on project <Z/>.";
@@ -233,6 +240,12 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getAntHelperRequiresADirectoryArgument() {
     return ANT_HELPER_REQUIRES_A_DIRECTORY_ARGUMENT;
   }
+  
+  @Override
+  public String getArchiveStageXCompletedSuccessfully() {
+    return ARCHIVE_STAGE_X_COMPLETED_SUCCESSFULLY;
+  }
+  
   @Override
   public String getArchiveStageXIsStillSettingUp() {
     return ARCHIVE_STAGE_X_IS_STILL_SETTING_UP;
@@ -294,6 +307,11 @@ public class SystemEnMessages implements I_SystemMessages {
   }
 
   @Override
+  public String getCommandXCompletedSuccessfully() {
+    return COMMAND_X_COMPLETED_SUCCESSFULLY;
+  }
+  
+  @Override
   public String getCommandXIsStillSettingUp() {
     return COMMAND_X_IS_STILL_SETTING_UP;
   }
@@ -321,6 +339,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getCommandXTaskYIsStillRunningOnProjectZ() {
     return COMMAND_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getBuildStageXCompletedSuccessfully() {
+    return BUILD_STAGE_X_COMPLETED_SUCCESSFULLY;
   }
   
   @Override
@@ -451,6 +474,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getFabricationSuccessful() {
     return FABRICATION_SUCCESSFUL;
+  }
+  
+  @Override
+  public String getFacetXCompletedSuccessfully() {
+    return FACET_X_COMPLETED_SUCCESSFULLY;
   }
   
   @Override

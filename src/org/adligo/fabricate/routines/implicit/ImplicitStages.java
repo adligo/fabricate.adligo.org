@@ -3,7 +3,6 @@ package org.adligo.fabricate.routines.implicit;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
-import org.adligo.fabricate.routines.DependenciesQueueRoutine;
 
 /**
  * This class just contains the routine brief
@@ -18,8 +17,8 @@ public class ImplicitStages {
   public static final String CREATE_JAR_TASK = "create jar";
   public static final String DEPOSIT_TASK = "deposit jar";
   public static final String JAR = "jar";
-  public static final RoutineBrief JAR_BRIEF = getJarBrief();
   
+  public static final RoutineBrief JAR_BRIEF = getJarBrief();
   
   private static RoutineBrief getJarBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();

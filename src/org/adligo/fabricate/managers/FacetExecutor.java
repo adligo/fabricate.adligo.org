@@ -61,8 +61,15 @@ public class FacetExecutor {
     try {
         RoutineExecutionEngine exe = factory_.createRoutineExecutionEngine(system_, routineBuilder);
         exe.runRoutines(memory);
+        if (log_.isLogEnabled(FacetExecutor.class)) {
+          log_.println(FacetExecutor.class.getName() + ".run(" + facetName + ") had failure " +
+              exe.hadFailure());
+        }
         if (exe.hadFailure()) {
           failure = exe.getFailure();
+          if (log_.isLogEnabled(FacetExecutor.class)) {
+            log_.println(FacetExecutor.class.getName() + ".run(" + facetName + ") failure is " + failure);
+          }
           routine = exe.getRoutineThatFailed();
         }
     } catch (Throwable t) {

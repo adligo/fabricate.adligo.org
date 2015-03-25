@@ -61,11 +61,20 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
     //order the inital project queue
     projectsQueue_ = system_.newConcurrentLinkedQueue(I_Project.class);
     List<I_Project> participants = identifyParticipants(projects_); 
-    ProjectDependencyOrderer orderer = new ProjectDependencyOrderer(participants);
+    if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+      log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup ProjectDependencyOrderer");
+    }
+    ProjectDependencyOrderer orderer = new ProjectDependencyOrderer(participants, system_);
+    if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+      log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup orderer");
+    }
     
     List<I_Project> orderedProjects = orderer.getProjects();
     projectsQueue_.addAll(orderedProjects);
     routineMemory.put(PROJECTS_QUEUE, projectsQueue_);
+    if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+      log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup with " + orderedProjects.size() + " participants");
+    }
     
     projectBlockMap_ = system_.newConcurrentHashMap(ProjectBlockKey.class, ProjectBlock.class);
     
@@ -85,7 +94,9 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
       }
     }
     routineMemory.put(PROJECTS_BLOCK_MAP, projectBlockMap_);
-    
+    if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+      log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup.super");
+    }
     return super.setup(memory, routineMemory);
   }
 
@@ -102,18 +113,46 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
 
 
   private List<I_Project> identifyParticipants(Collection<I_Project> projects) {
-    boolean participationAware = I_ParticipationAware.class.isAssignableFrom(this.getClass());
-    List<I_Project> copy = new ArrayList<I_Project>(projects);
+    if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+      log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".identifyParticipants " + projects.size() +
+          " thread " + system_.currentThreadName());
+    }
     
+    boolean participationAware = this instanceof I_ParticipationAware;
+    
+    List<I_Project> copy = new ArrayList<I_Project>();
+    //copy using a iterator, I think doing new ArrayList<I_Project>(projects)
+    // in the above line was causing a deadlock?
+    Iterator<I_Project> pits =  projects.iterator();
+    while(pits.hasNext()) {
+      copy.add(pits.next());
+    }
+    if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+      log_.println(DependenciesQueueRoutine.class.getSimpleName() + " copy has " + copy.size() + participationAware);
+    }
     if (participationAware) {
+      if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+        log_.println(DependenciesQueueRoutine.class.getSimpleName() + " participationAware 2");
+      }
+      
       String name = brief_.getName();
+      if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+        log_.println(DependenciesQueueRoutine.class.getSimpleName() + " brief name is  " + name);
+      }
       boolean command = brief_.isCommand();
       boolean stage = brief_.isStage();
       boolean archive = brief_.isArchivalStage();
+      if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+        log_.println(DependenciesQueueRoutine.class.getSimpleName() + " command " +
+            command + " stage " + stage + " archive " + archive);
+      }
       
       Iterator<I_Project> it = copy.iterator();
       while (it.hasNext()) {
         I_Project p = it.next();
+        if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
+          log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".checking " + p.getName());
+        }
         if (command) {
           I_RoutineBrief cmd = p.getCommand(name);
           if (cmd == null) {
@@ -134,7 +173,7 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
           */
         }
       }
-    }
+    } 
     return copy;
   }
 
