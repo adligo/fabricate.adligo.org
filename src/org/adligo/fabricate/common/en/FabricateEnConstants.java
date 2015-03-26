@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common.en;
 
+import org.adligo.fabricate.common.i18n.I_AttributeConstants;
 import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
@@ -15,6 +16,11 @@ public class FabricateEnConstants  implements I_FabricateConstants {
   public static final FabricateEnConstants INSTANCE = new FabricateEnConstants();
   
   private FabricateEnConstants() {
+  }
+  
+  @Override
+  public I_AttributeConstants getAttributeConstants() {
+    return AttributeEnConstants.INSTANCE;
   }
   
   @Override

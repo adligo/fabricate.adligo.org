@@ -1,6 +1,6 @@
 package org.adligo.fabricate.models.project;
 
-import org.adligo.fabricate.models.common.I_Parameter;
+import org.adligo.fabricate.models.common.I_AttributesContainer;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.dependencies.I_LibraryDependency;
@@ -17,27 +17,16 @@ import java.util.Map;
  * it was a extract from Compile/Jar for
  * the FabricateClasspath2Eclipse command. 
  * 
+ * Note it is the convention to have implementations of
+ * I_Project implement equals and hashCode using only 
+ * the project name.  When this convention is not followed
+ * there should be some comments as to why, in the respective
+ * class.
+ * 
  * @author scott
  */
-public interface I_Project extends I_ProjectBrief {
+public interface I_Project extends I_ProjectBrief, I_AttributesContainer {
 
-  /**
-   * Get the attributes that came from the project.xml file.
-   * @return
-   */
-  public abstract List<I_Parameter> getAttributes();
-  
-  /**
-   * Get the first attribute that came from the project.xml file.
-   * @return
-   */
-  public I_Parameter getAttribute(String key);
-  /**
-   * Get the attributes that came from the project.xml file.
-   * @return
-   */
-  public List<I_Parameter> getAttributes(String key);
-  
   /**
    * Get the command that came from the project.xml file,
    * with the specified name.

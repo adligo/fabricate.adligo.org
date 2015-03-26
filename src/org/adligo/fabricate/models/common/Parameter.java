@@ -1,5 +1,6 @@
 package org.adligo.fabricate.models.common;
 
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 
@@ -28,6 +29,30 @@ public class Parameter implements I_Parameter {
     }
     return toRet;
   }
+  
+  /**
+   * This method creates a unmodifiable list of Parameter only instances,
+   * or a empty list if input is null or empty.
+   * @param ps
+   * @return
+   */
+  public static List<I_Parameter> toImmutables(List<I_Parameter> ps) {
+    if (ps == null || ps.size() == 0) {
+      return Collections.emptyList();
+    }
+    List<I_Parameter> toRet = new ArrayList<I_Parameter>();
+    if (ps != null) {
+      for (I_Parameter p: ps) {
+        if (p instanceof Parameter) {
+          toRet.add(p);
+        } else {
+          toRet.add(new Parameter(p));
+        }
+      }
+    }
+    return Collections.unmodifiableList(toRet);
+  }
+  
   private static final List<I_Parameter> EMPTY_LIST = Collections.emptyList();
   
   private final List<I_Parameter> children_;
@@ -41,6 +66,10 @@ public class Parameter implements I_Parameter {
   
   public Parameter(String key, String value, List<I_Parameter> children) {
     key_ = key;
+    if (StringUtils.isEmpty(key_)) {
+      throw new IllegalArgumentException("key");
+    }
+    //allow null values
     value_ = value;
     children_ = newChildren(children);
     hashCode_ = ParameterMutant.hashCode(this);
@@ -48,6 +77,10 @@ public class Parameter implements I_Parameter {
   
   public Parameter(I_Parameter other) {
     key_ = other.getKey();
+    if (StringUtils.isEmpty(key_)) {
+      throw new IllegalArgumentException("key");
+    }
+    //allow null values
     value_ = other.getValue();
     children_ = newChildren(other.getChildren());
     hashCode_ = ParameterMutant.hashCode(this);
@@ -55,6 +88,10 @@ public class Parameter implements I_Parameter {
   
   public Parameter(ParamType other) {
     key_ = other.getKey();
+    if (StringUtils.isEmpty(key_)) {
+      throw new IllegalArgumentException("key");
+    }
+    //allow null values
     value_ = other.getValue();
     children_ = newChildren(convert(other.getParam()));
     hashCode_ = ParameterMutant.hashCode(this);

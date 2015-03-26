@@ -1,7 +1,7 @@
 package org.adligo.fabricate.common;
 
+import org.adligo.fabricate.models.common.I_AttributesContainer;
 import org.adligo.fabricate.models.common.I_Parameter;
-import org.adligo.fabricate.models.project.I_Project;
 
 import java.io.IOException;
 import java.util.Map;
@@ -38,7 +38,7 @@ public interface I_FabTask {
    * @param stageCtx may be null if the task is running from a command.
    *   They are the merged params from the fabricate.xml and project.xml files.
    */
-  public void setup(I_RunContext ctx, I_StageContext stageCtx, I_Project project);
+  public void setup(I_RunContext ctx, I_StageContext stageCtx, I_AttributesContainer project);
   
   /**
    * 

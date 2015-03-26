@@ -5,7 +5,7 @@ import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.depot.I_Depot;
-import org.adligo.fabricate.models.project.I_Project;
+import org.adligo.fabricate.models.common.I_AttributesContainer;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
@@ -91,7 +91,7 @@ public interface I_RunContext {
    * 
    * @return
    */
-  public I_Project getProjectContext();
+  public I_AttributesContainer getProjectContext();
   
   public void putInMemory(String key, Object value);
   public Object getFromMemory(String key);

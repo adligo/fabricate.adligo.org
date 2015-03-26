@@ -8,7 +8,14 @@
     	<sequence>
     		<element name="param" type="cns:param_type" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
-    	<attribute name="key" type="string" use="required"></attribute>
+    	<attribute name="key" use="required">
+    		<simpleType>
+    			<restriction base="string">
+    				<whiteSpace value="collapse"></whiteSpace>
+    				<minLength value="1"></minLength>
+    			</restriction>
+    		</simpleType>
+    	</attribute>
     	<attribute name="value" type="string" use="optional"></attribute>
     </complexType>
 

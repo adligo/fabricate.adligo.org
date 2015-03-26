@@ -1,6 +1,7 @@
 package org.adligo.fabricate.common.i18n;
 
 public interface I_FabricateConstants {
+  public I_AttributeConstants getAttributeConstants();
   
   public I_CommandLineConstants getCommandLineConstants();
   public String getCountry();

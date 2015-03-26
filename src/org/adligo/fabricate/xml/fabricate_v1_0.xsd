@@ -70,6 +70,20 @@
     		<element name="logs" type="fns:log_settings_type"
     			minOccurs="0" maxOccurs="1">
     		</element>
+    		<element name="attributes" type="cns:params_type"
+    			minOccurs="0" maxOccurs="1">
+    			<annotation>
+    				<documentation>
+    					Attributes are a way to extract common values
+    					from routines into a spot where they don't need to
+    					be repeated. They were initially added for
+    					srcDirs, so that classpath2Eclipse and compile
+    					could share multiple source directories for projects. Each
+    					routine must document which attributes it pays
+    					attention to.
+    				</documentation>
+    			</annotation>
+    		</element>
     		<element name="dependencies"
     			type="fns:fabricate_dependencies" minOccurs="1" maxOccurs="1">
     		</element>

@@ -1,6 +1,7 @@
 package org.adligo.fabricate.routines.implicit;
 
 import org.adligo.fabricate.common.system.I_ExecutingProcess;
+import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.managers.ProjectsManager;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
@@ -62,9 +63,12 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
               String projectFile = projectDir + files_.getNameSeparator() + "project.xml";
               FabricateProjectType fpt = xmlFiles_.parseProject_v1_0(projectFile);
               ProjectMutant pm = new ProjectMutant(projectDir, brief_, fpt);
-              I_Parameter dgb = pm.getAttribute("defaultGitBranch");
+              I_Parameter dgb = pm.getAttribute(attribConstants_.getGitDefaultBranch());
               if (dgb != null) {
-                defaultBranch = dgb.getValue();
+                String val = dgb.getValue();
+                if (!StringUtils.isEmpty(val)) {
+                  defaultBranch = val;
+                }
               }
             } catch (Exception e) {
               // TODO Auto-generated catch block

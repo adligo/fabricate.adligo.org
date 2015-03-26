@@ -4,14 +4,41 @@ import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
+/**
+ * This class mostly represents a typical non thread safe
+ * model which is mutable and represents a key, value
+ * and nested or child parameters. 
+ * @author scott
+ *
+ */
 public class ParameterMutant implements I_Parameter {
+  
+  /**
+   * This method is a thread safe method to add a ParameterMutant
+   * from any I_Parameter implementation, without changing
+   * implementations of ParameterMutant.
+   * @param params
+   * @return
+   */
+  public static void addOrClone(I_Parameter parameter, Collection<I_Parameter> collection) {
+    //don't dedup allow multiple attributes_
+    if (parameter instanceof ParameterMutant) {
+      collection.add(parameter);
+    } else if (parameter != null) {
+      collection.add(new ParameterMutant(parameter));
+    }
+  }
+  
+  /**
+   * This method is a thread safe method to convert parameters.
+   * @param params
+   * @return
+   */
   public static List<I_Parameter> convert(ParamsType params) {
     List<ParamType> ps = null;
     if (params != null) {
@@ -20,6 +47,11 @@ public class ParameterMutant implements I_Parameter {
     return convert(ps);
   }
 
+  /**
+   * This method is a thread safe method to convert parameters
+   * @param ps
+   * @return
+   */
   public static List<I_Parameter> convert(List<ParamType> ps) {
     List<I_Parameter> toRet = new ArrayList<I_Parameter>();
     if (ps != null) {
@@ -32,6 +64,27 @@ public class ParameterMutant implements I_Parameter {
     return toRet;
   }
   
+  /**
+   * This method is a thread safe method to convert instance into a 
+   * list I_Parameter which actually contains ParameterMutant only instances.
+   * @param ps
+   * @return
+   */
+  public static void setMutants(Collection<I_Parameter> to, Collection<? extends I_Parameter> from) {
+    to.clear();
+    if (from != null && from.size() >= 1) {
+      for (I_Parameter attribute: from) {
+        addOrClone(attribute, to);
+      }
+    }
+  }
+  
+  /**
+   * This method is a thread safe method to extract equals for I_Parameter instances
+   * @param me
+   * @param obj
+   * @return
+   */
   public static boolean equals(I_Parameter me, Object obj) {
     if (me == obj)
       return true;
@@ -80,6 +133,13 @@ public class ParameterMutant implements I_Parameter {
     }
     return false;
   }
+  
+  /**
+   * This method is a thread safe method to parse a string value.
+   * @param value
+   * @param delimitor
+   * @return
+   */
   public static String [] getValueDelimited(String value, String delimitor) {
     String [] delimited = null;
     
@@ -97,6 +157,12 @@ public class ParameterMutant implements I_Parameter {
     return delimited;
   }
   
+  /**
+   * This method is a thread safe method to extract hashCode for I_Parameter instance.
+   * @param value
+   * @param delimitor
+   * @return
+   */
   public static int hashCode(I_Parameter param) {
     final int prime = 31;
     int result = 1;
@@ -141,15 +207,15 @@ public class ParameterMutant implements I_Parameter {
         indent.delete(0,newIndent.length());
         indent.append(currentIndent);
         sb.append(System.lineSeparator());
-        sb.append(currentIndent);
-        sb.append("]");
       }
+      sb.append(currentIndent);
+      sb.append("]");
     } else {
       sb.append("]");
     }
   }
   
-  private List<ParameterMutant> children_ = new ArrayList<ParameterMutant>();
+  private List<I_Parameter> children_ = new ArrayList<I_Parameter>();
   private String key_;
   private String value_;
   
@@ -181,6 +247,10 @@ public class ParameterMutant implements I_Parameter {
     setChildren(convert(other.getParam()));
   }
   
+  public void addChild(I_Parameter p) {
+    addOrClone(p, children_);
+  }
+  
   @Override
   public boolean equals(Object obj) {
     return equals(this, obj);
@@ -210,16 +280,7 @@ public class ParameterMutant implements I_Parameter {
   }
   
   public void setChildren(Collection<I_Parameter> children) {
-    children_.clear();
-    if (children != null) {
-      for (I_Parameter child: children) {
-        if (child instanceof ParameterMutant) {
-          children_.add((ParameterMutant) child);
-        } else {
-          children_.add(new ParameterMutant(child));
-        }
-      }
-    }
+     setMutants(children_, children);
   }
   
   public void setKey(String key) {

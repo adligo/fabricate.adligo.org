@@ -10,7 +10,7 @@ import org.adligo.fabricate.common.log.DeferredLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.depot.I_Depot;
-import org.adligo.fabricate.models.project.I_Project;
+import org.adligo.fabricate.models.common.I_AttributesContainer;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.project_v1_0.FabricateProjectType;
 
@@ -39,7 +39,7 @@ public class RunContextMutant implements I_RunContext {
   private String javaHome_;
   private String javaVersion_;
   private String fabricateVersion_;
-  private I_Project projectContext_;
+  private I_AttributesContainer projectContext_;
   private ConcurrentHashMap<String, Object> memory_ = new ConcurrentHashMap<String, Object>();
   private I_FabFileIO fileIO_ = new FabFileIO(new FabSystem());
   private I_FabXmlFileIO xmlFileIO_ = new FabXmlFileIO();
@@ -211,11 +211,11 @@ public class RunContextMutant implements I_RunContext {
     return constants_;
   }
   
-  public I_Project getProjectContext() {
+  public I_AttributesContainer getProjectContext() {
     return projectContext_;
   }
 
-  public void setProjectContext(I_Project projectContext) {
+  public void setProjectContext(I_AttributesContainer projectContext) {
     this.projectContext_ = projectContext;
   }
 

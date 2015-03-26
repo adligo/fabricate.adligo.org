@@ -2,6 +2,7 @@ package org.adligo.fabricate.routines;
 
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.i18n.I_AttributeConstants;
 import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_ImplicitTraitMessages;
@@ -23,6 +24,7 @@ import org.adligo.fabricate.repository.I_RepositoryFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractRoutine implements I_FabricationRoutine {
+  protected I_AttributeConstants attribConstants_;
   protected I_RoutineBrief brief_;
   protected I_FabSystem system_;
   protected I_FabFileIO files_;
@@ -95,6 +97,7 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
     implicit_ = constants_.getImplicitTraitMessages();
     sysMessages_ = constants_.getSystemMessages();
     cmdConstants_ = constants_.getCommandLineConstants();
+    attribConstants_ = constants_.getAttributeConstants();
   }
   
   @Override

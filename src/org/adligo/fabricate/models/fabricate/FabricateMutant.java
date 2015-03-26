@@ -1,14 +1,18 @@
 package org.adligo.fabricate.models.fabricate;
 
 import org.adligo.fabricate.common.system.FabricateDefaults;
+import org.adligo.fabricate.models.common.AttributesOverlay;
 import org.adligo.fabricate.models.common.DuplicateRoutineException;
+import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
+import org.adligo.fabricate.models.common.ParameterMutant;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.dependencies.DependencyMutant;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.project.I_ProjectBrief;
 import org.adligo.fabricate.models.project.ProjectBrief;
+import org.adligo.fabricate.xml.io_v1.common_v1_0.ParamsType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
@@ -34,6 +38,13 @@ import java.util.Set;
  *
  */
 public class FabricateMutant implements I_Fabricate {
+  /**
+   * actually only ParameterMutant instances.
+   * This instance must be protected from external modification
+   * outside of this class to ensure that the values are always ParameterMutant.
+   */
+  private List<I_Parameter> attributes_ = new ArrayList<I_Parameter>();
+  
   /**
    * actually only RoutineBriefMutant instances
    */
@@ -89,6 +100,11 @@ public class FabricateMutant implements I_Fabricate {
    * @param xmlDisc
    */
   public FabricateMutant(FabricateType fab, I_FabricateXmlDiscovery xmlDisc) throws ClassNotFoundException {
+    ParamsType params = fab.getAttributes();
+    if (params != null) {
+      List<I_Parameter> converted = ParameterMutant.convert(params);
+      attributes_.addAll(converted);
+    }
     javaSettings_ = new JavaSettingsMutant(fab.getJava());
     FabricateDependencies deps =  fab.getDependencies();
     if (deps != null) {
@@ -108,6 +124,10 @@ public class FabricateMutant implements I_Fabricate {
   }
 
   public FabricateMutant(I_Fabricate other) {
+    List<I_Parameter> attributes = other.getAttributes();
+    if (attributes != null) {
+      setAttributes(attributes);
+    }
     developmentMode_ = other.isDevelopmentMode();
     fabricateHome_ = other.getFabricateHome();
     fabricateRepository_ = other.getFabricateRepository();
@@ -136,6 +156,10 @@ public class FabricateMutant implements I_Fabricate {
     setStages(other.getStages());
     setTraits(other.getTraits());
     projectsDir_ = other.getProjectsDir();
+  }
+  
+  public void addAttribute(I_Parameter parameter) {
+    ParameterMutant.addOrClone(parameter, attributes_);
   }
   
   public void addCommands(FabricateType type) 
@@ -250,6 +274,55 @@ public class FabricateMutant implements I_Fabricate {
   public void addTraits(Collection<RoutineParentType> routines) 
       throws ClassNotFoundException {
     addRoutineParents(routines, traits_, RoutineBriefOrigin.FABRICATE_TRAIT);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes()
+   */
+  @Override
+  public List<I_Parameter> getAttributes() {
+    //protect from external modification
+    return new ArrayList<I_Parameter>(attributes_);
+  }
+
+  /* (non-Javadoc)
+  * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttribute(String key)
+  */
+ @Override
+  public I_Parameter getAttribute(String key) {
+    return AttributesOverlay.getAttribute(key, attributes_);
+  }
+  
+ /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key)
+   */
+  @Override
+  public List<I_Parameter> getAttributes(String key) {
+    return AttributesOverlay.getAttributes(key, attributes_);
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key, String value)
+   */
+  @Override
+  public List<I_Parameter> getAttributes(String key, String value) {
+    return AttributesOverlay.getAttributes(key, value, attributes_);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributeValue(String key)
+   */
+  @Override
+  public String getAttributeValue(String key) {
+    return AttributesOverlay.getAttributeValue(key, attributes_);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributeValues(String key)
+   */
+  @Override
+  public List<String> getAttributeValues(String key) {
+    return AttributesOverlay.getAttributeValues(key, attributes_);
   }
   
   @Override
@@ -403,6 +476,10 @@ public class FabricateMutant implements I_Fabricate {
         }
       }
     }
+  }
+  
+  public void setAttributes(Collection<? extends I_Parameter> attributes) {
+    ParameterMutant.setMutants(attributes_, attributes);
   }
   
   public void setDependencies(Collection<? extends I_Dependency> deps) {

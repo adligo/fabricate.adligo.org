@@ -1,5 +1,6 @@
 package org.adligo.fabricate.models.project;
 
+import org.adligo.fabricate.models.common.AttributesOverlay;
 import org.adligo.fabricate.models.common.DuplicateRoutineException;
 import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
@@ -54,7 +55,7 @@ public class Project implements I_Project {
     dir_ = project.getDir();
     name_ = project.getName();
     version_ = project.getVersion();
-    attributes_ = copyAttributes(project.getAttributes());
+    attributes_ = Parameter.toImmutables(project.getAttributes());
     commands_ = copyRoutines(project.getCommands(), RoutineBriefOrigin.PROJECT_COMMAND);
     dependencies_ = copyDependencies(project.getDependencies());
     libraryDependencies_ = copyLibraryDependencies(project.getLibraryDependencies());
@@ -69,19 +70,52 @@ public class Project implements I_Project {
     return ProjectMutant.equals(obj, this);
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key, String value)
+   */
   @Override
   public List<I_Parameter> getAttributes() {
     return attributes_;
   }
 
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttribute(String key)
+   */
   @Override
   public I_Parameter getAttribute(String key) {
-    return ProjectMutant.getAttribute(key, attributes_);
+    return AttributesOverlay.getAttribute(key, attributes_);
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key)
+   */
   @Override
   public List<I_Parameter> getAttributes(String key) {
-    return ProjectMutant.getAttributes(key, attributes_);
+    return AttributesOverlay.getAttributes(key, attributes_);
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key, String value)
+   */
+  @Override
+  public List<I_Parameter> getAttributes(String key, String value) {
+    return AttributesOverlay.getAttributes(key, value, attributes_);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributeValue(String key)
+   */
+  @Override
+  public String getAttributeValue(String key) {
+    return AttributesOverlay.getAttributeValue(key, attributes_);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributeValues(String key)
+   */
+  @Override
+  public List<String> getAttributeValues(String key) {
+    return AttributesOverlay.getAttributeValues(key, attributes_);
   }
   
   @Override
@@ -166,23 +200,6 @@ public class Project implements I_Project {
   @Override
   public String toString() {
     return ProjectMutant.toString(this);
-  }
-  
-  private List<I_Parameter> copyAttributes(List<I_Parameter> attributes) {
-    List<I_Parameter> copy = new ArrayList<I_Parameter>();
-    if (attributes == null || attributes.size() == 0) {
-      return Collections.emptyList();
-    } else {
-      for (I_Parameter attrib: attributes) {
-        //don't dedupe
-        if (attrib instanceof Parameter) {
-          copy.add(attrib);
-        } else {
-          copy.add(new Parameter(attrib));
-        }
-      }
-    }
-    return Collections.unmodifiableList(copy);
   }
   
   private List<I_Dependency> copyDependencies(List<I_Dependency> dependencies) {

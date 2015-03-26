@@ -1,6 +1,7 @@
 package org.adligo.fabricate.models.project;
 
 import org.adligo.fabricate.common.util.StringUtils;
+import org.adligo.fabricate.models.common.AttributesOverlay;
 import org.adligo.fabricate.models.common.DuplicateRoutineException;
 import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
@@ -46,25 +47,6 @@ public class ProjectMutant implements I_Project {
       return false;
     }
     return false;
-  }
-  
-  public static I_Parameter getAttribute(String key, List<I_Parameter> attributes) {
-    for (I_Parameter attrib: attributes) {
-      if (key.equals(attrib.getKey())) {
-        return attrib;
-      }
-    }
-    return null;
-  }
-  
-  public static List<I_Parameter> getAttributes(String key, List<I_Parameter> attributes) {
-    ArrayList<I_Parameter> toRet = new ArrayList<I_Parameter>();
-    for (I_Parameter attrib: attributes) {
-      if (key.equals(attrib.getKey())) {
-        toRet.add(attrib);
-      }
-    }
-    return toRet;
   }
   
   public static int hashCode(I_Project p) {
@@ -145,8 +127,7 @@ public class ProjectMutant implements I_Project {
    * This instance must be protected from external modification
    * outside of this class to ensure that the values are always ParameterMutant.
    */
-  private List<I_Parameter> attributes_ = 
-      new ArrayList<I_Parameter>();
+  private List<I_Parameter> attributes_ = new ArrayList<I_Parameter>();
       
   /**
    * actually only RoutineBriefMutant instances.
@@ -278,12 +259,7 @@ public class ProjectMutant implements I_Project {
   }
   
   public void addAttribute(I_Parameter parameter) {
-    //don't dedup allow multiple attributes_
-    if (parameter instanceof ParameterMutant) {
-      attributes_.add(parameter);
-    } else if (parameter != null) {
-      attributes_.add(new ParameterMutant(parameter));
-    }
+    ParameterMutant.addOrClone(parameter, attributes_);
   }
   
   public void addCommand(I_RoutineBrief cmd) {
@@ -389,7 +365,7 @@ public class ProjectMutant implements I_Project {
   }
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.project.foo#getAttributes()
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes()
    */
   @Override
   public List<I_Parameter> getAttributes() {
@@ -397,16 +373,48 @@ public class ProjectMutant implements I_Project {
     return new ArrayList<I_Parameter>(attributes_);
   }
 
+  /* (non-Javadoc)
+  * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttribute(String key)
+  */
+ @Override
   public I_Parameter getAttribute(String key) {
-    return getAttribute(key, attributes_);
+    return AttributesOverlay.getAttribute(key, attributes_);
   }
   
+ /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key)
+   */
+  @Override
   public List<I_Parameter> getAttributes(String key) {
-    return getAttributes(key, attributes_);
+    return AttributesOverlay.getAttributes(key, attributes_);
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key, String value)
+   */
+  @Override
+  public List<I_Parameter> getAttributes(String key, String value) {
+    return AttributesOverlay.getAttributes(key, value, attributes_);
   }
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.project.foo#getCommand(java.lang.String)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributeValue(String key)
+   */
+  @Override
+  public String getAttributeValue(String key) {
+    return AttributesOverlay.getAttributeValue(key, attributes_);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributeValues(String key)
+   */
+  @Override
+  public List<String> getAttributeValues(String key) {
+    return AttributesOverlay.getAttributeValues(key, attributes_);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.project.I_Project#getCommand(java.lang.String)
    */
   @Override
   public I_RoutineBrief getCommand(String name) {
@@ -414,7 +422,7 @@ public class ProjectMutant implements I_Project {
   }
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.project.foo#getCommands()
+   * @see org.adligo.fabricate.models.project.I_Project#getCommands()
    */
   @Override
   public Map<String, I_RoutineBrief> getCommands() {
@@ -467,7 +475,7 @@ public class ProjectMutant implements I_Project {
   }
 
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.project.foo#getStage(java.lang.String)
+   * @see org.adligo.fabricate.models.project.I_Project#getStage(java.lang.String)
    */
   @Override
   public I_RoutineBrief getStage(String name) {
@@ -475,7 +483,7 @@ public class ProjectMutant implements I_Project {
   }
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.project.foo#getStages()
+   * @see org.adligo.fabricate.models.project.I_Project#getStages()
    */
   @Override
   public Map<String, I_RoutineBrief> getStages() {
@@ -484,7 +492,7 @@ public class ProjectMutant implements I_Project {
   }
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.project.foo#getTrait(java.lang.String)
+   * @see org.adligo.fabricate.models.project.I_Project#getTrait(java.lang.String)
    */
   @Override
   public I_RoutineBrief getTrait(String name) {
@@ -492,7 +500,7 @@ public class ProjectMutant implements I_Project {
   }
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.models.project.foo#getTraits()
+   * @see org.adligo.fabricate.models.project.I_Project#getTraits()
    */
   @Override
   public Map<String, I_RoutineBrief> getTraits() {
@@ -515,12 +523,7 @@ public class ProjectMutant implements I_Project {
   }
   
   public void setAttributes(Collection<? extends I_Parameter> attributes) {
-    attributes_.clear();
-    if (attributes != null && attributes.size() >= 1) {
-      for (I_Parameter attribute: attributes) {
-        addAttribute(attribute);
-      }
-    }
+    ParameterMutant.setMutants(attributes_, attributes);
   }
   
   public void setCommands(Collection<? extends I_RoutineBrief> commands) {

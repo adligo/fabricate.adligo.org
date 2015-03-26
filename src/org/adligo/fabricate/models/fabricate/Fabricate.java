@@ -1,7 +1,10 @@
 package org.adligo.fabricate.models.fabricate;
 
 import org.adligo.fabricate.common.system.FabricateDefaults;
+import org.adligo.fabricate.models.common.AttributesOverlay;
+import org.adligo.fabricate.models.common.I_Parameter;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
+import org.adligo.fabricate.models.common.Parameter;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
@@ -23,7 +26,8 @@ import java.util.Set;
  *
  */
 public class Fabricate implements I_Fabricate {
-  private final boolean developmentMode;
+  private final List<I_Parameter> attributes_;
+  private final boolean developmentMode_;
   private final List<I_Dependency> dependencies_;
   private final Map<String, I_RoutineBrief> commands_; 
   private final String fabricateHome_;
@@ -48,7 +52,8 @@ public class Fabricate implements I_Fabricate {
   private final Map<String, I_RoutineBrief> traits_; 
   
   public Fabricate(I_Fabricate other) {
-    developmentMode = other.isDevelopmentMode();
+    attributes_ = Parameter.toImmutables(other.getAttributes());
+    developmentMode_ = other.isDevelopmentMode();
     commands_ = createImmutableMap(other.getCommands());
     fabricateHome_ = other.getFabricateHome();
     
@@ -135,6 +140,55 @@ public class Fabricate implements I_Fabricate {
     traits_ = createImmutableMap(other.getTraits());
   }
 
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes()
+   */
+  @Override
+  public List<I_Parameter> getAttributes() {
+    //protect from external modification
+    return new ArrayList<I_Parameter>(attributes_);
+  }
+
+  /* (non-Javadoc)
+  * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttribute(String key)
+  */
+ @Override
+  public I_Parameter getAttribute(String key) {
+    return AttributesOverlay.getAttribute(key, attributes_);
+  }
+  
+ /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key)
+   */
+  @Override
+  public List<I_Parameter> getAttributes(String key) {
+    return AttributesOverlay.getAttributes(key, attributes_);
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes(String key, String value)
+   */
+  @Override
+  public List<I_Parameter> getAttributes(String key, String value) {
+    return AttributesOverlay.getAttributes(key, value, attributes_);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributeValue(String key)
+   */
+  @Override
+  public String getAttributeValue(String key) {
+    return AttributesOverlay.getAttributeValue(key, attributes_);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributeValues(String key)
+   */
+  @Override
+  public List<String> getAttributeValues(String key) {
+    return AttributesOverlay.getAttributeValues(key, attributes_);
+  }
+  
   @Override
   public I_RoutineBrief getCommand(String name) {
     return commands_.get(name);
@@ -197,7 +251,7 @@ public class Fabricate implements I_Fabricate {
   }
 
   public boolean isDevelopmentMode() {
-    return developmentMode;
+    return developmentMode_;
   }
 
   @Override

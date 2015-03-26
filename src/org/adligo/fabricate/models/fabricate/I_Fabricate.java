@@ -1,5 +1,6 @@
 package org.adligo.fabricate.models.fabricate;
 
+import org.adligo.fabricate.models.common.I_AttributesContainer;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.project.I_ProjectBrief;
@@ -12,7 +13,7 @@ import java.util.Map;
  * @author scott
  *
  */
-public interface I_Fabricate extends I_JavaSettings {
+public interface I_Fabricate extends I_JavaSettings, I_AttributesContainer {
 
   public List<I_Dependency> getDependencies();
   
