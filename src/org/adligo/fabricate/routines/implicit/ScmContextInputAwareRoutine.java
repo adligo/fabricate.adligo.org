@@ -42,12 +42,12 @@ implements I_InputAware<ScmContext> {
   }
 
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
     setupGitCalls();
     env_ = (I_ExecutionEnvironment) memory.get(FabricationMemoryConstants.ENV);
     
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
   @Override

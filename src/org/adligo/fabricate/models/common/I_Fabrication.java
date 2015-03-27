@@ -31,5 +31,5 @@ public interface I_Fabrication {
    * @param memory this is global memory for the entire fabrication.
    * @param routineMemory this is memory scoped to a set of routine instances of the same class.
    */
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException;
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException;
 }

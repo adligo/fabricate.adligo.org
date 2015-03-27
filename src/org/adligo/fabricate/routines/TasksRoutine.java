@@ -9,6 +9,7 @@ import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
+import org.adligo.fabricate.models.project.I_Project;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,13 +30,33 @@ public abstract class TasksRoutine extends AbstractRoutine implements I_Fabricat
     return fabricate_;
   }
 
+  public I_RoutineBrief getProjectRoutine(I_Project project) {
+    String name = brief_.getName();
+    boolean command = brief_.isCommand();
+    boolean stage = brief_.isStage();
+    boolean archive = brief_.isArchivalStage();
+    I_RoutineBrief projectRoutineBrief = null; 
+    
+    if (command) {
+      projectRoutineBrief = project.getCommand(name);
+    } else if (stage) {
+      projectRoutineBrief = project.getStage(name);
+    } else if (archive) {
+      /**
+       * TODO
+      projectRoutineBrief = p.getAr(name);
+      */
+    }
+    return projectRoutineBrief;
+  }
+  
   @Override
   public void setFabricate(I_Fabricate fab) {
     fabricate_ = fab;
   }
   
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
     if (log_.isLogEnabled(TasksRoutine.class)) {
       log_.println(TasksRoutine.class.getName() + " setup(I_FabricationMemoryMutant, I_RoutineMemoryMutant)");
@@ -43,7 +64,7 @@ public abstract class TasksRoutine extends AbstractRoutine implements I_Fabricat
     memoryMutant_ = memory;
     routineMemoryMutant_ = routineMemory;
     setup(true);
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
   @Override
@@ -76,7 +97,7 @@ public abstract class TasksRoutine extends AbstractRoutine implements I_Fabricat
       }
       setupTask(routine);
       if (mutants) {
-        routine.setup(memoryMutant_, routineMemoryMutant_);
+        routine.setupInitial(memoryMutant_, routineMemoryMutant_);
       } else {
         routine.setup(memory_, routineMemory_);
       }

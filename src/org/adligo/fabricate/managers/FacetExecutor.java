@@ -37,7 +37,7 @@ public class FacetExecutor {
           I_RoutineMemoryMutant<Object> routineMemory)
           throws FabricationRoutineCreationException {
         I_FabricationRoutine toRet = setup.processFacetSetup(facetName);
-        if (!toRet.setup(memory, routineMemory)) {
+        if (!toRet.setupInitial(memory, routineMemory)) {
           return null;
         }
         return toRet;

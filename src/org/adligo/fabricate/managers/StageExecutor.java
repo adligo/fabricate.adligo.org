@@ -40,7 +40,7 @@ public class StageExecutor {
           log_.println(StageExecutor.class.getName() + ".buildInitial(memory, routineMemory)");
         }
         I_FabricationRoutine toRet = setup.processStageSetup(stageName);
-        if (!toRet.setup(memory, routineMemory)) {
+        if (!toRet.setupInitial(memory, routineMemory)) {
           if (log_.isLogEnabled(StageExecutor.class)) {
             log_.println(StageExecutor.class.getName() + " buildInitial returning null");
           }

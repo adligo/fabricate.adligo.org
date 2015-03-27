@@ -62,21 +62,21 @@ public class CreateJarTask extends ProjectAwareRoutine implements I_PlatformAwar
   }
   
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory,
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     
-    nameJarTrait_ = traitFactory_.createRoutine(NameJar.NAME, NameJar.IMPLEMENTED_INTERFACES);
+    nameJarTrait_ = traitFactory_.createRoutine(NameJarTrait.NAME, NameJarTrait.IMPLEMENTED_INTERFACES);
     javaHome_ = (String) memory.get(FabricationMemoryConstants.JAVA_HOME);
     jFactory_ = (JavaFactory) memory.get(FabricationMemoryConstants.JAVA_FACTORY);
     
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
   @Override
   public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory)
       throws FabricationRoutineCreationException {
     
-    nameJarTrait_ = traitFactory_.createRoutine(NameJar.NAME, NameJar.IMPLEMENTED_INTERFACES);
+    nameJarTrait_ = traitFactory_.createRoutine(NameJarTrait.NAME, NameJarTrait.IMPLEMENTED_INTERFACES);
     javaHome_ = (String) memory.get(FabricationMemoryConstants.JAVA_HOME);
     jFactory_ = (JavaFactory) memory.get(FabricationMemoryConstants.JAVA_FACTORY);
     

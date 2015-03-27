@@ -98,12 +98,12 @@ public class GitCloneRoutine extends ScmContextInputAwareRoutine {
   }
 
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
     
     clonedProjects_ = new ConcurrentLinkedQueue<String>();
     memory.put(FabricationMemoryConstants.CLONED_PROJECTS, clonedProjects_);
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
   @SuppressWarnings("unchecked")

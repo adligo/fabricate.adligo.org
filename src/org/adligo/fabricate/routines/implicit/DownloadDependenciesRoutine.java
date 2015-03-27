@@ -18,7 +18,7 @@ public class DownloadDependenciesRoutine extends RepositoryManagerAwareRoutine {
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory,
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     
     List<I_Dependency> deps = (List<I_Dependency>) memory.get(FabricationMemoryConstants.DEPENDENCIES);
@@ -26,7 +26,7 @@ public class DownloadDependenciesRoutine extends RepositoryManagerAwareRoutine {
     depsQueue_.addAll(deps);
     
     routineMemory.put(DEPS_QUEUE, depsQueue_);
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
   @SuppressWarnings("unchecked")

@@ -27,7 +27,7 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
   protected ConcurrentLinkedQueue<I_ProjectBrief> queue;
   
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
     if (log_.isLogEnabled(ProjectBriefQueueRoutine.class)) {
       log_.println(ProjectBriefQueueRoutine.class.getName() + " setup(I_FabricationMemoryMutant, I_RoutineMemoryMutant)");
@@ -41,7 +41,7 @@ public class ProjectBriefQueueRoutine extends TasksRoutine
     }
     queue.addAll(briefs);
     routineMemory.put(QUEUE, queue);
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
   
   @SuppressWarnings("unchecked")

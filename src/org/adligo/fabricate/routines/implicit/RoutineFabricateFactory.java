@@ -103,7 +103,8 @@ public class RoutineFabricateFactory {
   public void addImplicitTraits() {
     addTrait(EncryptTrait.NAME, EncryptTrait.class);
     addTrait(DecryptTrait.NAME, DecryptTrait.class);
-    addTrait(NameJar.NAME, NameJar.class);
+    addTrait(NameJarTrait.NAME, NameJarTrait.class);
+    addTrait(FindSrcTrait.NAME, FindSrcTrait.class);
   }
   
   /**

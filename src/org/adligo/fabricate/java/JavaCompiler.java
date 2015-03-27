@@ -42,7 +42,9 @@ public class JavaCompiler {
         }
         lb.append(arg);
       }
-      log_.println("Running the following java compile;" + sys_.lineSeparator() + lb.toString());
+      log_.println("Running the following java compile;" + sys_.lineSeparator() + 
+          inDir_ + sys_.lineSeparator() +
+          lb.toString());
     }
     return exe.startProcessWithList(FabricationMemoryConstants.EMPTY_ENV, es, inDir_, args);
   }

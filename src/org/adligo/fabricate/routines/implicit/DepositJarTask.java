@@ -17,13 +17,13 @@ public class DepositJarTask extends ProjectAwareRoutine implements I_PlatformAwa
   private String jarFileName_;
   
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory,
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     
     depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
     
     ensureDepotDirs();
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
 

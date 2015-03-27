@@ -53,12 +53,12 @@ public class GenerateSourceTask extends ProjectAwareRoutine implements I_Partici
   }
 
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory,
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     
     traitRoutine_ = traitFactory_.createRoutine(GENERATE_SOURCE, GENERATE_SOURCE_INTERFACES);
     routineMemory.put(GENERATE_SOURCE, traitRoutine_);
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
 }

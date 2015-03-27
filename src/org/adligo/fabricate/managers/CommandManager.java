@@ -50,7 +50,7 @@ public class CommandManager {
         I_RoutineMemoryMutant<Object> routineMemory)
         throws FabricationRoutineCreationException {
       I_FabricationRoutine toRet = processCommandSetup();
-      if (!toRet.setup(memory, routineMemory)) {
+      if (!toRet.setupInitial(memory, routineMemory)) {
         return null;
       }
       return toRet;

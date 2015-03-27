@@ -26,13 +26,13 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
   
   @SuppressWarnings("unchecked")
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
     if (!system_.hasArg(cmdConstants_.getUpdate(true))) {
       return false;
     }
     clonedProjects_ = (ConcurrentLinkedQueue<String>) memory.get(FabricationMemoryConstants.CLONED_PROJECTS);
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
   @SuppressWarnings("unchecked")

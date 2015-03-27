@@ -1,5 +1,7 @@
 package org.adligo.fabricate.depot;
 
+import java.io.IOException;
+
 public interface I_Depot {
 
   /**
@@ -23,7 +25,7 @@ public interface I_Depot {
   * @return the full absolute path name for the jar
   * added to the depot by the project with the projectName parameter
   */
-  public String get(String projectName, String artifactType, String platformName);
+  public String get(String projectName, String artifactType, String platformName) ;
 
   /**
    * returns the absolute path of the 

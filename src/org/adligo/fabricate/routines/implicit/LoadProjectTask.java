@@ -39,7 +39,7 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
   
   
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
   
     dependenciesFilter_ = new DependenciesFilter();
@@ -47,7 +47,7 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     
     projects_ = system_.newConcurrentLinkedQueue(Project.class);
     routineMemory.put(PROJECTS_QUEUE, projects_);
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
   @SuppressWarnings("unchecked")

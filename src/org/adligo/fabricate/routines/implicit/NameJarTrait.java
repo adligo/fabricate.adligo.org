@@ -20,7 +20,7 @@ import java.util.Set;
  * @author scott
  *
  */
-public class NameJar extends AbstractRoutine implements I_FabricationRoutine, I_OutputProducer<String>, 
+public class NameJarTrait extends AbstractRoutine implements I_FabricationRoutine, I_OutputProducer<String>, 
 I_InputAware<I_Project> {
   /**
    * This is the implicit name of this trait.

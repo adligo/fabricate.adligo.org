@@ -2,6 +2,8 @@ package org.adligo.fabricate.depot;
 
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.util.StringUtils;
@@ -57,6 +59,7 @@ public class Depot implements I_Depot {
     dir_ = dir;
     system_ = ctx.getSystem();
     files_ = ctx.getFiles();
+    
     xmlFiles_ = ctx.getXmlFiles();
     log_ = ctx.getLog();
     List<ArtifactType> artifacts = depot.getArtifact();
@@ -64,8 +67,11 @@ public class Depot implements I_Depot {
     if (artifacts != null) {
       for (ArtifactType art: artifacts) {
         String platform = art.getPlatform();
-        platform = platform.toLowerCase();
-        
+        if (platform != null) {
+          platform = platform.toLowerCase();
+        } else {
+          platform = "jse";
+        }
         String project = art.getProject();
         String file = art.getFilename();
         String type = art.getType();
@@ -81,7 +87,7 @@ public class Depot implements I_Depot {
   }
 
   @Override
-  public boolean add(String externalFile, I_Artifact entryData) {
+  public synchronized boolean add(String externalFile, I_Artifact entryData) {
     String projectName = entryData.getProjectName();
     if (StringUtils.isEmpty(projectName)) {
       throw new IllegalArgumentException("No project name!");
@@ -100,7 +106,15 @@ public class Depot implements I_Depot {
     String artDir = null;
     
     artDir = getArtifactDir(artifactType, platform);
-    
+    if (!files_.exists(artDir)) {
+      if (!files_.mkdirs(artDir)) {
+        I_FabricateConstants constants = system_.getConstants();
+        I_SystemMessages messages = constants.getSystemMessages();
+        String message = messages.getThereWasAProblemCreatingTheFollowingDirectory();
+        throw new IllegalStateException(message + system_.lineSeparator() +
+            artDir);
+      }
+    }
     String fileName = entryData.getFileName();
     String depotFileName = getDepotFile(artDir, fileName);
     
@@ -178,6 +192,7 @@ public class Depot implements I_Depot {
   private String getArtifactDir(String artifactType, String platform) {
     String artDir;
     platform = platform.toLowerCase();
+    
     if ("jse".equalsIgnoreCase(platform)) {
       artDir = dir_ + files_.getNameSeparator() + artifactType + "s";
     } else {
@@ -234,13 +249,7 @@ public class Depot implements I_Depot {
     String platform = getPlatformLower(platformName);
     String file = artifactKeysToArtifacts_.get(new ArtifactKey(projectName, artifactType, platform));
     if (file == null) {
-      throw new IllegalStateException("There isn't a file for the following project/artifact;" + System.lineSeparator() +
-          "\t" + projectName + "," + artifactType);
-    }
-    if (!new File(file).exists()) {
-      throw new IllegalStateException("There isn't a file for the following project/artifact/file;" + System.lineSeparator() +
-          "\t" + projectName + "," + artifactType +System.lineSeparator() +
-          "\t" + file);
+      return null;
     }
     return file;
   }

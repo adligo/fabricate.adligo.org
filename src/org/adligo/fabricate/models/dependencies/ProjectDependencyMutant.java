@@ -84,6 +84,10 @@ public class ProjectDependencyMutant implements I_ProjectDependency {
   
   public ProjectDependencyMutant() {}
   
+  public ProjectDependencyMutant(String projectName) {
+    projectName_ = projectName;
+  }
+  
   public ProjectDependencyMutant(I_ProjectDependency other ) {
     projectName_ = other.getProjectName();
     platform_ = other.getPlatform();

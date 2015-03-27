@@ -2,7 +2,7 @@ package org.adligo.fabricate.common.files;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,7 +12,8 @@ import java.util.zip.ZipFile;
 
 /**
  * This is a way to stub out calls to the file system 
- * for test development.
+ * for test development.  All methods implemented
+ * for this interface are expected to be thread safe.
  * 
  * @author scott
  *
@@ -158,14 +159,18 @@ public interface I_FabFileIO {
    * @throws IOException
    */
   public void move(String from, String to, StandardCopyOption options) throws IOException;
+  
   /**
    * 
    * @param file
-   * @return
+   * @return A OutputStream which is a OutputStream, which was done
+   * because mockito had issues mocking OutputStream I think.
+   * 
    * @throws IOException
    * @throws FileNotFoundException
    */
   public OutputStream newFileOutputStream(String file) throws IOException, FileNotFoundException;
+  
   /**
    * simply creates a new ZipFile instance.
    * @param file
@@ -205,7 +210,7 @@ public interface I_FabFileIO {
    * @param fos
    * @throws IOException
    */
-  public void writeFile(InputStream in, FileOutputStream fos) throws IOException;
+  public void writeFile(InputStream in, OutputStream fos) throws IOException;
   /**
    * This method writes a file out to disk from a input stream, using NIO 
    * (ByteBuffer, ReadableByteChannel, FileChannel).
@@ -213,7 +218,7 @@ public interface I_FabFileIO {
    * @param fos
    * @throws IOException
    */
-  public void writeFile(InputStream in, FileOutputStream fos, int bufferSize) 
+  public void writeFile(InputStream in, OutputStream fos, int bufferSize) 
       throws IOException;
   
 

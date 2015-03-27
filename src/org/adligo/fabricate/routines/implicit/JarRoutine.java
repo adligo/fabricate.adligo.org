@@ -30,6 +30,8 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
     setRunning();
     
     I_Project project =  projectsQueue_.poll();
+    
+    
     while (project != null) {
       if (!singleProject_) {
         waitForProjectsDependedOnToFinish(project);
@@ -39,55 +41,75 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
       locationInfo_.setCurrentProject(currentProject);
       
       if (log_.isLogEnabled(JarRoutine.class)) {
-        log_.println(JarRoutine.class.getSimpleName() + ".run() starting project '" + currentProject + "'.") ;
+        log_.println(JarRoutine.class.getSimpleName() + ".run() starting project '" + 
+            currentProject + "'." + system_.lineSeparator() + 
+            project.getDir()) ;
+      }
+      
+      String platformsAttribute = project.getAttributeValue(attribConstants_.getPlatforms());
+      if (platformsAttribute == null) {
+        platformsAttribute = "jse";
+      } else {
+        platformsAttribute = platformsAttribute.toLowerCase();
       }
       
       I_RoutineBrief projectRoutineBrief = project.getStage(name);
       Iterator<String> platforms = platforms_.iterator();
       while(platforms.hasNext()) {
         String platform = platforms.next();
-        String jarName = null;
-        
-        //do tasks
-        for (TaskContext task: tasks_) {
-          I_FabricationRoutine taskRoutine = task.getTask();
-          
-          I_RoutineBrief brief = taskRoutine.getBrief();
-          String currentTask = brief.getName();
-          locationInfo_.setCurrentProject(currentTask);
-          
-          boolean run = true;
-          if (I_ParticipationAware.class.isAssignableFrom(taskRoutine.getClass())) {
-            run = false;
-            I_RoutineBrief projectTaskRoutine = projectRoutineBrief.getNestedRoutine(currentTask);
-            if (projectTaskRoutine != null) {
-              run = true;
-            }
+        platform = platform.toLowerCase();
+        if (platformsAttribute.indexOf(platform) >= 0) {
+          if (log_.isLogEnabled(JarRoutine.class)) {
+            log_.println(JarRoutine.class.getSimpleName() + ".run() starting project '" + currentProject + 
+                "'" + system_.lineSeparator() + 
+                " is a participant in the platform " + platform + system_.lineSeparator() +
+                "platformsAttribute '" + platformsAttribute + "' ") ;
           }
-          if (run) {
+          String jarName = null;
+          
+          //do tasks
+          Iterator<TaskContext> it = tasks_.iterator();
+          while (it.hasNext()) {
+            TaskContext task = it.next();
+            I_FabricationRoutine taskRoutine = task.getTask();
             
-            if (taskRoutine instanceof I_JarFileNameAware) {
-              ((I_JarFileNameAware)  taskRoutine).setJarFileName(jarName);
+            I_RoutineBrief brief = taskRoutine.getBrief();
+            String currentTask = brief.getName();
+            locationInfo_.setCurrentProject(currentTask);
+            
+            boolean run = true;
+            if (I_ParticipationAware.class.isAssignableFrom(taskRoutine.getClass())) {
+              run = false;
+              I_RoutineBrief projectTaskRoutine = projectRoutineBrief.getNestedRoutine(currentTask);
+              if (projectTaskRoutine != null) {
+                run = true;
+              }
             }
-            if (taskRoutine instanceof I_ProjectBriefAware) {
-              ((I_ProjectBriefAware)  taskRoutine).setProjectBrief(project);
-            }
-            if (taskRoutine instanceof I_ProjectAware) {
-              ((I_ProjectAware)  taskRoutine).setProject(project);
-            }
-            if (taskRoutine instanceof I_PlatformAware) {
-              ((I_PlatformAware)  taskRoutine).setPlatform(platform);
-            }
-            if (log_.isLogEnabled(JarRoutine.class)) {
-              log_.println(JarRoutine.class.getSimpleName() + "starting task '" + currentTask + "' "
-                  + "on project '" + currentProject + "' locationInfo " + 
-                  locationInfo_.toString() +
-                  system_.lineSeparator() +
-                  this.toString()) ;
-            }
-            taskRoutine.run();
-            if (ImplicitStages.CREATE_JAR_TASK.equals(currentTask)) {
-              jarName = ((I_OutputProducer<String>)  taskRoutine).getOutput();
+            if (run) {
+              
+              if (taskRoutine instanceof I_JarFileNameAware) {
+                ((I_JarFileNameAware)  taskRoutine).setJarFileName(jarName);
+              }
+              if (taskRoutine instanceof I_ProjectBriefAware) {
+                ((I_ProjectBriefAware)  taskRoutine).setProjectBrief(project);
+              }
+              if (taskRoutine instanceof I_ProjectAware) {
+                ((I_ProjectAware)  taskRoutine).setProject(project);
+              }
+              if (taskRoutine instanceof I_PlatformAware) {
+                ((I_PlatformAware)  taskRoutine).setPlatform(platform);
+              }
+              if (log_.isLogEnabled(JarRoutine.class)) {
+                log_.println(JarRoutine.class.getSimpleName() + ".run() starting task '" + currentTask + "' "
+                    + "on project '" + currentProject + "' locationInfo " + 
+                    locationInfo_.toString() +
+                    system_.lineSeparator() +
+                    this.toString()) ;
+              }
+              taskRoutine.run();
+              if (ImplicitStages.CREATE_JAR_TASK.equals(currentTask)) {
+                jarName = ((I_OutputProducer<String>)  taskRoutine).getOutput();
+              }
             }
           }
         }
@@ -99,7 +121,7 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory,
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     
     depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
@@ -107,7 +129,7 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
     if (log_.isLogEnabled(JarRoutine.class)) {
       log_.println(JarRoutine.class.getSimpleName() + ".setup.super") ;
     }
-    boolean toRet = super.setup(memory, routineMemory);
+    boolean toRet = super.setupInitial(memory, routineMemory);
     return toRet;
   }
 

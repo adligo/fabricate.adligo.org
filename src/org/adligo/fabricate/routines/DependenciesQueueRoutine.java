@@ -65,9 +65,9 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
     projects_ = new ArrayList<I_Project>(projects);
   }
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "boxing"})
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory,
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
 
     //order the inital project queue
@@ -134,10 +134,10 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
       singleProject_ = true;
       routineMemory.put(SINGLE_PROJECT, true);
     }
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "boxing"})
   @Override
   public void setup(I_FabricationMemory<Object> memory, I_RoutineMemory<Object> routineMemory)
       throws FabricationRoutineCreationException {
@@ -223,23 +223,11 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
       if (!singleProject_) {
         waitForProjectsDependedOnToFinish(project);
       }
-      String name = brief_.getName();
-      boolean command = brief_.isCommand();
-      boolean stage = brief_.isStage();
-      boolean archive = brief_.isArchivalStage();
-      I_RoutineBrief projectRoutineBrief = null; 
-      
-      if (command) {
-        projectRoutineBrief = project.getCommand(name);
-      } else if (stage) {
-        projectRoutineBrief = project.getStage(name);
-      } else if (archive) {
-        /**
-        projectRoutineBrief = p.getAr(name);
-        */
-      }
+      I_RoutineBrief projectRoutineBrief = getProjectRoutine(project);
       //do tasks
-      for (TaskContext task: tasks_) {
+      Iterator<TaskContext> it = tasks_.iterator();
+      while (it.hasNext()) {
+        TaskContext task = it.next();
         
         I_FabricationRoutine taskRoutine = task.getTask();
         
@@ -269,6 +257,8 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
       project =  projectsQueue_.poll();
     }
   }
+
+  
 
   protected void notifyProjectFinished(I_Project project) {
     if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
@@ -319,6 +309,7 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
     locationInfo_.setWaitingProject(null);
   }
 
+  @SuppressWarnings("incomplete-switch")
   @Override
   public String getCurrentLocation() {
     I_Project project = locationInfo_.getWaitingProject();

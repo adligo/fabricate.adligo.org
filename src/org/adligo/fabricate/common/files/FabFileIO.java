@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
@@ -203,7 +204,7 @@ public class FabFileIO implements I_FabFileIO {
     }
   }
 
-  public FileOutputStream newFileOutputStream(String file) throws IOException, FileNotFoundException {
+  public OutputStream newFileOutputStream(String file) throws IOException, FileNotFoundException {
     return new FileOutputStream(file);
   }
   @Override
@@ -249,7 +250,7 @@ public class FabFileIO implements I_FabFileIO {
           mkdirs(name);
         } else {
           InputStream is =  zip.getInputStream(ze);
-          FileOutputStream fos = new FileOutputStream(name);
+          OutputStream fos = new FileOutputStream(name);
           writeFile(is, fos, 1024);
         }
       }
@@ -298,7 +299,7 @@ public class FabFileIO implements I_FabFileIO {
    * @param length the known length of the file;
    * @throws IOException
    */
-  public void writeFile(InputStream in, FileOutputStream fos) throws IOException {
+  public void writeFile(InputStream in, OutputStream fos) throws IOException {
     writeFile(in, fos, 16 * 1024, -1, "");
   }
   /**
@@ -310,7 +311,7 @@ public class FabFileIO implements I_FabFileIO {
    * @param length the known length of the file;
    * @throws IOException
    */
-  public void writeFile(InputStream in, FileOutputStream fos, long length, String whichFile) throws IOException {
+  public void writeFile(InputStream in, OutputStream fos, long length, String whichFile) throws IOException {
     writeFile(in, fos, 16 * 1024, length, whichFile);
   }
   /**
@@ -323,7 +324,7 @@ public class FabFileIO implements I_FabFileIO {
    * @param length the known length of the file
    * @throws IOException
    */
-  public void writeFile(InputStream in, FileOutputStream fos, int bufferSize) throws IOException {
+  public void writeFile(InputStream in, OutputStream fos, int bufferSize) throws IOException {
     writeFileWithCloseTracker(in,fos, bufferSize, DefaultIOCloseTracker.INSTANCE, -1, "");
   }
   /**
@@ -336,16 +337,16 @@ public class FabFileIO implements I_FabFileIO {
    * @param length the known length of the file
    * @throws IOException
    */
-  public void writeFile(InputStream in, FileOutputStream fos, int bufferSize, long length, String whichFile) throws IOException {
+  public void writeFile(InputStream in, OutputStream fos, int bufferSize, long length, String whichFile) throws IOException {
     writeFileWithCloseTracker(in,fos, bufferSize, DefaultIOCloseTracker.INSTANCE, length, whichFile);
   }
 
-  public void writeFileWithCloseTracker(InputStream in, FileOutputStream fos, int bufferSize,
+  public void writeFileWithCloseTracker(InputStream in, OutputStream fos, int bufferSize,
       I_IOCloseTracker tracker, long length, String whichFile) throws IOException {
     try {
       ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
       ReadableByteChannel inputChannel = Channels.newChannel(in);
-      WritableByteChannel outputChannel = fos.getChannel();
+      WritableByteChannel outputChannel = ((FileOutputStream) fos).getChannel();
       
       writeFileWithBuffers(buffer, inputChannel, outputChannel, tracker, length, whichFile);
     } catch (IOException x) {
@@ -549,49 +550,16 @@ public class FabFileIO implements I_FabFileIO {
    */
   public List<String> list(final String path, final I_FileMatcher matcher) throws IOException
   {
-      Path dir = new File(path).toPath();
+      File dir = new File(path);
       final List<String> list = new ArrayList<String>();
-      File pathFile = dir.toFile();
-      final String absPath = pathFile.getAbsolutePath();
+      final String absPath = dir.getAbsolutePath();
      
       final int start = absPath.indexOf(path) + 1;
       final int length = path.length();
       
-      Files.walkFileTree(dir, new SimpleFileVisitor<Path>()
-      {
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                  throws IOException
-          {
-              File f = file.toFile();
-              String fpath = f.getAbsolutePath();
-              String relPath = fpath.substring(start + length, fpath.length());
-              if (matcher.isMatch(relPath)) {
-                list.add(fpath);
-              }
-              return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException
-          {
-            // this should never occur, unless some permission issue causes it
-            if (exc != null) {
-              throw exc;
-            }
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException
-          {
-            // this should never occur, unless some permission issue causes it
-            if (exc != null) {
-              throw exc;
-            }
-            return FileVisitResult.CONTINUE;
-          }
-      });
+      //the following isn't threadsafe boo, it should mention so in the javadoc
+      //Files.walkFileTree(dir, new SimpleFileVisitor<Path>()
+      recurseFilesThreadsafe(dir, start + length, matcher, list);
       return list;
   }
   
@@ -644,7 +612,23 @@ public class FabFileIO implements I_FabFileIO {
     return new File(filePath);
   }
 
- 
+  private void recurseFilesThreadsafe(File startDir,  int len, 
+      final I_FileMatcher matcher, List<String> results) {
+    File [] files = startDir.listFiles();
+    if (files != null) {
+      for (int i = 0; i < files.length; i++) {
+        File f = files[i];
+        if (f.isFile()) {
+          String fpath = f.getAbsolutePath();
+          String relPath = fpath.substring(len, fpath.length());
+          if (matcher.isMatch(relPath)) {
+            results.add(fpath);
+          }
+        }
+        recurseFilesThreadsafe(f, len, matcher, results);
+      }
+    }
+  }
 
   
 }

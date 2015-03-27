@@ -53,11 +53,11 @@ public class SetupProjectsRoutine extends FabricateAwareRoutine implements
   
   @SuppressWarnings("unchecked")
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory,
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     
     depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
-    nameJarTrait_ = traitFactory_.createRoutine(NameJar.NAME, NameJar.IMPLEMENTED_INTERFACES);
+    nameJarTrait_ = traitFactory_.createRoutine(NameJarTrait.NAME, NameJarTrait.IMPLEMENTED_INTERFACES);
     projects_ = (List<Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS);
     projectsMap_ = (Map<String,Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS_MAP);
     
@@ -131,7 +131,7 @@ public class SetupProjectsRoutine extends FabricateAwareRoutine implements
       log_.println(SetupProjectsRoutine.class.getSimpleName() + " setup with " + queue_.size() + " participants." );
     //}
     routineMemory.put(QUEUE, queue_);
-    return super.setup(memory, routineMemory);
+    return super.setupInitial(memory, routineMemory);
   }
 
 
@@ -152,7 +152,7 @@ public class SetupProjectsRoutine extends FabricateAwareRoutine implements
       throws FabricationRoutineCreationException {
     
     depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
-    nameJarTrait_ = traitFactory_.createRoutine(NameJar.NAME, NameJar.IMPLEMENTED_INTERFACES);
+    nameJarTrait_ = traitFactory_.createRoutine(NameJarTrait.NAME, NameJarTrait.IMPLEMENTED_INTERFACES);
     projectsMap_ = (Map<String,Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS_MAP);
     
     queue_ = (ConcurrentLinkedQueue<Project>) routineMemory.get(QUEUE);

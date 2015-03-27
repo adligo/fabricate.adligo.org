@@ -59,7 +59,7 @@ public class ScmRoutine extends ProjectBriefQueueRoutine {
   
   @SuppressWarnings("boxing")
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory)
       throws FabricationRoutineCreationException {
     
     I_RoutineBrief scm = fabricate_.getScm();
@@ -76,7 +76,7 @@ public class ScmRoutine extends ProjectBriefQueueRoutine {
       }
     }
     routineMemory.put(SCM_CONTEXT, context_);
-    boolean toRet = super.setup(memory, routineMemory);
+    boolean toRet = super.setupInitial(memory, routineMemory);
     return toRet;
   }
 

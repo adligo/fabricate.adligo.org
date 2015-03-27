@@ -21,6 +21,8 @@ import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
 import org.adligo.fabricate.repository.I_RepositoryFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractRoutine implements I_FabricationRoutine {
@@ -49,6 +51,14 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
       message = message + system_.lineSeparator() + dir;
       throw new RuntimeException(message);
     }
+  }
+  
+  public List<Class<?>> newClassList(Class<?> ... c) {
+    List<Class<?>> ret = new ArrayList<Class<?>>();
+    for (int i = 0; i < c.length; i++) {
+      ret.add(c[i]);
+    }
+    return ret;
   }
   
   @Override
@@ -170,7 +180,7 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
    * Do nothing, allow extension classes to override.
    */
   @Override
-  public boolean setup(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     if (log_.isLogEnabled(AbstractRoutine.class)) {
       log_.println(AbstractRoutine.class.getName() + " setup(I_FabricationMemoryMutant, I_RoutineMemoryMutant)");
     }
