@@ -18,11 +18,16 @@ public interface I_LibraryResolver {
   /**
    * 
    * @param libName
-   * @param the project name, or null for resolving libraries from fabricate.xml.
+   * @param projectName the project name, or null for resolving libraries from fabricate.xml.
+   * @param platform the platform name from the LibraryReferenctType or null,
+   *   if present the platform will overwrite the value on each dependency.
+   *   This gives the projects the ability to only depend on libraries for specific
+   *   platforms with out the library dependencies being aware of the platform.
+   *   
    * @return the list of dependencies, note
    * it is possible for a dependency to be in the list multiple times.
    * @throws IllegalStateException
    */
-  public abstract List<I_Dependency> getDependencies(String libName, String projectName) throws IllegalStateException;
+  public abstract List<I_Dependency> getDependencies(String libName, String projectName, String platform) throws IllegalStateException;
 
 }

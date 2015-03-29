@@ -28,6 +28,7 @@ public class FabSystemSetup {
     toRet.add("org.adligo.fabricate.managers.CommandManager");
     toRet.add("org.adligo.fabricate.managers.FabricationManager");
     toRet.add("org.adligo.fabricate.managers.ProjectsManager");
+    toRet.add("org.adligo.fabricate.routines.implicit.JarRoutine");
     
     return Collections.unmodifiableSet(toRet);
   }

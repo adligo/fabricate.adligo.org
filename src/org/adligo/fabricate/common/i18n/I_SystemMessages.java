@@ -83,6 +83,7 @@ public interface I_SystemMessages {
   public String getFinished();
   public String getFinishedGetCloneOnProjectX();
   public String getFinishedGetPullOnProjectX();
+  public String getFinishedXOnProjectY();
   
   public String getGitDoesNotAppearToBeInstalledPleaseInstallIt();
   public String getGroupColon();
@@ -119,6 +120,7 @@ public interface I_SystemMessages {
   public String getStartingDownloadFromTheFollowingUrl();
   public String getStartingGetCloneOnProjectX();
   public String getStartingGetPullOnProjectX();
+  public String getStartingXOnProjectY();
   
   public String getTheDownloadFromTheFollowingUrl();
   /**

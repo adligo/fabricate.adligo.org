@@ -6,6 +6,7 @@ import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.models.dependencies.DependencyMutant;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
@@ -54,23 +55,24 @@ public class LibraryResolver implements I_LibraryResolver {
     List<I_Dependency> toRet = new ArrayList<I_Dependency>();
     for (LibraryReferenceType lib: libs) {
       String libName = lib.getValue();
-      List<I_Dependency> deps = getDependencies(libName, projectName);
+      String platform = lib.getPlatform();
+      List<I_Dependency> deps = getDependencies(libName, projectName, platform);
       toRet.addAll(deps);
     }
     return toRet;
   }
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.repository.I_LibraryResolver#getDependencies(java.lang.String, java.lang.String)
+   * @see org.adligo.fabricate.repository.I_LibraryResolver#getDependencies(java.lang.String, java.lang.String, java.lang.String)
    */
   @Override
-  public List<I_Dependency> getDependencies(String libName, String projectName) throws IllegalStateException {
+  public List<I_Dependency> getDependencies(String libName, String projectName, String platform) throws IllegalStateException {
     libs_ = new ArrayList<String>();
     deps_ = new ArrayList<I_Dependency>();
-    return getDependenciesInternal(libName, projectName);
+    return getDependenciesInternal(libName, projectName, platform);
   }
   
-  private List<I_Dependency> getDependenciesInternal(String libName, String projectName) throws IllegalStateException {
+  private List<I_Dependency> getDependenciesInternal(String libName, String projectName, String platform) throws IllegalStateException {
     if (libs_.contains(libName)) {
       I_SystemMessages messages = constants_.getSystemMessages();
       throw new IllegalStateException(messages.getTheFollowingListOfFabricateLibrariesContainsACircularReference() +
@@ -89,12 +91,19 @@ public class LibraryResolver implements I_LibraryResolver {
       List<DependencyType> libDeps = deps.getDependency();
       
       List<I_Dependency> depsList = Dependency.convert(libDeps, projectName);
-      deps_.addAll(depsList);
-      
+      if (platform != null) {
+        for (I_Dependency dep: depsList) {
+          DependencyMutant dm = new DependencyMutant(dep);
+          dm.setPlatform(platform);
+          deps_.add(new Dependency(dm));
+        }
+      } else {
+        deps_.addAll(depsList);
+      }
       List<LibraryReferenceType> libs = deps.getLibrary();
       for (LibraryReferenceType lrt: libs) {
         String lrtName = lrt.getValue();
-        getDependenciesInternal(lrtName, projectName);
+        getDependenciesInternal(lrtName, projectName, platform);
       }
     } catch (IOException x) {
       throw new IllegalStateException(x.getMessage(), x);

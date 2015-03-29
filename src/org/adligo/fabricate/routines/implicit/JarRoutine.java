@@ -38,13 +38,17 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
       }
       String name = brief_.getName();
       String currentProject = project.getName();
-      locationInfo_.setCurrentProject(currentProject);
       
       if (log_.isLogEnabled(JarRoutine.class)) {
-        log_.println(JarRoutine.class.getSimpleName() + ".run() starting project '" + 
-            currentProject + "'." + system_.lineSeparator() + 
-            project.getDir()) ;
+        String message = sysMessages_.getStartingXOnProjectY();
+        message = message.replace("<X/>", name);
+        message = message.replace("<Y/>", currentProject);
+        log_.println(message);
       }
+      
+      locationInfo_.setCurrentProject(currentProject);
+      
+      
       
       String platformsAttribute = project.getAttributeValue(attribConstants_.getPlatforms());
       if (platformsAttribute == null) {
@@ -59,12 +63,6 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
         String platform = platforms.next();
         platform = platform.toLowerCase();
         if (platformsAttribute.indexOf(platform) >= 0) {
-          if (log_.isLogEnabled(JarRoutine.class)) {
-            log_.println(JarRoutine.class.getSimpleName() + ".run() starting project '" + currentProject + 
-                "'" + system_.lineSeparator() + 
-                " is a participant in the platform " + platform + system_.lineSeparator() +
-                "platformsAttribute '" + platformsAttribute + "' ") ;
-          }
           String jarName = null;
           
           //do tasks
@@ -99,13 +97,7 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
               if (taskRoutine instanceof I_PlatformAware) {
                 ((I_PlatformAware)  taskRoutine).setPlatform(platform);
               }
-              if (log_.isLogEnabled(JarRoutine.class)) {
-                log_.println(JarRoutine.class.getSimpleName() + ".run() starting task '" + currentTask + "' "
-                    + "on project '" + currentProject + "' locationInfo " + 
-                    locationInfo_.toString() +
-                    system_.lineSeparator() +
-                    this.toString()) ;
-              }
+              
               taskRoutine.run();
               if (ImplicitStages.CREATE_JAR_TASK.equals(currentTask)) {
                 jarName = ((I_OutputProducer<String>)  taskRoutine).getOutput();
@@ -113,6 +105,12 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
             }
           }
         }
+      }
+      if (log_.isLogEnabled(JarRoutine.class)) {
+        String message = sysMessages_.getFinishedXOnProjectY();
+        message = message.replace("<X/>", name);
+        message = message.replace("<Y/>", currentProject);
+        log_.println(message);
       }
       notifyProjectFinished(project);
       project =  projectsQueue_.poll();
@@ -126,9 +124,6 @@ public class JarRoutine extends DependenciesQueueRoutine implements I_Participat
     
     depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
     platforms_ = (List<String>) memory.get(FabricationMemoryConstants.PLATFORMS);
-    if (log_.isLogEnabled(JarRoutine.class)) {
-      log_.println(JarRoutine.class.getSimpleName() + ".setup.super") ;
-    }
     boolean toRet = super.setupInitial(memory, routineMemory);
     return toRet;
   }

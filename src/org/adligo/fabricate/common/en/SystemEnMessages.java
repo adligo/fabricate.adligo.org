@@ -133,6 +133,9 @@ public class SystemEnMessages implements I_SystemMessages {
       "Finished git pull on project <X/>.";
   private static final String FINISHED_GIT_CLONE_ON_PROJECT_X = 
       "Finished git clone on project <X/>.";
+  private static final String FINISHED_X_ON_PROJECT_Y = "Finished <X/> on project <Y/>.";
+
+  
   private static final String GIT_DOES_NOT_APPEAR_TO_BE_INSTALLED_PLEASE_INSTALL_IT = 
       "Git does not appear to be installed please install it.";
   private static final String GROUP = "Group:";
@@ -180,6 +183,7 @@ public class SystemEnMessages implements I_SystemMessages {
       "Starting git pull on project <X/>.";
   private static final String STARTING_GIT_CLONE_ON_PROJECT_X = 
       "Starting git clone on project <X/>.";
+  private static final String STARTING_X_ON_PROJECT_Y = "Starting <X/> on project <Y/>.";
   
   public static final SystemEnMessages INSTANCE = new SystemEnMessages();
   
@@ -549,6 +553,11 @@ public class SystemEnMessages implements I_SystemMessages {
   }
 
   @Override
+  public String getFinishedXOnProjectY() {
+    return FINISHED_X_ON_PROJECT_Y;
+  }
+  
+  @Override
   public String getFileNameColon() {
     return FILE_NAME;
   }
@@ -657,6 +666,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getStartingGetPullOnProjectX() {
     return STARTING_GIT_PULL_ON_PROJECT_X;
+  }
+  
+  @Override
+  public String getStartingXOnProjectY() {
+    return STARTING_X_ON_PROJECT_Y;
   }
   
   @Override

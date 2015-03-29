@@ -14,6 +14,8 @@ import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.system.FailureTransport;
+import org.adligo.fabricate.common.system.I_ExecutionResult;
+import org.adligo.fabricate.common.system.I_Executor;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.depot.Depot;
 import org.adligo.fabricate.depot.DepotContext;
@@ -345,6 +347,22 @@ public class FabricateController {
         String projectsDir = runDir + "projects";
         if (files_.exists(projectsDir)) {
           if (sys_.hasArg(cmdMessages_.getPurge(true))) {
+            
+            String fabricateDir = discovery_.getFabricateXmlDir();
+            //pull off the last slash
+            fabricateDir = fabricateDir.substring(0, fabricateDir.length() - 1);
+            //.idx and .pack files had a read only attribute set on Windows, this is the fix
+            // which allows the next Fabricate to purge (-p) the projects directory.
+            I_Executor exe = sys_.getExecutor();
+            I_ExecutionResult result = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV, fabricateDir, 
+                "chmod", "-R", "+w", "projects");
+            if (result.getExitCode() != 0) {
+              String message = sysMessages_.getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
+              message = message.replace("<X/>", "" + result.getExitCode());
+              throw new IllegalStateException(message + sys_.lineSeparator() +
+                  fabricateDir + ": chmod -R +x projects");
+            }
+            
             try {
               files_.deleteRecursive(projectsDir);
             } catch (IOException x) {
