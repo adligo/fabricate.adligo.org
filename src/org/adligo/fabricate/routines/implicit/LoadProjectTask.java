@@ -89,7 +89,7 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     ProjectDependenciesType pdeps =  project.getDependencies();
     if (pdeps != null) {
       List<LibraryReferenceType> libs  = pdeps.getLibrary();
-      libDeps = resolver.getDependencies(libs);
+      libDeps = resolver.getDependencies(libs, projectName);
     }
     try {
       ProjectMutant pm = new ProjectMutant(projectDir, brief_, project);

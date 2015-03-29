@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractRoutine implements I_FabricationRoutine {
+public abstract class AbstractRoutine implements I_FabricationRoutine, I_RepositoryFactoryAware {
   protected I_AttributeConstants attribConstants_;
   protected I_RoutineBrief brief_;
   protected I_FabSystem system_;
@@ -45,95 +45,16 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
   private AtomicBoolean settingUp = new AtomicBoolean(false);
   private AtomicBoolean running = new AtomicBoolean(false);
   
-  public void makeDir(String dir) {
-    if (!files_.mkdirs(dir)) {
-      String message = sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory();
-      message = message + system_.lineSeparator() + dir;
-      throw new RuntimeException(message);
-    }
-  }
-  
-  public List<Class<?>> newClassList(Class<?> ... c) {
-    List<Class<?>> ret = new ArrayList<Class<?>>();
-    for (int i = 0; i < c.length; i++) {
-      ret.add(c[i]);
-    }
-    return ret;
-  }
-  
   @Override
-  public void run() {
-    setRunning();
-  }
- 
   public String getAdditionalDetail() {
     return null;
   }
   
+  @Override
   public I_RoutineBrief getBrief() {
     return brief_;
   }
   
-  @Override
-  public I_RoutineFactory getTaskFactory() {
-    return taskFactory_;
-  }
-  @Override
-  public I_RoutineFactory getTraitFactory() {
-    return traitFactory_;
-  }
-  
-  @Override
-  public I_FabSystem getSystem() {
-    return system_;
-  }
-
-  public void setBrief(I_RoutineBrief brief) {
-    this.brief_ = brief;
-  }
-  
-  public void setRepositoryFactory(I_RepositoryFactory repositoryFactory) {
-    this.repositoryFactory_ = repositoryFactory;
-  }
-  
-  @Override
-  public void setSystem(I_FabSystem system) {
-    system_ = system;
-    files_ = system.getFileIO();
-    xmlFiles_ = system.getXmlFileIO();
-    
-    log_ = system.getLog();
-    constants_ = system.getConstants();
-    implicit_ = constants_.getImplicitTraitMessages();
-    sysMessages_ = constants_.getSystemMessages();
-    cmdConstants_ = constants_.getCommandLineConstants();
-    attribConstants_ = constants_.getAttributeConstants();
-  }
-  
-  @Override
-  public void setTaskFactory(I_RoutineFactory factory) {
-    taskFactory_ = factory;
-  }
-  
-  @Override
-  public void setTraitFactory(I_RoutineFactory factory) {
-    traitFactory_ = factory;
-  }
-
-  public I_RepositoryFactory getRepositoryFactory() {
-    return repositoryFactory_;
-  }
-  
-  @Override
-  public I_FabricateXmlDiscovery getLocations() {
-    return locations_;
-  }
-
-  @Override
-  public void setLocations(I_FabricateXmlDiscovery locations) {
-    locations_ = locations;
-  }
-
   @Override
   public String getCurrentLocation() {
     RoutineBriefOrigin rbo = brief_.getOrigin();
@@ -165,8 +86,99 @@ public abstract class AbstractRoutine implements I_FabricationRoutine {
     }
     return AbstractRoutine.class.getName() + ".getCurrentLocation() unknown location for " + rbo;
   }
+  
+  @Override
+  public I_FabricateXmlDiscovery getLocations() {
+    return locations_;
+  }
+  
+  @Override
+  public I_RepositoryFactory getRepositoryFactory() {
+    return repositoryFactory_;
+  }
+  
+  @Override
+  public I_RoutineFactory getTaskFactory() {
+    return taskFactory_;
+  }
+  @Override
+  public I_RoutineFactory getTraitFactory() {
+    return traitFactory_;
+  }
+  
+  @Override
+  public I_FabSystem getSystem() {
+    return system_;
+  }
+  
+  public void makeDir(String dir) {
+    if (!files_.mkdirs(dir)) {
+      String message = sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory();
+      message = message + system_.lineSeparator() + dir;
+      throw new RuntimeException(message);
+    }
+  }
+  
+  public List<Class<?>> newClassList(Class<?> ... c) {
+    List<Class<?>> ret = new ArrayList<Class<?>>();
+    for (int i = 0; i < c.length; i++) {
+      ret.add(c[i]);
+    }
+    return ret;
+  }
+  
+  @Override
+  public void run() {
+    setRunning();
+  }
+ 
+  public void setBrief(I_RoutineBrief brief) {
+    this.brief_ = brief;
+  }
+  
+  @Override
+  public void setLocations(I_FabricateXmlDiscovery locations) {
+    locations_ = locations;
+  }
+  
+  public void setRepositoryFactory(I_RepositoryFactory repositoryFactory) {
+    this.repositoryFactory_ = repositoryFactory;
+  }
+  
+
+ 
+  
+  @Override
+  public void setSystem(I_FabSystem system) {
+    system_ = system;
+    files_ = system.getFileIO();
+    xmlFiles_ = system.getXmlFileIO();
+    
+    log_ = system.getLog();
+    constants_ = system.getConstants();
+    implicit_ = constants_.getImplicitTraitMessages();
+    sysMessages_ = constants_.getSystemMessages();
+    cmdConstants_ = constants_.getCommandLineConstants();
+    attribConstants_ = constants_.getAttributeConstants();
+  }
+  
+  @Override
+  public void setTaskFactory(I_RoutineFactory factory) {
+    taskFactory_ = factory;
+  }
+  
+  @Override
+  public void setTraitFactory(I_RoutineFactory factory) {
+    traitFactory_ = factory;
+  }
 
 
+  
+
+ 
+
+
+  
   /**
    * /**
    * Overrides of this method should call this method.

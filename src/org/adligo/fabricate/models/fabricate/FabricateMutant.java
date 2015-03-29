@@ -169,7 +169,7 @@ public class FabricateMutant implements I_Fabricate {
   }
 
   public void addDependency(DependencyType dep) {
-    dependencies_.add(new DependencyMutant(dep));
+    dependencies_.add(new DependencyMutant(dep, null));
   }
 
   public void addDependency(I_Dependency dep) {

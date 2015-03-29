@@ -13,6 +13,7 @@ import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
+import org.adligo.fabricate.common.system.FailureTransport;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.depot.Depot;
 import org.adligo.fabricate.depot.DepotContext;
@@ -57,6 +58,14 @@ import javax.xml.datatype.Duration;
 public class FabricateController {
   private static FabricateEnvironment ENV = FabricateEnvironment.INSTANCE;
   
+  public static FabricateEnvironment getENV() {
+    return ENV;
+  }
+
+  public static void setENV(FabricateEnvironment eNV) {
+    ENV = eNV;
+  }
+  
   private final FabSystem sys_;
   
   private final I_CommandLineConstants cmdMessages_;
@@ -74,7 +83,7 @@ public class FabricateController {
    * The first throwable thrown by either
    * processing of a command or a build or share stage.
    */
-  private FailureType failure_;
+  private FailureTransport failure_;
   private Fabricate fab_;
   
   @SuppressWarnings("unused")
@@ -178,7 +187,7 @@ public class FabricateController {
         Collections.singleton(FabricateController.class.getName())));
     
     RepositoryManager rm = factory.createRepositoryManager(sys_, fab_);
-    if (requiresProjects()) {
+    if (requiresProjects(argCommands)) {
       if (!manageProjectsDirAndMode(factory)) {
         return;
       }
@@ -197,6 +206,7 @@ public class FabricateController {
         log_.println(sys_.lineSeparator() + sysMessages_.getRunningCommands());
       }
       CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_);
+      manager.setRepositoryFactory(factory);
       failure_ = manager.processCommands(memory);
       if (checkFailure()) {
         return;
@@ -255,6 +265,8 @@ public class FabricateController {
     String fabricateXmlPath = discovery_.getFabricateXmlPath();
     fabXml_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
     fab_ = factory.create(sys_, fabXml_, discovery_);
+    
+    
     FabricateMutant fm = factory.createMutant(fab_);
     
     String fabricateHome = fm.getFabricateHome();
@@ -360,6 +372,33 @@ public class FabricateController {
     return true;
   }
 
+  public void logDuration(long duration) {
+    if (duration < 1000) {
+      String message = sysMessages_.getDurationWasXMilliseconds();
+      message = message.replaceFirst("<X/>", "" + duration);
+      log_.println(message);
+    } else if (duration > 1000 * 60) {
+      double mins = duration;
+      double divisor = 1000 * 60;
+      mins = mins / divisor;
+      BigDecimal bd = new BigDecimal(mins);
+      bd = bd.setScale(2, RoundingMode.HALF_UP);
+      
+      String message = sysMessages_.getDurationWasXMinutes();
+      message = message.replaceFirst("<X/>", "" + bd.toPlainString());
+      log_.println(message);
+    } else {
+      double secs = duration;
+      double divisor = 1000;
+      secs = secs / divisor;
+      BigDecimal bd = new BigDecimal(secs);
+      bd = bd.setScale(2, RoundingMode.HALF_UP);
+      String message = sysMessages_.getDurationWasXSeconds();
+      message = message.replaceFirst("<X/>", "" + bd.toPlainString());
+      log_.println(message);
+    }
+  }
+  
   public void makeProjectsDir(String projectsDir) throws IOException {
     if (!files_.mkdirs(projectsDir)) {
       String message = sysMessages_.getThereWasAProblemCreatingTheFollowingDirectory();
@@ -368,17 +407,24 @@ public class FabricateController {
     }
   }
   
-  private boolean requiresProjects() {
+  private boolean requiresProjects(List<String> argCommands) {
     try {
       if (commands_) {
-        List<String> commands = sys_.getArgValues(cmdMessages_.getCommand());
         if (factory_.anyCommandsAssignableTo(I_ProjectBriefsAware.class, 
-            commands)) {
+            argCommands)) {
+          return true;
+        }
+        if (factory_.anyCommandsAssignableTo(I_ProjectsAware.class, 
+            argCommands)) {
           return true;
         }
       } else {
         List<String> stages = sys_.getArgValues(cmdMessages_.getStages());
         List<String> skips = sys_.getArgValues(cmdMessages_.getSkip());
+        if (factory_.anyStagesAssignableTo(I_ProjectBriefsAware.class, 
+            stages, skips)) {
+          return true;
+        }
         if (factory_.anyStagesAssignableTo(I_ProjectsAware.class, 
             stages, skips)) {
           return true;
@@ -389,6 +435,7 @@ public class FabricateController {
     }
     return false;
   }
+  
   
   @SuppressWarnings("boxing")
   private void writeResult() throws IOException {
@@ -420,7 +467,7 @@ public class FabricateController {
       result.setSuccessful(true);
     } else {
       result.setSuccessful(false);
-      result.setFailure(failure_);
+      result.setFailure(failure_.getFailure());
     }
     String hostName = sys_.getHostname();
     
@@ -463,7 +510,10 @@ public class FabricateController {
       log_.println(sysMessages_.getFabricationSuccessful());
     } else {
       if (failure_ != null) {
-        log_.println(failure_.getDetail());
+        if (!failure_.isLogged()) {
+          FailureType f = failure_.getFailure();
+          log_.println(f.getDetail());
+        }
       }
       log_.println(sysMessages_.getFabricationFailed());
     }
@@ -474,38 +524,7 @@ public class FabricateController {
     sys_.exit(0);
   }
   
-  public void logDuration(long duration) {
-    if (duration < 1000) {
-      String message = sysMessages_.getDurationWasXMilliseconds();
-      message = message.replaceFirst("<X/>", "" + duration);
-      log_.println(message);
-    } else if (duration > 1000 * 60) {
-      double mins = duration;
-      double divisor = 1000 * 60;
-      mins = mins / divisor;
-      BigDecimal bd = new BigDecimal(mins);
-      bd = bd.setScale(2, RoundingMode.HALF_UP);
-      
-      String message = sysMessages_.getDurationWasXMinutes();
-      message = message.replaceFirst("<X/>", "" + bd.toPlainString());
-      log_.println(message);
-    } else {
-      double secs = duration;
-      double divisor = 1000;
-      secs = secs / divisor;
-      BigDecimal bd = new BigDecimal(secs);
-      bd = bd.setScale(2, RoundingMode.HALF_UP);
-      String message = sysMessages_.getDurationWasXSeconds();
-      message = message.replaceFirst("<X/>", "" + bd.toPlainString());
-      log_.println(message);
-    }
-  }
 
-  public static FabricateEnvironment getENV() {
-    return ENV;
-  }
 
-  public static void setENV(FabricateEnvironment eNV) {
-    ENV = eNV;
-  }
+  
 }

@@ -3,6 +3,8 @@ package org.adligo.fabricate.common.system;
 import org.adligo.fabricate.common.files.FabFileUtils;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
+import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
+import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
@@ -19,6 +21,8 @@ import java.io.IOException;
  */
 public class FabricateXmlDiscovery implements I_FabricateXmlDiscovery {
 
+  private final I_FabSystem sys_;
+  private final I_CommandLineConstants clConstants_;
   private final I_FabLog log_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
@@ -28,6 +32,10 @@ public class FabricateXmlDiscovery implements I_FabricateXmlDiscovery {
   private boolean devParseException_ = false;
   
   public FabricateXmlDiscovery(I_FabSystem sys) {
+    sys_ = sys;
+    I_FabricateConstants constants = sys.getConstants();
+    clConstants_ = constants.getCommandLineConstants();
+    
     log_ = sys.getLog();
     files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
@@ -133,7 +141,7 @@ public class FabricateXmlDiscovery implements I_FabricateXmlDiscovery {
   @Override
   public String getFabricateXmlDir() {
     String absPath = fabricateXml_.getAbsolutePath();
-    return FabFileUtils.getAbsoluteDir(absPath);
+    return FabFileUtils.getAbsoluteDir(absPath, files_.getNameSeparator().charAt(0));
   }
   /* (non-Javadoc)
    * @see org.adligo.fabricate.common.system.I_FabricateXmlDiscovery#getProjectXmlDir()
@@ -144,7 +152,7 @@ public class FabricateXmlDiscovery implements I_FabricateXmlDiscovery {
       return "";
     }
     String absPath = projectXml_.getAbsolutePath();
-    return FabFileUtils.getAbsoluteDir(absPath);
+    return FabFileUtils.getAbsoluteDir(absPath, files_.getNameSeparator().charAt(0));
   }
   
   /* (non-Javadoc)
@@ -156,6 +164,25 @@ public class FabricateXmlDiscovery implements I_FabricateXmlDiscovery {
       return "";
     }
     String absPath = devXml_.getAbsolutePath();
-    return FabFileUtils.getAbsoluteDir(absPath);
+    return FabFileUtils.getAbsoluteDir(absPath, files_.getNameSeparator().charAt(0));
+  }
+
+  @Override
+  public String getProjectsDir() {
+    if (devXml_ != null) {
+      String dir = devXml_.getAbsolutePath();
+      return files_.getParentDir(dir);
+    }
+    if (projectXml_ != null) {
+      String proj = projectXml_.getAbsolutePath();
+      return files_.getParentDir(files_.getParentDir(proj));
+    }
+    String devMode = clConstants_.getDevelopment(true);
+    String fabXmlDir = getFabricateXmlDir();
+    if (sys_.hasArg(devMode)) {
+      return files_.getParentDir(fabXmlDir);
+    } else {
+      return fabXmlDir + "projects" + files_.getNameSeparator();
+    }
   }
 }

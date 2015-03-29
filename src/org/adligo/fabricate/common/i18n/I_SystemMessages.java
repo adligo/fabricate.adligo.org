@@ -1,6 +1,7 @@
 package org.adligo.fabricate.common.i18n;
 
 public interface I_SystemMessages {
+  public String getArtifactColon();
   public String getAntHelperRequiresADirectoryArgument();
   public String getArchiveStageXCompletedSuccessfully();
   public String getArchiveStageXIsStillSettingUp();
@@ -77,10 +78,14 @@ public interface I_SystemMessages {
   public String getFacetXTaskYIsStillRunning() ;
   public String getFacetXTaskYIsStillRunningOnProjectZ();
   
+  public String getForSemicolon();
+  public String getFileNameColon();
   public String getFinished();
   public String getFinishedGetCloneOnProjectX();
   public String getFinishedGetPullOnProjectX();
+  
   public String getGitDoesNotAppearToBeInstalledPleaseInstallIt();
+  public String getGroupColon();
   
   public String getInsteadOfTheFollowingActualGenericType();
   public String getItWasExpectedToImplementTheFollowingInterface();
@@ -140,6 +145,8 @@ public interface I_SystemMessages {
   public String getThereWasAProblemCreatingTheFollowingRoutine();
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory();
   public String getThereWasAProblemDeletingTheFollowingDirectory();
+  public String getThereWasAProblemVerifyingOrDownloadingTheFollowingDependency();
+  
   public String getThisMethodMustBeCalledFromTheMainThread();
   public String getThisVersionOfFabricateRequiresGitXOrGreater();
   
@@ -149,12 +156,13 @@ public interface I_SystemMessages {
   public String getTraitXIsStillRunningOnProjectZ();
   public String getTraitXTaskYIsStillRunning();
   public String getTraitXTaskYIsStillRunningOnProjectZ();
-  
+  public String getTypeColon();
   
   public String getUnableToLoadTheFollowingClass();
   public String getUnknown();
   public String getUsingTheFollowingRemoteRepositories();
   
   public String getVersionX();
+  public String getVersionColon();
   public String getWithTheFollowingGenericTypeX();
 }

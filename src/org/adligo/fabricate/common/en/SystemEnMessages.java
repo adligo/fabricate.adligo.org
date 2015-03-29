@@ -4,6 +4,9 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
 
+  private static final String ARTIFACT = "Artifact:";
+ 
+  
   private static final String ARCHIVE_STAGE_X_COMPLETED_SUCCESSFULLY = "Archive stage <X/> completed successfully.";
   private static final String ANT_HELPER_REQUIRES_A_DIRECTORY_ARGUMENT = 
       "AntHelper requires a directory argument.";
@@ -122,13 +125,17 @@ public class SystemEnMessages implements I_SystemMessages {
   
   
   private static final String FAILED = "failed!";
+  private static final String FILE_NAME = "File Name:";
   private static final String FINISHED = "finished.";
+  
+  private static final String FOR = "for;";
   private static final String FINISHED_GIT_PULL_ON_PROJECT_X = 
       "Finished git pull on project <X/>.";
   private static final String FINISHED_GIT_CLONE_ON_PROJECT_X = 
       "Finished git clone on project <X/>.";
   private static final String GIT_DOES_NOT_APPEAR_TO_BE_INSTALLED_PLEASE_INSTALL_IT = 
       "Git does not appear to be installed please install it.";
+  private static final String GROUP = "Group:";
   
   private static final String INSTEAD_OF_THE_FOLLOWING_ACTUAL_GENERIC_TYPE = 
       "Instead of the following actual generic type;";
@@ -205,6 +212,9 @@ public class SystemEnMessages implements I_SystemMessages {
       "There was a problem creating the following routine;";
   private static final String THERE_WAS_A_PROBLEM_DELETING_THE_FOLLOWING_DIRECTORY = 
       "There was a problem deleting the following directory;";
+  private static final String THERE_WAS_A_PROBLEM_VERIFYING_OR_DOWNLOADING_THE_FOLLOWING_DEPENDENCY =
+      "There was a problem verifying or downloading the following dependency;";
+  
   private static final String THIS_METHOD_MUST_BE_CALLED_FROM_THE_MAIN_THREAD_TRY_MOVING_THE_CALL_TO_SETUP =
       "This method must be called from the main thread (try moving the call to setup?).";
   private static final String THIS_VERSION_OF_FABRICATE_REQUIRES_GIT_X_OR_GREATER = 
@@ -223,6 +233,7 @@ public class SystemEnMessages implements I_SystemMessages {
       "Trait <X/> is still setting up.";
   
   private static final String TO_THE_FOLLOWING_FOLDER = "to the following folder;";
+  private static final String TYPE = "Type:";
   
   private static final String USING_THE_FOLLOWING_REMOTE_REPOSITORIES = 
       "Using the following remote repositories;";
@@ -232,6 +243,7 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String VERSION_X = "Version <X/>.";
   private static final String WITH_THE_FOLLOWING_GENERIC_TYPE_X = 
       "With the following generic type <X/>;";
+  private static final String VERSION = "Version:";
   
   private SystemEnMessages() {
   }
@@ -269,6 +281,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getArchiveStageXTaskYIsStillRunningOnProjectZ() {
     return ARCHIVE_STAGE_X_TASK_Y_IS_STILL_RUNNING_ON_PROJECT_Z;
+  }
+  
+  @Override
+  public String getArtifactColon() {
+    return ARTIFACT;
   }
   
   @Override
@@ -532,8 +549,23 @@ public class SystemEnMessages implements I_SystemMessages {
   }
 
   @Override
+  public String getFileNameColon() {
+    return FILE_NAME;
+  }
+  
+  @Override
+  public String getForSemicolon() {
+    return FOR;
+  }
+  
+  @Override
   public String getGitDoesNotAppearToBeInstalledPleaseInstallIt() {
     return GIT_DOES_NOT_APPEAR_TO_BE_INSTALLED_PLEASE_INSTALL_IT;
+  }
+  
+  @Override
+  public String getGroupColon() {
+    return GROUP;
   }
   
   @Override
@@ -691,6 +723,11 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getThereWasAProblemDeletingTheFollowingDirectory() {
     return THERE_WAS_A_PROBLEM_DELETING_THE_FOLLOWING_DIRECTORY;
   }
+
+  @Override
+  public String getThereWasAProblemVerifyingOrDownloadingTheFollowingDependency() {
+    return THERE_WAS_A_PROBLEM_VERIFYING_OR_DOWNLOADING_THE_FOLLOWING_DEPENDENCY;
+  }
   
   @Override
   public String getThereWasAProblemCreatingTheFollowingDirectory() {
@@ -743,6 +780,11 @@ public class SystemEnMessages implements I_SystemMessages {
   }
   
   @Override
+  public String getTypeColon() {
+    return TYPE;
+  }
+  
+  @Override
   public String getManagingFabricateRuntimeClassPathDependencies() {
     return MANAGING_FABRICATE_RUNTIME_CLASS_PATH_DEPENDENCIES;
   }
@@ -791,5 +833,10 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getWithTheFollowingGenericTypeX() {
     return WITH_THE_FOLLOWING_GENERIC_TYPE_X;
+  }
+  
+  @Override
+  public String getVersionColon() {
+    return VERSION;
   }
 }

@@ -7,12 +7,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class Dependency implements I_Dependency {
-  public static List<I_Dependency> convert(List<DependencyType> types) {
+  public static List<I_Dependency> convert(List<DependencyType> types, String project) {
     List<I_Dependency> toRet = new ArrayList<I_Dependency>();
     if (types != null) {
       for (DependencyType type: types) {
         if (type != null) {
-          toRet.add(new Dependency(type));
+          toRet.add(new Dependency(type, project));
         }
       }
     }
@@ -25,6 +25,7 @@ public class Dependency implements I_Dependency {
   private final String fileName_;
   private final String group_;
   private final String platform_;
+  private final String project_;
   private final String type_;
   private final String version_;
   
@@ -35,12 +36,13 @@ public class Dependency implements I_Dependency {
     fileName_ = other.getFileName();
     group_ = other.getGroup();
     platform_ = other.getPlatform();
+    project_ = other.getProject();
     type_ = other.getType();
     version_ = other.getVersion();
   }
   
   @SuppressWarnings("boxing")
-  public Dependency(DependencyType other) {
+  public Dependency(DependencyType other, String project) {
     artifact_ = other.getArtifact();
     children_ = getChildren(IdeMutant.convert(other.getIde()));
     Boolean oe = other.isExtract();
@@ -54,6 +56,7 @@ public class Dependency implements I_Dependency {
     fileName_ = other.getFileName();
     group_ = other.getGroup();
     platform_ = other.getPlatform();
+    project_ = project;
     String type = other.getType();
     if (type == null) {
       type_ = DependencyConstants.JAR;
@@ -104,6 +107,7 @@ public class Dependency implements I_Dependency {
   public String getGroup() {
     return group_;
   }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getPlatform()
    */
@@ -111,6 +115,15 @@ public class Dependency implements I_Dependency {
   public String getPlatform() {
     return platform_;
   }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.dependencies.I_Dependency#getProject()
+   */
+  @Override
+  public String getProject() {
+    return project_;
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getType()
    */

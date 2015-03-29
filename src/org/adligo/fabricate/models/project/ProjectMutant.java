@@ -229,7 +229,7 @@ public class ProjectMutant implements I_Project {
     
     ProjectDependenciesType pdt = fabProject.getDependencies();
     if (pdt != null) {
-      List<I_Dependency> deps =  DependencyMutant.convert(pdt.getDependency());
+      List<I_Dependency> deps =  DependencyMutant.convert(pdt.getDependency(), name_);
       setDependencies(deps);
       
       List<LibraryDependencyMutant> lDeps =  LibraryDependencyMutant.convert(pdt.getLibrary());

@@ -3,12 +3,12 @@ package org.adligo.fabricate.managers;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.FailureTransport;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.repository.I_RepositoryManager;
 import org.adligo.fabricate.routines.implicit.ImplicitFacets;
 import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
-import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
 
 public class ProjectsManager {
   private final I_FabricateConstants constants_;
@@ -25,27 +25,27 @@ public class ProjectsManager {
     setup_ = new FacetSetup(system, factory, rm);
   }
   
-  public FailureType setupAndRun(FabricationMemoryMutant<Object> memory) {
+  public FailureTransport setupAndRun(FabricationMemoryMutant<Object> memory) {
     
-    FailureType obtainFailure = runFacet(ImplicitFacets.OBTAIN_PROJECTS, memory);
+    FailureTransport obtainFailure = runFacet(ImplicitFacets.OBTAIN_PROJECTS, memory);
     if (obtainFailure != null) {
       return obtainFailure;
     }
     logSuccess(ImplicitFacets.OBTAIN_PROJECTS);
     setup_.clearRoutines();
-    FailureType loadFailure = runFacet(ImplicitFacets.LOAD_PROJECTS, memory);
+    FailureTransport loadFailure = runFacet(ImplicitFacets.LOAD_PROJECTS, memory);
     if (loadFailure != null) {
       return loadFailure;
     }
     logSuccess(ImplicitFacets.LOAD_PROJECTS);
     setup_.clearRoutines();
-    FailureType downloadFailure = runFacet(ImplicitFacets.DOWNLOAD_DEPENDENCIES, memory);
+    FailureTransport downloadFailure = runFacet(ImplicitFacets.DOWNLOAD_DEPENDENCIES, memory);
     if (downloadFailure != null) {
       return downloadFailure;
     }
     logSuccess(ImplicitFacets.DOWNLOAD_DEPENDENCIES);
     setup_.clearRoutines();
-    FailureType failure = runFacet(ImplicitFacets.SETUP_PROJECTS, memory);
+    FailureTransport failure = runFacet(ImplicitFacets.SETUP_PROJECTS, memory);
     if (failure != null) {
       return failure;
     }
@@ -61,7 +61,7 @@ public class ProjectsManager {
     }
   }
 
-  private FailureType runFacet(String facet, FabricationMemoryMutant<Object> memory) {
+  private FailureTransport runFacet(String facet, FabricationMemoryMutant<Object> memory) {
     if (log_.isLogEnabled(CommandManager.class)) {
       String message = sysMessages_.getRunningFacetX();
       message = message.replace("<X/>", facet);

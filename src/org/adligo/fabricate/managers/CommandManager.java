@@ -3,6 +3,8 @@ package org.adligo.fabricate.managers;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.AlreadyLoggedException;
+import org.adligo.fabricate.common.system.FailureTransport;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
@@ -15,7 +17,10 @@ import org.adligo.fabricate.models.common.I_RoutineFactory;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
+import org.adligo.fabricate.repository.I_RepositoryFactory;
 import org.adligo.fabricate.routines.I_CommandAware;
+import org.adligo.fabricate.routines.I_FabricateAware;
+import org.adligo.fabricate.routines.I_RepositoryFactoryAware;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
 import org.adligo.fabricate.routines.I_TaskProcessor;
 import org.adligo.fabricate.routines.RoutineExecutionEngine;
@@ -40,6 +45,7 @@ public class CommandManager {
   private final I_FabLog log_;
   private final I_Fabricate fabricate_;
   private final RoutineFabricateFactory factory_;
+  private I_RepositoryFactory repositoryFactory_;
   private String command_;
   
   private final I_RoutineBuilder executorFactory_ = new I_RoutineBuilder() {
@@ -80,7 +86,7 @@ public class CommandManager {
   /**
    * @return FailureType if failure occurs, otherwise null.
    */
-  public FailureType processCommands(FabricationMemoryMutant<Object> memory) {
+  public FailureTransport processCommands(FabricationMemoryMutant<Object> memory) {
     Throwable failure = null;
     I_FabricationRoutine routine = null;
     try {
@@ -99,6 +105,11 @@ public class CommandManager {
           break;
         }
       }
+    } catch (FabricationRoutineCreationException x) {
+      failure = x;
+      Class<?> routineClass = x.getRoutine();
+      log_.println("There was a problem using the following class;" +
+          routineClass);
     } catch (Throwable t) {
       failure = t;
     }
@@ -116,7 +127,7 @@ public class CommandManager {
       failure.printStackTrace(ps);
       String detail = baos.toString();
       result.setDetail(detail);
-      return result;
+      return new FailureTransport(failure instanceof AlreadyLoggedException, result);
     }
     return null;
   }
@@ -132,9 +143,23 @@ public class CommandManager {
     routine.setTaskFactory(taskFactory);
     routine.setBrief(brief);
     routine.setTraitFactory(factory_.getTraits());
-    if (I_CommandAware.class.isAssignableFrom(routine.getClass())) {
+    if (routine instanceof I_CommandAware) {
       ((I_CommandAware) routine).setCommandFactory(cmdFactory);
     }
+    if (routine instanceof I_FabricateAware) {
+      ((I_FabricateAware) routine).setFabricate(fabricate_);
+    }
+    if (routine instanceof I_RepositoryFactoryAware) {
+      ((I_RepositoryFactoryAware) routine).setRepositoryFactory(repositoryFactory_);
+    }
     return routine;
+  }
+
+  public I_RepositoryFactory getRepositoryFactory() {
+    return repositoryFactory_;
+  }
+
+  public void setRepositoryFactory(I_RepositoryFactory repositoryFactory) {
+    this.repositoryFactory_ = repositoryFactory;
   }
 }

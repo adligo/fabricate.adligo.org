@@ -85,10 +85,12 @@ public class FabLog implements I_FabLog {
     }
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void printTrace(Throwable t) {
     if (!derailed_.get()) {
+      if (isLogEnabled(FabLog.class)) {
+        ThreadLocalPrintStream.printTrace(new RuntimeException("logging trace from;"));
+      }
       ThreadLocalPrintStream.printTrace(t);
     }
   }

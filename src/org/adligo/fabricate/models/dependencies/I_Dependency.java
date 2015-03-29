@@ -7,12 +7,11 @@ import java.util.List;
  * from the xml file.  Implementation may be immutable
  * or mutable.  Equals and hashCode are done performing the following fields;
  * Artifact
- * IdeOnly
  * FileName
  * Group
  * Type
  * Version
- * Note platform is omitted from equals and hashCode, because equals and hashCode
+ * Note platform and project are omitted from equals and hashCode, because equals and hashCode
  * are used to determine uniqueness in the local repository, and it is possible
  * to have the same dependency required for multiple platforms (which should only
  * be downloaded once).
@@ -43,6 +42,13 @@ public interface I_Dependency {
 
   public abstract String getPlatform();
 
+  /**
+   * This is the name of the project where this
+   * dependency came from, or null if it came from fabricate.xml.
+   * @return
+   */
+  public abstract String getProject();
+  
   public abstract String getType();
 
   public abstract String getVersion();

@@ -1,12 +1,7 @@
 package org.adligo.fabricate.common.files;
 
-import java.io.File;
 
 public class FabFileUtils {
-  
-  public static String getAbsoluteDir(String filePath) {
-    return getAbsoluteDir(filePath, File.separatorChar);
-  }
   
   /**
    * always includes the last separator.

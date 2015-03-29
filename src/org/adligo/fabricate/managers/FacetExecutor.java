@@ -1,6 +1,8 @@
 package org.adligo.fabricate.managers;
 
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.AlreadyLoggedException;
+import org.adligo.fabricate.common.system.FailureTransport;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
@@ -29,7 +31,7 @@ public class FacetExecutor {
     system_ = system;
   }
   
-  public FailureType run(final String facetName, final I_FacetSetup setup, FabricationMemoryMutant<Object> memory) {
+  public FailureTransport run(final String facetName, final I_FacetSetup setup, FabricationMemoryMutant<Object> memory) {
     I_RoutineBuilder routineBuilder = new I_RoutineBuilder() {
       
       @Override
@@ -73,6 +75,9 @@ public class FacetExecutor {
           routine = exe.getRoutineThatFailed();
         }
     } catch (Throwable t) {
+      if (log_.isLogEnabled(FacetExecutor.class)) {
+        log_.println(FacetExecutor.class.getName() + ".run(" + facetName + ") caught exception.");
+      }
       failure = t;
     }
     if (failure != null) {
@@ -93,7 +98,7 @@ public class FacetExecutor {
         log_.println(FacetExecutor.class.getName() + ".run(" + facetName + ") returns " + system_.lineSeparator() +
             result);
       }
-      return result;
+      return new FailureTransport(failure instanceof AlreadyLoggedException, result);
     }
     if (log_.isLogEnabled(FacetExecutor.class)) {
       log_.println(FacetExecutor.class.getName() + ".run(" + facetName + ") returns null");

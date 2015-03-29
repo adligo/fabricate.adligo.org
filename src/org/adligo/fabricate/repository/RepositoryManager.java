@@ -3,13 +3,12 @@ package org.adligo.fabricate.repository;
 import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
+import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.I_FabSystem;
-import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
-import org.adligo.fabricate.models.project.I_Project;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +39,8 @@ public class RepositoryManager implements I_RepositoryManager {
   private final I_FabricateConstants constants_;
   private final I_SystemMessages messages_;
   private final I_RepositoryFactory factory_;
+  private IOException localException_;
+  private DependencyNotAvailableException remoteException_;
   
   public RepositoryManager(I_FabSystem sys, I_Fabricate fab, I_RepositoryFactory factory) {
     sys_ = sys;
@@ -53,13 +54,141 @@ public class RepositoryManager implements I_RepositoryManager {
     dependencies_ = sys_.newConcurrentLinkedQueue(I_Dependency.class);
   }
   
+  
+
+  
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#addDependencies(java.util.concurrent.ConcurrentLinkedQueue)
+   */
+  @Override
+  public void addDependencies(Collection<I_Dependency> dependencies) {
+    dependencies_.addAll(dependencies);
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#checkRepositories()
+   */
+  @Override
+  public void checkRepositories() {
+    Iterator<String> repos = repositories_.iterator();
+    while (repos.hasNext()) {
+      String repo = repos.next();
+      final String repoUrl = repo;
+      try {
+        int status = files_.check(repoUrl);
+        if (status >= 300) {
+          repos.remove();
+        }
+      } catch (IOException e) {
+        I_SystemMessages messages =  constants_.getSystemMessages();
+        String line = messages.getTheFollowingRemoteRepositoryAppearsToBeDown();
+        log_.println(RepositoryManager.class.getSimpleName() + " " + line + sys_.lineSeparator() + repo + sys_.lineSeparator());
+      }
+    }
+    if (repositories_.size() == 0) {
+      I_SystemMessages messages =  constants_.getSystemMessages();
+      throw new RuntimeException(messages.getNoRemoteRepositoriesCouldBeReached());
+    }
+  }
+
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#getLocalException()
+   */
+  @Override
+  public IOException getLocalException() {
+    return localException_;
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#getRemoteException()
+   */
+  @Override
+  public DependencyNotAvailableException getRemoteException() {
+    return remoteException_;
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_RepositoryManager#getDependencies()
+   */
+  @Override
+  public ConcurrentLinkedQueue<I_Dependency> getDependencies() {
+    return dependencies_;
+  }
+
+
+  public void logError(DependencyNotAvailableException x) {
+    I_Dependency dep = x.getDependency();
+    StringBuilder sb = new StringBuilder();
+    I_FabricateConstants constants = sys_.getConstants();
+    I_SystemMessages messages = constants.getSystemMessages();
+   
+    sb.append(messages.getThereWasAProblemVerifyingOrDownloadingTheFollowingDependency());
+    sb.append(sys_.lineSeparator());
+    String artifact = dep.getArtifact();
+    if (artifact == null) {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getArtifactColon(), artifact));
+    } else {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getArtifactColon(), "'", artifact, "'"));
+    }
+    sb.append(sys_.lineSeparator());
+    
+    
+    String file = dep.getFileName();
+    if (file == null) {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getFileNameColon(), file));
+    } else {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getFileNameColon(), "'", file, "'"));
+    }
+    sb.append(sys_.lineSeparator());
+    
+    String group = dep.getGroup();
+    if (group == null) {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getGroupColon(), group));
+    } else {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getGroupColon(), "'", group, "'"));
+    }
+    sb.append(sys_.lineSeparator());
+    
+    String type = dep.getType();
+    if (type == null) {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getTypeColon(), type));
+    } else {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getTypeColon(), "'", type, "'"));
+    }
+    sb.append(sys_.lineSeparator());
+    
+    String version = dep.getVersion();
+    if (version == null) {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getVersionColon(), version));
+    } else {
+      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getVersionColon(), "'", version, "'"));
+    }
+    sb.append(sys_.lineSeparator());
+    sb.append(messages.getForSemicolon());
+    sb.append(sys_.lineSeparator());
+    String project = dep.getProject();
+    if (project == null) {
+      sb.append(fab_.getFabricateXmlRunDir() + "fabricate.xml");
+      sb.append(sys_.lineSeparator());
+    } else {
+      sb.append(fab_.getProjectsDir() + project);
+      sb.append(sys_.lineSeparator());
+    }
+      
+    I_FabLog log = sys_.getLog();
+    log.printTrace(x);
+    log.println(sb.toString());
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.repository.I_RepositoryManager#manageDependencies()
    */
   @Override
-  public void manageDependencies() {
+  public boolean manageDependencies() {
     if (log_.isLogEnabled(RepositoryManager.class)) {
-      log_.println(messages_.getManagingTheFollowingLocalRepository() + sys_.lineSeparator() +
+      log_.println(RepositoryManager.class.getSimpleName() + " " + messages_.getManagingTheFollowingLocalRepository() + sys_.lineSeparator() +
           fab_.getFabricateRepository() + sys_.lineSeparator());
     }
     checkRepositories();
@@ -70,7 +199,7 @@ public class RepositoryManager implements I_RepositoryManager {
         sb.append(sys_.lineSeparator());
         sb.append(repo);
       }
-      log_.println(sb.toString()  + sys_.lineSeparator());
+      log_.println(RepositoryManager.class.getSimpleName() + " " + sb.toString()  + sys_.lineSeparator());
     }
     String localRepo = fab_.getFabricateRepository();
     if (!files_.exists(localRepo)) {
@@ -96,7 +225,7 @@ public class RepositoryManager implements I_RepositoryManager {
     if (dependencies_.size() >= 1) {
       I_SystemMessages messages = constants_.getSystemMessages();
       if (log_.isLogEnabled(RepositoryManager.class)) {
-        log_.println(messages.getCheckingFabricateRuntimeDependencies());
+        log_.println(RepositoryManager.class.getSimpleName() + " " + messages.getCheckingFabricateRuntimeDependencies());
       }
       
       if (threads <= 1) {
@@ -129,6 +258,16 @@ public class RepositoryManager implements I_RepositoryManager {
             allDone = true;
           }
         }
+        for (I_DependenciesManager dm: dms) {
+          localException_ = dm.getLocalException();
+          if (localException_ != null) {
+            break;
+          }
+          remoteException_ = dm.getRemoteException();
+          if (remoteException_ != null) {
+            break;
+          }
+        }
         es.shutdownNow();
       }
     }
@@ -138,55 +277,15 @@ public class RepositoryManager implements I_RepositoryManager {
       log_.println(CommandLineArgs.END);
       throw new RuntimeException(e);
     }
+    return remoteException_ == null;
   }
+  
   private void setRepositories(List<String> repositories ) {
     if (repositories != null) {
       for (String repo: repositories) {
         repositories_.add(repo);
       }
     }
-  }
-
-  /* (non-Javadoc)
-   * @see org.adligo.fabricate.repository.I_RepositoryManager#checkRepositories()
-   */
-  @Override
-  public void checkRepositories() {
-    Iterator<String> repos = repositories_.iterator();
-    while (repos.hasNext()) {
-      String repo = repos.next();
-      final String repoUrl = repo;
-      try {
-        int status = files_.check(repoUrl);
-        if (status >= 300) {
-          repos.remove();
-        }
-      } catch (IOException e) {
-        I_SystemMessages messages =  constants_.getSystemMessages();
-        String line = messages.getTheFollowingRemoteRepositoryAppearsToBeDown();
-        log_.println(line + sys_.lineSeparator() + repo + sys_.lineSeparator());
-      }
-    }
-    if (repositories_.size() == 0) {
-      I_SystemMessages messages =  constants_.getSystemMessages();
-      throw new RuntimeException(messages.getNoRemoteRepositoriesCouldBeReached());
-    }
-  }
-
-  /* (non-Javadoc)
-   * @see org.adligo.fabricate.repository.I_RepositoryManager#getDependencies()
-   */
-  @Override
-  public ConcurrentLinkedQueue<I_Dependency> getDependencies() {
-    return dependencies_;
-  }
-
-  /* (non-Javadoc)
-   * @see org.adligo.fabricate.repository.I_RepositoryManager#addDependencies(java.util.concurrent.ConcurrentLinkedQueue)
-   */
-  @Override
-  public void addDependencies(ConcurrentLinkedQueue<I_Dependency> dependencies) {
-    dependencies_.addAll(dependencies);
   }
 
 }

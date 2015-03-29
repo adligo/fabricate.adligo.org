@@ -39,7 +39,9 @@ public class RunMonitor implements I_RunMonitor {
     } catch (Throwable t) {
       synchronized (this) {
         I_FabLog log = system_.getLog();
-        log.printTrace(t);
+        if (!(t instanceof AlreadyLoggedException)) {
+          log.printTrace(t);
+        }
         //note fabricate doesn't try to recover from out of memory errors,
         // etc since the end result will be simply reporting major errors
         // to the user so that the user can fix them.

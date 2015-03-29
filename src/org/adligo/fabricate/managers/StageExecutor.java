@@ -1,6 +1,8 @@
 package org.adligo.fabricate.managers;
 
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.AlreadyLoggedException;
+import org.adligo.fabricate.common.system.FailureTransport;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
@@ -29,7 +31,7 @@ public class StageExecutor {
     system_ = system;
   }
   
-  public FailureType run(final String stageName, final I_StageSetup setup, FabricationMemoryMutant<Object> memory) {
+  public FailureTransport run(final String stageName, final I_StageSetup setup, FabricationMemoryMutant<Object> memory) {
     I_RoutineBuilder routineBuilder = new I_RoutineBuilder() {
       
       @Override
@@ -95,7 +97,7 @@ public class StageExecutor {
         log_.println(StageExecutor.class.getName() + ".run(" + stageName + ") returns " + system_.lineSeparator() +
             result);
       }
-      return result;
+      return new FailureTransport(failure instanceof AlreadyLoggedException, result);
     }
     if (log_.isLogEnabled(StageExecutor.class)) {
       log_.println(StageExecutor.class.getName() + ".run(" + stageName + ") returns null");

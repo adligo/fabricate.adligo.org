@@ -1,5 +1,6 @@
 package org.adligo.fabricate.routines.implicit;
 
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
@@ -13,6 +14,8 @@ import org.adligo.fabricate.routines.I_RoutineBuilder;
 import org.adligo.fabricate.routines.RoutineExecutionEngine;
 import org.adligo.fabricate.routines.RoutineFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +32,16 @@ public class RoutineFabricateFactory {
   private static final Set<I_ExpectedRoutineInterface> EMPTY_SET = Collections.emptySet();
   private final I_Fabricate fabricate;
   
+  private final I_FabSystem system_;
+  private final I_FabLog log_;
   private final RoutineFactory commands_;
   private final RoutineFactory facets_;
   private final RoutineFactory stages_;
   private final RoutineFactory traits_;
   
   public RoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
+    system_ = system;
+    log_ = system.getLog();
     facets_ = new RoutineFactory(system);
     commands_ = new RoutineFactory(system);
     stages_ = new RoutineFactory(system);
@@ -44,8 +51,18 @@ public class RoutineFabricateFactory {
     addImplicitFacets();
     if (commandsNotStages) {
       addImplicitCommands();
+      Map<String, I_RoutineBrief> fabCmds = fab.getCommands();
+      Collection<I_RoutineBrief>  briefs = fabCmds.values();
+      for (I_RoutineBrief brief: briefs) {
+        commands_.add(brief);
+      }
     } else {
       addImplicitStages();
+      Map<String, I_RoutineBrief> fabStages = fab.getStages();
+      Collection<I_RoutineBrief>  briefs = fabStages.values();
+      for (I_RoutineBrief brief: briefs) {
+        commands_.add(brief);
+      }
     }
     addImplicitTraits();
     
@@ -119,8 +136,16 @@ public class RoutineFabricateFactory {
     for (String name: commandLineCommands) {
       I_FabricationRoutine fr = commands_.createRoutine(name, EMPTY_SET);
       if (assignableTo.isAssignableFrom(fr.getClass())) {
+        if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+          log_.println("The following commands are assignable to " + assignableTo + system_.lineSeparator() +
+              commandLineCommands);
+        }
         return true;
       }
+    }
+    if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+      log_.println("The following commands are NOT assignable to " + assignableTo + system_.lineSeparator() +
+          commandLineCommands);
     }
     return false;
   }
@@ -135,9 +160,15 @@ public class RoutineFabricateFactory {
       List<String> commandLineStages, 
       List<String> commandStagesSkips) throws FabricationRoutineCreationException {
    
+
     for (String name: commandLineStages) {
       I_FabricationRoutine fr = stages_.createRoutine(name, EMPTY_SET);
       if (assignableTo.isAssignableFrom(fr.getClass())) {
+        if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+          log_.println("The following stages are NOT assignable to " + assignableTo + system_.lineSeparator() +
+              commandLineStages + system_.lineSeparator() +
+              commandStagesSkips);
+        }
         return true;
       }
     }
@@ -149,10 +180,20 @@ public class RoutineFabricateFactory {
         if (!routine.isOptional()) {
           I_FabricationRoutine fr = stages_.createRoutine(name, EMPTY_SET);
           if (assignableTo.isAssignableFrom(fr.getClass())) {
+            if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+              log_.println("The following stages are assignable to " + assignableTo + system_.lineSeparator() +
+                  commandLineStages + system_.lineSeparator() +
+                  commandStagesSkips);
+            }
             return true;
           }
         }
       }
+    }
+    if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+      log_.println("The following stages are NOT assignable to " + assignableTo + system_.lineSeparator() +
+          commandLineStages + system_.lineSeparator() +
+          commandStagesSkips);
     }
     return false;
   }

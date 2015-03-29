@@ -14,6 +14,7 @@ import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
 import org.adligo.fabricate.models.fabricate.I_JavaSettings;
+import org.adligo.fabricate.repository.DependencyNotAvailableException;
 import org.adligo.fabricate.repository.I_DependenciesNormalizer;
 import org.adligo.fabricate.repository.I_RepositoryManager;
 import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
@@ -86,7 +87,9 @@ public class FabricateOptsSetup {
       fab_ = factory_.create(sys_, fabX, fd);
       
       //@diagram_sync on 1/26/2014 with Overview.seq
-      manageFabricateRuntimeClasspathDependencies();
+      if (!manageFabricateRuntimeClasspathDependencies()) {
+        return;
+      }
       
       //@diagram_sync on 1/26/2014 with Overview.seq
       String classpath = buildFabricateRuntimeClasspath();
@@ -167,14 +170,34 @@ public class FabricateOptsSetup {
    * @param fab
    * @throws IOException
    */
-  private void manageFabricateRuntimeClasspathDependencies() throws IOException {
+  private boolean manageFabricateRuntimeClasspathDependencies() throws IOException {
     if (log_.isLogEnabled(FabricateOptsSetup.class)) {
       I_SystemMessages messages = constants_.getSystemMessages();
       log_.println(messages.getManagingFabricateRuntimeClassPathDependencies() +
-          sys_.lineSeparator());
+          sys_.lineSeparator() + fab_.getDependencies().size());
     }
-    I_RepositoryManager rm = factory_.createRepositoryManager(sys_, fab_);
-    rm.manageDependencies();
+    List<I_Dependency> deps = fab_.getDependencies();
+    if (deps.size() >= 1) {
+      I_RepositoryManager rm = factory_.createRepositoryManager(sys_, fab_);
+      ConcurrentLinkedQueue<I_Dependency> depQueue = sys_.newConcurrentLinkedQueue(I_Dependency.class);
+      depQueue.addAll(deps);
+      rm.addDependencies(depQueue);
+      if (!rm.manageDependencies()) {
+        IOException x = rm.getLocalException();
+        if (x != null) {
+          log_.printTrace(x);
+          log_.println(CommandLineArgs.END);
+          return false;
+        }
+        DependencyNotAvailableException caught = rm.getRemoteException();
+        if (caught != null) {
+          rm.logError(caught);
+        }
+        log_.println(CommandLineArgs.END);
+        return false;
+      }
+    }
+    return true;
   }
 
   public I_FabricateConstants getConstants() {

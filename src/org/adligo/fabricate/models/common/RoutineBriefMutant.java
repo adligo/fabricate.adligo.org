@@ -23,6 +23,7 @@ import java.util.Map;
  */
 public class RoutineBriefMutant implements I_RoutineBrief {
   private static final String NULL = "null";
+  
 
   public static Map<String, I_RoutineBrief> convert(List<RoutineParentType> types, 
       RoutineBriefOrigin origin) throws ClassNotFoundException {
@@ -317,9 +318,6 @@ public class RoutineBriefMutant implements I_RoutineBrief {
     }
     origin_ = origin;
     if (className != null) {
-      //This uses the system class loader so that
-      // it doesn't collide with the instrumented class
-      // loader for tests4j_4jacoco.
       ClassLoader cl = ClassLoader.getSystemClassLoader();
       clazz_ = (Class<? extends I_FabricationRoutine>) Class.forName(className, true, cl);
     }
@@ -837,6 +835,5 @@ public class RoutineBriefMutant implements I_RoutineBrief {
   public String toString() {
     return toString(this);
   }
-
 
 }

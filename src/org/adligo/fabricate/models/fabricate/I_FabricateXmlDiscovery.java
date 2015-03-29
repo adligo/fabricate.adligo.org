@@ -24,4 +24,9 @@ public interface I_FabricateXmlDiscovery {
    */
   public String getDevXmlDir();
 
+  /**
+   * This is the location of the projects including the last File.separatorChar.
+   * @return
+   */
+  public String getProjectsDir();
 }

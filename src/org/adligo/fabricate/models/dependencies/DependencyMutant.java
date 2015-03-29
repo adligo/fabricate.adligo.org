@@ -1,5 +1,7 @@
 package org.adligo.fabricate.models.dependencies;
 
+import org.adligo.fabricate.common.i18n.I_SystemMessages;
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
 import java.util.ArrayList;
@@ -11,12 +13,12 @@ import java.util.List;
  *
  */
 public class DependencyMutant implements I_Dependency {
-  public static List<I_Dependency> convert(List<DependencyType> types) {
+  public static List<I_Dependency> convert(List<DependencyType> types, String project) {
     List<I_Dependency> toRet = new ArrayList<I_Dependency>();
     if (types != null) {
       for (DependencyType type: types) {
         if (type != null) {
-          toRet.add(new DependencyMutant(type));
+          toRet.add(new DependencyMutant(type, project));
         }
       }
     }
@@ -95,6 +97,7 @@ public class DependencyMutant implements I_Dependency {
   private String fileName_;
   private String group_;
   private String platform_;
+  private String project_;
   private String type_ = DependencyConstants.JAR;
   private String version_;
   
@@ -107,12 +110,13 @@ public class DependencyMutant implements I_Dependency {
     fileName_ = other.getFileName();
     group_ = other.getGroup();
     platform_ = other.getPlatform();
+    project_ = other.getProject();
     type_ = other.getType();
     version_ = other.getVersion();
   }
   
   @SuppressWarnings("boxing")
-  public DependencyMutant(DependencyType other) {
+  public DependencyMutant(DependencyType other, String project) {
     artifact_ = other.getArtifact();
     setChildren(IdeMutant.convert(other.getIde()));
     Boolean oe = other.isExtract();
@@ -125,6 +129,7 @@ public class DependencyMutant implements I_Dependency {
     fileName_ = other.getFileName();
     group_ = other.getGroup();
     platform_ = other.getPlatform();
+    project_ = project;
     String type = other.getType();
     if (type != null) {
       type_ = type;
@@ -183,6 +188,14 @@ public class DependencyMutant implements I_Dependency {
   }
   
   /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.dependencies.I_Dependency#getProject()
+   */
+  @Override
+  public String getProject() {
+    return project_;
+  }
+  
+  /* (non-Javadoc)
    * @see org.adligo.fabricate.models.dependencies.I_Dependency#getType()
    */
   @Override
@@ -205,6 +218,7 @@ public class DependencyMutant implements I_Dependency {
   public void setArtifact(String artifact) {
     this.artifact_ = artifact;
   }
+  
   public void setChildren(List<I_Ide> children) {
     children_.clear();
     if (children != null) {
@@ -217,6 +231,7 @@ public class DependencyMutant implements I_Dependency {
       }
     }
   }
+  
   public void setExtract(boolean extract) {
     this.extract_ = extract;
   }
@@ -224,18 +239,27 @@ public class DependencyMutant implements I_Dependency {
   public void setFileName(String fileName) {
     this.fileName_ = fileName;
   }
+  
   public void setGroup(String group) {
     this.group_ = group;
   }
+  
   public void setPlatform(String platform) {
     this.platform_ = platform;
   }
+  
+  public void setProject(String project) {
+    this.project_ = project;
+  }
+  
   public void setType(String type) {
     this.type_ = type;
   }
+  
   public void setVersion(String version) {
     this.version_ = version;
   }
+ 
   @Override
   public I_Ide get(int child) {
     return children_.get(child);
@@ -249,4 +273,5 @@ public class DependencyMutant implements I_Dependency {
   public String toString() {
     return toString(this);
   }
+
 }

@@ -1,6 +1,7 @@
 package org.adligo.fabricate.routines;
 
 import org.adligo.fabricate.depot.I_Depot;
+import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
@@ -28,8 +29,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author scott
  *
  */
-public abstract class ProjectQueueRoutine extends TasksRoutine implements 
-  I_ConcurrencyAware {
+public class ProjectQueueRoutine extends TasksRoutine implements 
+  I_ConcurrencyAware, I_ProjectsAware {
   protected static final String PROJECTS_QUEUE = "projectsQueue";
   
   protected I_Depot depot_;
@@ -45,21 +46,17 @@ public abstract class ProjectQueueRoutine extends TasksRoutine implements
   // looking for it's name and adds a item to the BlockingQueue. 
  protected ConcurrentHashMap<ProjectBlockKey, ProjectBlock> projectBlockMap_;
  
-  public List<I_Project> getProjects() {
-    return new ArrayList<I_Project>(projects_);
-  }
   
-  public void setProjects(Collection<I_Project> projects) {
-    projects_ = new ArrayList<I_Project>(projects);
-  }
-  
+  @SuppressWarnings("unchecked")
   @Override
   public boolean setupInitial(I_FabricationMemoryMutant<Object> memory,
       I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
 
+    projects_ = (List<I_Project>) memory.get(FabricationMemoryConstants.PARTICIPATING_PROJECTS);
     //order the inital project queue
     projectsQueue_ = system_.newConcurrentLinkedQueue(I_Project.class);
     projectsQueue_.addAll(projects_);
+    
     routineMemory.put(PROJECTS_QUEUE, projectsQueue_);
     if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
       log_.println(ProjectQueueRoutine.class.getSimpleName() + ".setup with " + projects_.size() + " participants");
@@ -109,6 +106,9 @@ public abstract class ProjectQueueRoutine extends TasksRoutine implements
           if (taskRoutine instanceof I_FabricateAware) {
             ((I_FabricateAware)  taskRoutine).setFabricate(fabricate_);
           }
+          if (taskRoutine instanceof I_RepositoryFactoryAware) {
+            ((I_RepositoryFactoryAware)  taskRoutine).setRepositoryFactory(repositoryFactory_);
+          }
           if (taskRoutine instanceof I_ProjectBriefAware) {
             ((I_ProjectBriefAware)  taskRoutine).setProjectBrief(project);
           }
@@ -129,6 +129,15 @@ public abstract class ProjectQueueRoutine extends TasksRoutine implements
       project = projectsQueue_.poll();
     }
   }
-  
-  
+
+  @Override
+  public List<I_Project> getProjects() {
+    return new ArrayList<I_Project>(projects_);
+  }
+
+  @Override
+  public void setProjects(Collection<I_Project> projects) {
+    projects_ = new ArrayList<I_Project>(projects);
+  }
+
 }

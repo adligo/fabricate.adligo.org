@@ -73,6 +73,9 @@ public class Fabricate implements I_Fabricate {
     fabricateProjectRunDir_ = other.getFabricateProjectRunDir();
     
     projectsDir_ = other.getProjectsDir();
+    if (projectsDir_ == null) {
+      throw new IllegalArgumentException("projectsDir");
+    }
     List<String> remotRepos = other.getRemoteRepositories();
     if (remotRepos == null) {
       remoteRepositories_ = Collections.emptyList();

@@ -56,6 +56,9 @@ public class DeferredLog implements I_FabLog {
       if (delegate_ == null) {
         ThreadLocalPrintStream.printTrace(t);
       } else {
+        if (isLogEnabled(DeferredLog.class)) {
+          delegate_.printTrace(new RuntimeException("logging trace from;"));
+        }
         delegate_.printTrace(t);
       }
     }

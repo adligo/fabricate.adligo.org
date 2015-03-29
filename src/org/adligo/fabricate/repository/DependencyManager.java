@@ -5,14 +5,15 @@ import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_FileMessages;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipFile;
 
 /**
@@ -43,7 +44,8 @@ public class DependencyManager implements I_DependencyManager {
   private String localRepository_;
   private boolean confirmIntegrity_;
   private boolean downloadedAnyArtifact_ = false;
-  private IOException lastIOException_;
+  private Map<String,WeightedException> reposToExceptions_ = new HashMap<String,WeightedException>();
+  
   
   public DependencyManager(I_FabSystem sys, Collection<String> repos,
       I_RepositoryPathBuilder pathBuilder) {
@@ -60,7 +62,7 @@ public class DependencyManager implements I_DependencyManager {
    * @see org.adligo.fabricate.repository.I_DependencyManager#manange(org.adligo.fabricate.models.dependencies.I_Dependency)
    */
   @Override
-  public boolean manange(I_Dependency dep ) {
+  public void manange(I_Dependency dep ) throws DependencyNotAvailableException, IOException {
     reset();
    
     if (find(dep)) {
@@ -68,18 +70,20 @@ public class DependencyManager implements I_DependencyManager {
       if (confirmIntegrity_) {
         if (!checkMd5AndExtract(dep)) {
           cleanFiles();
-          if (downloadEtc(dep)) {
-            return true;
+          if (!downloadEtc(dep)) {
+            throwDependencyNotAvailable(dep);
           }
         }
       }
     } else {
-      if (downloadEtc(dep)) {
-        return true;
+      if (!downloadEtc(dep)) {
+        throwDependencyNotAvailable(dep);
       }
     }
-    return false;
   }
+
+
+ 
 
   
   /**
@@ -89,9 +93,9 @@ public class DependencyManager implements I_DependencyManager {
    * @return
    */
   private boolean checkMd5AndExtract(I_Dependency dep) {
-    if (checkMd5s()) {
+    if (checkMd5s(null)) {
       if (dep.isExtract()) {
-        if (checkExtract(dep)) {
+        if (checkExtract(null, dep)) {
           return true;
         }
       } else {
@@ -102,7 +106,7 @@ public class DependencyManager implements I_DependencyManager {
   }
 
 
-  private boolean checkMd5s() {
+  private boolean checkMd5s(String remoteRepository) {
     String md5FromFile = null;
     I_SystemMessages messages = constants_.getSystemMessages();
     
@@ -110,20 +114,27 @@ public class DependencyManager implements I_DependencyManager {
       md5FromFile = files_.readFile(md5OnDisk_);
       md5FromFile = md5FromFile.replaceAll(sys_.lineSeparator(), "");
     } catch (IOException x) {
-      logMd5Mismatch(messages,md5FromFile, "");
-      lastIOException_ = x;
+      if (remoteRepository != null) {
+        reposToExceptions_.put(remoteRepository, new WeightedException(x, 2));
+      }
       return false;
     }
     String md5 = null;
     try {
        md5 = files_.calculateMd5(depOnDisk_);
     } catch (IOException x) {
-      logMd5Mismatch(messages,md5FromFile, md5);
-      lastIOException_ = x;
+      if (remoteRepository != null) {
+        reposToExceptions_.put(remoteRepository, new WeightedException(x, 3));
+      }
       return false;
     }
     if ( !md5FromFile.equals(md5)) {
-      logMd5Mismatch(messages, md5FromFile, md5);
+      String message = getMd5MismatchMessage(messages, md5FromFile, md5);
+      if (log_.isLogEnabled(DependencyManager.class)) {
+        log_.println(message);
+      }
+      reposToExceptions_.put(remoteRepository, new WeightedException(
+          new IllegalStateException(message), 4));
       return false;
     }
     if (log_.isLogEnabled(DependencyManager.class)) {
@@ -136,15 +147,13 @@ public class DependencyManager implements I_DependencyManager {
   }
 
 
-  public void logMd5Mismatch(I_SystemMessages messages, String fileMd5, String md5) {
-    if (log_.isLogEnabled(DependencyManager.class)) {
-      log_.println(
+  public String getMd5MismatchMessage(I_SystemMessages messages, String fileMd5, String md5) {
+    return 
           messages.getTheFollowingArtifact() + sys_.lineSeparator() +
           depOnDisk_ + sys_.lineSeparator() +
           messages.getDidNotPassTheMd5Check() + sys_.lineSeparator() + 
           fileMd5 + sys_.lineSeparator() + 
-          md5);
-    }
+          md5;
   }
 
 
@@ -153,7 +162,7 @@ public class DependencyManager implements I_DependencyManager {
    * @param dep
    * @return
    */
-  private boolean checkExtract(I_Dependency dep) {
+  private boolean checkExtract(String remoteRepository, I_Dependency dep) {
     if (dep.isExtract()) {
       ZipFile zipFile;
       I_SystemMessages messages = constants_.getSystemMessages();
@@ -161,21 +170,31 @@ public class DependencyManager implements I_DependencyManager {
       try {
         zipFile = files_.newZipFile(depOnDisk_);
       } catch (IOException e) {
-        logExtractFailure(messages);
-        lastIOException_ = e;
+        String message = getExtractFailure(messages);
+        if (log_.isLogEnabled(DependencyManager.class)) {
+          log_.println(message);
+        }
+        if (remoteRepository != null) {
+          reposToExceptions_.put(remoteRepository, new WeightedException(
+              new IllegalStateException(message), 4));
+        }
         return false;
       }
       if (files_.verifyZipFileExtract(extractOnDisk_, zipFile)) {
         logExtractVerificationSuccess(messages);
       } else {
-        logExtractFailure(messages);
+        String message = getExtractFailure(messages);
+        if (log_.isLogEnabled(DependencyManager.class)) {
+          log_.println(message);
+        }
+        return false;
       }
     }
     return true;
   }
 
 
-  private boolean downloadArtifact(I_RepositoryPathBuilder remotePathBuilder, I_Dependency dep) {
+  private boolean downloadArtifact(String remoteRepository, I_RepositoryPathBuilder remotePathBuilder, I_Dependency dep) {
     String from = remotePathBuilder.getArtifactUrl(dep);
     String to = pathBuilder_.getArtifactPath(dep);
     I_SystemMessages messages = constants_.getSystemMessages();
@@ -191,7 +210,7 @@ public class DependencyManager implements I_DependencyManager {
         log_.printTrace(x);
       
       }
-      lastIOException_ = x;
+      reposToExceptions_.put(remoteRepository, new WeightedException(x, 1));
       return false;
     }
     if (!files_.exists(to)) {
@@ -207,7 +226,7 @@ public class DependencyManager implements I_DependencyManager {
     return true;
   }
   
-  private boolean downloadMd5(I_RepositoryPathBuilder remotePathBuilder, I_Dependency dep) {
+  private boolean downloadMd5(String repository, I_RepositoryPathBuilder remotePathBuilder, I_Dependency dep) throws DependencyNotAvailableException {
     String from = remotePathBuilder.getMd5Url(dep);
     String to = pathBuilder_.getMd5Path(dep);
     String folder = pathBuilder_.getFolderPath(dep);
@@ -218,8 +237,7 @@ public class DependencyManager implements I_DependencyManager {
         if (!files_.exists(folder)) {
           if (log_.isLogEnabled(DependencyManager.class)) {
             I_FileMessages messages = constants_.getFileMessages();
-            log_.println(CommandLineArgs.END);
-            throw new RuntimeException(messages.getThereWasAProblemCreatingTheFollowingDirectory() + sys_.lineSeparator() +
+            throw new DependencyNotAvailableException(dep, messages.getThereWasAProblemCreatingTheFollowingDirectory() + sys_.lineSeparator() +
                 folder);
           }
         }
@@ -237,7 +255,7 @@ public class DependencyManager implements I_DependencyManager {
             from + sys_.lineSeparator() +
             messages.getFailed() + sys_.lineSeparator());
       }
-      lastIOException_ = x;
+      reposToExceptions_.put(repository, new WeightedException(x, 0));
       return false;
     }
     if (!files_.exists(to)) {
@@ -252,20 +270,25 @@ public class DependencyManager implements I_DependencyManager {
     return true;
   }
   
-  private boolean downloadEtc(I_Dependency dep) {
+  private boolean downloadEtc(I_Dependency dep) throws DependencyNotAvailableException, IOException {
     for (String remoteRepo: repositories_) {
       I_RepositoryPathBuilder builder = factory_.createRepositoryPathBuilder(remoteRepo);
-      if (downloadMd5(builder, dep)) {
-        if (downloadArtifact(builder, dep)) {
-          if (checkMd5s()) {
+      if (log_.isLogEnabled(DependencyManager.class)) {
+        log_.println("trying to obtain dependency " + sys_.lineSeparator() +
+            dep + sys_.lineSeparator() +
+            "from" + sys_.lineSeparator() +
+            remoteRepo);
+      }
+      if (downloadMd5(remoteRepo, builder, dep)) {
+        if (downloadArtifact(remoteRepo, builder, dep)) {
+          if (checkMd5s(remoteRepo)) {
             if (dep.isExtract()) {
-              if (extract(dep)) {
-                if (checkExtract(dep)) {
+              if (extract(remoteRepo, dep)) {
+                if (checkExtract(remoteRepo,dep)) {
                   return true;
                 }
               }
               cleanExtract();
-              return false;
             } else {
               return true;
             }
@@ -283,7 +306,7 @@ public class DependencyManager implements I_DependencyManager {
    * @param dep
    * @return
    */
-  private boolean extract(I_Dependency dep) {
+  private boolean extract(String remoteRepository, I_Dependency dep) throws IOException {
     cleanExtract();
     I_SystemMessages messages = constants_.getSystemMessages();
     if (log_.isLogEnabled(DependencyManager.class)) {
@@ -291,23 +314,15 @@ public class DependencyManager implements I_DependencyManager {
           messages.getExtractingTheFollowingArtifact() + sys_.lineSeparator() +
           depOnDisk_ + sys_.lineSeparator());
     }
-    try {
-      files_.unzip(depOnDisk_, extractOnDisk_);
-    } catch (IOException x) {
-      logExtractFailure(messages);
-      lastIOException_ = x;
-      return false;
-    }
+    files_.unzip(depOnDisk_, extractOnDisk_);
+    
     ZipFile zipFile = null;
-    try {
-      zipFile = files_.newZipFile(depOnDisk_);
-    } catch (IOException e) {
-      logExtractFailure(messages);
-      lastIOException_ = e;
-      return false;
-    }
+    zipFile = files_.newZipFile(depOnDisk_);
+    
     if (!files_.verifyZipFileExtract(extractOnDisk_, zipFile)) {
-      logExtractFailure(messages);
+      String message = getExtractFailure(messages);
+      reposToExceptions_.put(remoteRepository, new WeightedException(
+          new IOException(message), 11));
       return false;
     }
     return true;
@@ -323,15 +338,13 @@ public class DependencyManager implements I_DependencyManager {
     }
   }
 
-
-  public void logExtractFailure(I_SystemMessages messages) {
-    if (log_.isLogEnabled(DependencyManager.class)) {
-      log_.println(
+  public String getExtractFailure(I_SystemMessages messages) {
+    return 
           messages.getExtractionOfTheFollowingArtifact() + sys_.lineSeparator() +
           depOnDisk_ + sys_.lineSeparator() + 
-          messages.getFailed() + sys_.lineSeparator());
-    }
+          messages.getFailed() + sys_.lineSeparator();
   }
+  
   /**
    * identifies the variables
    * depOnDisk_
@@ -368,33 +381,21 @@ public class DependencyManager implements I_DependencyManager {
     downloadedAnyArtifact_ = false;
   }
 
-  private void cleanFiles() {
+  private void cleanFiles() throws IOException {
     if (files_.exists(depOnDisk_)) {
-      try {
-        files_.delete(depOnDisk_);
-      } catch (IOException x) {
-        lastIOException_ = x;
-      }
+     files_.delete(depOnDisk_);
     }
     if (files_.exists(md5OnDisk_)) {
-      try {
-        files_.delete(md5OnDisk_);
-      } catch (IOException x) {
-        lastIOException_ = x;
-      }
+      files_.delete(md5OnDisk_);
     }
     cleanExtract();
   }
 
 
-  private void cleanExtract() {
+  private void cleanExtract() throws IOException {
     if (extractOnDisk_ != null) {
       if (files_.exists(extractOnDisk_)) {
-        try {
-          files_.deleteRecursive(extractOnDisk_);
-        } catch (IOException x) {
-          lastIOException_ = x;
-        }
+        files_.deleteRecursive(extractOnDisk_);
       }
     }
   }
@@ -445,8 +446,23 @@ public class DependencyManager implements I_DependencyManager {
     return downloadedAnyArtifact_;
   }
 
-
-  public IOException getLastIOException() {
-    return lastIOException_;
+  
+  private void throwDependencyNotAvailable(I_Dependency dep) throws DependencyNotAvailableException {
+    if (log_.isLogEnabled(DependencyManager.class)) {
+      log_.println("throwing " + DependencyNotAvailableException.class.getName());
+    }
+    Collection<WeightedException> wes = reposToExceptions_.values();
+    WeightedException biggestWeight = null;
+    for (WeightedException we: wes) {
+      if (biggestWeight == null) {
+        biggestWeight = we;
+      } else {
+        if (we.getWeight() > biggestWeight.getWeight()) {
+          biggestWeight = we;
+        }
+      }
+    }
+    Exception x = biggestWeight.getException();
+    throw new DependencyNotAvailableException(dep, x.getMessage(), x);
   }
 }

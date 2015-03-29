@@ -49,7 +49,7 @@ public class FabricateFactory implements I_RepositoryFactory {
     String javaHome = FabricateEnvironment.INSTANCE.getJavaHome(sys);
     fm.setJavaHome(javaHome);
     FabSystemSetup.setup(sys, fab);
-    
+    fm.setProjectsDir(xmlDisc.getProjectsDir());
     
     Fabricate tf = new Fabricate(fm);
     FabricateDependencies deps = fab.getDependencies();
@@ -57,7 +57,7 @@ public class FabricateFactory implements I_RepositoryFactory {
       List<LibraryReferenceType> lrts = deps.getLibrary();
       if (lrts.size() >= 1) {
         LibraryResolver lr = new LibraryResolver(sys,tf);
-        List<I_Dependency> imutDeps = lr.getDependencies(lrts);
+        List<I_Dependency> imutDeps = lr.getDependencies(lrts, null);
         List<I_Dependency> fmDeps = fm.getDependencies();
         List<I_Dependency> allDeps = new ArrayList<I_Dependency>();
         allDeps.addAll(imutDeps);

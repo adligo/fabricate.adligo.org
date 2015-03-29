@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.FailureTransport;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
@@ -61,7 +62,7 @@ public class FabricationManager {
   }
   
   @SuppressWarnings("unchecked")
-  public FailureType setupAndRunBuildStages(FabricationMemoryMutant<Object> memory) {
+  public FailureTransport setupAndRunBuildStages(FabricationMemoryMutant<Object> memory) {
     List<I_Project> projects = (List<I_Project>) memory.get(FabricationMemoryConstants.PARTICIPATING_PROJECTS);
     setup_.setProjects(projects);
     
@@ -90,7 +91,7 @@ public class FabricationManager {
           message = message.replace("<X/>", name);
           log_.println(message);
         }
-        FailureType failure = executor_.run(name, setup_, memory);
+        FailureTransport failure = executor_.run(name, setup_, memory);
         if (failure != null) {
           return failure;
         }

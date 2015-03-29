@@ -46,28 +46,31 @@ public class LibraryResolver implements I_LibraryResolver {
     libDir_ = fab.getFabricateXmlRunDir() + "lib";
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.repository.I_LibraryResolver#getDependencies(java.lang.String, java.lang.String)
+   */
   @Override
-  public List<I_Dependency> getDependencies(List<LibraryReferenceType> libs) throws IllegalStateException {
+  public List<I_Dependency> getDependencies(List<LibraryReferenceType> libs, String projectName) throws IllegalStateException {
     List<I_Dependency> toRet = new ArrayList<I_Dependency>();
     for (LibraryReferenceType lib: libs) {
       String libName = lib.getValue();
-      List<I_Dependency> deps = getDependencies(libName);
+      List<I_Dependency> deps = getDependencies(libName, projectName);
       toRet.addAll(deps);
     }
     return toRet;
   }
   
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.repository.I_LibraryResolver#getDependencies(java.lang.String)
+   * @see org.adligo.fabricate.repository.I_LibraryResolver#getDependencies(java.lang.String, java.lang.String)
    */
   @Override
-  public List<I_Dependency> getDependencies(String libName) throws IllegalStateException {
+  public List<I_Dependency> getDependencies(String libName, String projectName) throws IllegalStateException {
     libs_ = new ArrayList<String>();
     deps_ = new ArrayList<I_Dependency>();
-    return getDependenciesInternal(libName);
+    return getDependenciesInternal(libName, projectName);
   }
   
-  private List<I_Dependency> getDependenciesInternal(String libName) throws IllegalStateException {
+  private List<I_Dependency> getDependenciesInternal(String libName, String projectName) throws IllegalStateException {
     if (libs_.contains(libName)) {
       I_SystemMessages messages = constants_.getSystemMessages();
       throw new IllegalStateException(messages.getTheFollowingListOfFabricateLibrariesContainsACircularReference() +
@@ -85,13 +88,13 @@ public class LibraryResolver implements I_LibraryResolver {
       DependenciesType deps = lib.getDependencies();
       List<DependencyType> libDeps = deps.getDependency();
       
-      List<I_Dependency> depsList = Dependency.convert(libDeps);
+      List<I_Dependency> depsList = Dependency.convert(libDeps, projectName);
       deps_.addAll(depsList);
       
       List<LibraryReferenceType> libs = deps.getLibrary();
       for (LibraryReferenceType lrt: libs) {
         String lrtName = lrt.getValue();
-        getDependenciesInternal(lrtName);
+        getDependenciesInternal(lrtName, projectName);
       }
     } catch (IOException x) {
       throw new IllegalStateException(x.getMessage(), x);
