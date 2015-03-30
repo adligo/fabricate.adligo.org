@@ -32,6 +32,7 @@ import org.adligo.fabricate.models.common.MemoryLock;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
+import org.adligo.fabricate.models.project.I_Project;
 import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.routines.I_ProjectBriefsAware;
 import org.adligo.fabricate.routines.I_ProjectsAware;
@@ -83,7 +84,9 @@ public class FabricateController {
   private ImplicitRoutineFactory factory_;
   private FabricateType fabXml_;
   private boolean commands_;
-  I_FabFileLog fileLog_ = null;
+  private RepositoryManager repositoryManager_;
+  private I_FabFileLog fileLog_ = null;
+  private FabricationMemoryMutant<Object> memory_;
   /**
    * The first throwable thrown by either
    * processing of a command or a build or share stage.
@@ -175,7 +178,7 @@ public class FabricateController {
     if (!addXmlRoutines(factory, argCommands)) {
       return;
     }
-    FabricationMemoryMutant<Object> memory = addMemoryValues(sys, factory);
+    memory_ = addMemoryValues(sys, factory);
     
     String depotDir = fab_.getFabricateXmlRunDir() + "depot";
     String depotFile = depotDir + files_.getNameSeparator() + "depot.xml";
@@ -188,11 +191,11 @@ public class FabricateController {
     } else {
       depotType = new DepotType();
     }
-    memory.put(FabricationMemoryConstants.DEPOT, new Depot(depotDir, new DepotContext(sys_), depotType));
-    memory.addLock(new MemoryLock(FabricationMemoryConstants.DEPOT, 
+    memory_.put(FabricationMemoryConstants.DEPOT, new Depot(depotDir, new DepotContext(sys_), depotType));
+    memory_.addLock(new MemoryLock(FabricationMemoryConstants.DEPOT, 
         Collections.singleton(FabricateController.class.getName())));
     
-    RepositoryManager rm = factory.createRepositoryManager(sys_, fab_);
+    repositoryManager_ = factory.createRepositoryManager(sys_, fab_);
     if (requiresProjects(argCommands)) {
       if (!manageProjectsDirAndMode(factory)) {
         return;
@@ -200,8 +203,10 @@ public class FabricateController {
       if (log_.isLogEnabled(FabricateController.class)) {
         log_.println(sys_.lineSeparator() + sysMessages_.getRunningFacets());
       }
-      ProjectsManager pm = factory.createProjectsManager(sys_, factory_, rm);
-      failure_ = pm.setupAndRun(memory);
+      RoutineBuilder routineBuilder = factory.createRoutineBuilder(sys_, RoutineBriefOrigin.FACET, factory_);
+      setupRoutineBuilder(routineBuilder);
+      ProjectsManager pm = factory.createProjectsManager(sys_, factory_, routineBuilder);
+      failure_ = pm.setupAndRun(memory_);
       if (checkFailure()) {
         return;
       }
@@ -215,7 +220,7 @@ public class FabricateController {
       setupRoutineBuilder(routineBuilder);
       CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_, routineBuilder);
 
-      failure_ = manager.processCommands(memory);
+      failure_ = manager.processCommands(memory_);
       if (checkFailure()) {
         return;
       }
@@ -223,8 +228,13 @@ public class FabricateController {
       if (log_.isLogEnabled(FabricateController.class)) {
         log_.println(sys_.lineSeparator() + sysMessages_.getRunningBuildStages());
       }
-      FabricationManager fabManager = factory.createFabricationManager(sys_, factory_, rm);
-      failure_ = fabManager.setupAndRunBuildStages(memory);
+      RoutineBuilder routineBuilder = factory.createRoutineBuilder(sys_, RoutineBriefOrigin.STAGE, factory_);
+      setupRoutineBuilder(routineBuilder);
+      RoutineBuilder routineArchiveBuilder = factory.createRoutineBuilder(sys_, RoutineBriefOrigin.ARCHIVE_STAGE, factory_);
+      setupRoutineBuilder(routineArchiveBuilder);
+      FabricationManager fabManager = factory.createFabricationManager(sys_, factory_, routineBuilder,
+          routineArchiveBuilder);
+      failure_ = fabManager.setupAndRunBuildStages(memory_);
       if (checkFailure()) {
         return;
       }
@@ -550,6 +560,12 @@ public class FabricateController {
   
   private void setupRoutineBuilder(RoutineBuilder builder) {
     builder.setRepositoryFactory(fabFactory_);
+    builder.setRepositoryManager(repositoryManager_);
+    
+    if (memory_ != null) {
+      List<I_Project> projects = (List<I_Project>) memory_.get(FabricationMemoryConstants.PARTICIPATING_PROJECTS);
+      builder.setProjects(projects);
+    }
   }
 
   

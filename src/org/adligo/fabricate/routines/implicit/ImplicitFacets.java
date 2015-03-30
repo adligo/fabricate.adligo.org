@@ -1,9 +1,14 @@
 package org.adligo.fabricate.routines.implicit;
 
+import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.routines.ProjectBriefQueueRoutine;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class just contains the routine brief
@@ -12,6 +17,7 @@ import org.adligo.fabricate.routines.ProjectBriefQueueRoutine;
  *
  */
 public class ImplicitFacets {
+  
   public static final String SETUP_PROJECTS = "setup projects";
   public static final RoutineBrief SETUP_PROJECTS_BRIEF = getSetupProjectsBrief();
   
@@ -26,6 +32,25 @@ public class ImplicitFacets {
   public static final RoutineBrief LOAD_PROJECTS_BRIEF = getProjectsLoadBrief();
   public static final String OBTAIN_PROJECTS = "obtain projects";
   public static final RoutineBrief OBTAIN_BRIEF = getObtainBrief();
+  /**
+   * all must be at the bottom, so that instances can be init
+   */
+  public static final List<I_RoutineBrief> ALL = getAll();
+  
+  
+  private static List<I_RoutineBrief> getAll() {
+    List<I_RoutineBrief> ret = new ArrayList<I_RoutineBrief>();
+    
+    try {
+      ret.add(SETUP_PROJECTS_BRIEF);
+      ret.add(OBTAIN_BRIEF);    
+      ret.add(LOAD_PROJECTS_BRIEF);
+      ret.add(DOWNLOAD_DEPENDENCIES_BRIEF);
+    } catch (Exception x) {
+      throw new RuntimeException(x);
+    }
+    return Collections.unmodifiableList(ret);
+  }
   
   private static RoutineBrief getSetupProjectsBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();

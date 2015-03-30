@@ -1,8 +1,5 @@
 package org.adligo.fabricate.managers;
 
-import org.adligo.fabricate.common.i18n.I_FabricateConstants;
-import org.adligo.fabricate.common.i18n.I_SystemMessages;
-import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.system.I_FailureTransport;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
@@ -16,22 +13,13 @@ import java.util.List;
 
 public class CommandManager {
   private final List<String> commands_ = new ArrayList<String>();
-  private final I_FabSystem system_;
-  private final I_FabricateConstants constants_;
-  private final I_SystemMessages sysMessages_;
-  private final I_FabLog log_;
   private final I_RoutineFabricateFactory factory_;
-  private String command_;
   
   private final I_RoutineBuilder routineBuilder_;
   
   public CommandManager(Collection<String> commands, I_FabSystem system, 
       I_RoutineFabricateFactory factory, I_RoutineBuilder routineBuilder) {
     commands_.addAll(commands);
-    system_ = system;
-    log_ = system.getLog();
-    constants_ = system.getConstants();
-    sysMessages_ = constants_.getSystemMessages();
     factory_ = factory;
     routineBuilder_ = routineBuilder;
   }
@@ -40,8 +28,9 @@ public class CommandManager {
    * @return FailureType if failure occurs, otherwise null.
    */
   public I_FailureTransport processCommands(FabricationMemoryMutant<Object> memory) {
-    I_RoutineExecutor executor = factory_.createRoutineExecutor(system_, factory_);
+    
     for (String command: commands_) {
+      I_RoutineExecutor executor = factory_.createRoutineExecutor();
       I_FailureTransport result = executor.run(command, routineBuilder_, memory);
       if (result != null) {
         return result;

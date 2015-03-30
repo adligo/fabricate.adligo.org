@@ -17,7 +17,6 @@ import org.adligo.fabricate.routines.RoutineExecutionEngine;
 import org.adligo.fabricate.routines.RoutineExecutor;
 import org.adligo.fabricate.routines.RoutineFactory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -106,27 +105,35 @@ public class ImplicitRoutineFactory implements I_RoutineFabricateFactory {
   }
   
   public void addImplicitFacets() {
-    facets_.add(ImplicitFacets.SETUP_PROJECTS_BRIEF);
-    facets_.add(ImplicitFacets.OBTAIN_BRIEF);
-    facets_.add(ImplicitFacets.LOAD_PROJECTS_BRIEF);
-    facets_.add(ImplicitFacets.DOWNLOAD_DEPENDENCIES_BRIEF);
+    List<I_RoutineBrief> briefs = ImplicitFacets.ALL;
+    
+    for (I_RoutineBrief brief: briefs) {
+      facets_.add(brief);
+    }
   }
   
   public void addImplicitCommands() {
-    addCommand(EncryptCommand.NAME, EncryptCommand.class);
-    addCommand(DecryptCommand.NAME, DecryptCommand.class);
-    addCommand(PublishCommand.NAME, PublishCommand.class);
+    List<I_RoutineBrief> briefs = ImplicitCommands.ALL;
+    
+    for (I_RoutineBrief brief: briefs) {
+      commands_.add(brief);
+    }
   }
 
   public void addImplicitStages() {
-    stages_.add(ImplicitStages.JAR_BRIEF);
+    List<I_RoutineBrief> briefs = ImplicitStages.ALL;
+    
+    for (I_RoutineBrief brief: briefs) {
+      stages_.add(brief);
+    }
   }
   
   public void addImplicitTraits() {
-    addTrait(EncryptTrait.NAME, EncryptTrait.class);
-    addTrait(DecryptTrait.NAME, DecryptTrait.class);
-    addTrait(NameJarTrait.NAME, NameJarTrait.class);
-    addTrait(FindSrcTrait.NAME, FindSrcTrait.class);
+    List<I_RoutineBrief> briefs = ImplicitTraits.ALL;
+    
+    for (I_RoutineBrief brief: briefs) {
+      traits_.add(brief);
+    }
   }
   
   /**
@@ -271,13 +278,6 @@ public class ImplicitRoutineFactory implements I_RoutineFabricateFactory {
     return traits_;
   }
   
-  private void addCommand(String name, Class<? extends I_FabricationRoutine> clazz) {
-    RoutineBriefMutant bm = new RoutineBriefMutant();
-    bm.setName(name);
-    bm.setClazz(clazz);
-    bm.setOrigin(RoutineBriefOrigin.IMPLICIT_COMMAND);
-    commands_.add(new RoutineBrief(bm));
-  }
   
   private void addTrait(String name, Class<? extends I_FabricationRoutine> clazz) {
     RoutineBriefMutant bm = new RoutineBriefMutant();
@@ -288,7 +288,7 @@ public class ImplicitRoutineFactory implements I_RoutineFabricateFactory {
   }
 
   @Override
-  public I_RoutineExecutor createRoutineExecutor(I_FabSystem system, I_RoutineFabricateFactory factory) {
-    return new RoutineExecutor(system, factory);
+  public I_RoutineExecutor createRoutineExecutor() {
+    return new RoutineExecutor(system_, this);
   }
 }

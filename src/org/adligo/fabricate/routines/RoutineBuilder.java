@@ -14,11 +14,14 @@ import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
+import org.adligo.fabricate.models.project.I_Project;
 import org.adligo.fabricate.repository.I_RepositoryFactory;
 import org.adligo.fabricate.repository.I_RepositoryManager;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +45,7 @@ public class RoutineBuilder implements I_RoutineBuilder {
   }
   private final I_Fabricate fabricate_;
   private final I_FabSystem system_;
+  private List<I_Project> projects_;
   private final RoutineBriefOrigin routineType_;
   private final I_RoutineFabricateFactory factory_;
   private final I_SystemMessages sysMessages_;
@@ -168,6 +172,12 @@ public class RoutineBuilder implements I_RoutineBuilder {
       }
       ((I_RepositoryFactoryAware) routine).setRepositoryFactory(repositoryFactory_);
     }
+    if (routine instanceof I_ProjectsAware) {
+      if (projects_ == null) {
+        throwException(I_ProjectsAware.class.getName(), routine);
+      }
+      ((I_ProjectsAware) routine).setProjects(projects_);
+    }
   }
 
   private void throwException(String x, I_FabricationRoutine routine) {
@@ -204,5 +214,24 @@ public class RoutineBuilder implements I_RoutineBuilder {
   
   public RoutineBriefOrigin getRoutineType() {
     return routineType_;
+  }
+
+  public List<I_Project> getProjects() {
+    return new ArrayList<I_Project>(projects_);
+  }
+
+  public void setProjects(List<I_Project> projects) {
+    if (projects != null) {
+      if (projects_ == null) {
+        projects_ = new ArrayList<I_Project>();
+      }
+      projects_.clear();
+      
+      for (I_Project project: projects) {
+        if (project != null) {
+          projects_.add(project);
+        }
+      }
+    }
   }
 }

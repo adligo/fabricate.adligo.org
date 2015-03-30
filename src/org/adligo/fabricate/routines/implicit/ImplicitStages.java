@@ -1,8 +1,13 @@
 package org.adligo.fabricate.routines.implicit;
 
+import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class just contains the routine brief
@@ -11,6 +16,7 @@ import org.adligo.fabricate.models.common.RoutineBriefOrigin;
  *
  */
 public class ImplicitStages {
+  
   public static final String GENERATE_SOURCE_TASK = "generate source";
   public static final String COMPILE_SOURCE_TASK = "compile source";
   public static final String ADD_FILES_TASK = "add files";
@@ -19,6 +25,22 @@ public class ImplicitStages {
   public static final String JAR = "jar";
   
   public static final RoutineBrief JAR_BRIEF = getJarBrief();
+  
+  /**
+   * all must be at the bottom, so that instances can be init
+   */
+  public static final List<I_RoutineBrief> ALL = getAll();
+  
+  private static List<I_RoutineBrief> getAll() {
+    List<I_RoutineBrief> ret = new ArrayList<I_RoutineBrief>();
+    
+    try {
+      ret.add(JAR_BRIEF);    
+    } catch (Exception x) {
+      throw new RuntimeException(x);
+    }
+    return Collections.unmodifiableList(ret);
+  }
   
   private static RoutineBrief getJarBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();

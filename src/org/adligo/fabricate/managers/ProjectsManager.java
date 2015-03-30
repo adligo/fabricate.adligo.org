@@ -6,24 +6,25 @@ import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.system.I_FailureTransport;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
-import org.adligo.fabricate.repository.I_RepositoryManager;
+import org.adligo.fabricate.routines.I_RoutineBuilder;
+import org.adligo.fabricate.routines.I_RoutineExecutor;
+import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
 import org.adligo.fabricate.routines.implicit.ImplicitFacets;
-import org.adligo.fabricate.routines.implicit.ImplicitRoutineFactory;
 
 public class ProjectsManager {
   private final I_FabricateConstants constants_;
   private final I_SystemMessages sysMessages_;
   private final I_FabLog log_;
-  private final FacetExecutor executor_;
-  private final FacetSetup setup_;
+  private final I_RoutineBuilder routineBuilder_;
+  private final I_RoutineFabricateFactory factory_;
   
-  public ProjectsManager(I_FabSystem system,  ImplicitRoutineFactory factory, 
-      I_RepositoryManager rm) {
+  public ProjectsManager(I_FabSystem system,  I_RoutineFabricateFactory factory, 
+      I_RoutineBuilder routineBuilder) {
     log_ = system.getLog();
     constants_ = system.getConstants();
     sysMessages_ = constants_.getSystemMessages();
-    executor_ = new FacetExecutor(system, factory);
-    setup_ = new FacetSetup(system, factory, rm);
+    routineBuilder_ = routineBuilder;
+    factory_ = factory;
   }
   
   public I_FailureTransport setupAndRun(FabricationMemoryMutant<Object> memory) {
@@ -33,19 +34,16 @@ public class ProjectsManager {
       return obtainFailure;
     }
     logSuccess(ImplicitFacets.OBTAIN_PROJECTS);
-    setup_.clearRoutines();
     I_FailureTransport loadFailure = runFacet(ImplicitFacets.LOAD_PROJECTS, memory);
     if (loadFailure != null) {
       return loadFailure;
     }
     logSuccess(ImplicitFacets.LOAD_PROJECTS);
-    setup_.clearRoutines();
     I_FailureTransport downloadFailure = runFacet(ImplicitFacets.DOWNLOAD_DEPENDENCIES, memory);
     if (downloadFailure != null) {
       return downloadFailure;
     }
     logSuccess(ImplicitFacets.DOWNLOAD_DEPENDENCIES);
-    setup_.clearRoutines();
     I_FailureTransport failure = runFacet(ImplicitFacets.SETUP_PROJECTS, memory);
     if (failure != null) {
       return failure;
@@ -68,7 +66,9 @@ public class ProjectsManager {
       message = message.replace("<X/>", facet);
       log_.println(message);
     }
-    return executor_.run(facet, setup_, memory);
+    I_RoutineExecutor executor = factory_.createRoutineExecutor();
+    
+    return executor.run(facet, routineBuilder_, memory);
   }
 
 }

@@ -9,7 +9,7 @@ import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import java.util.Set;
 
 public interface I_RoutineFabricateFactory {
-  public I_RoutineExecutor createRoutineExecutor(I_FabSystem system, I_RoutineFabricateFactory factory);
+  public I_RoutineExecutor createRoutineExecutor();
   
   public abstract I_FabricationRoutine createArchiveStage(String name,
       Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException;

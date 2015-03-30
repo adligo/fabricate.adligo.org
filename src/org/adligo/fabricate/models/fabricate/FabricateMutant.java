@@ -188,6 +188,9 @@ public class FabricateMutant implements I_Fabricate {
   
   public void addCommands(List<RoutineParentType> commandsFromXml) 
       throws ClassNotFoundException {
+    //TODO this should be replacement logic, overwriting 
+    // the implicit commands with the ones
+    // from fabricate.xml
     addRoutineParents(commandsFromXml, commands_, RoutineBriefOrigin.FABRICATE_COMMAND);
   }
 
@@ -213,6 +216,9 @@ public class FabricateMutant implements I_Fabricate {
   
   public void addFacets(Collection<RoutineParentType> routines) 
       throws ClassNotFoundException {
+    //TODO this should be replacement logic, overwriting 
+    // the implicit facets with the ones
+    // from fabricate.xml
     addRoutineParents(routines, facets_, RoutineBriefOrigin.FABRICATE_FACET);
   }
   
@@ -248,6 +254,9 @@ public class FabricateMutant implements I_Fabricate {
       if (stages != null) {
         List<StageType> stageTypes = stages.getStage();
         
+        //TODO this should be replacement logic, overwriting 
+        // the implicit stages and archive stages with the ones
+        // from fabricate.xml
         if (stageTypes != null) {
           for (StageType routine: stageTypes) {
             RoutineBriefMutant mut = new RoutineBriefMutant(routine, RoutineBriefOrigin.FABRICATE_STAGE);
@@ -319,6 +328,9 @@ public class FabricateMutant implements I_Fabricate {
   
   public void addTraits(Collection<RoutineParentType> routines) 
       throws ClassNotFoundException {
+      //TODO this should be replacement logic, overwriting 
+    // the implicit traits with the ones
+    // from fabricate.xml
     addRoutineParents(routines, traits_, RoutineBriefOrigin.FABRICATE_TRAIT);
   }
   

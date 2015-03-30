@@ -1,6 +1,7 @@
 package org.adligo.fabricate.models.common;
 
 import org.adligo.fabricate.common.util.StringUtils;
+import org.adligo.fabricate.routines.implicit.EncryptCommand;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.StageType;
 
@@ -59,8 +60,9 @@ public class RoutineBrief implements I_RoutineBrief {
   private final List<I_Parameter> parameters_;
   private final Map<String, List<String>> parametersValueLookup_;
 
-  
-
+  public RoutineBrief(String name, String clazz, RoutineBriefOrigin origin) throws ClassNotFoundException {
+    this(new RoutineBriefMutant(name, clazz, origin));
+  }
   
   /**
    * 

@@ -1,5 +1,6 @@
 package org.adligo.fabricate.routines;
 
+import org.adligo.fabricate.models.common.I_FabricationRoutine;
 import org.adligo.fabricate.models.project.I_Project;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.List;
  * @author scott
  *
  */
-public interface I_ProjectsAware {
+public interface I_ProjectsAware extends I_FabricationRoutine {
   public List<I_Project> getProjects();
   public void setProjects(Collection<I_Project> projects);
 }

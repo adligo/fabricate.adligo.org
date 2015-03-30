@@ -6,94 +6,108 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.common.system.I_FailureTransport;
-import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
-import org.adligo.fabricate.models.project.I_Project;
-import org.adligo.fabricate.repository.I_RepositoryManager;
-import org.adligo.fabricate.routines.implicit.ImplicitRoutineFactory;
-import org.adligo.fabricate.routines.implicit.ImplicitStages;
-import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
+import org.adligo.fabricate.routines.I_RoutineBuilder;
+import org.adligo.fabricate.routines.I_RoutineExecutor;
+import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FabricationManager {
-  private static final Map<String, I_RoutineBrief> IMPLICIT_ROUTINES = getImplicitRoutines();
-  private static final List<String> IMPLICIT_STAGE_ORDER = getImplicitStageOrder();
-  
-  private static final Map<String, I_RoutineBrief> getImplicitRoutines() {
-    Map<String, I_RoutineBrief> toRet = new HashMap<String, I_RoutineBrief>();
-    toRet.put(ImplicitStages.JAR, ImplicitStages.JAR_BRIEF);
-    return Collections.unmodifiableMap(toRet);
-  }
-  
-  private static final List<String> getImplicitStageOrder() {
-    List<String> toRet = new ArrayList<String>();
-    toRet.add(ImplicitStages.JAR);
-    return Collections.unmodifiableList(toRet);
-  }
-  
-  private final I_CommandLineConstants commandLineConstants_;
-  private final I_FabricateConstants constants_;
-  private final StageExecutor executor_;
-  private final I_Fabricate fab_;
-  private final I_SystemMessages sysMessages_;
-  private final StageSetup setup_;
+
   private final I_FabSystem system_;
   private final I_FabLog log_;
-  private final String stages_;
+  private final I_SystemMessages sysMessages_;
+  private final I_CommandLineConstants commandLineConstants_;
+  private final I_RoutineFabricateFactory factory_;
+  private final I_FabricateConstants constants_;
+  private final I_Fabricate fab_;
+  private final I_RoutineBuilder routineBuilder_;
+  private final I_RoutineBuilder archiveBuilder_;
   
-  public FabricationManager(I_FabSystem system,  ImplicitRoutineFactory factory, I_RepositoryManager rm) {
-    executor_ = new StageExecutor(system, factory);
-    fab_ = factory.getFabricate();
-    log_ = system.getLog();
-    setup_ = new StageSetup(system, factory, rm);
+  public FabricationManager(I_FabSystem system,  I_RoutineFabricateFactory factory, 
+      I_RoutineBuilder routineBuilder, I_RoutineBuilder archiveBuilder) {
     system_ = system;
+    log_ = system.getLog();
+    I_FabricateConstants constants = system.getConstants();
+    sysMessages_ = constants.getSystemMessages();
+    fab_ = factory.getFabricate();
     constants_ = system.getConstants();
-    sysMessages_ = constants_.getSystemMessages();
     
+    factory_ = factory;
     commandLineConstants_ = constants_.getCommandLineConstants();
-    stages_ = commandLineConstants_.getStages();
+    routineBuilder_ = routineBuilder;
+    archiveBuilder_ = archiveBuilder;
   }
   
-  @SuppressWarnings("unchecked")
   public I_FailureTransport setupAndRunBuildStages(FabricationMemoryMutant<Object> memory) {
-    List<I_Project> projects = (List<I_Project>) memory.get(FabricationMemoryConstants.PARTICIPATING_PROJECTS);
-    setup_.setProjects(projects);
-    
     List<String> stages = fab_.getStageOrder();
-    Map<String,I_RoutineBrief> routines = fab_.getStages();
-    if (stages.isEmpty()) {
-      stages = IMPLICIT_STAGE_ORDER;
-      routines = IMPLICIT_ROUTINES;
-    }
+    
+    String stagesKey = commandLineConstants_.getStages();
+    List<String> clStages = system_.getArgValues(stagesKey);
+    
     for (String stage: stages) {
-      I_RoutineBrief stageBrief = routines.get(stage);
-      String name = stageBrief.getName();
-      
-      boolean execute = false;
-      if (stageBrief.isOptional()) {
-        List<String> stageList = system_.getArgValues(stages_);
-        if (stageList.contains(name)) {
-          execute = true;
+      I_RoutineBrief routine = fab_.getStage(stage);
+      boolean run = false;
+      if (routine.isOptional()) {
+        if (clStages.contains(stage)) {
+          run = true;
         }
       } else {
-        execute = true;
+        run = true;
       }
-      if (execute) {
+      if (run) {
         if (log_.isLogEnabled(CommandManager.class)) {
           String message = sysMessages_.getRunningBuildStageX();
-          message = message.replace("<X/>", name);
+          message = message.replace("<X/>", stage);
           log_.println(message);
         }
-        I_FailureTransport failure = executor_.run(name, setup_, memory);
-        if (failure != null) {
-          return failure;
+        I_RoutineExecutor executor = factory_.createRoutineExecutor();
+        routineBuilder_.setNextRoutineName(stage);
+        I_FailureTransport result = executor.run(stage, routineBuilder_, memory);
+        if (result != null) {
+          return result;
+        }
+        if (log_.isLogEnabled(CommandManager.class)) {
+          String message = sysMessages_.getBuildStageXCompletedSuccessfully();
+          message = message.replace("<X/>", stage);
+          log_.println(message);
+        }
+      }
+    }
+    
+    String archive = commandLineConstants_.getArchive(true);
+    if (system_.hasArg(archive)) {
+      List<String> archiveStages = fab_.getArchiveStageOrder();
+      for (String stage: archiveStages) {
+        I_RoutineBrief routine = fab_.getArchiveStage(stage);
+        boolean run = false;
+        if (routine.isOptional()) {
+          if (clStages.contains(stage)) {
+            run = true;
+          }
+        } else {
+          run = true;
+        }
+        if (run) {
+          if (log_.isLogEnabled(CommandManager.class)) {
+            String message = sysMessages_.getRunningArchiveStageX();
+            message = message.replace("<X/>", stage);
+            log_.println(message);
+          }
+          I_RoutineExecutor executor = factory_.createRoutineExecutor();
+          archiveBuilder_.setNextRoutineName(stage);
+          I_FailureTransport result = executor.run(stage, archiveBuilder_, memory);
+          if (result != null) {
+            return result;
+          }
+          if (log_.isLogEnabled(CommandManager.class)) {
+            String message = sysMessages_.getArchiveStageXCompletedSuccessfully();
+            message = message.replace("<X/>", stage);
+            log_.println(message);
+          }
         }
       }
     }

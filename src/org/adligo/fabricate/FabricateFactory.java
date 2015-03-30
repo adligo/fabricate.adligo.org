@@ -11,6 +11,7 @@ import org.adligo.fabricate.managers.CommandManager;
 import org.adligo.fabricate.managers.FabricationManager;
 import org.adligo.fabricate.managers.ProjectsManager;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
+import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
@@ -26,12 +27,18 @@ import org.adligo.fabricate.repository.I_DependenciesNormalizer;
 import org.adligo.fabricate.repository.I_DependencyManager;
 import org.adligo.fabricate.repository.I_LibraryResolver;
 import org.adligo.fabricate.repository.I_RepositoryFactory;
-import org.adligo.fabricate.repository.I_RepositoryManager;
 import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.repository.LibraryResolver;
 import org.adligo.fabricate.repository.RepositoryManager;
+import org.adligo.fabricate.routines.I_RoutineBuilder;
+import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
 import org.adligo.fabricate.routines.RoutineBuilder;
+import org.adligo.fabricate.routines.implicit.ImplicitArchiveStages;
+import org.adligo.fabricate.routines.implicit.ImplicitCommands;
+import org.adligo.fabricate.routines.implicit.ImplicitFacets;
 import org.adligo.fabricate.routines.implicit.ImplicitRoutineFactory;
+import org.adligo.fabricate.routines.implicit.ImplicitStages;
+import org.adligo.fabricate.routines.implicit.ImplicitTraits;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
@@ -52,6 +59,31 @@ public class FabricateFactory implements I_RepositoryFactory {
     fm.setJavaHome(javaHome);
     FabSystemSetup.setup(sys, fab);
     fm.setProjectsDir(xmlDisc.getProjectsDir());
+    
+    List<I_RoutineBrief> aStages = ImplicitArchiveStages.ALL;
+    for (I_RoutineBrief brief: aStages) {
+      fm.addArchiveStage(brief);
+    }
+    
+    List<I_RoutineBrief> commands = ImplicitCommands.ALL;
+    for (I_RoutineBrief brief: commands) {
+      fm.addCommand(brief);
+    }
+    
+    List<I_RoutineBrief> facets = ImplicitFacets.ALL;
+    for (I_RoutineBrief brief: facets) {
+      fm.addFacet(brief);
+    }
+    
+    List<I_RoutineBrief> stages = ImplicitStages.ALL;
+    for (I_RoutineBrief brief: stages) {
+      fm.addStage(brief);
+    }
+    
+    List<I_RoutineBrief> traits = ImplicitTraits.ALL;
+    for (I_RoutineBrief brief: traits) {
+      fm.addTrait(brief);
+    }
     
     Fabricate tf = new Fabricate(fm);
     FabricateDependencies deps = fab.getDependencies();
@@ -76,7 +108,7 @@ public class FabricateFactory implements I_RepositoryFactory {
   }
   
   public CommandManager createCommandManager(Collection<String> commands, I_FabSystem system, 
-      ImplicitRoutineFactory factory, RoutineBuilder builder) {
+      I_RoutineFabricateFactory factory, RoutineBuilder builder) {
     return new CommandManager(commands, system, factory, builder);
   }
   
@@ -103,8 +135,9 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new JavaFactory();
   }
   
-  public FabricationManager createFabricationManager(I_FabSystem system,  ImplicitRoutineFactory factory, I_RepositoryManager rm) {
-    return new FabricationManager(system, factory, rm);
+  public FabricationManager createFabricationManager(I_FabSystem system,  
+      I_RoutineFabricateFactory factory, I_RoutineBuilder builder, I_RoutineBuilder archiveBuilder) {
+    return new FabricationManager(system, factory, builder, archiveBuilder);
   }
   
   @Override
@@ -121,8 +154,9 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new FabricateMutant(fab);
   }
   
-  public ProjectsManager createProjectsManager(I_FabSystem system,  ImplicitRoutineFactory factory, I_RepositoryManager rm) {
-    return new ProjectsManager(system, factory, rm);
+  public ProjectsManager createProjectsManager(I_FabSystem system, 
+      I_RoutineFabricateFactory factory, I_RoutineBuilder builder) {
+    return new ProjectsManager(system, factory, builder);
   }
   
   public RepositoryManager createRepositoryManager(I_FabSystem sys, I_Fabricate fab) {
