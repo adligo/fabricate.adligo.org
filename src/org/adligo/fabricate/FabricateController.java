@@ -13,9 +13,9 @@ import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateEnvironment;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
-import org.adligo.fabricate.common.system.FailureTransport;
 import org.adligo.fabricate.common.system.I_ExecutionResult;
 import org.adligo.fabricate.common.system.I_Executor;
+import org.adligo.fabricate.common.system.I_FailureTransport;
 import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.depot.Depot;
 import org.adligo.fabricate.depot.DepotContext;
@@ -29,12 +29,14 @@ import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.MemoryLock;
+import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
 import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.routines.I_ProjectBriefsAware;
 import org.adligo.fabricate.routines.I_ProjectsAware;
-import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
+import org.adligo.fabricate.routines.RoutineBuilder;
+import org.adligo.fabricate.routines.implicit.ImplicitRoutineFactory;
 import org.adligo.fabricate.xml.io_v1.common_v1_0.RoutineParentType;
 import org.adligo.fabricate.xml.io_v1.depot_v1_0.DepotType;
 import org.adligo.fabricate.xml.io_v1.dev_v1_0.FabricateDevType;
@@ -76,8 +78,9 @@ public class FabricateController {
   private final I_FabLog log_;
   private final I_FabFileIO files_;
   private final I_FabXmlFileIO xmlFiles_;
+  private final FabricateFactory fabFactory_;
   private final FabricateXmlDiscovery discovery_;
-  private RoutineFabricateFactory factory_;
+  private ImplicitRoutineFactory factory_;
   private FabricateType fabXml_;
   private boolean commands_;
   I_FabFileLog fileLog_ = null;
@@ -85,7 +88,7 @@ public class FabricateController {
    * The first throwable thrown by either
    * processing of a command or a build or share stage.
    */
-  private FailureTransport failure_;
+  private I_FailureTransport failure_;
   private Fabricate fab_;
   
   @SuppressWarnings("unused")
@@ -97,6 +100,7 @@ public class FabricateController {
       throws ClassNotFoundException, IOException {
     Map<String,String> argMap = CommandLineArgs.parseArgs(args);
     sys_ = sys;
+    fabFactory_ = factory;
     files_ = sys.getFileIO();
     xmlFiles_ = sys.getXmlFileIO();
     constants_ = sys_.getConstants();
@@ -207,8 +211,10 @@ public class FabricateController {
       if (log_.isLogEnabled(FabricateController.class)) {
         log_.println(sys_.lineSeparator() + sysMessages_.getRunningCommands());
       }
-      CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_);
-      manager.setRepositoryFactory(factory);
+      RoutineBuilder routineBuilder = factory.createRoutineBuilder(sys_, RoutineBriefOrigin.COMMAND, factory_);
+      setupRoutineBuilder(routineBuilder);
+      CommandManager manager = factory.createCommandManager(argCommands, sys_, factory_, routineBuilder);
+
       failure_ = manager.processCommands(memory);
       if (checkFailure()) {
         return;
@@ -293,9 +299,9 @@ public class FabricateController {
       }
       
       if (argCommands.size() >= 1) {
-        fm.addCommands(fabXml_);
+        fm.addCommands(fabXml_.getCommand());
       } else {
-        fm.addStages(fabXml_);
+        fm.addStagesAndProjects(fabXml_);
         commands_ = false;
       }
        
@@ -542,7 +548,9 @@ public class FabricateController {
     sys_.exit(0);
   }
   
-
+  private void setupRoutineBuilder(RoutineBuilder builder) {
+    builder.setRepositoryFactory(fabFactory_);
+  }
 
   
 }

@@ -11,7 +11,10 @@ import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
+import org.adligo.fabricate.routines.I_RoutineExecutor;
+import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
 import org.adligo.fabricate.routines.RoutineExecutionEngine;
+import org.adligo.fabricate.routines.RoutineExecutor;
 import org.adligo.fabricate.routines.RoutineFactory;
 
 import java.util.ArrayList;
@@ -28,20 +31,22 @@ import java.util.Set;
  * @author scott
  *
  */
-public class RoutineFabricateFactory {
+public class ImplicitRoutineFactory implements I_RoutineFabricateFactory {
   private static final Set<I_ExpectedRoutineInterface> EMPTY_SET = Collections.emptySet();
   private final I_Fabricate fabricate;
   
   private final I_FabSystem system_;
   private final I_FabLog log_;
+  private final RoutineFactory archiveStages_;
   private final RoutineFactory commands_;
   private final RoutineFactory facets_;
   private final RoutineFactory stages_;
   private final RoutineFactory traits_;
   
-  public RoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
+  public ImplicitRoutineFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
     system_ = system;
     log_ = system.getLog();
+    archiveStages_ = new RoutineFactory(system);
     facets_ = new RoutineFactory(system);
     commands_ = new RoutineFactory(system);
     stages_ = new RoutineFactory(system);
@@ -136,14 +141,14 @@ public class RoutineFabricateFactory {
     for (String name: commandLineCommands) {
       I_FabricationRoutine fr = commands_.createRoutine(name, EMPTY_SET);
       if (assignableTo.isAssignableFrom(fr.getClass())) {
-        if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+        if (log_.isLogEnabled(ImplicitRoutineFactory.class)) {
           log_.println("The following commands are assignable to " + assignableTo + system_.lineSeparator() +
               commandLineCommands);
         }
         return true;
       }
     }
-    if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+    if (log_.isLogEnabled(ImplicitRoutineFactory.class)) {
       log_.println("The following commands are NOT assignable to " + assignableTo + system_.lineSeparator() +
           commandLineCommands);
     }
@@ -164,7 +169,7 @@ public class RoutineFabricateFactory {
     for (String name: commandLineStages) {
       I_FabricationRoutine fr = stages_.createRoutine(name, EMPTY_SET);
       if (assignableTo.isAssignableFrom(fr.getClass())) {
-        if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+        if (log_.isLogEnabled(ImplicitRoutineFactory.class)) {
           log_.println("The following stages are NOT assignable to " + assignableTo + system_.lineSeparator() +
               commandLineStages + system_.lineSeparator() +
               commandStagesSkips);
@@ -180,7 +185,7 @@ public class RoutineFabricateFactory {
         if (!routine.isOptional()) {
           I_FabricationRoutine fr = stages_.createRoutine(name, EMPTY_SET);
           if (assignableTo.isAssignableFrom(fr.getClass())) {
-            if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+            if (log_.isLogEnabled(ImplicitRoutineFactory.class)) {
               log_.println("The following stages are assignable to " + assignableTo + system_.lineSeparator() +
                   commandLineStages + system_.lineSeparator() +
                   commandStagesSkips);
@@ -190,34 +195,65 @@ public class RoutineFabricateFactory {
         }
       }
     }
-    if (log_.isLogEnabled(RoutineFabricateFactory.class)) {
+    if (log_.isLogEnabled(ImplicitRoutineFactory.class)) {
       log_.println("The following stages are NOT assignable to " + assignableTo + system_.lineSeparator() +
           commandLineStages + system_.lineSeparator() +
           commandStagesSkips);
     }
     return false;
   }
-  public I_FabricationRoutine createFacet(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
-    return facets_.createRoutine(name, interfaces);
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.implicit.I_RoutineFabricateFactory#createArchiveStage(org.adligo.fabricate.common.system.I_FabSystem, org.adligo.fabricate.routines.I_RoutineBuilder)
+   */
+  @Override
+  public I_FabricationRoutine createArchiveStage(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
+    return archiveStages_.createRoutine(name, interfaces);
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.implicit.I_RoutineFabricateFactory#createCommand(org.adligo.fabricate.common.system.I_FabSystem, org.adligo.fabricate.routines.I_RoutineBuilder)
+   */
+  @Override
   public I_FabricationRoutine createCommand(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
     return commands_.createRoutine(name, interfaces);
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.implicit.I_RoutineFabricateFactory#createFacet(java.lang.String, java.util.Set)
+   */
+  @Override
+  public I_FabricationRoutine createFacet(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
+    return facets_.createRoutine(name, interfaces);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.implicit.I_RoutineFabricateFactory#createRoutineExecutionEngine(org.adligo.fabricate.common.system.I_FabSystem, org.adligo.fabricate.routines.I_RoutineBuilder)
+   */
+  @Override
   public RoutineExecutionEngine createRoutineExecutionEngine(I_FabSystem system, I_RoutineBuilder executorFactory) {
      return new RoutineExecutionEngine(system, executorFactory, fabricate.getThreads());
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.implicit.I_RoutineFabricateFactory#createStage(java.lang.String, java.util.Set)
+   */
+  @Override
   public I_FabricationRoutine createStage(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
     return stages_.createRoutine(name, interfaces);
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.implicit.I_RoutineFabricateFactory#createTrait(java.lang.String, java.util.Set)
+   */
+  @Override
   public I_FabricationRoutine createTrait(String name,Set<I_ExpectedRoutineInterface> interfaces) throws FabricationRoutineCreationException {
     return traits_.createRoutine(name, interfaces);
   }
 
-
+  public RoutineFactory getArchiveStages() {
+    return archiveStages_;
+  }
   public RoutineFactory getCommands() {
     return commands_;
   }
@@ -249,5 +285,10 @@ public class RoutineFabricateFactory {
     bm.setClazz(clazz);
     bm.setOrigin(RoutineBriefOrigin.IMPLICIT_TRAIT);
     traits_.add(new RoutineBrief(bm));
+  }
+
+  @Override
+  public I_RoutineExecutor createRoutineExecutor(I_FabSystem system, I_RoutineFabricateFactory factory) {
+    return new RoutineExecutor(system, factory);
   }
 }

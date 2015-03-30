@@ -6,7 +6,6 @@ public class SystemEnMessages implements I_SystemMessages {
 
   private static final String ARTIFACT = "Artifact:";
  
-  
   private static final String ARCHIVE_STAGE_X_COMPLETED_SUCCESSFULLY = "Archive stage <X/> completed successfully.";
   private static final String ANT_HELPER_REQUIRES_A_DIRECTORY_ARGUMENT = 
       "AntHelper requires a directory argument.";
@@ -129,6 +128,8 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String FINISHED = "finished.";
   
   private static final String FOR = "for;";
+  private static final String THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_BUT_THE_ROUTINE_BUILDER_S_VALUE_IS_NULL =
+      "The following routine implements <X/> but the RoutineBuilder's value is null.";
   private static final String FINISHED_GIT_PULL_ON_PROJECT_X = 
       "Finished git pull on project <X/>.";
   private static final String FINISHED_GIT_CLONE_ON_PROJECT_X = 
@@ -696,6 +697,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getTheFollowingFabricateLibraryCanNotBeFound() {
     return THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND;
+  }
+  
+  @Override
+  public String getTheFollowingRoutineImplementsXButTheRoutinesBuilderValueIsNull() {
+    return THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_BUT_THE_ROUTINE_BUILDER_S_VALUE_IS_NULL;
   }
   
   @Override

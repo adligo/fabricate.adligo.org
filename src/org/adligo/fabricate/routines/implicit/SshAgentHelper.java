@@ -1,4 +1,4 @@
-package org.adligo.fabricate.routines;
+package org.adligo.fabricate.routines.implicit;
 
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.util.StringUtils;

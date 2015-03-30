@@ -56,6 +56,9 @@ public class LibraryResolver implements I_LibraryResolver {
     for (LibraryReferenceType lib: libs) {
       String libName = lib.getValue();
       String platform = lib.getPlatform();
+      if (platform != null) {
+        platform = platform.toLowerCase();
+      }
       List<I_Dependency> deps = getDependencies(libName, projectName, platform);
       toRet.addAll(deps);
     }
@@ -69,6 +72,9 @@ public class LibraryResolver implements I_LibraryResolver {
   public List<I_Dependency> getDependencies(String libName, String projectName, String platform) throws IllegalStateException {
     libs_ = new ArrayList<String>();
     deps_ = new ArrayList<I_Dependency>();
+    if (platform != null) {
+      platform = platform.toLowerCase();
+    }
     return getDependenciesInternal(libName, projectName, platform);
   }
   

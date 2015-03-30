@@ -11,6 +11,7 @@ import org.adligo.fabricate.managers.CommandManager;
 import org.adligo.fabricate.managers.FabricationManager;
 import org.adligo.fabricate.managers.ProjectsManager;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
+import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
@@ -29,7 +30,8 @@ import org.adligo.fabricate.repository.I_RepositoryManager;
 import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.repository.LibraryResolver;
 import org.adligo.fabricate.repository.RepositoryManager;
-import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
+import org.adligo.fabricate.routines.RoutineBuilder;
+import org.adligo.fabricate.routines.implicit.ImplicitRoutineFactory;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateDependencies;
 import org.adligo.fabricate.xml.io_v1.fabricate_v1_0.FabricateType;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.LibraryReferenceType;
@@ -74,8 +76,8 @@ public class FabricateFactory implements I_RepositoryFactory {
   }
   
   public CommandManager createCommandManager(Collection<String> commands, I_FabSystem system, 
-      RoutineFabricateFactory factory) {
-    return new CommandManager(commands, system, factory);
+      ImplicitRoutineFactory factory, RoutineBuilder builder) {
+    return new CommandManager(commands, system, factory, builder);
   }
   
   public I_DependenciesManager createDependenciesManager(I_FabSystem sys, 
@@ -101,7 +103,7 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new JavaFactory();
   }
   
-  public FabricationManager createFabricationManager(I_FabSystem system,  RoutineFabricateFactory factory, I_RepositoryManager rm) {
+  public FabricationManager createFabricationManager(I_FabSystem system,  ImplicitRoutineFactory factory, I_RepositoryManager rm) {
     return new FabricationManager(system, factory, rm);
   }
   
@@ -119,7 +121,7 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new FabricateMutant(fab);
   }
   
-  public ProjectsManager createProjectsManager(I_FabSystem system,  RoutineFabricateFactory factory, I_RepositoryManager rm) {
+  public ProjectsManager createProjectsManager(I_FabSystem system,  ImplicitRoutineFactory factory, I_RepositoryManager rm) {
     return new ProjectsManager(system, factory, rm);
   }
   
@@ -137,8 +139,13 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new DefaultRepositoryPathBuilder(localRepository, separator);
   }
 
-  public RoutineFabricateFactory createRoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
-    return new RoutineFabricateFactory(system, fab, commandsNotStages);
+  public RoutineBuilder createRoutineBuilder(I_FabSystem system, RoutineBriefOrigin type, 
+      ImplicitRoutineFactory factory) {
+    return new RoutineBuilder(system, type, factory);
+  }
+  
+  public ImplicitRoutineFactory createRoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
+    return new ImplicitRoutineFactory(system, fab, commandsNotStages);
   }
 
 

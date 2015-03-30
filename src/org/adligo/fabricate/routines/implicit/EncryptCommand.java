@@ -15,7 +15,7 @@ import org.adligo.fabricate.routines.I_OutputProducer;
  *
  */
 public class EncryptCommand extends AbstractRoutine implements 
-  I_FabricationRoutine, I_PresentationAware {
+  I_FabricationRoutine {
   /**
    * This is the implicit name of this command.
    */
@@ -32,7 +32,7 @@ public class EncryptCommand extends AbstractRoutine implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public boolean setupInitial(I_FabricationMemoryMutant memory, I_RoutineMemoryMutant routineMemory) throws FabricationRoutineCreationException {
+  public boolean setupInitial(I_FabricationMemoryMutant<Object> memory, I_RoutineMemoryMutant<Object> routineMemory) throws FabricationRoutineCreationException {
     encryptTrait_ = traitFactory_.createRoutine(EncryptTrait.NAME, EncryptTrait.IMPLEMENTED_INTERFACES);
     
     String data =  system_.getArgValue(INPUT_CLA);

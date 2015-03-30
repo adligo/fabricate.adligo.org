@@ -138,6 +138,7 @@ public interface I_SystemMessages {
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess();
   public String getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
+  public String getTheFollowingRoutineImplementsXButTheRoutinesBuilderValueIsNull();
   public String getTheFollowingRequiredFileIsMissing();
   
   public String getTheFollowingArtifact();

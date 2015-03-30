@@ -6,6 +6,7 @@ import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
+import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 
 /**
  * This interface is used to create and setup
@@ -47,4 +48,7 @@ public interface I_RoutineBuilder {
    */
   public I_FabricationRoutine build(I_FabricationMemory<Object> memory, 
       I_RoutineMemory<Object> routineMemory) throws FabricationRoutineCreationException;
+  
+  public void setNextRoutineName(String name);
+  public RoutineBriefOrigin getRoutineType();
 }

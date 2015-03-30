@@ -120,14 +120,15 @@ fab cmd=encrypt
     	<sequence>
     		<element name="detail" type="string"></element>
     	</sequence>
-    	<attribute name="command" type="string" use="optional"></attribute>
-        <attribute name="facet" type="string"></attribute>
-        <attribute name="stage" type="string" use="optional">
+        <attribute name="archiveStage" type="string"></attribute>
+        <attribute name="command" type="string" use="optional"></attribute>
+    	<attribute name="facet" type="string"></attribute>
+    	<attribute name="stage" type="string" use="optional">
     		<annotation>
     			<documentation>The stage which failed.</documentation>
     		</annotation>
     	</attribute>
-    	<attribute name="stage_type" type="string" use="optional"></attribute>
+    	<attribute name="trait" type="string" use="optional"></attribute>
     	<attribute name="project" type="string" use="optional">
     		<annotation>
     			<documentation>The project which failed.</documentation>

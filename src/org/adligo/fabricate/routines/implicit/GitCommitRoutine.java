@@ -10,19 +10,8 @@ import org.adligo.fabricate.routines.I_ProjectAware;
  * @author scott
  *
  */
-public class GitCommitRoutine extends AbstractRoutine implements I_ProjectAware {
+public class GitCommitRoutine extends AbstractRoutine {
   public static final String NAME = "gitCommit";
   
-  @Override
-  public I_AttributesContainer getProject() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void setProject(I_Project project) {
-    // TODO Auto-generated method stub
-    
-  }
 
 }

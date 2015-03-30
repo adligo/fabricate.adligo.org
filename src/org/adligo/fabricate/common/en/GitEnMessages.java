@@ -3,6 +3,10 @@ package org.adligo.fabricate.common.en;
 import org.adligo.fabricate.common.i18n.I_GitMessages;
 
 public class GitEnMessages implements I_GitMessages {
+
+  private static final String CANCEL = "Cancel";
+  private static final String DEFAULT = "Default";
+  
   private static final String DISCOVERED_X_PROJECTS = "Discovered <X/> projects.";
   private static final String FINISHED_GIT_CHECKOUT_FOR_THE_FOLLOWING_PROJECT = 
       "Finished git checkout for the following project;";
@@ -19,11 +23,15 @@ public class GitEnMessages implements I_GitMessages {
   
   private static final String FINISHED_WITH_GIT_STAGE = "Finished git stage.";
   
+  private static final String SELECT_ALL = "Select All";
+  private static final String SELECT_NONE = "Select None";
+  private static final String OK = "Ok";
   
-  private static final String PLEASE_ENTER_THE_PASSWORD_FOR_YOUR_SSH_KEY = 
-      "Please enter the password for your ssh key (Enter for empty password):";
-  private static final String PLEASE_ENTER_YOUR_COMMIT_MESSAGE = 
-      "Please enter your commit message (Enter twice to finish);";
+  private static final String PLEASE_ENTER_YOUR_DEFAULT_COMMIT_MESSAGE = 
+      "Please enter your default commit message.";
+  private static final String PLEASE_ENTER_YOUR_COMMIT_MESSAGE_FOR_PROJECT_X = 
+      "Please enter your commit message for project <X/>.";
+  
   private static final String THE_FOLLOWING_PROJECT_HAS_A_VERSION_X_IN_FABRICATE_XML_BUT_IS_NOT_CHECKED_OUT_TO_THAT_VERSION_ABORT = 
       "The following project has the version '<X/>' in fabricate.xml but is not checked out to that version aborting fabrication;";
   
@@ -40,6 +48,24 @@ public class GitEnMessages implements I_GitMessages {
     
   private GitEnMessages() {}
  
+
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.en.I_GitMessages#getCancel()
+   */
+  @Override
+  public String getCancel() {
+    return CANCEL;
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.en.I_GitMessages#getDefault()
+   */
+  @Override
+  public String getDefault() {
+    return DEFAULT;
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.common.en.I_GitMessages#getDiscoveredXProjects()
    */
@@ -90,20 +116,46 @@ public class GitEnMessages implements I_GitMessages {
     return FINISHED_WITH_GIT_STAGE;
   }
   
+
+  
   /* (non-Javadoc)
-   * @see org.adligo.fabricate.common.en.I_GitMessages#getPleaseEnterThePasswordForYourSshKey()
+   * @see org.adligo.fabricate.common.en.I_GitMessages#getOk()
    */
   @Override
-  public String getPleaseEnterThePasswordForYourSshKey() {
-    return PLEASE_ENTER_THE_PASSWORD_FOR_YOUR_SSH_KEY;
+  public String getOk() {
+    return OK;
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.en.I_GitMessages#getPleaseEnterYourCommitMessageForProjectX()
+   */
+  @Override  
+  public String getPleaseEnterYourCommitMessageForProjectX() {
+    return PLEASE_ENTER_YOUR_COMMIT_MESSAGE_FOR_PROJECT_X;
   }
   
   /* (non-Javadoc)
    * @see org.adligo.fabricate.common.en.I_GitMessages#getPleaseEnterYourCommitMessage()
    */
   @Override
-  public String getPleaseEnterYourCommitMessage() {
-    return PLEASE_ENTER_YOUR_COMMIT_MESSAGE;
+  public String getPleaseEnterYourDefaultCommitMessage() {
+    return PLEASE_ENTER_YOUR_DEFAULT_COMMIT_MESSAGE;
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.en.I_GitMessages#getAll()
+   */
+  @Override
+  public String getSelectAll() {
+    return SELECT_ALL;
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.en.I_GitMessages#getNone()
+   */
+  @Override
+  public String getSelectNone() {
+    return SELECT_NONE;
   }
   
   /* (non-Javadoc)

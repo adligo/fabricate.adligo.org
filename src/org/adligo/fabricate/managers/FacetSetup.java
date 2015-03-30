@@ -10,21 +10,27 @@ import org.adligo.fabricate.repository.I_RepositoryManager;
 import org.adligo.fabricate.routines.I_CommandAware;
 import org.adligo.fabricate.routines.I_FabricateAware;
 import org.adligo.fabricate.routines.I_RepositoryManagerAware;
-import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
+import org.adligo.fabricate.routines.implicit.ImplicitRoutineFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This sets up facets, 
+ * this may be merged into a common routine setup class at some point.
+ * @author scott
+ *
+ */
 public class FacetSetup implements I_FacetSetup {
   private final I_FabSystem system_;
   private final I_Fabricate fabricate_;
-  private final RoutineFabricateFactory factory_;
+  private final ImplicitRoutineFactory factory_;
   private final List<I_FabricationRoutine> routines_ = new ArrayList<I_FabricationRoutine>();
   private final I_RepositoryManager repositoryManager_;
   
-  public FacetSetup(I_FabSystem system, RoutineFabricateFactory factory, I_RepositoryManager rm) {
+  public FacetSetup(I_FabSystem system, ImplicitRoutineFactory factory, I_RepositoryManager rm) {
     fabricate_ = factory.getFabricate();
     factory_ = factory;
     repositoryManager_ = rm;
@@ -49,20 +55,24 @@ public class FacetSetup implements I_FacetSetup {
     routines_.add(routine);
     
     routine.setSystem(system_);
-    if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
-      ((I_FabricateAware) routine).setFabricate(fabricate_);
-    } 
+    
     I_RoutineFactory facetFactory = factory_.getFacets();
     I_RoutineFactory taskFactory = facetFactory.createTaskFactory(name);
     routine.setTaskFactory(taskFactory);
-    routine.setTraitFactory(factory_.getTraits());
+
     if (I_CommandAware.class.isAssignableFrom(routine.getClass())) {
       I_RoutineFactory cmdFactory = factory_.getCommands();
       ((I_CommandAware) routine).setCommandFactory(cmdFactory);
     }
+    if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
+      ((I_FabricateAware) routine).setFabricate(fabricate_);
+    } 
     if (I_RepositoryManagerAware.class.isAssignableFrom(routine.getClass())) {
       ((I_RepositoryManagerAware) routine).setRepositoryManager(repositoryManager_);
     }
+    routine.setTraitFactory(factory_.getTraits());
+
+
     return routine;
   }
   

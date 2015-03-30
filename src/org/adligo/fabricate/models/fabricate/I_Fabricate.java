@@ -15,6 +15,10 @@ import java.util.Map;
  */
 public interface I_Fabricate extends I_JavaSettings, I_AttributesContainer {
 
+  public I_RoutineBrief getArchiveStage(String name);
+  public Map<String, I_RoutineBrief> getArchiveStages();
+  public List<String> getArchiveStageOrder();
+  
   public List<I_Dependency> getDependencies();
   
   public I_RoutineBrief getCommand(String name);

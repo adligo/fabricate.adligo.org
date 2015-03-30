@@ -26,6 +26,8 @@ import java.util.Set;
  *
  */
 public class Fabricate implements I_Fabricate {
+  private final List<String> archiveStageOrder_; 
+  private final Map<String, I_RoutineBrief> archiveStages_; 
   private final List<I_Parameter> attributes_;
   private final boolean developmentMode_;
   private final List<I_Dependency> dependencies_;
@@ -52,6 +54,20 @@ public class Fabricate implements I_Fabricate {
   private final Map<String, I_RoutineBrief> traits_; 
   
   public Fabricate(I_Fabricate other) {
+    archiveStages_ = createImmutableMap(other.getArchiveStages());
+    List<String> archiveStageOrderIn = other.getArchiveStageOrder();
+    if (archiveStageOrderIn != null && archiveStageOrderIn.size() >= 1) {
+      List<String> copy = new ArrayList<String>();
+      for (String stage: archiveStageOrderIn) {
+        if (stage != null) {
+          copy.add(stage);
+        }
+      }
+      archiveStageOrder_ = Collections.unmodifiableList(copy);
+    } else {
+      archiveStageOrder_ = Collections.emptyList();
+    }
+    
     attributes_ = Parameter.toImmutables(other.getAttributes());
     developmentMode_ = other.isDevelopmentMode();
     commands_ = createImmutableMap(other.getCommands());
@@ -143,6 +159,31 @@ public class Fabricate implements I_Fabricate {
     traits_ = createImmutableMap(other.getTraits());
   }
 
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getArchiveStage(java.lang.String)
+   */
+  @Override
+  public I_RoutineBrief getArchiveStage(String name) {
+    return archiveStages_.get(name);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getArchiveStages()
+   */
+  @Override
+  public Map<String, I_RoutineBrief> getArchiveStages() {
+    return archiveStages_;
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getArchiveStageOrder()
+   */
+  @Override
+  public List<String> getArchiveStageOrder() {
+    return archiveStageOrder_;
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttributes()
    */

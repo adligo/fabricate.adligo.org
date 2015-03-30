@@ -38,6 +38,8 @@ import java.util.Set;
  *
  */
 public class FabricateMutant implements I_Fabricate {
+  private Map<String,I_RoutineBrief> archiveStages_ = new HashMap<String,I_RoutineBrief>();
+  private List<String> archiveStageOrder_ = new ArrayList<String>();
   /**
    * actually only ParameterMutant instances.
    * This instance must be protected from external modification
@@ -124,6 +126,7 @@ public class FabricateMutant implements I_Fabricate {
   }
 
   public FabricateMutant(I_Fabricate other) {
+    setArchiveStages(other.getArchiveStageOrder(), other.getArchiveStages());
     List<I_Parameter> attributes = other.getAttributes();
     if (attributes != null) {
       setAttributes(attributes);
@@ -153,19 +156,39 @@ public class FabricateMutant implements I_Fabricate {
     setDependencies(deps);
     setFacets(other.getFacets());
     
-    setStages(other.getStages());
+    setStages(other.getStageOrder(), other.getStages());
     setTraits(other.getTraits());
     projectsDir_ = other.getProjectsDir();
+  }
+  
+  public void addArchiveStage(I_RoutineBrief rb) {
+    String name = rb.getName();
+    if (archiveStageOrder_.contains(name)) {
+      throw new IllegalArgumentException("Duplicate archive stage name " + name);
+    }
+    archiveStageOrder_.add(name);
+    if (rb instanceof RoutineBriefMutant) {
+      archiveStages_.put(name, rb);
+    } else {
+      archiveStages_.put(name, new RoutineBriefMutant(rb));
+    }
   }
   
   public void addAttribute(I_Parameter parameter) {
     ParameterMutant.addOrClone(parameter, attributes_);
   }
   
-  public void addCommands(FabricateType type) 
+  public void addCommand(I_RoutineBrief command) {
+    if (command instanceof RoutineBriefMutant) {
+      commands_.put(command.getName(), (RoutineBriefMutant) command);
+    } else {
+      commands_.put(command.getName(), new RoutineBriefMutant(command));
+    }
+  }
+  
+  public void addCommands(List<RoutineParentType> commandsFromXml) 
       throws ClassNotFoundException {
-    List<RoutineParentType> routines =  type.getCommand();
-    addRoutineParents(routines, commands_, RoutineBriefOrigin.FABRICATE_COMMAND);
+    addRoutineParents(commandsFromXml, commands_, RoutineBriefOrigin.FABRICATE_COMMAND);
   }
 
   public void addDependency(DependencyType dep) {
@@ -177,6 +200,14 @@ public class FabricateMutant implements I_Fabricate {
       dependencies_.add(dep);
     } else if (dep != null) {
       dependencies_.add(new DependencyMutant(dep));
+    }
+  }
+  
+  public void addFacet(I_RoutineBrief facet) {
+    if (facet instanceof RoutineBriefMutant) {
+      facets_.put(facet.getName(), (RoutineBriefMutant) facet);
+    } else {
+      facets_.put(facet.getName(), new RoutineBriefMutant(facet));
     }
   }
   
@@ -204,7 +235,13 @@ public class FabricateMutant implements I_Fabricate {
     }
   }
   
-  public void addStages(FabricateType type) throws ClassNotFoundException {
+  /**
+   * Adds all date from the StagesAndProjectsType xml type, 
+   * including scm, projects, stages and archive stages.
+   * @param type
+   * @throws ClassNotFoundException
+   */
+  public void addStagesAndProjects(FabricateType type) throws ClassNotFoundException {
     StagesAndProjectsType spt =  type.getProjectGroup();
     if (spt != null) {
       StagesType stages = spt.getStages();
@@ -223,7 +260,7 @@ public class FabricateMutant implements I_Fabricate {
         if (archiveTypes != null) {
           for (StageType routine: archiveTypes) {
             RoutineBriefMutant mut = new RoutineBriefMutant(routine, RoutineBriefOrigin.FABRICATE_ARCHIVE_STAGE);
-            stages_.put(mut.getName(), mut);
+            addArchiveStage(mut);
           }
         }
       }
@@ -271,6 +308,15 @@ public class FabricateMutant implements I_Fabricate {
     }
   }
   
+  public void addTrait(I_RoutineBrief v) {
+    if (v instanceof RoutineBriefMutant) {
+      traits_.put(v.getName(), (RoutineBriefMutant) v);
+    } else {
+      //should throw a npe for null v
+      traits_.put(v.getName(), new RoutineBriefMutant(v));
+    }
+  }
+  
   public void addTraits(Collection<RoutineParentType> routines) 
       throws ClassNotFoundException {
     addRoutineParents(routines, traits_, RoutineBriefOrigin.FABRICATE_TRAIT);
@@ -286,9 +332,33 @@ public class FabricateMutant implements I_Fabricate {
   }
 
   /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getArchiveStage(java.lang.String)
+   */
+  @Override
+  public I_RoutineBrief getArchiveStage(String name) {
+    return archiveStages_.get(name);
+  }
+  
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getArchiveStages()
+   */
+  @Override
+  public Map<String, I_RoutineBrief> getArchiveStages() {
+    return new HashMap<String,I_RoutineBrief>(archiveStages_);
+  }
+
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.models.fabricate.I_Fabricate#getArchiveStageOrder()
+   */
+  @Override
+  public List<String> getArchiveStageOrder() {
+    return new ArrayList<String>(archiveStageOrder_);
+  }
+  
+  /* (non-Javadoc)
   * @see org.adligo.fabricate.models.common.I_AttributesContainer#getAttribute(String key)
   */
- @Override
+  @Override
   public I_Parameter getAttribute(String key) {
     return AttributesOverlay.getAttribute(key, attributes_);
   }
@@ -421,10 +491,12 @@ public class FabricateMutant implements I_Fabricate {
     return stages_.get(name);
   }
   
+  @Override
   public Map<String, I_RoutineBrief> getStages() {
     return new HashMap<String,I_RoutineBrief>(stages_);
   }
 
+  @Override
   public List<String> getStageOrder() {
     return new ArrayList<String>(stageOrder_);
   }
@@ -463,16 +535,16 @@ public class FabricateMutant implements I_Fabricate {
     return developmentMode_;
   }
 
-  public void setCommands(Map<String, I_RoutineBrief> commands) {
-    commands_.clear();
-    if (commands != null && commands.size() >= 1) {
-      Set<Entry<String, I_RoutineBrief>> entries = commands.entrySet();
-      for (Entry<String,I_RoutineBrief> e: entries) {
-        I_RoutineBrief v = e.getValue();
-        if (v instanceof RoutineBriefMutant) {
-          commands_.put(e.getKey(), (RoutineBriefMutant) v);
-        } else {
-          commands_.put(e.getKey(), new RoutineBriefMutant(v));
+  public void setArchiveStages(List<String> archiveStageOrder, Map<String, I_RoutineBrief> archiveStages) {
+    archiveStageOrder_.clear();
+    archiveStages_.clear();
+    if (archiveStageOrder != null && archiveStageOrder.size() >= 1) {
+      if (archiveStages != null && archiveStages.size() >= 1) {
+        for (String name: archiveStageOrder) {
+          if (name != null) {
+            I_RoutineBrief v = archiveStages.get(name);
+            addArchiveStage(v);
+          }
         }
       }
     }
@@ -482,6 +554,18 @@ public class FabricateMutant implements I_Fabricate {
     ParameterMutant.setMutants(attributes_, attributes);
   }
   
+  public void setCommands(Map<String, I_RoutineBrief> commands) {
+    commands_.clear();
+    if (commands != null && commands.size() >= 1) {
+      Set<Entry<String, I_RoutineBrief>> entries = commands.entrySet();
+      for (Entry<String,I_RoutineBrief> e: entries) {
+        addCommand(e.getValue());
+      }
+    }
+  }
+
+  
+
   public void setDependencies(Collection<? extends I_Dependency> deps) {
     dependencies_.clear();
     if (deps != null) {
@@ -512,12 +596,7 @@ public class FabricateMutant implements I_Fabricate {
     if (facets != null && facets.size() >= 1) {
       Set<Entry<String, I_RoutineBrief>> entries = facets.entrySet();
       for (Entry<String,I_RoutineBrief> e: entries) {
-        I_RoutineBrief v = e.getValue();
-        if (v instanceof RoutineBriefMutant) {
-          facets_.put(e.getKey(), (RoutineBriefMutant) v);
-        } else {
-          facets_.put(e.getKey(), new RoutineBriefMutant(v));
-        }
+        addFacet(e.getValue());
       }
     }
   }
@@ -526,7 +605,6 @@ public class FabricateMutant implements I_Fabricate {
     this.javaHome_ = javaHome;
   }
 
-  
   public void setJavaSettings(I_JavaSettings javaSettings) {
     if (javaSettings instanceof JavaSettingsMutant) {
       javaSettings_ = (JavaSettingsMutant) javaSettings;
@@ -553,13 +631,17 @@ public class FabricateMutant implements I_Fabricate {
     this.fabricateDevXmlDir_ = fabricateDevXmlDir;
   }
 
-  public void setStages(Map<String, I_RoutineBrief> stages) {
+  public void setStages(List<String> stageOrder, Map<String, I_RoutineBrief> stages) {
+    stageOrder_.clear();
     stages_.clear();
-    if (stages != null && stages.size() >= 1) {
-      Set<Entry<String, I_RoutineBrief>> entries = stages.entrySet();
-      for (Entry<String,I_RoutineBrief> e: entries) {
-        I_RoutineBrief v = e.getValue();
-        addStage(v);
+    if (stageOrder != null && stageOrder.size() >= 1) {
+      if (stages != null && stages.size() >= 1) {
+        for (String name: stageOrder) {
+          if (name != null) {
+            I_RoutineBrief v = stages.get(name);
+            addStage(v);
+          }
+        }
       }
     }
   }
@@ -569,16 +651,12 @@ public class FabricateMutant implements I_Fabricate {
     if (traits != null && traits.size() >= 1) {
       Set<Entry<String, I_RoutineBrief>> entries = traits.entrySet();
       for (Entry<String,I_RoutineBrief> e: entries) {
-        I_RoutineBrief v = e.getValue();
-        if (v instanceof RoutineBriefMutant) {
-          traits_.put(e.getKey(), (RoutineBriefMutant) v);
-        } else {
-          //should throw a npe for null v
-          traits_.put(e.getKey(), new RoutineBriefMutant(v));
-        }
+        addTrait(e.getValue());
       }
     }
   }
+
+
 
   public void setProjectsDir(String projectsDir) {
     projectsDir_ = projectsDir;
@@ -608,17 +686,22 @@ public class FabricateMutant implements I_Fabricate {
           throws IllegalArgumentException, ClassNotFoundException {
     if (routines != null) {
       for (RoutineParentType routine: routines) {
-        RoutineBriefMutant mut = new RoutineBriefMutant(routine, origin);
-        String name = mut.getName();
-        if (map.containsKey(name)) {
-          DuplicateRoutineException dre = new DuplicateRoutineException();
-          dre.setName(name);
-          dre.setOrigin(mut.getOrigin());
-          throw dre;
-        } else {
-          map.put(mut.getName(), mut);
-        }
+        addRoutineParent(map, origin, routine);
       }
+    }
+  }
+
+  private void addRoutineParent(Map<String, I_RoutineBrief> map, RoutineBriefOrigin origin,
+      RoutineParentType routine) throws ClassNotFoundException {
+    RoutineBriefMutant mut = new RoutineBriefMutant(routine, origin);
+    String name = mut.getName();
+    if (map.containsKey(name)) {
+      DuplicateRoutineException dre = new DuplicateRoutineException();
+      dre.setName(name);
+      dre.setOrigin(mut.getOrigin());
+      throw dre;
+    } else {
+      map.put(mut.getName(), mut);
     }
   }
 

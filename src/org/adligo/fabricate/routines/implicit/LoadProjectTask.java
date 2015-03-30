@@ -106,7 +106,12 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
         dependenciesFilter_.add(normDeps);
       }
       if (log_.isLogEnabled(LoadProjectTask.class)) {
-        log_.println("project '" + pm.getName() + "' has " + normDeps.size() + " external dependencies.");
+        StringBuilder sb = new StringBuilder();
+        sb.append("project '" + pm.getName() + "' has " + normDeps.size() + " external dependencies.");
+        for (I_Dependency dep: normDeps) {
+          sb.append(system_.lineSeparator() + "\t" + dep.toString());
+        }
+        log_.println(sb.toString());
       }
       Project p = new Project(pm);
       projects_.add(p);

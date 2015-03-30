@@ -14,23 +14,29 @@ import org.adligo.fabricate.routines.I_CommandAware;
 import org.adligo.fabricate.routines.I_FabricateAware;
 import org.adligo.fabricate.routines.I_ProjectsAware;
 import org.adligo.fabricate.routines.I_RepositoryManagerAware;
-import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
+import org.adligo.fabricate.routines.implicit.ImplicitRoutineFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This sets up stages, 
+ * this may be merged into a common routine setup class at some point.
+ * @author scott
+ *
+ */
 public class StageSetup implements I_StageSetup {
   private final I_FabSystem system_;
   private final I_FabLog log_;
   private final I_Fabricate fabricate_;
-  private final RoutineFabricateFactory factory_;
+  private final ImplicitRoutineFactory factory_;
   private final List<I_FabricationRoutine> routines_ = new ArrayList<I_FabricationRoutine>();
   private final I_RepositoryManager repositoryManager_;
   private List<I_Project> projects_ = new ArrayList<I_Project>();
   
-  public StageSetup(I_FabSystem system, RoutineFabricateFactory factory, I_RepositoryManager rm) {
+  public StageSetup(I_FabSystem system, ImplicitRoutineFactory factory, I_RepositoryManager rm) {
     fabricate_ = factory.getFabricate();
     factory_ = factory;
     repositoryManager_ = rm;
@@ -57,7 +63,6 @@ public class StageSetup implements I_StageSetup {
       log_.println(StageSetup.class.getSimpleName() + ".processStageSetup created the following routine;" + routine);
     }
     routines_.add(routine);
-    
     
     routine.setSystem(system_);
     if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {

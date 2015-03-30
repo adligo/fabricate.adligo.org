@@ -4,16 +4,16 @@ import org.adligo.fabricate.common.i18n.I_CommandLineConstants;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
-import org.adligo.fabricate.common.system.FailureTransport;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.common.system.I_FailureTransport;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import org.adligo.fabricate.models.project.I_Project;
 import org.adligo.fabricate.repository.I_RepositoryManager;
+import org.adligo.fabricate.routines.implicit.ImplicitRoutineFactory;
 import org.adligo.fabricate.routines.implicit.ImplicitStages;
-import org.adligo.fabricate.routines.implicit.RoutineFabricateFactory;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class FabricationManager {
   private final I_FabLog log_;
   private final String stages_;
   
-  public FabricationManager(I_FabSystem system,  RoutineFabricateFactory factory, I_RepositoryManager rm) {
+  public FabricationManager(I_FabSystem system,  ImplicitRoutineFactory factory, I_RepositoryManager rm) {
     executor_ = new StageExecutor(system, factory);
     fab_ = factory.getFabricate();
     log_ = system.getLog();
@@ -62,7 +62,7 @@ public class FabricationManager {
   }
   
   @SuppressWarnings("unchecked")
-  public FailureTransport setupAndRunBuildStages(FabricationMemoryMutant<Object> memory) {
+  public I_FailureTransport setupAndRunBuildStages(FabricationMemoryMutant<Object> memory) {
     List<I_Project> projects = (List<I_Project>) memory.get(FabricationMemoryConstants.PARTICIPATING_PROJECTS);
     setup_.setProjects(projects);
     
@@ -91,7 +91,7 @@ public class FabricationManager {
           message = message.replace("<X/>", name);
           log_.println(message);
         }
-        FailureTransport failure = executor_.run(name, setup_, memory);
+        I_FailureTransport failure = executor_.run(name, setup_, memory);
         if (failure != null) {
           return failure;
         }
