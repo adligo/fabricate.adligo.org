@@ -75,13 +75,26 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
             }
             gitCalls_.checkout(projectName, projectsDir, defaultBranch);
           }
+          if (log_.isLogEnabled(GitUpdateRoutine.class)) {
+            log_.println(GitUpdateRoutine.class.getSimpleName() + " git pull on project " + projectName);
+          }
           I_ExecutingProcess ep = gitCalls_.pull(env_, projectName, projectsDir);
           while (!ep.isFinished()) {
+            if (!gitCalls_.isSuccess(ep)) {
+              String message = sysMessages_.getThereWasAProblemUpdatingTheFollowingProject() +
+                  system_.lineSeparator() + projectName;
+              ep.throwIOExceptionWithAllOutput(message );
+            }
             try {
               ep.waitUntilFinished(1000);
             } catch (InterruptedException e) {
               system_.currentThread().interrupt();
             }
+          }
+          if (!gitCalls_.isSuccess(ep)) {
+            String message = sysMessages_.getThereWasAProblemUpdatingTheFollowingProject() +
+                system_.lineSeparator() + projectName;
+            ep.throwIOExceptionWithAllOutput(message );
           }
         } catch (IOException x) {
           //pass to the RunMonitor

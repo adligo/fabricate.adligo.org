@@ -9,10 +9,10 @@ import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.project.I_Project;
+import org.adligo.fabricate.models.project.I_ProjectBrief;
 import org.adligo.fabricate.models.project.ProjectModifications;
 import org.adligo.fabricate.routines.I_FabricateAware;
 import org.adligo.fabricate.routines.I_InputAware;
-import org.adligo.fabricate.routines.I_ProjectAware;
 import org.adligo.fabricate.routines.I_ProjectBriefAware;
 import org.adligo.fabricate.routines.I_ProjectsAware;
 
@@ -30,12 +30,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  */
 public class GitStageTask extends ScmContextInputAwareRoutine 
-  implements I_ProjectAware, I_InputAware<ScmContext> {
+  implements I_ProjectBriefAware, I_InputAware<ScmContext> {
   public static final Set<I_ExpectedRoutineInterface> IMPLEMENTED_INTERFACES = getImplementedInterfaces();
   private static final String MODIFICATIONS = GitStageTask.class.getName() + ".modifications";
   
   private ConcurrentLinkedQueue<ProjectModifications> modifications_;
-  private I_Project project_;
+  private I_ProjectBrief project_;
   
   
   private static Set<I_ExpectedRoutineInterface> getImplementedInterfaces() {
@@ -54,11 +54,10 @@ public class GitStageTask extends ScmContextInputAwareRoutine
     
     String projectsDir = fabricate_.getProjectsDir();
     String projectName = project_.getName();
-    String projectDir = project_.getDir();
     
     try {
      
-      List<String> result = gitCalls_.status(projectDir);
+      List<String> result = gitCalls_.status(projectsDir + projectName);
       if (log_.isLogEnabled(GitStageTask.class)) {
         StringBuilder sb = new StringBuilder();
         sb.append(GitStageTask.class.getName() + system_.lineSeparator() +
@@ -104,12 +103,12 @@ public class GitStageTask extends ScmContextInputAwareRoutine
   }
 
   @Override
-  public I_Project getProject() {
+  public I_ProjectBrief getProjectBrief() {
     return project_;
   }
 
   @Override
-  public void setProject(I_Project project) {
+  public void setProjectBrief(I_ProjectBrief project) {
     project_ = project;
   }
 

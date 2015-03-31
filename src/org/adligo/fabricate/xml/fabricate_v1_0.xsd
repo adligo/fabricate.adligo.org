@@ -258,8 +258,8 @@
     </complexType>
 
     <complexType name="log_setting_type">
-    	<attribute name="class" type="string"></attribute>
-    	<attribute name="setting" type="boolean"></attribute>
+        <attribute name="setting" type="boolean"></attribute>
+        <attribute name="class" type="string"></attribute>
     </complexType>
 
     <complexType name="log_settings_type">

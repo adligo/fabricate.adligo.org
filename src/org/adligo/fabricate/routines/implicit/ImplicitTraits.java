@@ -4,7 +4,7 @@ import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
-import org.adligo.fabricate.routines.ProjectQueueRoutine;
+import org.adligo.fabricate.routines.ProjectBriefQueueRoutine;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +38,7 @@ public class ImplicitTraits {
   
   private static I_RoutineBrief getGitStatusBrief() {
     RoutineBriefMutant rbm = new RoutineBriefMutant();
-    rbm.setClazz(ProjectQueueRoutine.class);
+    rbm.setClazz(ProjectBriefQueueRoutine.class);
     rbm.setName(GIT_STATUS);
     rbm.setOrigin(RoutineBriefOrigin.IMPLICIT_TRAIT);
     

@@ -1,5 +1,7 @@
 package org.adligo.fabricate.common.system;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -12,6 +14,7 @@ public class ExecutingProcess implements I_ExecutingProcess {
   private AtomicBoolean finished_ = new AtomicBoolean(false);
   private ArrayBlockingQueue<Boolean> done_;
   private Throwable caught_;
+  private List<String> allOutput_ = new ArrayList<String>();
   
   /**
    * use the I_FabSystem factory method for stubbing.
@@ -87,7 +90,9 @@ public class ExecutingProcess implements I_ExecutingProcess {
 
   @Override
   public List<String> getOutput() {
-    return delegate_.getOutput();
+    List<String> ret = delegate_.getOutput();
+    allOutput_.addAll(ret);
+    return ret;
   }
 
   @Override
@@ -104,4 +109,23 @@ public class ExecutingProcess implements I_ExecutingProcess {
     delegate_.destroy();
   }
 
+  @Override
+  public List<String> getAllOutput() {
+    List<String> out = getOutput();
+    allOutput_.addAll(out);
+    return new ArrayList<String>(allOutput_);
+  }
+
+  public void throwIOExceptionWithAllOutput(String message) throws IOException {
+    StringBuilder sb = new StringBuilder();
+    sb.append(message);
+    
+    List<String> allOut = getAllOutput();
+    for (String line: allOut) {
+      sb.append(system_.lineSeparator());
+      sb.append(line);
+    }
+    sb.append(system_.lineSeparator());
+    throw new IOException(sb.toString());
+  }
 }

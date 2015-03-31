@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common.system;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -50,6 +51,16 @@ public interface I_ExecutingProcess extends Runnable {
    * @throws InterruptedException
    */
   public abstract void waitUntilFinished(long millis) throws InterruptedException;
+  
+  /**
+   * This should return all of the lines of output
+   * regardless of how many times getOutput has been called.
+   * This method will also call getOutput, so it may 'hide'
+   * output from calls to that method.
+   * @return
+   */
+  public List<String> getAllOutput();
+  
   /**
    * Returns a list of lines the executing process has 
    * executed so far.  Each call to this method 
@@ -65,4 +76,6 @@ public interface I_ExecutingProcess extends Runnable {
    * @param input
    */
   public void writeInputToProcess(String input, String charSet);
+  
+  public void throwIOExceptionWithAllOutput(String message) throws IOException;
 }

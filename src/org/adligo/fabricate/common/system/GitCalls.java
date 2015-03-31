@@ -99,6 +99,22 @@ public class GitCalls implements I_GitCalls {
   }
   
   /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_GitCalls#isSuccess(org.adligo.fabricate.common.I_ExecutingProcess process)
+   */
+  public boolean isSuccess(I_ExecutingProcess process) {
+    List<String> out = process.getOutput();
+    if (out == null | out.size() == 0) {
+      return true;
+    }
+    for (String line: out) {
+      if (!isSuccess(line)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  /* (non-Javadoc)
    * @see org.adligo.fabricate.common.system.I_GitCalls#check(org.adligo.fabricate.common.system.I_Executor)
    */
   @Override

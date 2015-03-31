@@ -83,6 +83,14 @@ public interface I_GitCalls {
    */
   public boolean isSuccess(String result);
 
+  /**
+   * Checks if the executing process isSuccess on each 
+   * line of output.
+   * @param process
+   * @return true if no output, false if isSuccess(String) returns
+   * false for any line.
+   */
+  public boolean isSuccess(I_ExecutingProcess process);
 
   public void setHostname(String hostname);
 
