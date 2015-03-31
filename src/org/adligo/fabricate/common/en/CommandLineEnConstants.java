@@ -8,12 +8,13 @@ import java.util.Map;
 
 public class CommandLineEnConstants implements I_CommandLineConstants {
   
-
   public static final CommandLineEnConstants INSTANCE = new CommandLineEnConstants();
 
   
   private static final String A = "-a";
   private static final String ARCHIVE = "--archive";
+  private static final String ARCHIVE_STAGES = "archiveStages";
+
   /**
    * key to a comma delimited String which turns into a List<String>
    */
@@ -34,15 +35,9 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   private static final String R = "-r";
   private static final String REBUILD = "--rebuild-dependents";
   
-  /**
-   * key to a comma delimited String which turns into a  key to a List<String>
-   * and represents non optional stages to skip (not execute).
-   */
   private static final String SKIP = "skip";
-  /**
-   * key to a comma delimited String which turns into a  key to a List<String>
-   * and represents optional stages to execute (in fabricate.xml order).
-   */
+  private static final String SKIP_ARCHIVES = "skipArchives";
+
   private static final String STAGES = "stages";
   private static final String T = "-t";
   private static final String TEST = "--test";
@@ -86,6 +81,10 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   }
   
   @Override
+  public String getArchiveStages() {
+    return ARCHIVE_STAGES;
+  }
+  @Override
   public String getCommand() {
     return COMMAND;
   }
@@ -117,6 +116,11 @@ public class CommandLineEnConstants implements I_CommandLineConstants {
   @Override
   public String getSkip() {
     return SKIP;
+  }
+  
+  @Override
+  public String getSkipArchives() {
+    return SKIP_ARCHIVES;
   }
   
   @Override

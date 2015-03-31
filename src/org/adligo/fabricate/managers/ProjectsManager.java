@@ -8,7 +8,7 @@ import org.adligo.fabricate.common.system.I_FailureTransport;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
 import org.adligo.fabricate.routines.I_RoutineExecutor;
-import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
+import org.adligo.fabricate.routines.I_RoutineProcessorFactory;
 import org.adligo.fabricate.routines.implicit.ImplicitFacets;
 
 public class ProjectsManager {
@@ -16,9 +16,9 @@ public class ProjectsManager {
   private final I_SystemMessages sysMessages_;
   private final I_FabLog log_;
   private final I_RoutineBuilder routineBuilder_;
-  private final I_RoutineFabricateFactory factory_;
+  private final I_RoutineProcessorFactory factory_;
   
-  public ProjectsManager(I_FabSystem system,  I_RoutineFabricateFactory factory, 
+  public ProjectsManager(I_FabSystem system,  I_RoutineProcessorFactory factory, 
       I_RoutineBuilder routineBuilder) {
     log_ = system.getLog();
     constants_ = system.getConstants();

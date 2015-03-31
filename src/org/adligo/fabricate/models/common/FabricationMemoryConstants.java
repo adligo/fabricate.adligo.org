@@ -50,19 +50,25 @@ public class FabricationMemoryConstants {
 
   public static final FabricationMemoryConstants INSTANCE = new FabricationMemoryConstants();
   
-  /**
-   * Key to a unmodifiable List<Project> usually from the 'load projects' facet.
-   */
-  public static final String LOADED_PROJECTS = "loadedProjects";
-  /**
-   * Key to a unmodifiable Map<String,Project> usually from the 'load projects' facet.
-   */
-  public static final String LOADED_PROJECTS_MAP = "loadedProjectsMap";
+
   
   /**
    * Key to a unmodifiable List<Project> usually from the 'setup projects' facet.
    */
   public static final String PARTICIPATING_PROJECTS = "participatingProjects";
+  
+  /**
+   * Key to a unmodifiable List<Project> usually from the 'load projects' facet.
+   */
+  public static final String PROJECTS_LOADED = "projectsLoaded";
+  /**
+   * Key to a unmodifiable Map<String,Project> usually from the 'load projects' facet.
+   */
+  public static final String PROJECTS_LOADED_MAP = "projectsLoadedMap";
+  /**
+   * Key to a unmodifiable List<ProjectModifications> usually from the 'git stage' trait.
+   */
+  public static final String PROJECTS_MODIFIED = "projectsModified";
   
   /**
    * Key to a unmodifiable List<String> of lower case platforms which were entered

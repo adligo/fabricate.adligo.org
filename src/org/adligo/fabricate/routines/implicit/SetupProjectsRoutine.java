@@ -58,8 +58,8 @@ public class SetupProjectsRoutine extends FabricateAwareRoutine implements
     
     depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
     nameJarTrait_ = traitFactory_.createRoutine(NameJarTrait.NAME, NameJarTrait.IMPLEMENTED_INTERFACES);
-    projects_ = (List<Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS);
-    projectsMap_ = (Map<String,Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS_MAP);
+    projects_ = (List<Project>) memory.get(FabricationMemoryConstants.PROJECTS_LOADED);
+    projectsMap_ = (Map<String,Project>) memory.get(FabricationMemoryConstants.PROJECTS_LOADED_MAP);
     
     I_CommandLineConstants clConstants = constants_.getCommandLineConstants();
     String value = system_.getArgValue(clConstants.getPlatforms());
@@ -153,7 +153,7 @@ public class SetupProjectsRoutine extends FabricateAwareRoutine implements
     
     depot_ = (I_Depot) memory.get(FabricationMemoryConstants.DEPOT);
     nameJarTrait_ = traitFactory_.createRoutine(NameJarTrait.NAME, NameJarTrait.IMPLEMENTED_INTERFACES);
-    projectsMap_ = (Map<String,Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS_MAP);
+    projectsMap_ = (Map<String,Project>) memory.get(FabricationMemoryConstants.PROJECTS_LOADED_MAP);
     
     queue_ = (ConcurrentLinkedQueue<Project>) routineMemory.get(QUEUE);
     

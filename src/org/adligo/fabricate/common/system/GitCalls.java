@@ -9,6 +9,8 @@ import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.I_ExecutionEnvironment;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class GitCalls implements I_GitCalls {
@@ -213,6 +215,28 @@ public class GitCalls implements I_GitCalls {
     user_ = user;
   }
 
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.common.system.I_GitCalls#status(java.lang.String)
+   */
+  @Override
+  public List<String> status(String where) throws IOException {
+    
+    I_Executor exe = sys_.getExecutor();
+    I_ExecutingProcess process_ = exe.startProcess(FabricationMemoryConstants.EMPTY_ENV,
+        service_, where, "git", "status");
+    List<String> ret = new ArrayList<String>();
+    while (!process_.isFinished()) {
+      try {
+        process_.waitUntilFinished(1000);
+        List<String> output = process_.getOutput();
+        ret.addAll(output);
+      } catch (InterruptedException e) {
+        sys_.currentThread().interrupt();
+      }
+    }
+    return ret;
+  }
+  
   /* (non-Javadoc)
    * @see org.adligo.fabricate.common.system.I_GitCalls#getRemotePath()
    */

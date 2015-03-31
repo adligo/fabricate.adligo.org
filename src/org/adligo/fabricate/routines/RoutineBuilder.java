@@ -2,6 +2,7 @@ package org.adligo.fabricate.routines;
 
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
+import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
@@ -20,6 +21,7 @@ import org.adligo.fabricate.repository.I_RepositoryManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,20 +47,23 @@ public class RoutineBuilder implements I_RoutineBuilder {
   }
   private final I_Fabricate fabricate_;
   private final I_FabSystem system_;
+  private final I_FabLog log_;
   private List<I_Project> projects_;
   private final RoutineBriefOrigin routineType_;
-  private final I_RoutineFabricateFactory factory_;
+  private final I_RoutineFabricateProcessorFactory factory_;
   private final I_SystemMessages sysMessages_;
-  
-  private I_RepositoryManager repositoryManager_;
-  private I_RepositoryFactory repositoryFactory_;
-  
-  
+  private final I_RoutinePopulator routinePopulator_;
+  /**
+   * objects to pass to I_InputAware
+   */
+  private Map<String,Object> input_ = new HashMap<String,Object>();
   private String nextRoutineName_;
   
-  public RoutineBuilder(I_FabSystem system, RoutineBriefOrigin type, I_RoutineFabricateFactory factory) {
+  public RoutineBuilder(I_FabSystem system, RoutineBriefOrigin type, 
+      I_RoutineFabricateProcessorFactory factory, I_RoutinePopulator routinePopulator) {
     fabricate_ = factory.getFabricate();
     system_ = system;
+    log_ = system.getLog();
     I_FabricateConstants constants = system.getConstants();
     sysMessages_ = constants.getSystemMessages();
     if (!ALLOWED_TYPES.contains(type)) {
@@ -66,6 +71,7 @@ public class RoutineBuilder implements I_RoutineBuilder {
     }
     routineType_ = type;
     factory_ = factory;
+    routinePopulator_ = routinePopulator;
   }
   
   @Override
@@ -89,6 +95,9 @@ public class RoutineBuilder implements I_RoutineBuilder {
   }
   
   private I_FabricationRoutine processSetup() throws FabricationRoutineCreationException {
+    if (log_.isLogEnabled(RoutineBuilder.class)) {
+      log_.println(RoutineBuilder.class.getSimpleName() + ".processSetup() " + nextRoutineName_);
+    }
     I_FabricationRoutine routine = null;
     Set<I_ExpectedRoutineInterface> es = Collections.emptySet();
     I_RoutineBrief brief = null;
@@ -141,97 +150,26 @@ public class RoutineBuilder implements I_RoutineBuilder {
           brief = traits.get(nextRoutineName_);
         break;
     }
-    
-    routine.setBrief(brief);
-    
-    addOptional(routine);
-    routine.setSystem(system_);
+    if (log_.isLogEnabled(RoutineBuilder.class)) {
+      log_.println(RoutineBuilder.class.getSimpleName() + ".processSetup() " + nextRoutineName_ +
+          " created" + system_.lineSeparator() +
+          routine);
+    }
     routine.setTraitFactory(factory_.getTraits());
+    routinePopulator_.populate(routine);
     return routine;
-  }
-
-  
-  public void addOptional(I_FabricationRoutine routine) {
-    //alpha order 
-    if (routine instanceof I_CommandAware) {
-      I_RoutineFactory cmdFactory = factory_.getCommands();
-      ((I_CommandAware) routine).setCommandFactory(cmdFactory);
-    }
-    if (routine instanceof I_FabricateAware) {
-      ((I_FabricateAware) routine).setFabricate(fabricate_);
-    } 
-    if (routine instanceof I_RepositoryManagerAware) {
-      if (repositoryManager_ == null) {
-        throwException(I_RepositoryManagerAware.class.getName(), routine);
-      }
-      ((I_RepositoryManagerAware) routine).setRepositoryManager(repositoryManager_);
-    }
-    if (routine instanceof I_RepositoryFactoryAware) {
-      if (repositoryFactory_ == null) {
-        throwException(I_RepositoryFactoryAware.class.getName(), routine);
-      }
-      ((I_RepositoryFactoryAware) routine).setRepositoryFactory(repositoryFactory_);
-    }
-    if (routine instanceof I_ProjectsAware) {
-      if (projects_ == null) {
-        throwException(I_ProjectsAware.class.getName(), routine);
-      }
-      ((I_ProjectsAware) routine).setProjects(projects_);
-    }
-  }
-
-  private void throwException(String x, I_FabricationRoutine routine) {
-    String messages = sysMessages_.getTheFollowingRoutineImplementsXButTheRoutinesBuilderValueIsNull();
-    messages = messages.replace("<X/>", x);
-    throw new IllegalStateException(messages + system_.lineSeparator() +
-        routine.getClass().getName());
   }
 
   public String getNextRoutineName() {
     return nextRoutineName_;
   }
 
-  @Override
-  public void setNextRoutineName(String nextRoutineName) {
-    this.nextRoutineName_ = nextRoutineName;
-  }
-
-  public I_RepositoryManager getRepositoryManager() {
-    return repositoryManager_;
-  }
-
-  public void setRepositoryManager(I_RepositoryManager repositoryManager) {
-    this.repositoryManager_ = repositoryManager;
-  }
-
-  public I_RepositoryFactory getRepositoryFactory() {
-    return repositoryFactory_;
-  }
-
-  public void setRepositoryFactory(I_RepositoryFactory repositoryFactory) {
-    this.repositoryFactory_ = repositoryFactory;
-  }
-  
   public RoutineBriefOrigin getRoutineType() {
     return routineType_;
   }
 
-  public List<I_Project> getProjects() {
-    return new ArrayList<I_Project>(projects_);
-  }
-
-  public void setProjects(List<I_Project> projects) {
-    if (projects != null) {
-      if (projects_ == null) {
-        projects_ = new ArrayList<I_Project>();
-      }
-      projects_.clear();
-      
-      for (I_Project project: projects) {
-        if (project != null) {
-          projects_.add(project);
-        }
-      }
-    }
+  @Override
+  public void setNextRoutineName(String nextRoutineName) {
+    this.nextRoutineName_ = nextRoutineName;
   }
 }

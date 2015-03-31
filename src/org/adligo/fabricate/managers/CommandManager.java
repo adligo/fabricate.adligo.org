@@ -5,7 +5,7 @@ import org.adligo.fabricate.common.system.I_FailureTransport;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
 import org.adligo.fabricate.routines.I_RoutineExecutor;
-import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
+import org.adligo.fabricate.routines.I_RoutineProcessorFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,12 +13,12 @@ import java.util.List;
 
 public class CommandManager {
   private final List<String> commands_ = new ArrayList<String>();
-  private final I_RoutineFabricateFactory factory_;
+  private final I_RoutineProcessorFactory factory_;
   
   private final I_RoutineBuilder routineBuilder_;
   
   public CommandManager(Collection<String> commands, I_FabSystem system, 
-      I_RoutineFabricateFactory factory, I_RoutineBuilder routineBuilder) {
+      I_RoutineProcessorFactory factory, I_RoutineBuilder routineBuilder) {
     commands_.addAll(commands);
     factory_ = factory;
     routineBuilder_ = routineBuilder;

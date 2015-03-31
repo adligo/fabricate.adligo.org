@@ -62,6 +62,15 @@ public interface I_CommandLineConstants {
   public String getArchive(boolean alias);
   
   /**
+   * When the archive flag (-a in English) is turned
+   * on this command line key to a comma delimited list
+   * of values tells Fabricate to execute optional
+   * archive stages.
+   * @return
+   */
+  public String getArchiveStages();
+  
+  /**
    * This argument key instructs Fabricate to execute 
    * a command, the command itself 
    * @return The command line key for 
@@ -172,6 +181,15 @@ public interface I_CommandLineConstants {
    * @return
    */
   public String getSkip();
+  
+  /**
+   * When the archive flag (-a in English) is turned
+   * on this command line key to a comma delimited list
+   * of values keeps archive stages from executing.
+   * @return
+   */
+  public String getSkipArchives();
+  
   /**
    * This argument turns on optional stages which are set as optional
    * in the fabricate.xml file.  In English this is 'stages' for command

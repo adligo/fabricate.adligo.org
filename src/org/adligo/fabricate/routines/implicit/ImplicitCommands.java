@@ -20,6 +20,8 @@ public class ImplicitCommands {
           EncryptCommand.class.getName(), RoutineBriefOrigin.IMPLICIT_COMMAND));
       ret.add(new RoutineBrief(DecryptCommand.NAME, 
           DecryptCommand.class.getName(), RoutineBriefOrigin.IMPLICIT_COMMAND));
+      ret.add(new RoutineBrief(GitCommitCommand.NAME, 
+          GitCommitCommand.class.getName(), RoutineBriefOrigin.IMPLICIT_COMMAND));
       ret.add(new RoutineBrief(PublishCommand.NAME, 
           PublishCommand.class.getName(), RoutineBriefOrigin.IMPLICIT_COMMAND));
     } catch (Exception x) {

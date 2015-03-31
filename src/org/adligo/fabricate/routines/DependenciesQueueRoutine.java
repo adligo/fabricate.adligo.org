@@ -76,7 +76,7 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
     if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
       log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup ProjectDependencyOrderer");
     }
-    List<I_Project> allProjects = (List<I_Project>) memory.get(FabricationMemoryConstants.LOADED_PROJECTS);
+    List<I_Project> allProjects = (List<I_Project>) memory.get(FabricationMemoryConstants.PROJECTS_LOADED);
     ProjectDependencyOrderer orderer = new ProjectDependencyOrderer(allProjects, system_);
     if (log_.isLogEnabled(DependenciesQueueRoutine.class)) {
       log_.println(DependenciesQueueRoutine.class.getSimpleName() + ".setup orderer ");
@@ -265,14 +265,15 @@ public class DependenciesQueueRoutine extends TasksRoutine implements
       log_.println("notifying that " + project + " is finished.");
     }
     String projectName = project.getName();
-    
-    Collection<ProjectBlock> blocks = projectBlockMap_.values();
-    for (ProjectBlock block: blocks) {
-      if (projectName.equals(block.getBlockingProject())) {
-        try {
-          block.setProjectFinished();
-        } catch (InterruptedException x) {
-          system_.currentThread().interrupt();
+    if (!singleProject_) {
+      Collection<ProjectBlock> blocks = projectBlockMap_.values();
+      for (ProjectBlock block: blocks) {
+        if (projectName.equals(block.getBlockingProject())) {
+          try {
+            block.setProjectFinished();
+          } catch (InterruptedException x) {
+            system_.currentThread().interrupt();
+          }
         }
       }
     }

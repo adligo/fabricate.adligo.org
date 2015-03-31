@@ -3,6 +3,7 @@ package org.adligo.fabricate.common.system;
 import org.adligo.fabricate.models.common.I_ExecutionEnvironment;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface I_GitCalls {
 
@@ -92,6 +93,14 @@ public interface I_GitCalls {
   public void setUser(String user);
 
 
-  
+  /**
+   * performs a 'git status' in the where directory 
+   * and returns the result;
+   * @param where a absolute system dependent path where
+   * a project is checked out.
+   * @return
+   * @throws IOException
+   */
+  public List<String> status(String where) throws IOException;
 
 }

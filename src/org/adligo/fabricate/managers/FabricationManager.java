@@ -11,7 +11,8 @@ import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
 import org.adligo.fabricate.routines.I_RoutineExecutor;
-import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
+import org.adligo.fabricate.routines.I_RoutineFabricateProcessorFactory;
+import org.adligo.fabricate.routines.I_RoutineProcessorFactory;
 
 import java.util.List;
 
@@ -21,13 +22,13 @@ public class FabricationManager {
   private final I_FabLog log_;
   private final I_SystemMessages sysMessages_;
   private final I_CommandLineConstants commandLineConstants_;
-  private final I_RoutineFabricateFactory factory_;
+  private final I_RoutineProcessorFactory factory_;
   private final I_FabricateConstants constants_;
   private final I_Fabricate fab_;
   private final I_RoutineBuilder routineBuilder_;
   private final I_RoutineBuilder archiveBuilder_;
   
-  public FabricationManager(I_FabSystem system,  I_RoutineFabricateFactory factory, 
+  public FabricationManager(I_FabSystem system,  I_RoutineFabricateProcessorFactory factory, 
       I_RoutineBuilder routineBuilder, I_RoutineBuilder archiveBuilder) {
     system_ = system;
     log_ = system.getLog();
@@ -48,15 +49,22 @@ public class FabricationManager {
     String stagesKey = commandLineConstants_.getStages();
     List<String> clStages = system_.getArgValues(stagesKey);
     
+    String skipKey = commandLineConstants_.getSkip();
+    List<String> clSkip = system_.getArgValues(skipKey);
+    
     for (String stage: stages) {
       I_RoutineBrief routine = fab_.getStage(stage);
       boolean run = false;
       if (routine.isOptional()) {
         if (clStages.contains(stage)) {
-          run = true;
+          if (!clSkip.contains(stage)) {
+            run = true;
+          }
         }
       } else {
-        run = true;
+        if (!clSkip.contains(stage)) {
+          run = true;
+        }
       }
       if (run) {
         if (log_.isLogEnabled(CommandManager.class)) {

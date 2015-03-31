@@ -116,6 +116,9 @@ public class RoutineFactory implements I_RoutineFactory {
       I_FabricateConstants constants_ = system_.getConstants();
       I_SystemMessages sysMes = constants_.getSystemMessages();
       String message = sysMes.getNoRoutineFoundWithNameX();
+      if (name == null) {
+        name = "null";
+      }
       message = message.replaceAll("<X/>", name);
       throw new IllegalArgumentException(message);
     }
@@ -178,6 +181,7 @@ public class RoutineFactory implements I_RoutineFactory {
           }
         }
       }
+      instance.setSystem(system_);
       instance.setBrief(brief);
       return instance;
     } catch (InstantiationException | IllegalAccessException e) {

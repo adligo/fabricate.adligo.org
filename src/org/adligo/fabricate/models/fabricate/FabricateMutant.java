@@ -159,6 +159,11 @@ public class FabricateMutant implements I_Fabricate {
     setStages(other.getStageOrder(), other.getStages());
     setTraits(other.getTraits());
     projectsDir_ = other.getProjectsDir();
+    
+    I_RoutineBrief otherScm = other.getScm();
+    if (otherScm != null) {
+      scm_ = new RoutineBriefMutant(otherScm);
+    }
   }
   
   public void addArchiveStage(I_RoutineBrief rb) {
@@ -292,31 +297,6 @@ public class FabricateMutant implements I_Fabricate {
     }
   }
 
-
-  
-  public void addScmAndProjects(FabricateType type) throws ClassNotFoundException {
-    StagesAndProjectsType spt =  type.getProjectGroup();
-    if (spt != null) {
-      
-      
-      if (spt != null) {
-        ProjectsType projects =  spt.getProjects();
-        if (projects != null) {
-          RoutineType scm = projects.getScm();
-          if (scm != null) {
-            scm_ = new RoutineBriefMutant(scm, RoutineBriefOrigin.FABRICATE_SCM);
-          }
-          List<ProjectType> projectsList =  projects.getProject();
-          for (ProjectType proj: projectsList) {
-            if (proj != null) {
-              projects_.add(new ProjectBrief(proj));
-            }
-          }
-        }
-      }
-    }
-  }
-  
   public void addTrait(I_RoutineBrief v) {
     if (v instanceof RoutineBriefMutant) {
       traits_.put(v.getName(), (RoutineBriefMutant) v);

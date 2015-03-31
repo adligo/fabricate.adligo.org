@@ -135,8 +135,8 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     List<Project> ps = new ArrayList<Project>();
     ps.addAll(projects_);
     List<Project> projects = Collections.unmodifiableList(ps);
-    memory.put(FabricationMemoryConstants.LOADED_PROJECTS, projects);
-    memory.addLock(new MemoryLock(FabricationMemoryConstants.LOADED_PROJECTS, 
+    memory.put(FabricationMemoryConstants.PROJECTS_LOADED, projects);
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.PROJECTS_LOADED, 
               Collections.singletonList(LoadProjectTask.class.getName())));
     
     Map<String, Project> projectsMap = new HashMap<String,Project>();
@@ -150,8 +150,8 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
       log_.println("LoadProjectTask loaded " + projectsMap.size() + " projects.");
     }
     projectsMap = Collections.unmodifiableMap(projectsMap);
-    memory.put(FabricationMemoryConstants.LOADED_PROJECTS_MAP, projectsMap);
-    memory.addLock(new MemoryLock(FabricationMemoryConstants.LOADED_PROJECTS_MAP, 
+    memory.put(FabricationMemoryConstants.PROJECTS_LOADED_MAP, projectsMap);
+    memory.addLock(new MemoryLock(FabricationMemoryConstants.PROJECTS_LOADED_MAP, 
               Collections.singletonList(LoadProjectTask.class.getName())));
     
     

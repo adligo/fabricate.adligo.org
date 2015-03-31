@@ -14,7 +14,7 @@ implements I_ProjectAware, I_FabricateAware {
   private I_AttributesOverlay overlay_;
   
   @Override
-  public I_AttributesContainer getProject() {
+  public I_Project getProject() {
     return project_;
   }
   

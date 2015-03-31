@@ -31,7 +31,8 @@ import org.adligo.fabricate.repository.I_RepositoryPathBuilder;
 import org.adligo.fabricate.repository.LibraryResolver;
 import org.adligo.fabricate.repository.RepositoryManager;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
-import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
+import org.adligo.fabricate.routines.I_RoutineFabricateProcessorFactory;
+import org.adligo.fabricate.routines.I_RoutineProcessorFactory;
 import org.adligo.fabricate.routines.RoutineBuilder;
 import org.adligo.fabricate.routines.implicit.ImplicitArchiveStages;
 import org.adligo.fabricate.routines.implicit.ImplicitCommands;
@@ -108,7 +109,7 @@ public class FabricateFactory implements I_RepositoryFactory {
   }
   
   public CommandManager createCommandManager(Collection<String> commands, I_FabSystem system, 
-      I_RoutineFabricateFactory factory, RoutineBuilder builder) {
+      I_RoutineProcessorFactory factory, I_RoutineBuilder builder) {
     return new CommandManager(commands, system, factory, builder);
   }
   
@@ -136,7 +137,7 @@ public class FabricateFactory implements I_RepositoryFactory {
   }
   
   public FabricationManager createFabricationManager(I_FabSystem system,  
-      I_RoutineFabricateFactory factory, I_RoutineBuilder builder, I_RoutineBuilder archiveBuilder) {
+      I_RoutineFabricateProcessorFactory factory, I_RoutineBuilder builder, I_RoutineBuilder archiveBuilder) {
     return new FabricationManager(system, factory, builder, archiveBuilder);
   }
   
@@ -155,7 +156,7 @@ public class FabricateFactory implements I_RepositoryFactory {
   }
   
   public ProjectsManager createProjectsManager(I_FabSystem system, 
-      I_RoutineFabricateFactory factory, I_RoutineBuilder builder) {
+      I_RoutineProcessorFactory factory, I_RoutineBuilder builder) {
     return new ProjectsManager(system, factory, builder);
   }
   
@@ -173,12 +174,8 @@ public class FabricateFactory implements I_RepositoryFactory {
     return new DefaultRepositoryPathBuilder(localRepository, separator);
   }
 
-  public RoutineBuilder createRoutineBuilder(I_FabSystem system, RoutineBriefOrigin type, 
-      ImplicitRoutineFactory factory) {
-    return new RoutineBuilder(system, type, factory);
-  }
   
-  public ImplicitRoutineFactory createRoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
+  public I_RoutineFabricateProcessorFactory createRoutineFabricateFactory(I_FabSystem system, I_Fabricate fab, boolean commandsNotStages) {
     return new ImplicitRoutineFactory(system, fab, commandsNotStages);
   }
 

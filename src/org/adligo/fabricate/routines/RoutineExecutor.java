@@ -14,9 +14,7 @@ import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.routines.I_RoutineBuilder;
-import org.adligo.fabricate.routines.I_RoutineFabricateFactory;
 import org.adligo.fabricate.routines.I_TaskProcessor;
-import org.adligo.fabricate.routines.RoutineExecutionEngine;
 import org.adligo.fabricate.xml.io_v1.result_v1_0.FailureType;
 
 import java.io.ByteArrayOutputStream;
@@ -31,9 +29,9 @@ import java.io.PrintStream;
 public class RoutineExecutor implements I_RoutineExecutor {
   private final I_FabSystem system_;
   private final I_FabLog log_;
-  private final I_RoutineFabricateFactory factory_;
+  private final I_RoutineProcessorFactory factory_;
   
-  public RoutineExecutor(I_FabSystem system, I_RoutineFabricateFactory factory) {
+  public RoutineExecutor(I_FabSystem system, I_RoutineProcessorFactory factory) {
     factory_ = factory;
     log_ = system.getLog();
     system_ = system;
@@ -53,7 +51,7 @@ public class RoutineExecutor implements I_RoutineExecutor {
     I_FabricationRoutine routine = null;
     try {
         builder.setNextRoutineName(routineName);
-        RoutineExecutionEngine exe = factory_.createRoutineExecutionEngine(system_, builder);
+        I_RoutineExecutionEngine exe = factory_.createRoutineExecutionEngine(system_, builder);
         exe.runRoutines(memory);
         if (log_.isLogEnabled(RoutineExecutor.class)) {
           log_.println(RoutineExecutor.class.getName() + ".run(" + routineName + ") had failure " +

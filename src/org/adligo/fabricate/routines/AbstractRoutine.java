@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractRoutine implements I_FabricationRoutine, I_RepositoryFactoryAware {
+public abstract class AbstractRoutine implements I_FabricationRoutine, 
+  I_RepositoryFactoryAware, I_RoutinePopulatorAware {
   protected I_AttributeConstants attribConstants_;
   protected I_RoutineBrief brief_;
   protected I_FabSystem system_;
@@ -35,6 +36,7 @@ public abstract class AbstractRoutine implements I_FabricationRoutine, I_Reposit
   protected I_CommandLineConstants cmdConstants_;
   protected I_SystemMessages sysMessages_;
   protected I_RepositoryFactory repositoryFactory_;
+  protected I_RoutinePopulator routinePopluator_;
   protected final RoutineLocationInfo locationInfo_ = new RoutineLocationInfo();
   
   protected I_ImplicitTraitMessages implicit_;
@@ -98,6 +100,11 @@ public abstract class AbstractRoutine implements I_FabricationRoutine, I_Reposit
   }
   
   @Override
+  public I_RoutinePopulator getRoutinePopluator() {
+    return routinePopluator_;
+  }
+  
+  @Override
   public I_RoutineFactory getTaskFactory() {
     return taskFactory_;
   }
@@ -141,11 +148,15 @@ public abstract class AbstractRoutine implements I_FabricationRoutine, I_Reposit
     locations_ = locations;
   }
   
+  @Override
   public void setRepositoryFactory(I_RepositoryFactory repositoryFactory) {
     this.repositoryFactory_ = repositoryFactory;
   }
   
-
+  @Override
+  public void setRoutinePopluator(I_RoutinePopulator routinePopulator) {
+    this.routinePopluator_ = routinePopulator;
+  }
  
   
   @Override
@@ -388,4 +399,5 @@ public abstract class AbstractRoutine implements I_FabricationRoutine, I_Reposit
       return message;
     }
   }
+
 }

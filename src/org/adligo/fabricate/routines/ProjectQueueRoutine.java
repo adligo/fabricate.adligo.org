@@ -1,8 +1,10 @@
 package org.adligo.fabricate.routines;
 
 import org.adligo.fabricate.depot.I_Depot;
+import org.adligo.fabricate.models.common.ExpectedRoutineInterface;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
+import org.adligo.fabricate.models.common.I_ExpectedRoutineInterface;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
 import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
@@ -13,11 +15,15 @@ import org.adligo.fabricate.models.project.I_Project;
 import org.adligo.fabricate.models.project.ProjectBlock;
 import org.adligo.fabricate.models.project.ProjectBlockKey;
 import org.adligo.fabricate.routines.implicit.JarRoutine;
+import org.adligo.fabricate.routines.implicit.ScmContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -31,8 +37,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class ProjectQueueRoutine extends TasksRoutine implements 
   I_ConcurrencyAware, I_ProjectsAware {
+  public static final Set<I_ExpectedRoutineInterface> IMPLEMENTED_INTERFACES = getImplementedInterfaces();
+  
   protected static final String PROJECTS_QUEUE = "projectsQueue";
   
+  private static Set<I_ExpectedRoutineInterface> getImplementedInterfaces() {
+    Set<I_ExpectedRoutineInterface> ret = new HashSet<I_ExpectedRoutineInterface>();
+    
+    ret.add(new ExpectedRoutineInterface(I_ConcurrencyAware.class));
+    ret.add(new ExpectedRoutineInterface(I_ProjectsAware.class));
+    return Collections.unmodifiableSet(ret);
+  }
   protected I_Depot depot_;
   
   protected List<I_Project> projects_;

@@ -9,16 +9,15 @@ import org.adligo.fabricate.common.system.I_RunMonitor;
 import org.adligo.fabricate.models.common.FabricationMemory;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
+import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_FabricationRoutine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RoutineExecutionEngine {
+public class RoutineExecutionEngine implements I_RoutineExecutionEngine {
   private final I_FabSystem system_;
   private final I_SystemMessages sysMessages_;
   private final I_FabLog log_;
@@ -40,8 +39,12 @@ public class RoutineExecutionEngine {
     threads_ = threads;
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.I_RoutineExecutionEngine#runRoutines(org.adligo.fabricate.models.common.FabricationMemoryMutant)
+   */
+  @Override
   @SuppressWarnings("static-access")
-  public void runRoutines(FabricationMemoryMutant<Object> memoryMut)
+  public void runRoutines(I_FabricationMemoryMutant<Object> memoryMut)
       throws FabricationRoutineCreationException {
     if (log_.isLogEnabled(RoutineExecutionEngine.class)) {
       log_.println(RoutineExecutionEngine.class.getName() + " runRoutines(FabricationMemoryMutant)");
@@ -173,14 +176,26 @@ public class RoutineExecutionEngine {
     service.shutdownNow();
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.I_RoutineExecutionEngine#hadFailure()
+   */
+  @Override
   public boolean hadFailure() {
     return failure_.get();
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.I_RoutineExecutionEngine#getFailure()
+   */
+  @Override
   public Throwable getFailure() {
     return failureThrowable_;
   }
   
+  /* (non-Javadoc)
+   * @see org.adligo.fabricate.routines.I_RoutineExecutionEngine#getRoutineThatFailed()
+   */
+  @Override
   public I_FabricationRoutine getRoutineThatFailed() {
     for (I_RunMonitor rm: monitors_) {
       if (rm.hasFailure()) {

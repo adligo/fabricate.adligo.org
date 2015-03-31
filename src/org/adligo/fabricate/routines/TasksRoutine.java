@@ -89,9 +89,10 @@ public abstract class TasksRoutine extends AbstractRoutine implements I_Fabricat
       if (log_.isLogEnabled(TasksRoutine.class)) {
         log_.println(TasksRoutine.class.getName() + " setup(boolean) " + routine);
       }
-      routine.setSystem(system_);
-      routine.setLocations(locations_);
       routine.setTraitFactory(traitFactory_);
+      routine.setTaskFactory(taskFactory_);
+      routinePopluator_.populate(routine);
+      
       if (I_FabricateAware.class.isAssignableFrom(routine.getClass())) {
         ((I_FabricateAware) routine).setFabricate(fabricate_);
       }

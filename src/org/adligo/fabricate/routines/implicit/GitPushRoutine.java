@@ -14,7 +14,7 @@ public class GitPushRoutine extends AbstractRoutine implements I_ProjectAware {
   public static final String NAME = "gitPush";
   
   @Override
-  public I_AttributesContainer getProject() {
+  public I_Project getProject() {
     // TODO Auto-generated method stub
     return null;
   }

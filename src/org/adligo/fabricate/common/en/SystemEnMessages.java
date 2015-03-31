@@ -4,6 +4,8 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
 
+
+
   private static final String ARTIFACT = "Artifact:";
  
   private static final String ARCHIVE_STAGE_X_COMPLETED_SUCCESSFULLY = "Archive stage <X/> completed successfully.";
@@ -128,8 +130,7 @@ public class SystemEnMessages implements I_SystemMessages {
   private static final String FINISHED = "finished.";
   
   private static final String FOR = "for;";
-  private static final String THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_BUT_THE_ROUTINE_BUILDER_S_VALUE_IS_NULL =
-      "The following routine implements <X/> but the RoutineBuilder's value is null.";
+  
   private static final String FINISHED_GIT_PULL_ON_PROJECT_X = 
       "Finished git pull on project <X/>.";
   private static final String FINISHED_GIT_CLONE_ON_PROJECT_X = 
@@ -203,6 +204,15 @@ public class SystemEnMessages implements I_SystemMessages {
       "The following remote repository appears to be down;";
   private static final String THE_FOLLOWING_REQUIRED_FILE_IS_MISSING = 
       "The following required file is missing;";
+  
+  private static final String THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_HOWEVER_IT_S_CLASS_TYPE_IS_NULL =
+      "The following routine implements <X/> however it's class type is null.";
+  private static final String THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_HOWEVER_ITS_GET_CLASS_TYPE_METHOD_RETURNED_Y =
+      "The following routine implements <X/>, however it's getClassType method returned <Y/>"
+          + " class types instead of one.";
+  private static final String THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_BUT_THE_ROUTINE_POPULATORS_VALUE_IS_NULL =
+      "The following routine implements <X/> but the RoutinePopulator's value is null.";
+  
   private static final String THE_FOLLOWING_COMMAND_LINE_PROGRAM_EXITED_ABNORMALLY_WITH_EXIT_CODE_X =
       "The following command line program exited abnormally with exit code <X/>;";
   
@@ -698,10 +708,20 @@ public class SystemEnMessages implements I_SystemMessages {
   public String getTheFollowingFabricateLibraryCanNotBeFound() {
     return THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND;
   }
+
+  @Override
+  public String getTheFollowingRoutineImplementsXHoweverItsGetClassTypeMethodReturnedYClassTypesInsteadOfOne() {
+    return THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_HOWEVER_ITS_GET_CLASS_TYPE_METHOD_RETURNED_Y;
+  }
   
   @Override
-  public String getTheFollowingRoutineImplementsXButTheRoutinesBuilderValueIsNull() {
-    return THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_BUT_THE_ROUTINE_BUILDER_S_VALUE_IS_NULL;
+  public String getTheFollowingRoutineImplementsXHoweverItsClassTypeIsNull() {
+    return THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_HOWEVER_IT_S_CLASS_TYPE_IS_NULL;
+  }
+  
+  @Override
+  public String getTheFollowingRoutineImplementsXButTheRoutinesPopulatorValueIsNull() {
+    return THE_FOLLOWING_ROUTINE_IMPLEMENTS_X_BUT_THE_ROUTINE_POPULATORS_VALUE_IS_NULL;
   }
   
   @Override
