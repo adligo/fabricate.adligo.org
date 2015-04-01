@@ -154,6 +154,7 @@ public interface I_SystemMessages {
   public String getThereWasAProblemCreatingTheFollowingDirectory();
   public String getThereWasAProblemCreatingTheFollowingRoutine();
   public String getThereWasAProblemCreatingRunMarkerInTheFollowingDirectory();
+  public String getThereWasAProblemCheckingOutVersionXOnTheFollowingProject();
   public String getThereWasAProblemDeletingTheFollowingDirectory();
   public String getThereWasAProblemUpdatingTheFollowingProject();
   public String getThereWasAProblemVerifyingOrDownloadingTheFollowingDependency();

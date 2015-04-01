@@ -4,7 +4,6 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
 
-  
   private static final String ARTIFACT = "Artifact:";
  
   private static final String ARCHIVE_STAGE_X_COMPLETED_SUCCESSFULLY = "Archive stage <X/> completed successfully.";
@@ -230,6 +229,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "There was a problem creating run.marker in the following directory;";
   private static final String THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_ROUTINE = 
       "There was a problem creating the following routine;";
+  private static final String THERE_WAS_A_PROBLEM_CHECKING_OUT_VERSION_X_ON_THE_FOLLOWING_PROJECT =
+      "There was a problem checking out version <X/> on the following project;";
   private static final String THERE_WAS_A_PROBLEM_DELETING_THE_FOLLOWING_DIRECTORY = 
       "There was a problem deleting the following directory;";
   private static final String THERE_WAS_A_PROBLEM_UPDATING_THE_FOLLOWING_PROJECT = 
@@ -795,6 +796,11 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getThereWasAProblemCreatingTheFollowingRoutine() {
     return THERE_WAS_A_PROBLEM_CREATING_THE_FOLLOWING_ROUTINE;
+  }
+  
+  @Override
+  public String getThereWasAProblemCheckingOutVersionXOnTheFollowingProject() {
+    return THERE_WAS_A_PROBLEM_CHECKING_OUT_VERSION_X_ON_THE_FOLLOWING_PROJECT;
   }
   
   @Override

@@ -106,7 +106,7 @@ public class ImplicitFacets {
     rbm.addNestedRoutine(update);
     
     RoutineBriefMutant checkout = new RoutineBriefMutant();
-    checkout.setClazz(GitCloneRoutine.class);
+    checkout.setClazz(GitCheckoutRoutine.class);
     checkout.setName(CHECKOUT_PROJECT_TASK);
     checkout.setOrigin(RoutineBriefOrigin.IMPLICIT_FACET_TASK);
     

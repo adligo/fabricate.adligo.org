@@ -61,8 +61,11 @@ public class GitCalls implements I_GitCalls {
   public void checkout(String project, String localProjectDir, String version) throws IOException {
     
     I_Executor exe = sys_.getExecutor();
-    String inDir = localProjectDir + files_.getNameSeparator() + project;
+    String inDir = localProjectDir + project;
     
+    if (log_.isLogEnabled(GitCalls.class)) {
+      log_.println("checking out in " + inDir);
+    }
     I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV, inDir, 
         "git", "checkout", version);
     String result = er.getOutput();
