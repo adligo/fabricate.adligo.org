@@ -31,6 +31,7 @@ import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.MemoryLock;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
+import org.adligo.fabricate.models.dependencies.DependencyVersionMismatchException;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
 import org.adligo.fabricate.models.project.I_Project;
@@ -184,7 +185,13 @@ public class FabricateController {
     if (argCommands.size() >= 1) {
       commands_ = true;
     }
-    if (!addXmlRoutines(factory, argCommands)) {
+    try {
+      if (!addXmlRoutines(factory, argCommands)) {
+        return;
+      }
+    } catch (DependencyVersionMismatchException x) {
+      log_.printTrace(x);
+      DependencyVersionMismatchException.logProjectError(sys_, discovery_.getFabricateXmlPath(), x);
       return;
     }
     memory_ = addMemoryValues(sys, factory);
@@ -287,7 +294,7 @@ public class FabricateController {
   }
 
   private boolean addXmlRoutines(FabricateFactory factory, List<String> argCommands)
-      throws IOException, ClassNotFoundException {
+      throws IOException, ClassNotFoundException, DependencyVersionMismatchException {
     
     String fabricateXmlPath = discovery_.getFabricateXmlPath();
     fabXml_ =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
@@ -330,6 +337,13 @@ public class FabricateController {
     }
   }
 
+  /**
+   * 
+   * @param factory
+   * @return false if fabricate failed
+   * @throws IOException
+   * @throws ClassNotFoundException
+   */
   private boolean manageProjectsDirAndMode(FabricateFactory factory) throws IOException, ClassNotFoundException {
     FabricateMutant fm = factory.createMutant(fab_);
     
@@ -399,7 +413,13 @@ public class FabricateController {
       }
     }
     
-    fab_ = factory.create(fm);
+    try {
+      fab_ = factory.create(fm);
+    } catch (DependencyVersionMismatchException x) {
+      log_.printTrace(x);
+      DependencyVersionMismatchException.logProjectError(sys_, discovery_.getFabricateXmlPath(), x);
+      return false;
+    }
     factory_ = factory.createRoutineFabricateFactory(sys_, fab_, commands_);
     String dir = fab_.getProjectsDir();
     String message = sysMessages_.getProjectsAreLocatedInTheFollowingDirectory();

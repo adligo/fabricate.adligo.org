@@ -7,6 +7,7 @@ import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.Parameter;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.models.dependencies.DependencyVersionMismatchException;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.project.I_ProjectBrief;
 import org.adligo.fabricate.models.project.ProjectBrief;
@@ -53,7 +54,7 @@ public class Fabricate implements I_Fabricate {
   private final Map<String, I_RoutineBrief> stages_; 
   private final Map<String, I_RoutineBrief> traits_; 
   
-  public Fabricate(I_Fabricate other) {
+  public Fabricate(I_Fabricate other) throws DependencyVersionMismatchException  {
     archiveStages_ = createImmutableMap(other.getArchiveStages());
     List<String> archiveStageOrderIn = other.getArchiveStageOrder();
     if (archiveStageOrderIn != null && archiveStageOrderIn.size() >= 1) {

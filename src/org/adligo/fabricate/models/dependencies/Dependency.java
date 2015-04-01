@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Dependency implements I_Dependency {
-  public static List<I_Dependency> convert(List<DependencyType> types, String project) {
+  public static List<I_Dependency> convert(List<DependencyType> types, String project) throws DependencyVersionMismatchException {
     List<I_Dependency> toRet = new ArrayList<I_Dependency>();
     if (types != null) {
       for (DependencyType type: types) {
@@ -29,7 +29,7 @@ public class Dependency implements I_Dependency {
   private final String type_;
   private final String version_;
   
-  public Dependency(I_Dependency other) {
+  public Dependency(I_Dependency other) throws DependencyVersionMismatchException {
     artifact_ = other.getArtifact();
     children_ = getChildren(other.getChildren());
     extract_ = other.isExtract();
@@ -39,10 +39,11 @@ public class Dependency implements I_Dependency {
     project_ = other.getProject();
     type_ = other.getType();
     version_ = other.getVersion();
+    check();
   }
   
   @SuppressWarnings("boxing")
-  public Dependency(DependencyType other, String project) {
+  public Dependency(DependencyType other, String project) throws DependencyVersionMismatchException {
     artifact_ = other.getArtifact();
     children_ = getChildren(IdeMutant.convert(other.getIde()));
     Boolean oe = other.isExtract();
@@ -64,7 +65,9 @@ public class Dependency implements I_Dependency {
       type_ = type;
     }
     version_ = other.getVersion();
+    check();
   }
+  
   
   @Override
   public boolean equals(Object o) {
@@ -143,20 +146,7 @@ public class Dependency implements I_Dependency {
   public int hashCode() {
     return DependencyMutant.hashCode(this);
   }
-  
-  private List<I_Ide> getChildren(List<I_Ide> children) {
-    List<I_Ide> toAdd = new ArrayList<I_Ide>();
-    if (children != null) {
-      for(I_Ide child: children) {
-        if (child instanceof Ide) {
-          toAdd.add((Ide) child);
-        } else {
-          toAdd.add(new Ide(child));
-        }
-      }
-    }
-    return Collections.unmodifiableList(toAdd);
-  }
+
 
   @Override
   public I_Ide get(int child) {
@@ -172,6 +162,27 @@ public class Dependency implements I_Dependency {
     return DependencyMutant.toString(this);
   }
 
-
+  private void check() throws DependencyVersionMismatchException {
+    if (fileName_ != null) {
+      if (version_ != null) {
+        if (fileName_.indexOf(version_) == -1) {
+          throw new DependencyVersionMismatchException(this);
+        }
+      }
+    }
+  }
   
+  private List<I_Ide> getChildren(List<I_Ide> children) {
+    List<I_Ide> toAdd = new ArrayList<I_Ide>();
+    if (children != null) {
+      for(I_Ide child: children) {
+        if (child instanceof Ide) {
+          toAdd.add((Ide) child);
+        } else {
+          toAdd.add(new Ide(child));
+        }
+      }
+    }
+    return Collections.unmodifiableList(toAdd);
+  }
 }

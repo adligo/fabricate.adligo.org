@@ -4,6 +4,7 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 
 public class SystemEnMessages implements I_SystemMessages {
 
+  
   private static final String ARTIFACT = "Artifact:";
  
   private static final String ARCHIVE_STAGE_X_COMPLETED_SUCCESSFULLY = "Archive stage <X/> completed successfully.";
@@ -195,6 +196,8 @@ public class SystemEnMessages implements I_SystemMessages {
       "The following command line argument is required for command <X/>;";
   private static final String THE_FOLLOWING_COMMAND_LINE_ARGUMENT_WAS_NOT_PROVIDED_FOR_COMMAND_X_USING_DEFAULT_Y =
       "The following command line argument was NOT provided for command <X/> using default '<Y/>';";
+  private static final String THE_FOLLOWING_DEPENDENCIES_VERSION_DOES_NOT_MATCH_THE_FILE_NAME = 
+      "The following dependencies version does NOT match the file name;";
 
   private static final String THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS = 
       "The following Fabricate Home should have only these jars;";
@@ -738,6 +741,12 @@ public class SystemEnMessages implements I_SystemMessages {
     return THE_FOLLOWING_COMMAND_LINE_PROGRAM_EXITED_ABNORMALLY_WITH_EXIT_CODE_X;
   }
 
+  @Override
+  public String getTheFollowingDependenciesVersionDoesNotMatchTheFileName() {
+    return THE_FOLLOWING_DEPENDENCIES_VERSION_DOES_NOT_MATCH_THE_FILE_NAME;
+  }
+
+  
   @Override
   public String getTheFollowingCommandLineArgumentIsRequiredForCommandX() {
     return THE_FOLLOWING_COMMAND_LINE_ARGUMENT_IS_REQUIRED_FOR_COMMAND_X;

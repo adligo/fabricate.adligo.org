@@ -7,6 +7,7 @@ import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.system.I_FabSystem;
 import org.adligo.fabricate.models.dependencies.Dependency;
 import org.adligo.fabricate.models.dependencies.DependencyMutant;
+import org.adligo.fabricate.models.dependencies.DependencyVersionMismatchException;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependenciesType;
@@ -51,7 +52,8 @@ public class LibraryResolver implements I_LibraryResolver {
    * @see org.adligo.fabricate.repository.I_LibraryResolver#getDependencies(java.lang.String, java.lang.String)
    */
   @Override
-  public List<I_Dependency> getDependencies(List<LibraryReferenceType> libs, String projectName) throws IllegalStateException {
+  public List<I_Dependency> getDependencies(List<LibraryReferenceType> libs, String projectName) 
+      throws IllegalStateException, DependencyVersionMismatchException  {
     List<I_Dependency> toRet = new ArrayList<I_Dependency>();
     for (LibraryReferenceType lib: libs) {
       String libName = lib.getValue();
@@ -69,7 +71,8 @@ public class LibraryResolver implements I_LibraryResolver {
    * @see org.adligo.fabricate.repository.I_LibraryResolver#getDependencies(java.lang.String, java.lang.String, java.lang.String)
    */
   @Override
-  public List<I_Dependency> getDependencies(String libName, String projectName, String platform) throws IllegalStateException {
+  public List<I_Dependency> getDependencies(String libName, String projectName, String platform) 
+      throws IllegalStateException, DependencyVersionMismatchException  {
     libs_ = new ArrayList<String>();
     deps_ = new ArrayList<I_Dependency>();
     if (platform != null) {
@@ -78,7 +81,8 @@ public class LibraryResolver implements I_LibraryResolver {
     return getDependenciesInternal(libName, projectName, platform);
   }
   
-  private List<I_Dependency> getDependenciesInternal(String libName, String projectName, String platform) throws IllegalStateException {
+  private List<I_Dependency> getDependenciesInternal(String libName, String projectName, String platform) 
+      throws IllegalStateException, DependencyVersionMismatchException {
     if (libs_.contains(libName)) {
       I_SystemMessages messages = constants_.getSystemMessages();
       throw new IllegalStateException(messages.getTheFollowingListOfFabricateLibrariesContainsACircularReference() +

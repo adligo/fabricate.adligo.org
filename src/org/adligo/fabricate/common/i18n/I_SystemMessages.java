@@ -140,6 +140,7 @@ public interface I_SystemMessages {
   public String getTheFollowingCommandLineArgumentIsRequiredForCommandX();
   public String getTheFollowingCommandLineArgumentWasNotProvidedForCommandXUsingDefaultY();
   public String getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
+  public String getTheFollowingDependenciesVersionDoesNotMatchTheFileName();
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   
   public String getTheFollowingRoutineImplementsXHoweverItsGetClassTypeMethodReturnedYClassTypesInsteadOfOne(); 

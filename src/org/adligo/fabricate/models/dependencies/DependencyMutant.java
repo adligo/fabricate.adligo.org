@@ -1,7 +1,5 @@
 package org.adligo.fabricate.models.dependencies;
 
-import org.adligo.fabricate.common.i18n.I_SystemMessages;
-import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.xml.io_v1.library_v1_0.DependencyType;
 
 import java.util.ArrayList;

@@ -79,7 +79,7 @@ else
 		exit 0
 	else 
 		OPTS=$OPTIONS_FROM_SETUP:$FABRICATE_JAR 
-		# echo OPTS=$OPTS
+		echo OPTS=$OPTS
 		# @diagram_sync on 1/26/2014 with Overview.seq
 		# main(String [] args) run Fabricate.
 		# to debug class loader issues add '-verbose:class' after $AGENTPATH

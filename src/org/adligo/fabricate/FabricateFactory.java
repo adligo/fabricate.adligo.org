@@ -13,6 +13,7 @@ import org.adligo.fabricate.managers.ProjectsManager;
 import org.adligo.fabricate.models.common.FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
+import org.adligo.fabricate.models.dependencies.DependencyVersionMismatchException;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.FabricateMutant;
@@ -50,7 +51,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FabricateFactory implements I_RepositoryFactory {
-  public Fabricate create(FabSystem sys, FabricateType fab, I_FabricateXmlDiscovery xmlDisc) throws ClassNotFoundException {
+  public Fabricate create(FabSystem sys, FabricateType fab, I_FabricateXmlDiscovery xmlDisc) 
+      throws ClassNotFoundException, DependencyVersionMismatchException  {
     FabricateMutant fm = new FabricateMutant(fab, xmlDisc);
     String fabHome = FabricateEnvironment.INSTANCE.getFabricateHome(sys);
     fm.setFabricateHome(fabHome);
@@ -104,7 +106,7 @@ public class FabricateFactory implements I_RepositoryFactory {
     return tf;
   }
   
-  public Fabricate create(I_Fabricate fab) {
+  public Fabricate create(I_Fabricate fab) throws DependencyVersionMismatchException  {
     return new Fabricate(fab);
   }
   

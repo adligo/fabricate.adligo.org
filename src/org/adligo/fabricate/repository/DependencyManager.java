@@ -370,7 +370,12 @@ public class DependencyManager implements I_DependencyManager {
     if (!files_.exists(md5OnDisk_)) {
       return false;
     }
-    
+    if (log_.isLogEnabled(DependencyManager.class)) {
+      log_.println("found dependency on disk " + dep + System.lineSeparator() +
+          pathBuilder_ + System.lineSeparator() +
+          depOnDisk_ + System.lineSeparator() +
+          md5OnDisk_);
+    }
     return true;
   }
 

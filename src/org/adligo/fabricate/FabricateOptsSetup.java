@@ -5,11 +5,13 @@ import org.adligo.fabricate.common.files.xml_io.I_FabXmlFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
+import org.adligo.fabricate.common.system.AlreadyLoggedException;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.FabSystem;
 import org.adligo.fabricate.common.system.FabSystemSetup;
 import org.adligo.fabricate.common.system.FabricateXmlDiscovery;
 import org.adligo.fabricate.common.util.StringUtils;
+import org.adligo.fabricate.models.dependencies.DependencyVersionMismatchException;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.Fabricate;
 import org.adligo.fabricate.models.fabricate.I_FabricateXmlDiscovery;
@@ -84,7 +86,14 @@ public class FabricateOptsSetup {
     try {
       FabricateType fabX =  xmlFiles_.parseFabricate_v1_0(fabricateXmlPath);
       FabSystemSetup.setup(sys_, fabX);
-      fab_ = factory_.create(sys_, fabX, fd);
+      try {
+        fab_ = factory_.create(sys_, fabX, fd);
+      } catch (DependencyVersionMismatchException x) {
+        log_.printTrace(x);
+        DependencyVersionMismatchException.logProjectError(sys_, fabricateXmlPath, x);
+        log_.println(CommandLineArgs.END);
+        return;
+      }
       
       //@diagram_sync on 1/26/2014 with Overview.seq
       if (!manageFabricateRuntimeClasspathDependencies()) {

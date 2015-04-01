@@ -1,5 +1,6 @@
 package org.adligo.fabricate.routines.implicit;
 
+import org.adligo.fabricate.common.system.AlreadyLoggedException;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.FabricationRoutineCreationException;
 import org.adligo.fabricate.models.common.I_FabricationMemory;
@@ -7,6 +8,7 @@ import org.adligo.fabricate.models.common.I_FabricationMemoryMutant;
 import org.adligo.fabricate.models.common.I_RoutineMemory;
 import org.adligo.fabricate.models.common.I_RoutineMemoryMutant;
 import org.adligo.fabricate.models.common.MemoryLock;
+import org.adligo.fabricate.models.dependencies.DependencyVersionMismatchException;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.project.Project;
 import org.adligo.fabricate.models.project.ProjectMutant;
@@ -89,7 +91,12 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
     ProjectDependenciesType pdeps =  project.getDependencies();
     if (pdeps != null) {
       List<LibraryReferenceType> libs  = pdeps.getLibrary();
-      libDeps = resolver.getDependencies(libs, projectName);
+      try {
+        libDeps = resolver.getDependencies(libs, projectName);
+      } catch (DependencyVersionMismatchException x) {
+        DependencyVersionMismatchException.logProjectError(system_, projectFile, x);
+        throw new AlreadyLoggedException(x);
+      }
     }
     try {
       ProjectMutant pm = new ProjectMutant(projectDir, brief_, project);
@@ -113,8 +120,13 @@ public class LoadProjectTask extends ProjectBriefAwareRoutine {
         }
         log_.println(sb.toString());
       }
-      Project p = new Project(pm);
-      projects_.add(p);
+      try {
+        Project p = new Project(pm);
+        projects_.add(p);
+      } catch (DependencyVersionMismatchException x) {
+        DependencyVersionMismatchException.logProjectError(system_, projectFile, x);
+        throw new AlreadyLoggedException(x);
+      }
     } catch (ClassNotFoundException e) {
       //pass to run monitor
       throw new RuntimeException(e);

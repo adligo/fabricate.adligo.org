@@ -7,6 +7,7 @@ import org.adligo.fabricate.common.log.FabLog;
 import org.adligo.fabricate.common.log.I_FabLog;
 import org.adligo.fabricate.common.system.CommandLineArgs;
 import org.adligo.fabricate.common.system.I_FabSystem;
+import org.adligo.fabricate.models.dependencies.DependencyLogger;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.fabricate.I_Fabricate;
 
@@ -126,45 +127,9 @@ public class RepositoryManager implements I_RepositoryManager {
    
     sb.append(messages.getThereWasAProblemVerifyingOrDownloadingTheFollowingDependency());
     sb.append(sys_.lineSeparator());
-    String artifact = dep.getArtifact();
-    if (artifact == null) {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getArtifactColon(), artifact));
-    } else {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getArtifactColon(), "'", artifact, "'"));
-    }
-    sb.append(sys_.lineSeparator());
+    DependencyLogger logger = new DependencyLogger(sys_);
+    logger.addDependencyLogMessage(dep, sb);
     
-    
-    String file = dep.getFileName();
-    if (file == null) {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getFileNameColon(), file));
-    } else {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getFileNameColon(), "'", file, "'"));
-    }
-    sb.append(sys_.lineSeparator());
-    
-    String group = dep.getGroup();
-    if (group == null) {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getGroupColon(), group));
-    } else {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getGroupColon(), "'", group, "'"));
-    }
-    sb.append(sys_.lineSeparator());
-    
-    String type = dep.getType();
-    if (type == null) {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getTypeColon(), type));
-    } else {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getTypeColon(), "'", type, "'"));
-    }
-    sb.append(sys_.lineSeparator());
-    
-    String version = dep.getVersion();
-    if (version == null) {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getVersionColon(), version));
-    } else {
-      sb.append(FabLog.orderLine(constants.isLeftToRight(), "\t", messages.getVersionColon(), "'", version, "'"));
-    }
     sb.append(sys_.lineSeparator());
     sb.append(messages.getForSemicolon());
     sb.append(sys_.lineSeparator());
@@ -181,6 +146,7 @@ public class RepositoryManager implements I_RepositoryManager {
     log.printTrace(x);
     log.println(sb.toString());
   }
+
   
   /* (non-Javadoc)
    * @see org.adligo.fabricate.repository.I_RepositoryManager#manageDependencies()

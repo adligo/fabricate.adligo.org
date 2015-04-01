@@ -306,7 +306,7 @@ public class CompileSourceTask extends ProjectAwareRoutine implements I_Platform
             add = true;
           }
           if (add) {
-            String jarFilePath = repositoryPathBuilder_.getArtifactPath(new Dependency(dep));
+            String jarFilePath = repositoryPathBuilder_.getArtifactPath(dep);
             first = addJar(sb, first, jarFilePath);
             count++;
           }

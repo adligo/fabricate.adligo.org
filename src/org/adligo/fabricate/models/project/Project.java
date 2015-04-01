@@ -8,6 +8,7 @@ import org.adligo.fabricate.models.common.Parameter;
 import org.adligo.fabricate.models.common.RoutineBrief;
 import org.adligo.fabricate.models.common.RoutineBriefOrigin;
 import org.adligo.fabricate.models.dependencies.Dependency;
+import org.adligo.fabricate.models.dependencies.DependencyVersionMismatchException;
 import org.adligo.fabricate.models.dependencies.I_Dependency;
 import org.adligo.fabricate.models.dependencies.I_LibraryDependency;
 import org.adligo.fabricate.models.dependencies.I_ProjectDependency;
@@ -51,7 +52,7 @@ public class Project implements I_Project {
    */
   private final Map<String, I_RoutineBrief> traits_;
   
-  public Project(I_Project project) {
+  public Project(I_Project project) throws DependencyVersionMismatchException {
     dir_ = project.getDir();
     name_ = project.getName();
     version_ = project.getVersion();
@@ -202,7 +203,7 @@ public class Project implements I_Project {
     return ProjectMutant.toString(this);
   }
   
-  private List<I_Dependency> copyDependencies(List<I_Dependency> dependencies) {
+  private List<I_Dependency> copyDependencies(List<I_Dependency> dependencies) throws DependencyVersionMismatchException  {
     List<I_Dependency> copy = new ArrayList<I_Dependency>();
     if (dependencies == null || dependencies.size() == 0) {
       return Collections.emptyList();
