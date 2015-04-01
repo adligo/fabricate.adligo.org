@@ -458,7 +458,18 @@ public class FabFileIO implements I_FabFileIO {
 
   @Override
   public String getAbsolutePath(String filePath) {
-    return new File(filePath).getAbsolutePath();
+    File file = new File(filePath);
+    String ret = file.getAbsolutePath();
+    
+    if (ret.charAt(ret.length() - 1) == '.'){
+      ret = ret.substring(0, ret.length() -1);
+    }
+    if (file.isDirectory()) {
+      if ( !File.separator.equals(new String(new char [] {ret.charAt(ret.length() - 1)}))){
+        ret = ret +  File.separator;
+      }
+    }
+    return ret;
   }
 
   public void deleteRecursive(String path) throws IOException

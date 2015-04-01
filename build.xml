@@ -83,7 +83,9 @@
 		
 		<replace file="build/${fabricate_name}/${fabricate_name}/bin/fab" 
   	  		        token="@FABRICATE_NAME@" value="${fabricate_name}"/>
-  	  	<chmod dir="build/${fabricate_name}/${fabricate_name}/bin" perm="ugo+rx" 
+		<replace file="build/${fabricate_name}/${fabricate_name}/bin/fab.bat" 
+		  	  		        token="@FABRICATE_NAME@" value="${fabricate_name}"/>
+		<chmod dir="build/${fabricate_name}/${fabricate_name}/bin" perm="ugo+rx" 
        		includes="fab"/>
   	  	
 		<tar destfile="build/${fabricate_name}.tar.gz" basedir="build/${fabricate_name}" 

@@ -53,7 +53,7 @@ public class GitUpdateRoutine extends ScmContextInputAwareRoutine {
         String projectsDir = fabricate_.getProjectsDir();
         String projectDir = projectsDir +  projectName;
         try {
-          String desc = gitCalls_.describe(projectDir);
+          String desc = gitCalls_.describeVersion(projectDir);
           if ( !"snapshot".equals(desc)) {
             //its on a tag, so revert to the master before update
             //note i noticed that some projects use trunk log4j for instance.

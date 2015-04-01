@@ -42,7 +42,7 @@ public interface I_GitCalls {
    * @return
    * @throws IOException
    */
-  public String describe() throws IOException;
+  public String describeVersion() throws IOException;
   /**
    * This runs 'git describe' in the directory passed in and
    * returns the version of the project or 'snapshot' if the call
@@ -52,7 +52,7 @@ public interface I_GitCalls {
    * @return
    * @throws IOException
    */
-  public String describe(String where) throws IOException;
+  public String describeVersion(String where) throws IOException;
 
   public String getHostname();
   public int getPort();

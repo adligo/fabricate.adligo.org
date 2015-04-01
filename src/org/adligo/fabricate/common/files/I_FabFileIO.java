@@ -94,7 +94,10 @@ public interface I_FabFileIO {
    * 
    * @param filePath
    * @return new File(String filePath).getAbsolutePath()
-   * the system dependent path.
+   * the system dependent path. This method also pulls off
+   * the . for files created with ".", and may add a 
+   * directory slash if the file is a directory and doesn't end 
+   * with a slash.
    */
   public String getAbsolutePath(String filePath);
   

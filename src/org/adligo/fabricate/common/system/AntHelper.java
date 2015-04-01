@@ -50,7 +50,7 @@ public class AntHelper {
     }
     try {
       
-      String desc = calls.describe();
+      String desc = calls.describeVersion();
       fos = files_.newFileOutputStream(dir + files_.getNameSeparator() + "version.properties");
       fos.write(new String("fabricate_name=fabricate_" + desc + 
           sys.lineSeparator()).getBytes("UTF-8"));

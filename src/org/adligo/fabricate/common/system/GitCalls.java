@@ -8,6 +8,7 @@ import org.adligo.fabricate.common.util.StringUtils;
 import org.adligo.fabricate.models.common.FabricationMemoryConstants;
 import org.adligo.fabricate.models.common.I_ExecutionEnvironment;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -175,19 +176,35 @@ public class GitCalls implements I_GitCalls {
    * @see org.adligo.fabricate.common.system.I_GitCalls#describe()
    */
   @Override
-  public String describe() throws IOException {
-    return describe(".");
+  public String describeVersion() throws IOException {
+    return describeVersion(".");
   }
   
   /* (non-Javadoc)
    * @see org.adligo.fabricate.common.system.I_GitCalls#describe(java.lang.String)
    */
   @Override
-  public String describe(String where) throws IOException {
+  public String describeVersion(String where) throws IOException {
     
+    String absPath = files_.getAbsolutePath(where);
+    
+    String head = files_.readFile(absPath + ".git" + files_.getNameSeparator() + "HEAD");
+    if (StringUtils.isEmpty(head)) {
+      return "snapshot";
+    }
+    head = head.trim();
+    char [] chars = head.toCharArray();
+    for (int i = 0; i < chars.length; i++) {
+      char c = chars[i];
+      if (c == ' ' || c == ':' || c == '/') {
+        //.git/HEAD contains something like 'ref: refs/heads/master'
+        //also note / is used on windows and linux.
+        return "snapshot";
+      }
+    }
     I_Executor exe = sys_.getExecutor();
     I_ExecutionResult er = exe.executeProcess(FabricationMemoryConstants.EMPTY_ENV,
-        where, "git", "describe");
+        where, "git", "describe", "--exact-match", head);
     String result = er.getOutput();
     if (StringUtils.isEmpty(result)) {
       return "snapshot";
