@@ -33,6 +33,11 @@ public interface I_Fabricate extends I_JavaSettings, I_AttributesContainer {
   public String getFabricateVersion();
   public String getFabricateXmlRunDir();
   
+  /**
+   * This is a system dependent path 
+   * which should contain the last slash.
+   * @return
+   */
   public String getFabricateRepository();
   
   public I_RoutineBrief getFacet(String name);

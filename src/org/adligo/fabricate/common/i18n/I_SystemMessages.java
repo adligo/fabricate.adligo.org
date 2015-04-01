@@ -136,6 +136,9 @@ public interface I_SystemMessages {
   
   public String getTheFollowingListOfFabricateLibrariesContainsACircularReference();
   public String getTheFollowingLocalRepositoryIsLockedByAnotherProcess();
+  
+  public String getTheFollowingCommandLineArgumentIsRequiredForCommandX();
+  public String getTheFollowingCommandLineArgumentWasNotProvidedForCommandXUsingDefaultY();
   public String getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX();
   public String getTheFollowingRemoteRepositoryAppearsToBeDown();
   

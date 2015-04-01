@@ -191,7 +191,11 @@ public class SystemEnMessages implements I_SystemMessages {
       "The download from the following url;";
   private static final String THE_FOLLOWING_ARTIFACT = "The following artifact;";
   
-  
+  private static final String THE_FOLLOWING_COMMAND_LINE_ARGUMENT_IS_REQUIRED_FOR_COMMAND_X = 
+      "The following command line argument is required for command <X/>;";
+  private static final String THE_FOLLOWING_COMMAND_LINE_ARGUMENT_WAS_NOT_PROVIDED_FOR_COMMAND_X_USING_DEFAULT_Y =
+      "The following command line argument was NOT provided for command <X/> using default '<Y/>';";
+
   private static final String THE_FOLLOWING_FABRICATE_HOME_SHOULD_HAVE_ONLY_THESE_JARS = 
       "The following Fabricate Home should have only these jars;";
   private static final String THE_FOLLOWING_FABRICATE_LIBRARY_CAN_NOT_BE_FOUND = 
@@ -732,6 +736,16 @@ public class SystemEnMessages implements I_SystemMessages {
   @Override
   public String getTheFollowingCommandLineProgramExitedAbnormallyWithExitCodeX() {
     return THE_FOLLOWING_COMMAND_LINE_PROGRAM_EXITED_ABNORMALLY_WITH_EXIT_CODE_X;
+  }
+
+  @Override
+  public String getTheFollowingCommandLineArgumentIsRequiredForCommandX() {
+    return THE_FOLLOWING_COMMAND_LINE_ARGUMENT_IS_REQUIRED_FOR_COMMAND_X;
+  }
+
+  @Override
+  public String getTheFollowingCommandLineArgumentWasNotProvidedForCommandXUsingDefaultY() {
+    return THE_FOLLOWING_COMMAND_LINE_ARGUMENT_WAS_NOT_PROVIDED_FOR_COMMAND_X_USING_DEFAULT_Y;
   }
   
   @Override

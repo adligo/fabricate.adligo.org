@@ -1,5 +1,6 @@
 package org.adligo.fabricate.common.system;
 
+import org.adligo.fabricate.common.files.I_FabFileIO;
 import org.adligo.fabricate.common.i18n.I_FabricateConstants;
 import org.adligo.fabricate.common.i18n.I_SystemMessages;
 import org.adligo.fabricate.common.log.I_FabLog;
@@ -78,6 +79,12 @@ public class FabricateEnvironment {
     String repo = sys.getenv(FabricateEnvironment.FABRICATE_REPOSITORY);
     if (StringUtils.isEmpty(repo)) {
       repo = FabricateDefaults.LOCAL_REPOSITORY;
+    }
+    String lastChar = new String(new char[] {repo.charAt(repo.length() -1)});
+    I_FabFileIO files = sys.getFileIO();
+    String ns = files.getNameSeparator();
+    if (!lastChar.equals(ns)) {
+      repo = repo + ns;
     }
     return repo;
   }
