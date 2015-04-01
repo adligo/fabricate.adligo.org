@@ -12,7 +12,8 @@ SETLOCAL enabledelayedexpansion
 IF "%FABRICATE_HOME%" ==  "" ( 
 	@ECHO "Fabricate requires the FABRICATE_HOME environment variable to be set."
 ) ELSE (
-	
+
+	IF NOT EXIST %FABRICATE_HOME% GOTO HOME_NOT_THERE
 	SET CLASSPATH=%FABRICATE_HOME%/lib/commons-logging-1.2.jar;
 	SET CLASSPATH=!CLASSPATH!%FABRICATE_HOME%/lib/httpcore-4.3.2.jar;
 	SET CLASSPATH=!CLASSPATH!%FABRICATE_HOME%/lib/httpclient-4.3.5.jar;
@@ -58,5 +59,9 @@ IF "%FABRICATE_HOME%" ==  "" (
 	REM main(String [] args) run Fabricate.
 	java !OPTS! org.adligo.fabricate.FabricateController !ARGS_FROM_SETUP! 
 )
+GOTO END
+:HOME_NOT_THERE
+@ECHO FABRICATE_HOME %FABRICATE_HOME%
+@ECHO does not exit.
 :END
 ENDLOCAL
